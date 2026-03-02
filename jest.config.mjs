@@ -12,7 +12,9 @@ const customJestConfig = {
   setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
   collectCoverageFrom: [
     '<rootDir>/src/**/*.{ts,tsx}',
-    '!<rootDir>/src/**/*.d.ts',
+    '!**/*.d.ts',
+    '!**/*.stories.*',
+    '!**/*.config.*',
     '!**/.DS_Store',
   ],
   coverageThreshold: {
