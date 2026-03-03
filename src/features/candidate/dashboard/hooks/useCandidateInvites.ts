@@ -16,12 +16,20 @@ type UseCandidateInvitesResult = {
 };
 
 export function useCandidateInvites(
-  authToken: string | null,
+  onAuthRequired?: () => void,
 ): UseCandidateInvitesResult {
   const fetchInvites = useCallback(async () => {
-    if (!authToken) return [];
-    return listCandidateInvites(authToken);
-  }, [authToken]);
+    try {
+      return await listCandidateInvites();
+    } catch (err) {
+      const status = (err as { status?: number })?.status;
+      if (status === 401 || status === 403) {
+        onAuthRequired?.();
+        return [];
+      }
+      throw err;
+    }
+  }, [onAuthRequired]);
 
   const { data, loading, error, load, setError } = useAsyncLoader<
     CandidateInvite[]

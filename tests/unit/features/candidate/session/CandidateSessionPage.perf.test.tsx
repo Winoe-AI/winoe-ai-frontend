@@ -181,7 +181,6 @@ describe('CandidateSessionPage handlers and perf', () => {
     expect(result).toEqual({ runId: 'run-123' });
     expect(startTestRunMock).toHaveBeenCalledWith({
       taskId: 1,
-      token: 'auth-token',
       candidateSessionId: 99,
     });
   });
@@ -204,7 +203,6 @@ describe('CandidateSessionPage handlers and perf', () => {
     expect(pollTestRunMock).toHaveBeenCalledWith({
       taskId: 1,
       runId: 'run-456',
-      token: 'auth-token',
       candidateSessionId: 99,
     });
   });
@@ -236,17 +234,7 @@ describe('CandidateSessionPage handlers and perf', () => {
       ...baseState(),
       state: {
         ...baseState().state,
-        token: null,
-        taskState: {
-          ...baseState().state.taskState,
-          currentTask: {
-            id: 1,
-            dayIndex: 2,
-            type: 'code',
-            title: 'Code Day',
-            description: '',
-          },
-        },
+        candidateSessionId: null,
       },
     });
 
@@ -254,12 +242,7 @@ describe('CandidateSessionPage handlers and perf', () => {
       render(<CandidateSessionPage token="inv" />);
     });
 
-    // With no token, goes to auth view
-    await waitFor(() =>
-      expect(screen.getByTestId('state-message')).toHaveTextContent(
-        'Sign in to continue',
-      ),
-    );
+    expect(screen.queryByTestId('run-tests-panel')).not.toBeInTheDocument();
   });
 });
 

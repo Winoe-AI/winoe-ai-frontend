@@ -10,7 +10,6 @@ import {
 import type { Task, SubmitPayload } from '../task/types';
 
 type Deps = {
-  token: string | null;
   candidateSessionId: number | null;
   currentTask: Task | null;
   clearTaskError: () => void;
@@ -21,7 +20,6 @@ type Deps = {
 };
 
 export function useTaskSubmitHandler({
-  token,
   candidateSessionId,
   currentTask,
   clearTaskError,
@@ -33,7 +31,7 @@ export function useTaskSubmitHandler({
   const { notify } = useNotifications();
 
   const handleSubmit = async (payload: SubmitPayload) => {
-    if (!token || !candidateSessionId || !currentTask) return;
+    if (!candidateSessionId || !currentTask) return;
 
     const type = String(currentTask.type);
     const wantsText = isTextTask(type);
@@ -54,7 +52,6 @@ export function useTaskSubmitHandler({
     try {
       const resp = await submitCandidateTask({
         taskId: currentTask.id,
-        token,
         candidateSessionId,
         contentText: isGithubNative ? undefined : payload.contentText,
       });

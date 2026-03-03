@@ -462,7 +462,7 @@ describe('httpClient branch coverage', () => {
   });
 
   describe('auth token handling', () => {
-    it('uses provided authToken from clientOptions', async () => {
+    it('does not attach auth header even with authToken option', async () => {
       (global.fetch as jest.Mock).mockResolvedValueOnce(
         responseHelpers.jsonResponse({ ok: true }) as unknown as Response,
       );
@@ -475,7 +475,7 @@ describe('httpClient branch coverage', () => {
 
       expect(
         (global.fetch as jest.Mock).mock.calls[0][1].headers.Authorization,
-      ).toBe('Bearer custom-token');
+      ).toBeUndefined();
     });
 
     it('respects null authToken to skip auth', async () => {

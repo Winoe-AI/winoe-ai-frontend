@@ -7,7 +7,6 @@ import {
   getCandidateCurrentTask,
   resolveCandidateInviteToken,
 } from '@/features/candidate/api';
-import { jsonResponse } from '../../setup/responseHelpers';
 
 jest.mock('@/features/candidate/api', () => {
   const actual = jest.requireActual('@/features/candidate/api');
@@ -79,9 +78,6 @@ describe('CandidateSessionPage', () => {
       },
     });
 
-    fetchMock.mockResolvedValueOnce(
-      jsonResponse({ accessToken: 'candidate-token' }) as Response,
-    );
     renderWithProvider(<CandidateSessionPage token="VALID_TOKEN" />);
 
     expect(
@@ -104,13 +100,11 @@ describe('CandidateSessionPage', () => {
     expect(await screen.findByText(/Role:\s*Backend/i)).toBeInTheDocument();
     const dayTitles = await screen.findAllByText('Day 1 — Architecture');
     expect(dayTitles.length).toBeGreaterThan(0);
-    expect(currentTaskMock).toHaveBeenCalledWith(123, 'candidate-token');
+    expect(currentTaskMock).toHaveBeenCalledWith(123);
   });
 
-  it('redirects to login when access token is missing', async () => {
-    fetchMock.mockResolvedValueOnce(
-      jsonResponse({ message: 'Not authenticated' }, 401) as Response,
-    );
+  it('redirects to login when invite bootstrap returns 401', async () => {
+    resolveMock.mockRejectedValueOnce({ status: 401 });
     renderWithProvider(<CandidateSessionPage token="VALID_TOKEN" />);
 
     await waitFor(() =>
@@ -120,10 +114,7 @@ describe('CandidateSessionPage', () => {
     );
   });
 
-  it('returns to auth state when the access token is rejected', async () => {
-    fetchMock.mockResolvedValueOnce(
-      jsonResponse({ accessToken: 'candidate-token' }) as Response,
-    );
+  it('returns to auth state when invite bootstrap is rejected', async () => {
     resolveMock.mockRejectedValueOnce({ status: 401 });
 
     renderWithProvider(<CandidateSessionPage token="VALID_TOKEN" />);

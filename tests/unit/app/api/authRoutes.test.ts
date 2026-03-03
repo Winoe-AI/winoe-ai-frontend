@@ -24,49 +24,52 @@ jest.mock('@/lib/server/bff', () => ({
 }));
 
 describe('auth-related API routes', () => {
+  const originalNodeEnv = process.env.NODE_ENV;
+  const originalVercelEnv = process.env.VERCEL_ENV;
+
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  it('auth/access-token returns token on success', async () => {
-    requireBffAuthMock.mockResolvedValue({
-      ok: true,
-      accessToken: 'tok',
-      cookies: [],
-    });
-    const { GET } = await import('@/app/api/auth/access-token/route');
-    const res = await GET(
-      new MockNextRequest('http://localhost/api/auth/access-token'),
-    );
-    expect(res.status).toBe(200);
+  afterEach(() => {
+    process.env.NODE_ENV = originalNodeEnv;
+    if (originalVercelEnv === undefined) {
+      delete process.env.VERCEL_ENV;
+    } else {
+      process.env.VERCEL_ENV = originalVercelEnv;
+    }
   });
 
-  it('auth/access-token bubbles auth failure', async () => {
-    const fail = MockNextResponse.json({ message: 'nope' }, { status: 401 });
-    requireBffAuthMock.mockResolvedValue({
-      ok: false,
-      response: fail,
-      cookies: [],
-    });
+  it('auth/access-token returns 410 in local development', async () => {
+    process.env.NODE_ENV = 'development';
+    delete process.env.VERCEL_ENV;
     const { GET } = await import('@/app/api/auth/access-token/route');
-    const res = await GET(
-      new MockNextRequest('http://localhost/api/auth/access-token'),
-    );
-    expect(res.status).toBe(401);
-    expect(mergeResponseCookiesMock).toHaveBeenCalled();
+    const res = await GET();
+    expect(res.status).toBe(410);
+    expect(await res.json()).toEqual({
+      message: 'This endpoint has been disabled.',
+    });
   });
 
-  it('dev/access-token mirrors auth flow', async () => {
-    requireBffAuthMock.mockResolvedValue({
-      ok: true,
-      accessToken: 'dev',
-      cookies: [],
+  it('auth/access-token returns 404 in preview/prod', async () => {
+    process.env.VERCEL_ENV = 'preview';
+    const { GET } = await import('@/app/api/auth/access-token/route');
+    const res = await GET();
+    expect(res.status).toBe(404);
+    expect(await res.json()).toEqual({
+      message: 'Not found',
     });
+  });
+
+  it('dev/access-token returns 410 in local development', async () => {
+    process.env.NODE_ENV = 'development';
+    delete process.env.VERCEL_ENV;
     const { GET } = await import('@/app/api/dev/access-token/route');
-    const res = await GET(
-      new MockNextRequest('http://localhost/api/dev/access-token'),
-    );
-    expect(res.status).toBe(200);
+    const res = await GET();
+    expect(res.status).toBe(410);
+    expect(await res.json()).toEqual({
+      message: 'This endpoint has been disabled.',
+    });
   });
 
   it('auth/me forwards profile request with request id', async () => {

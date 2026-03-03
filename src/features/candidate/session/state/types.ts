@@ -34,7 +34,6 @@ export type TaskState = {
 
 export type CandidateSessionState = {
   inviteToken: string | null;
-  token: string | null;
   candidateSessionId: number | null;
   bootstrap: CandidateBootstrap | null;
   started: boolean;
@@ -45,7 +44,6 @@ export type CandidateSessionState = {
 
 export type Action =
   | { type: 'SET_INVITE_TOKEN'; inviteToken: string }
-  | { type: 'SET_TOKEN'; token: string | null }
   | { type: 'SET_CANDIDATE_SESSION_ID'; candidateSessionId: number | null }
   | { type: 'SET_BOOTSTRAP'; bootstrap: CandidateBootstrap }
   | { type: 'SET_STARTED'; started: boolean }
@@ -69,12 +67,10 @@ export type Action =
 export type Ctx = {
   state: CandidateSessionState;
   setInviteToken: (token: string) => void;
-  setToken: (token: string | null) => void;
   setCandidateSessionId: (id: number | null) => void;
   setBootstrap: (b: CandidateBootstrap) => void;
   setStarted: (started: boolean) => void;
   reset: () => void;
-  loadAccessToken: () => Promise<string | null>;
   setTaskLoading: () => void;
   setTaskLoaded: (p: {
     isComplete: boolean;
@@ -86,7 +82,6 @@ export type Ctx = {
 };
 
 export type PersistedState = {
-  inviteToken: string | null;
   candidateSessionId: number | null;
   bootstrap: CandidateBootstrap | null;
   started: boolean;

@@ -16,7 +16,6 @@ const submitMock = jest.requireMock('@/features/candidate/api')
   .submitCandidateTask as jest.Mock;
 
 function Harness({
-  token,
   candidateSessionId,
   currentTask,
   setTaskError,
@@ -24,7 +23,6 @@ function Harness({
   refreshTask,
   payload = { contentText: 'answer' },
 }: {
-  token: string | null;
   candidateSessionId: number | null;
   currentTask: Task | null;
   setTaskError: jest.Mock;
@@ -33,7 +31,6 @@ function Harness({
   payload?: { contentText?: string };
 }) {
   const { submitting, handleSubmit } = useTaskSubmission({
-    token,
     candidateSessionId,
     currentTask,
     clearTaskError,
@@ -61,7 +58,6 @@ describe('useTaskSubmission', () => {
 
     render(
       <Harness
-        token="auth"
         candidateSessionId={5}
         currentTask={{
           id: 1,
@@ -95,7 +91,6 @@ describe('useTaskSubmission', () => {
 
     render(
       <Harness
-        token="auth"
         candidateSessionId={5}
         currentTask={{
           id: 1,
@@ -116,7 +111,6 @@ describe('useTaskSubmission', () => {
 
     expect(submitMock).toHaveBeenCalledWith({
       taskId: 1,
-      token: 'auth',
       candidateSessionId: 5,
       contentText: 'answer',
     });
@@ -136,7 +130,6 @@ describe('useTaskSubmission', () => {
 
     render(
       <Harness
-        token="auth"
         candidateSessionId={12}
         currentTask={{
           id: 12,
@@ -159,7 +152,6 @@ describe('useTaskSubmission', () => {
     expect(setTaskError).not.toHaveBeenCalled();
     expect(submitMock).toHaveBeenCalledWith({
       taskId: 12,
-      token: 'auth',
       candidateSessionId: 12,
       contentText: undefined,
     });

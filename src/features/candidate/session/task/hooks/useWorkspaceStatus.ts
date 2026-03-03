@@ -8,14 +8,9 @@ import { createWorkspaceStatusLoader } from '../utils/createWorkspaceStatusLoade
 type Params = {
   taskId: number;
   candidateSessionId: number;
-  token: string | null;
 };
 
-export function useWorkspaceStatus({
-  taskId,
-  candidateSessionId,
-  token,
-}: Params) {
+export function useWorkspaceStatus({ taskId, candidateSessionId }: Params) {
   const { notify } = useNotifications();
   const [workspace, setWorkspace] = useState<CandidateWorkspaceStatus | null>(
     null,
@@ -31,12 +26,11 @@ export function useWorkspaceStatus({
     const run = createWorkspaceStatusLoader({
       taskId,
       candidateSessionId,
-      token,
       modeRef,
       initAttemptedRef,
     });
     return run();
-  }, [candidateSessionId, taskId, token]);
+  }, [candidateSessionId, taskId]);
 
   const { load, abort } = useAsyncLoader(loader, {
     immediate: false,

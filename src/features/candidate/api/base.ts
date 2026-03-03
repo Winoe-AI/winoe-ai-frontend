@@ -1,25 +1,10 @@
 import type { ApiClientOptions } from '@/lib/api/client';
-import { HttpError } from '@/lib/api/errors/errors';
 import { throwMappedApiError } from '@/lib/api/errors/errorMapping';
 
-const RAW_API_BASE =
-  process.env.NEXT_PUBLIC_TENON_API_BASE_URL ?? '/api/backend';
-const API_BASE = RAW_API_BASE === '/api' ? '/api/backend' : RAW_API_BASE;
-
 export const candidateClientOptions: ApiClientOptions = {
-  basePath: API_BASE || '/api/backend',
+  basePath: '/api/backend',
   skipAuth: false,
 };
-
-export function withCandidateAuth(authToken: string): ApiClientOptions {
-  return { ...candidateClientOptions, authToken };
-}
-
-export function ensureAuthToken(authToken: string | null | undefined) {
-  if (!authToken || !authToken.trim()) {
-    throw new HttpError(401, 'Not authenticated. Please sign in again.');
-  }
-}
 
 export function mapCandidateApiError(error: unknown, fallback: string): never {
   throwMappedApiError(error, fallback, 'candidate');

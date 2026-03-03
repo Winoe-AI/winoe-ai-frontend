@@ -6,7 +6,6 @@ import type { PollResult } from '../task/hooks/runTestsTypes';
 type Props = {
   task: CandidateTask;
   candidateSessionId: number;
-  authToken: string | null;
   onStartTests: () => Promise<{ runId: string }>;
   onPollTests: (runId: string) => Promise<PollResult>;
 };
@@ -14,7 +13,6 @@ type Props = {
 export function WorkspaceAndTests({
   task,
   candidateSessionId,
-  authToken,
   onStartTests,
   onPollTests,
 }: Props) {
@@ -23,7 +21,6 @@ export function WorkspaceAndTests({
       <WorkspacePanel
         taskId={task.id}
         candidateSessionId={candidateSessionId}
-        token={authToken}
         dayIndex={task.dayIndex}
       />
       <RunTestsPanel

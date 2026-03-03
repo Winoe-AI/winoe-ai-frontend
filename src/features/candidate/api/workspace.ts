@@ -1,9 +1,8 @@
 import { requestWithMeta } from '@/lib/api/client/request';
 import { HttpError } from '@/lib/api/errors/errors';
 import {
-  ensureAuthToken,
+  candidateClientOptions,
   mapCandidateApiError,
-  withCandidateAuth,
   toStringOrNull,
 } from './base';
 import type { CandidateWorkspaceStatus } from './types';
@@ -30,11 +29,9 @@ function normalizeWorkspaceStatus(data: unknown): CandidateWorkspaceStatus {
 
 export async function initCandidateWorkspace(params: {
   taskId: number;
-  token: string;
   candidateSessionId: number;
 }): Promise<CandidateWorkspaceStatus> {
-  const { taskId, token, candidateSessionId } = params;
-  ensureAuthToken(token);
+  const { taskId, candidateSessionId } = params;
   const path = `/tasks/${taskId}/codespace/init`;
 
   try {
@@ -46,7 +43,7 @@ export async function initCandidateWorkspace(params: {
         headers: { 'x-candidate-session-id': String(candidateSessionId) },
         cache: 'no-store',
       },
-      withCandidateAuth(token),
+      candidateClientOptions,
     );
     return normalizeWorkspaceStatus(data);
   } catch (err) {
@@ -62,11 +59,9 @@ export async function initCandidateWorkspace(params: {
 
 export async function getCandidateWorkspaceStatus(params: {
   taskId: number;
-  token: string;
   candidateSessionId: number;
 }): Promise<CandidateWorkspaceStatus> {
-  const { taskId, token, candidateSessionId } = params;
-  ensureAuthToken(token);
+  const { taskId, candidateSessionId } = params;
   const path = `/tasks/${taskId}/codespace/status`;
 
   try {
@@ -76,7 +71,7 @@ export async function getCandidateWorkspaceStatus(params: {
         headers: { 'x-candidate-session-id': String(candidateSessionId) },
         cache: 'no-store',
       },
-      withCandidateAuth(token),
+      candidateClientOptions,
     );
     return normalizeWorkspaceStatus(data);
   } catch (err) {

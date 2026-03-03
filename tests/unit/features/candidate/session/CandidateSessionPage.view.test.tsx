@@ -332,18 +332,19 @@ describe('CandidateSessionPage view rendering', () => {
   });
 
   it('redirects unauthenticated users to login', async () => {
+    resolveInviteMock.mockRejectedValue({ status: 401 });
     useCandidateSessionMock.mockReturnValue(
       buildState({
         state: {
           ...baseState().state,
-          authStatus: 'unauthenticated',
+          authStatus: 'ready',
         },
       }),
     );
 
     render(<CandidateSessionPage token="inv" />);
     await waitFor(() => expect(buildLoginHrefMock).toHaveBeenCalled());
-    expect(routerMock.replace).toHaveBeenCalled();
+    await waitFor(() => expect(routerMock.replace).toHaveBeenCalled());
   });
 
   it('navigates to candidate dashboard from start view back button', async () => {
@@ -437,7 +438,6 @@ describe('CandidateSessionPage view rendering', () => {
     await waitFor(() =>
       expect(getCurrentTaskMock).toHaveBeenCalledWith(
         99,
-        'auth-token',
         expect.objectContaining({ skipCache: true }),
       ),
     );

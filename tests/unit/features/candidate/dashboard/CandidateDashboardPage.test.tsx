@@ -294,18 +294,18 @@ describe('CandidateDashboardPage', () => {
     });
   });
 
-  it('redirects to login when unauthenticated', async () => {
+  it('redirects to login when invite fetch returns 401', async () => {
     useCandidateSessionMock.mockReturnValue({
       state: {
-        token: null,
-        authStatus: 'unauthenticated',
+        token: 'access-token',
+        authStatus: 'authenticated',
         candidateSessionId: null,
         inviteToken: null,
       },
       loadAccessToken: jest.fn(),
     });
 
-    listCandidateInvitesMock.mockResolvedValue([]);
+    listCandidateInvitesMock.mockRejectedValue({ status: 401 });
 
     await act(async () => {
       render(<CandidateDashboardPage />);
@@ -314,27 +314,6 @@ describe('CandidateDashboardPage', () => {
     await waitFor(() => {
       expect(useRouterMock.replace).toHaveBeenCalled();
     });
-  });
-
-  it('loads access token when idle', async () => {
-    const loadAccessTokenMock = jest.fn();
-    useCandidateSessionMock.mockReturnValue({
-      state: {
-        token: null,
-        authStatus: 'idle',
-        candidateSessionId: null,
-        inviteToken: null,
-      },
-      loadAccessToken: loadAccessTokenMock,
-    });
-
-    listCandidateInvitesMock.mockResolvedValue([]);
-
-    await act(async () => {
-      render(<CandidateDashboardPage />);
-    });
-
-    expect(loadAccessTokenMock).toHaveBeenCalled();
   });
 
   it('uses fallback token for matching session', async () => {

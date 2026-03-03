@@ -43,7 +43,7 @@ export function useCandidateSessionActions({
     setView,
   });
   useAuthRedirect({
-    authStatus: session.state.authStatus,
+    shouldRedirect: view === 'auth',
     token,
     loginHref: inviteActions.loginHref,
   });

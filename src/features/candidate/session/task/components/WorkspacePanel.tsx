@@ -7,14 +7,13 @@ import { WorkspacePanelBody } from './WorkspacePanelBody';
 type WorkspacePanelProps = {
   taskId: number;
   candidateSessionId: number;
-  token: string | null;
   dayIndex: number;
 };
 
 export function WorkspacePanel(props: WorkspacePanelProps) {
-  const { dayIndex } = props;
+  const { dayIndex, taskId, candidateSessionId } = props;
   const { workspace, loading, refreshing, error, notice, refresh } =
-    useWorkspaceStatus(props);
+    useWorkspaceStatus({ taskId, candidateSessionId });
 
   const workspaceMessage = buildWorkspaceMessage(workspace);
 

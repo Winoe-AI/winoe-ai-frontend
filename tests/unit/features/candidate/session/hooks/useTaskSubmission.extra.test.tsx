@@ -34,7 +34,6 @@ jest.mock('@/lib/errors/errors', () => ({
 type HookReturn = ReturnType<typeof useTaskSubmission>;
 
 type HarnessProps = {
-  token: string | null;
   candidateSessionId: number | null;
   currentTask: {
     id: number;
@@ -58,7 +57,6 @@ const HookHarness = forwardRef<HookReturn, HarnessProps>(
 
 describe('useTaskSubmission extra coverage', () => {
   const baseProps = () => ({
-    token: 'tok',
     candidateSessionId: 11,
     currentTask: {
       id: 1,
@@ -130,7 +128,6 @@ describe('useTaskSubmission extra coverage', () => {
 
     expect(submitCandidateTaskMock).toHaveBeenCalledWith({
       taskId: 2,
-      token: 'tok',
       candidateSessionId: 11,
       contentText: undefined, // GitHub-native doesn't include text
     });
@@ -206,7 +203,6 @@ describe('useTaskSubmission extra coverage', () => {
 
     expect(submitCandidateTaskMock).toHaveBeenCalledWith({
       taskId: 5,
-      token: 'tok',
       candidateSessionId: 11,
       contentText: 'My answer',
     });
@@ -247,7 +243,6 @@ describe('useTaskSubmission extra coverage', () => {
 
     expect(submitCandidateTaskMock).toHaveBeenCalledWith({
       taskId: 6,
-      token: 'tok',
       candidateSessionId: 11,
       contentText: undefined,
     });

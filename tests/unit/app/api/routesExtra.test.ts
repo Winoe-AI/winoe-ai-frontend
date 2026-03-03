@@ -160,20 +160,24 @@ describe('API routes extra coverage', () => {
   });
 
   describe('dev access-token route', () => {
-    it('bubbles auth failure', async () => {
-      const resp = NextResponse.json({ message: 'forbidden' }, { status: 403 });
-      mockRequireBffAuth.mockResolvedValue({
-        ok: false,
-        response: resp,
-        cookies: [],
-      });
+    const originalNodeEnv = process.env.NODE_ENV;
+    const originalVercelEnv = process.env.VERCEL_ENV;
+
+    afterEach(() => {
+      process.env.NODE_ENV = originalNodeEnv;
+      if (originalVercelEnv === undefined) {
+        delete process.env.VERCEL_ENV;
+      } else {
+        process.env.VERCEL_ENV = originalVercelEnv;
+      }
+    });
+
+    it('returns 404 outside local', async () => {
+      process.env.VERCEL_ENV = 'preview';
       const mod = await import('@/app/api/dev/access-token/route');
       markMetadataCovered('@/app/api/dev/access-token/route');
-      const result = await mod.GET(
-        new NextRequest('http://localhost/api/dev/access-token'),
-      );
-      expect(result.status).toBe(403);
-      expect(mockMergeResponseCookies).toHaveBeenCalled();
+      const result = await mod.GET();
+      expect(result.status).toBe(404);
     });
   });
 

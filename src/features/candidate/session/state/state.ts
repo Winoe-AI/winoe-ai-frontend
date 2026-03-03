@@ -13,7 +13,6 @@ const initialTaskState: TaskState = {
 
 export const initialState: CandidateSessionState = {
   inviteToken: null,
-  token: null,
   candidateSessionId: null,
   bootstrap: null,
   started: false,
@@ -30,9 +29,6 @@ export function reducer(
     case 'SET_INVITE_TOKEN':
       if (state.inviteToken === action.inviteToken) return state;
       return { ...state, inviteToken: action.inviteToken };
-    case 'SET_TOKEN':
-      if (state.token === action.token) return state;
-      return { ...state, token: action.token };
     case 'SET_CANDIDATE_SESSION_ID':
       if (state.candidateSessionId === action.candidateSessionId) return state;
       return { ...state, candidateSessionId: action.candidateSessionId };
@@ -73,7 +69,6 @@ export function reducer(
         ...state,
         authStatus: 'unauthenticated',
         authError: null,
-        token: null,
       };
     case 'AUTH_ERROR':
       return { ...state, authStatus: 'error', authError: action.error };

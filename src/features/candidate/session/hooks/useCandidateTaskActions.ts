@@ -16,7 +16,6 @@ export function useCandidateTaskActions({
 }: Params) {
   const { fetchCurrentTask } = useTaskLoader({
     candidateSessionId: session.state.candidateSessionId,
-    token: session.state.token,
     clearTaskError: session.clearTaskError,
     setTaskLoading: session.setTaskLoading,
     setTaskLoaded: session.setTaskLoaded,
@@ -26,7 +25,6 @@ export function useCandidateTaskActions({
   });
 
   const { submitting, handleSubmit } = useTaskSubmission({
-    token: session.state.token,
     candidateSessionId: session.state.candidateSessionId,
     currentTask: session.state.taskState.currentTask,
     clearTaskError: session.clearTaskError,

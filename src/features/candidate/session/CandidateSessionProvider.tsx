@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useMemo, useReducer } from 'react';
+import { useMemo, useReducer } from 'react';
 import { CandidateSessionContext, useCandidateSession } from './state/context';
 import { initialState, reducer } from './state/state';
 import { useSessionActions } from './state/actions';
@@ -11,14 +11,9 @@ export function CandidateSessionProvider({
   children: React.ReactNode;
 }) {
   const [state, dispatch] = useReducer(reducer, initialState);
-  const actions = useSessionActions(state, dispatch);
+  const actions = useSessionActions(dispatch);
 
   usePersistedState(state, dispatch);
-
-  useEffect(() => {
-    if (state.token || state.authStatus !== 'idle') return;
-    void actions.loadAccessToken();
-  }, [actions, state.authStatus, state.token]);
 
   const value = useMemo(
     () => ({

@@ -3,27 +3,6 @@ import { getAuthToken, setAuthToken } from '@/lib/auth';
 describe('auth token helpers', () => {
   const originalWindow = global.window;
 
-  beforeEach(() => {
-    Object.defineProperty(window, 'localStorage', {
-      value: (() => {
-        let store: Record<string, string> = {};
-        return {
-          getItem: (k: string) => store[k] ?? null,
-          setItem: (k: string, v: string) => {
-            store[k] = v;
-          },
-          removeItem: (k: string) => {
-            delete store[k];
-          },
-          clear: () => {
-            store = {};
-          },
-        };
-      })(),
-      configurable: true,
-    });
-  });
-
   afterEach(() => {
     // @ts-expect-error reset window if modified
     global.window = originalWindow;
@@ -35,9 +14,9 @@ describe('auth token helpers', () => {
     expect(getAuthToken()).toBeNull();
   });
 
-  it('stores and clears token in localStorage', () => {
+  it('always returns null and setAuthToken is a no-op', () => {
     setAuthToken('token123');
-    expect(getAuthToken()).toBe('token123');
+    expect(getAuthToken()).toBeNull();
     setAuthToken(null);
     expect(getAuthToken()).toBeNull();
   });

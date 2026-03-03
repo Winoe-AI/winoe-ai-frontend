@@ -27,19 +27,11 @@ describe('WorkspacePanel', () => {
       codespaceUrl: 'https://codespaces.new/acme/repo',
     });
 
-    render(
-      <WorkspacePanel
-        taskId={12}
-        candidateSessionId={34}
-        token="tok"
-        dayIndex={2}
-      />,
-    );
+    render(<WorkspacePanel taskId={12} candidateSessionId={34} dayIndex={2} />);
 
     expect(await screen.findByText(/Workspace is ready/i)).toBeInTheDocument();
     expect(statusMock).toHaveBeenCalledWith({
       taskId: 12,
-      token: 'tok',
       candidateSessionId: 34,
     });
     expect(initMock).not.toHaveBeenCalled();
@@ -72,14 +64,7 @@ describe('WorkspacePanel', () => {
       codespaceUrl: null,
     });
 
-    render(
-      <WorkspacePanel
-        taskId={9}
-        candidateSessionId={10}
-        token="tok"
-        dayIndex={3}
-      />,
-    );
+    render(<WorkspacePanel taskId={9} candidateSessionId={10} dayIndex={3} />);
 
     await screen.findByText(/Repository is ready/i);
     expect(statusMock).toHaveBeenCalledTimes(1);
@@ -97,7 +82,6 @@ describe('WorkspacePanel', () => {
     await waitFor(() => {
       expect(statusMock).toHaveBeenCalledWith({
         taskId: 9,
-        token: 'tok',
         candidateSessionId: 10,
       });
     });
@@ -111,14 +95,7 @@ describe('WorkspacePanel', () => {
       codespaceUrl: null,
     });
 
-    render(
-      <WorkspacePanel
-        taskId={13}
-        candidateSessionId={14}
-        token="tok"
-        dayIndex={2}
-      />,
-    );
+    render(<WorkspacePanel taskId={13} candidateSessionId={14} dayIndex={2} />);
 
     await screen.findByText(/Repository is ready/i);
     expect(initMock).not.toHaveBeenCalled();
@@ -146,14 +123,7 @@ describe('WorkspacePanel', () => {
       codespaceUrl: null,
     });
 
-    render(
-      <WorkspacePanel
-        taskId={7}
-        candidateSessionId={8}
-        token="tok"
-        dayIndex={2}
-      />,
-    );
+    render(<WorkspacePanel taskId={7} candidateSessionId={8} dayIndex={2} />);
 
     await screen.findByText(/Repository is ready/i);
     expect(statusMock).toHaveBeenCalledTimes(1);
@@ -176,14 +146,7 @@ describe('WorkspacePanel', () => {
       codespaceUrl: null,
     });
 
-    render(
-      <WorkspacePanel
-        taskId={5}
-        candidateSessionId={6}
-        token="tok"
-        dayIndex={2}
-      />,
-    );
+    render(<WorkspacePanel taskId={5} candidateSessionId={6} dayIndex={2} />);
 
     await screen.findByText(/Repository is ready/i);
     expect(statusMock).toHaveBeenCalledTimes(1);
@@ -204,14 +167,7 @@ describe('WorkspacePanel', () => {
       message: 'Workspace repo not provisioned yet. Please try again.',
     });
 
-    render(
-      <WorkspacePanel
-        taskId={15}
-        candidateSessionId={16}
-        token="tok"
-        dayIndex={2}
-      />,
-    );
+    render(<WorkspacePanel taskId={15} candidateSessionId={16} dayIndex={2} />);
 
     expect(
       await screen.findByText(/Workspace repo not provisioned yet/i),
@@ -219,33 +175,30 @@ describe('WorkspacePanel', () => {
     expect(initMock).not.toHaveBeenCalled();
   });
 
-  it('shows session expired error when token is null', async () => {
-    render(
-      <WorkspacePanel
-        taskId={17}
-        candidateSessionId={18}
-        token={null}
-        dayIndex={2}
-      />,
-    );
+  it('shows provisioning copy when workspace data is empty', async () => {
+    statusMock.mockResolvedValueOnce({
+      repoUrl: null,
+      repoName: null,
+      codespaceUrl: null,
+    });
+    initMock.mockResolvedValueOnce({
+      repoUrl: null,
+      repoName: null,
+      codespaceUrl: null,
+    });
+
+    render(<WorkspacePanel taskId={17} candidateSessionId={18} dayIndex={2} />);
 
     expect(
-      await screen.findByText(/Session expired\. Please sign in again/i),
+      await screen.findByText(/Workspace provisioning is underway/i),
     ).toBeInTheDocument();
-    expect(statusMock).not.toHaveBeenCalled();
+    expect(statusMock).toHaveBeenCalledTimes(1);
   });
 
   it('shows session expired for 401 status errors', async () => {
     statusMock.mockRejectedValueOnce({ status: 401 });
 
-    render(
-      <WorkspacePanel
-        taskId={19}
-        candidateSessionId={20}
-        token="tok"
-        dayIndex={2}
-      />,
-    );
+    render(<WorkspacePanel taskId={19} candidateSessionId={20} dayIndex={2} />);
 
     expect(
       await screen.findByText(/Session expired\. Please sign in again/i),
@@ -255,14 +208,7 @@ describe('WorkspacePanel', () => {
   it('shows session expired for 403 status errors', async () => {
     statusMock.mockRejectedValueOnce({ status: 403 });
 
-    render(
-      <WorkspacePanel
-        taskId={21}
-        candidateSessionId={22}
-        token="tok"
-        dayIndex={2}
-      />,
-    );
+    render(<WorkspacePanel taskId={21} candidateSessionId={22} dayIndex={2} />);
 
     expect(
       await screen.findByText(/Session expired\. Please sign in again/i),
@@ -275,14 +221,7 @@ describe('WorkspacePanel', () => {
       message: 'Server error',
     });
 
-    render(
-      <WorkspacePanel
-        taskId={23}
-        candidateSessionId={24}
-        token="tok"
-        dayIndex={2}
-      />,
-    );
+    render(<WorkspacePanel taskId={23} candidateSessionId={24} dayIndex={2} />);
 
     expect(await screen.findByText(/Server issue/i)).toBeInTheDocument();
     const retryButton = screen.getByRole('button', { name: /Retry/i });
@@ -298,14 +237,7 @@ describe('WorkspacePanel', () => {
     });
     statusMock.mockRejectedValueOnce({ status: 404 });
 
-    render(
-      <WorkspacePanel
-        taskId={25}
-        candidateSessionId={26}
-        token="tok"
-        dayIndex={2}
-      />,
-    );
+    render(<WorkspacePanel taskId={25} candidateSessionId={26} dayIndex={2} />);
 
     await screen.findByText(/Repository is ready/i);
 
@@ -324,14 +256,7 @@ describe('WorkspacePanel', () => {
       codespaceUrl: null,
     });
 
-    render(
-      <WorkspacePanel
-        taskId={27}
-        candidateSessionId={28}
-        token="tok"
-        dayIndex={2}
-      />,
-    );
+    render(<WorkspacePanel taskId={27} candidateSessionId={28} dayIndex={2} />);
 
     expect(await screen.findByText(/Repo: org\/fullname/i)).toBeInTheDocument();
   });
@@ -348,14 +273,7 @@ describe('WorkspacePanel', () => {
       codespaceUrl: null,
     });
 
-    render(
-      <WorkspacePanel
-        taskId={29}
-        candidateSessionId={30}
-        token="tok"
-        dayIndex={2}
-      />,
-    );
+    render(<WorkspacePanel taskId={29} candidateSessionId={30} dayIndex={2} />);
 
     expect(
       await screen.findByText(/Workspace provisioning is underway/i),

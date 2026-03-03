@@ -174,7 +174,7 @@ describe('CandidateSessionPage auth/error states', () => {
     });
   });
 
-  it('gates unauthenticated users with auth message when token missing', async () => {
+  it('does not gate session initialization on missing access-token state', async () => {
     useCandidateSessionMock.mockReturnValue({
       ...baseState(),
       state: { ...baseState().state, token: null, authStatus: 'ready' },
@@ -182,15 +182,8 @@ describe('CandidateSessionPage auth/error states', () => {
 
     render(<CandidateSessionPage token="inv" />);
 
-    await waitFor(() =>
-      expect(screen.getByTestId('state-message')).toHaveTextContent(
-        'Sign in to continue',
-      ),
-    );
-    expect(buildLoginHrefMock).toHaveBeenCalledWith(
-      '/candidate/session/inv',
-      'candidate',
-    );
+    await waitFor(() => expect(getCurrentTaskMock).toHaveBeenCalled());
+    expect(screen.queryByTestId('state-message')).not.toBeInTheDocument();
   });
 
   it('shows invite expired error with sign-in link when unauthenticated', async () => {
@@ -232,11 +225,9 @@ describe('CandidateSessionPage auth/error states', () => {
   });
 
   it('sends user back to auth when resolve fails with 401', async () => {
-    const setToken = jest.fn();
     resolveInviteMock.mockRejectedValue({ status: 401 });
     useCandidateSessionMock.mockReturnValue({
       ...baseState(),
-      setToken,
     });
 
     await act(async () => {
@@ -248,15 +239,12 @@ describe('CandidateSessionPage auth/error states', () => {
         'Sign in to continue',
       ),
     );
-    expect(setToken).toHaveBeenCalledWith(null);
   });
 
   it('sends user back to auth when resolve fails with 403', async () => {
-    const setToken = jest.fn();
     resolveInviteMock.mockRejectedValue({ status: 403 });
     useCandidateSessionMock.mockReturnValue({
       ...baseState(),
-      setToken,
     });
 
     await act(async () => {
@@ -268,7 +256,6 @@ describe('CandidateSessionPage auth/error states', () => {
         'Sign in to continue',
       ),
     );
-    expect(setToken).toHaveBeenCalledWith(null);
   });
 
   it('shows generic error with retry action for non-invite errors', async () => {
@@ -595,7 +582,6 @@ describe('CandidateSessionPage auth/error states', () => {
 
     await waitFor(() =>
       expect(getCurrentTaskMock).toHaveBeenCalledWith(
-        expect.anything(),
         expect.anything(),
         expect.objectContaining({ skipCache: true }),
       ),

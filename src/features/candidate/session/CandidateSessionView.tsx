@@ -67,7 +67,6 @@ export function CandidateSessionView(props: Props) {
       currentDayIndex={props.currentDayIndex}
       currentTask={props.currentTask}
       candidateSessionId={props.candidateSessionId}
-      authToken={props.authToken}
       taskError={props.taskError}
       taskLoading={props.taskLoading}
       resourceLink={props.resourceLink}

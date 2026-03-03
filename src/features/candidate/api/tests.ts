@@ -1,10 +1,6 @@
 import { requestWithMeta } from '@/lib/api/client/request';
 import { HttpError } from '@/lib/api/errors/errors';
-import {
-  ensureAuthToken,
-  mapCandidateApiError,
-  withCandidateAuth,
-} from './base';
+import { candidateClientOptions, mapCandidateApiError } from './base';
 import { normalizeRunId, normalizeRunStatus } from './testNormalize';
 import type {
   CandidateTestRunStartResponse,
@@ -13,11 +9,9 @@ import type {
 
 export async function startCandidateTestRun(params: {
   taskId: number;
-  token: string;
   candidateSessionId: number;
 }): Promise<CandidateTestRunStartResponse> {
-  const { taskId, token, candidateSessionId } = params;
-  ensureAuthToken(token);
+  const { taskId, candidateSessionId } = params;
   const path = `/tasks/${taskId}/run`;
 
   try {
@@ -29,7 +23,7 @@ export async function startCandidateTestRun(params: {
         headers: { 'x-candidate-session-id': String(candidateSessionId) },
         cache: 'no-store',
       },
-      withCandidateAuth(token),
+      candidateClientOptions,
     );
     const run = normalizeRunId(data);
     if (run) return run;
@@ -48,11 +42,9 @@ export async function startCandidateTestRun(params: {
 export async function pollCandidateTestRun(params: {
   taskId: number;
   runId: string;
-  token: string;
   candidateSessionId: number;
 }): Promise<CandidateTestRunStatusResponse> {
-  const { taskId, runId, token, candidateSessionId } = params;
-  ensureAuthToken(token);
+  const { taskId, runId, candidateSessionId } = params;
   const path = `/tasks/${taskId}/run/${encodeURIComponent(runId)}`;
 
   try {
@@ -62,7 +54,7 @@ export async function pollCandidateTestRun(params: {
         headers: { 'x-candidate-session-id': String(candidateSessionId) },
         cache: 'no-store',
       },
-      withCandidateAuth(token),
+      candidateClientOptions,
     );
     return normalizeRunStatus(data);
   } catch (err) {

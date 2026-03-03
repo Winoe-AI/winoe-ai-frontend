@@ -25,18 +25,11 @@ describe('WorkspacePanel', () => {
     notifyMock.mockReset();
   });
 
-  const renderPanel = (
-    opts?: Partial<{ token: string | null; dayIndex: number }>,
-  ) =>
+  const renderPanel = (opts?: Partial<{ dayIndex: number }>) =>
     render(
       <WorkspacePanel
         taskId={1}
         candidateSessionId={2}
-        token={
-          opts && Object.prototype.hasOwnProperty.call(opts, 'token')
-            ? (opts.token ?? null)
-            : 'tok'
-        }
         dayIndex={opts?.dayIndex ?? 2}
       />,
     );
@@ -129,12 +122,12 @@ describe('WorkspacePanel', () => {
     await screen.findByText(/Workspace provisioning is underway/i);
   });
 
-  it('shows signin guidance when token missing', async () => {
+  it('shows provisioning guidance when status is empty', async () => {
     getStatusMock.mockResolvedValue(undefined);
     const user = userEvent.setup();
-    renderPanel({ token: null });
+    renderPanel();
     await user.click(screen.getByRole('button', { name: /Refresh/i }));
-    await screen.findByText(/Session expired\. Please sign in again\./i);
+    await screen.findByText(/Workspace provisioning is underway/i);
   });
 
   it('renders day index in header', async () => {

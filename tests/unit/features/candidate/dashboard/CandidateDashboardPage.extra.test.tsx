@@ -291,27 +291,4 @@ describe('CandidateDashboardPage extra coverage', () => {
       expect(screen.getByText(/100% complete/)).toBeInTheDocument();
     });
   });
-
-  describe('loading access token', () => {
-    it('shows loading when auth status is loading', async () => {
-      useCandidateSessionMock.mockReturnValue({
-        state: {
-          token: null,
-          authStatus: 'loading',
-          candidateSessionId: null,
-          inviteToken: null,
-        },
-        loadAccessToken: jest.fn(),
-      });
-
-      listCandidateInvitesMock.mockResolvedValue([]);
-
-      await act(async () => {
-        render(<CandidateDashboardPage />);
-      });
-
-      // Loading state should not show invites list yet
-      expect(listCandidateInvitesMock).not.toHaveBeenCalled();
-    });
-  });
 });

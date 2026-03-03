@@ -9,7 +9,6 @@ type Params = {
 export function useCandidateTestActions({ session }: Params) {
   const { handleStartTests, handlePollTests } = useTestHandlers({
     candidateSessionId: session.state.candidateSessionId,
-    token: session.state.token,
     currentTask: session.state.taskState.currentTask,
   });
 

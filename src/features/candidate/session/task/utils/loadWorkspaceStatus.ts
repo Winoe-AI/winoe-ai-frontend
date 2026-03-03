@@ -18,7 +18,6 @@ type Params = {
   mode: 'init' | 'refresh';
   taskId: number;
   candidateSessionId: number;
-  token: string;
   initAttempted: boolean;
 };
 
@@ -26,13 +25,11 @@ async function fetchOrInitWorkspace(
   mode: 'init' | 'refresh',
   initAttempted: boolean,
   taskId: number,
-  token: string,
   candidateSessionId: number,
 ): Promise<CandidateWorkspaceStatus | null> {
   try {
     const status = await getCandidateWorkspaceStatus({
       taskId,
-      token,
       candidateSessionId,
     });
     const needsInit =
@@ -40,14 +37,13 @@ async function fetchOrInitWorkspace(
     if (mode === 'init' && needsInit && !initAttempted) {
       return await initCandidateWorkspace({
         taskId,
-        token,
         candidateSessionId,
       });
     }
     return status;
   } catch (err) {
     if (mode === 'init' && toStatus(err) === 404 && !initAttempted) {
-      return initCandidateWorkspace({ taskId, token, candidateSessionId });
+      return initCandidateWorkspace({ taskId, candidateSessionId });
     }
     throw err;
   }
@@ -57,7 +53,6 @@ export async function loadWorkspaceStatus({
   mode,
   taskId,
   candidateSessionId,
-  token,
   initAttempted,
 }: Params): Promise<WorkspaceLoadResult> {
   try {
@@ -65,7 +60,6 @@ export async function loadWorkspaceStatus({
       mode,
       initAttempted,
       taskId,
-      token,
       candidateSessionId,
     );
     if (mode === 'refresh' && workspace) {

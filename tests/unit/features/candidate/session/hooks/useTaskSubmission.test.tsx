@@ -31,7 +31,6 @@ jest.mock('@/lib/errors/errors', () => ({
 type HookReturn = ReturnType<typeof useTaskSubmission>;
 
 type HarnessProps = {
-  token: string | null;
   candidateSessionId: number | null;
   currentTask: {
     id: number;
@@ -55,7 +54,6 @@ const HookHarness = forwardRef<HookReturn, HarnessProps>(
 
 describe('useTaskSubmission', () => {
   const baseProps = () => ({
-    token: 'tok',
     candidateSessionId: 11,
     currentTask: {
       id: 1,
@@ -83,7 +81,7 @@ describe('useTaskSubmission', () => {
 
   it('returns early when required identifiers missing', async () => {
     const props = baseProps();
-    props.token = null;
+    props.candidateSessionId = null;
     const ref = React.createRef<HookReturn>();
     render(<HookHarness ref={ref} {...props} />);
 
@@ -129,7 +127,6 @@ describe('useTaskSubmission', () => {
     });
     expect(submitCandidateTaskMock).toHaveBeenCalledWith({
       taskId: 2,
-      token: 'tok',
       candidateSessionId: 11,
       contentText: undefined,
     });
