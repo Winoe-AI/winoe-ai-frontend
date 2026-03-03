@@ -1,4 +1,3 @@
-import { NextRequest, NextResponse } from 'next/server';
 import { markMetadataCovered } from './coverageHelpers';
 
 class SimpleHeaders {
@@ -138,8 +137,20 @@ jest.mock('@/lib/auth0', () => ({
 }));
 
 describe('app/api auth token routes', () => {
+  const originalNodeEnv = process.env.NODE_ENV;
+  const originalVercelEnv = process.env.VERCEL_ENV;
+
   beforeEach(() => {
     jest.clearAllMocks();
+  });
+
+  afterEach(() => {
+    process.env.NODE_ENV = originalNodeEnv;
+    if (originalVercelEnv === undefined) {
+      delete process.env.VERCEL_ENV;
+    } else {
+      process.env.VERCEL_ENV = originalVercelEnv;
+    }
   });
 
   afterAll(() => {
@@ -152,48 +163,31 @@ describe('app/api auth token routes', () => {
     files.forEach((p) => markMetadataCovered(`${p}.ts`));
   });
 
-  it('returns access token when auth ok', async () => {
-    mockRequireBffAuth.mockResolvedValue({
-      ok: true,
-      accessToken: 'abc',
-      cookies: [],
-    });
+  it('returns 410 in local development', async () => {
+    process.env.NODE_ENV = 'development';
+    delete process.env.VERCEL_ENV;
     const mod = await import('@/app/api/auth/access-token/route');
     markMetadataCovered('@/app/api/auth/access-token/route.ts');
-    const res = await mod.GET(
-      new NextRequest('http://localhost/api/auth/access-token'),
-    );
-    expect(res.status).toBe(200);
-    expect(mockMergeResponseCookies).toHaveBeenCalled();
+    const res = await mod.GET();
+    expect(res.status).toBe(410);
   });
 
-  it('bubbles auth failure', async () => {
-    const fail = NextResponse.json({ message: 'nope' }, { status: 401 });
-    mockRequireBffAuth.mockResolvedValue({
-      ok: false,
-      response: fail,
-      cookies: [],
-    });
+  it('returns 404 outside local', async () => {
+    process.env.NODE_ENV = 'production';
+    process.env.VERCEL_ENV = 'preview';
     const mod = await import('@/app/api/auth/access-token/route');
     markMetadataCovered('@/app/api/auth/access-token/route.ts');
-    const res = await mod.GET(
-      new NextRequest('http://localhost/api/auth/access-token'),
-    );
-    expect(res.status).toBe(401);
+    const res = await mod.GET();
+    expect(res.status).toBe(404);
   });
 
-  it('dev access-token mirrors auth flow', async () => {
-    mockRequireBffAuth.mockResolvedValue({
-      ok: true,
-      accessToken: 'dev-token',
-      cookies: [],
-    });
+  it('dev access-token returns 410 in local development', async () => {
+    process.env.NODE_ENV = 'development';
+    delete process.env.VERCEL_ENV;
     const mod = await import('@/app/api/dev/access-token/route');
     markMetadataCovered('@/app/api/dev/access-token/route.ts');
-    const res = await mod.GET(
-      new NextRequest('http://localhost/api/dev/access-token'),
-    );
-    expect(res.status).toBe(200);
+    const res = await mod.GET();
+    expect(res.status).toBe(410);
   });
 });
 

@@ -1,7 +1,4 @@
 import { GET } from '@/app/api/auth/access-token/route';
-import { NextRequest } from 'next/server';
-
-const requireBffAuthMock = jest.fn();
 
 jest.mock('next/server', () => {
   class SimpleNextRequest {
@@ -30,38 +27,33 @@ jest.mock('next/server', () => {
   };
 });
 
-jest.mock('@/lib/server/bffAuth', () => ({
-  requireBffAuth: (...args: unknown[]) => requireBffAuthMock(...args),
-  mergeResponseCookies: jest.fn(),
-}));
-
 describe('auth/access-token route', () => {
   const originalNodeEnv = process.env.NODE_ENV;
+  const originalVercelEnv = process.env.VERCEL_ENV;
 
   afterEach(() => {
     process.env.NODE_ENV = originalNodeEnv;
+    if (originalVercelEnv === undefined) {
+      delete process.env.VERCEL_ENV;
+    } else {
+      process.env.VERCEL_ENV = originalVercelEnv;
+    }
     jest.clearAllMocks();
   });
 
-  it('returns token json in test mode when auth succeeds', async () => {
-    process.env.NODE_ENV = 'test';
-    requireBffAuthMock.mockResolvedValue({
-      ok: true,
-      accessToken: 'token-1',
-      cookies: null,
-    });
-
-    const req = new NextRequest('http://localhost/api/auth/access-token');
-    const res = await GET(req);
-    expect(res.status).toBe(200);
+  it('returns 410 in local development', async () => {
+    process.env.NODE_ENV = 'development';
+    delete process.env.VERCEL_ENV;
+    const res = await GET();
+    expect(res.status).toBe(410);
     const body = await res.json();
-    expect(body).toEqual({ accessToken: 'token-1' });
+    expect(body).toEqual({ message: 'This endpoint has been disabled.' });
   });
 
-  it('returns 404 in production', async () => {
+  it('returns 404 in preview/prod', async () => {
     process.env.NODE_ENV = 'production';
-    const req = new NextRequest('http://localhost/api/auth/access-token');
-    const res = await GET(req);
+    process.env.VERCEL_ENV = 'preview';
+    const res = await GET();
     expect(res.status).toBe(404);
     const body = await res.json();
     expect(body).toEqual({ message: 'Not found' });

@@ -351,22 +351,31 @@ describe('API Routes Coverage - submissions/[submissionId]', () => {
 });
 
 describe('API Routes Coverage - dev/access-token', () => {
+  const originalNodeEnv = process.env.NODE_ENV;
+  const originalVercelEnv = process.env.VERCEL_ENV;
+
   beforeEach(() => jest.clearAllMocks());
 
-  it('covers route success path', async () => {
+  afterEach(() => {
+    process.env.NODE_ENV = originalNodeEnv;
+    if (originalVercelEnv === undefined) {
+      delete process.env.VERCEL_ENV;
+    } else {
+      process.env.VERCEL_ENV = originalVercelEnv;
+    }
+  });
+
+  it('covers local disabled path', async () => {
+    process.env.NODE_ENV = 'development';
+    delete process.env.VERCEL_ENV;
     const mod = await import('@/app/api/dev/access-token/route');
     markMetadataCovered('@/app/api/dev/access-token/route');
 
-    mockRequireBffAuth.mockResolvedValue({
-      ok: true,
-      accessToken: 'dev-tok',
-      cookies: NextResponse.next(),
+    const res = await mod.GET();
+    expect(res.status).toBe(410);
+    expect(await res.json()).toEqual({
+      message: 'This endpoint has been disabled.',
     });
-
-    const res = await mod.GET(
-      new NextRequest('http://localhost/api/dev/access-token'),
-    );
-    expect(res.status).toBe(200);
   });
 });
 
@@ -466,36 +475,39 @@ describe('API Routes Coverage - debug/auth', () => {
 });
 
 describe('API Routes Coverage - auth/access-token', () => {
+  const originalNodeEnv = process.env.NODE_ENV;
+  const originalVercelEnv = process.env.VERCEL_ENV;
+
   beforeEach(() => jest.clearAllMocks());
 
-  it('covers route success path', async () => {
+  afterEach(() => {
+    process.env.NODE_ENV = originalNodeEnv;
+    if (originalVercelEnv === undefined) {
+      delete process.env.VERCEL_ENV;
+    } else {
+      process.env.VERCEL_ENV = originalVercelEnv;
+    }
+  });
+
+  it('covers local disabled path', async () => {
+    process.env.NODE_ENV = 'development';
+    delete process.env.VERCEL_ENV;
     const mod = await import('@/app/api/auth/access-token/route');
     markMetadataCovered('@/app/api/auth/access-token/route');
 
-    mockRequireBffAuth.mockResolvedValue({
-      ok: true,
-      accessToken: 'access-tok',
-      cookies: NextResponse.next(),
+    const res = await mod.GET();
+    expect(res.status).toBe(410);
+    expect(await res.json()).toEqual({
+      message: 'This endpoint has been disabled.',
     });
-
-    const res = await mod.GET(
-      new NextRequest('http://localhost/api/auth/access-token'),
-    );
-    expect(res.status).toBe(200);
   });
 
-  it('covers route failure path', async () => {
+  it('covers non-local not-found path', async () => {
+    process.env.NODE_ENV = 'production';
+    process.env.VERCEL_ENV = 'preview';
     const mod = await import('@/app/api/auth/access-token/route');
-
-    mockRequireBffAuth.mockResolvedValue({
-      ok: false,
-      response: NextResponse.json({ message: 'unauthorized' }, { status: 401 }),
-      cookies: NextResponse.next(),
-    });
-
-    const res = await mod.GET(
-      new NextRequest('http://localhost/api/auth/access-token'),
-    );
-    expect(res.status).toBe(401);
+    const res = await mod.GET();
+    expect(res.status).toBe(404);
+    expect(await res.json()).toEqual({ message: 'Not found' });
   });
 });

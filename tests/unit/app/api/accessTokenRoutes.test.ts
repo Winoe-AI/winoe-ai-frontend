@@ -1,11 +1,7 @@
 /**
  * Tests for disabled access token routes
  */
-import { NextRequest } from 'next/server';
 import { markMetadataCovered } from './coverageHelpers';
-
-const mockRequireBffAuth = jest.fn();
-const mockMergeResponseCookies = jest.fn();
 
 jest.mock('next/server', () => {
   const buildHeaders = () => {
@@ -64,17 +60,17 @@ jest.mock('next/server', () => {
   };
 });
 
-jest.mock('@/lib/server/bffAuth', () => ({
-  requireBffAuth: (...args: unknown[]) => mockRequireBffAuth(...args),
-  mergeResponseCookies: (...args: unknown[]) =>
-    mockMergeResponseCookies(...args),
-}));
-
 describe('/api/auth/access-token route', () => {
   const originalNodeEnv = process.env.NODE_ENV;
+  const originalVercelEnv = process.env.VERCEL_ENV;
 
   afterEach(() => {
     process.env.NODE_ENV = originalNodeEnv;
+    if (originalVercelEnv === undefined) {
+      delete process.env.VERCEL_ENV;
+    } else {
+      process.env.VERCEL_ENV = originalVercelEnv;
+    }
     jest.resetModules();
   });
 
@@ -88,25 +84,22 @@ describe('/api/auth/access-token route', () => {
     expect(mod.fetchCache).toBe('force-no-store');
   });
 
-  it('returns 410 in local/test', async () => {
-    process.env.NODE_ENV = 'test';
-    mockRequireBffAuth.mockResolvedValue({
-      ok: true,
-      accessToken: 'token-1',
-      cookies: null,
-    });
+  it('returns 410 in local development', async () => {
+    process.env.NODE_ENV = 'development';
+    delete process.env.VERCEL_ENV;
     const mod = await import('@/app/api/auth/access-token/route');
-    const req = new NextRequest('http://localhost/api/auth/access-token');
-    const res = await mod.GET(req as never);
-    expect(res.status).toBe(200);
-    expect(await res.json()).toEqual({ accessToken: 'token-1' });
+    const res = await mod.GET();
+    expect(res.status).toBe(410);
+    expect(await res.json()).toEqual({
+      message: 'This endpoint has been disabled.',
+    });
   });
 
   it('returns 404 outside local', async () => {
     process.env.NODE_ENV = 'production';
+    process.env.VERCEL_ENV = 'preview';
     const mod = await import('@/app/api/auth/access-token/route');
-    const req = new NextRequest('http://localhost/api/auth/access-token');
-    const res = await mod.GET(req as never);
+    const res = await mod.GET();
     expect(res.status).toBe(404);
     expect(await res.json()).toEqual({ message: 'Not found' });
   });
@@ -114,9 +107,15 @@ describe('/api/auth/access-token route', () => {
 
 describe('/api/dev/access-token route', () => {
   const originalNodeEnv = process.env.NODE_ENV;
+  const originalVercelEnv = process.env.VERCEL_ENV;
 
   afterEach(() => {
     process.env.NODE_ENV = originalNodeEnv;
+    if (originalVercelEnv === undefined) {
+      delete process.env.VERCEL_ENV;
+    } else {
+      process.env.VERCEL_ENV = originalVercelEnv;
+    }
     jest.resetModules();
   });
 
@@ -130,25 +129,22 @@ describe('/api/dev/access-token route', () => {
     expect(mod.fetchCache).toBe('force-no-store');
   });
 
-  it('returns 410 in local/test', async () => {
-    process.env.NODE_ENV = 'test';
-    mockRequireBffAuth.mockResolvedValue({
-      ok: true,
-      accessToken: 'token-dev',
-      cookies: null,
-    });
+  it('returns 410 in local development', async () => {
+    process.env.NODE_ENV = 'development';
+    delete process.env.VERCEL_ENV;
     const mod = await import('@/app/api/dev/access-token/route');
-    const req = new NextRequest('http://localhost/api/dev/access-token');
-    const res = await mod.GET(req as never);
-    expect(res.status).toBe(200);
-    expect(await res.json()).toEqual({ accessToken: 'token-dev' });
+    const res = await mod.GET();
+    expect(res.status).toBe(410);
+    expect(await res.json()).toEqual({
+      message: 'This endpoint has been disabled.',
+    });
   });
 
   it('returns 404 outside local', async () => {
     process.env.NODE_ENV = 'production';
+    process.env.VERCEL_ENV = 'preview';
     const mod = await import('@/app/api/dev/access-token/route');
-    const req = new NextRequest('http://localhost/api/dev/access-token');
-    const res = await mod.GET(req as never);
+    const res = await mod.GET();
     expect(res.status).toBe(404);
     expect(await res.json()).toEqual({ message: 'Not found' });
   });

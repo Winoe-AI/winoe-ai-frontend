@@ -25,6 +25,7 @@ jest.mock('@/lib/server/bff', () => ({
 
 describe('auth-related API routes', () => {
   const originalNodeEnv = process.env.NODE_ENV;
+  const originalVercelEnv = process.env.VERCEL_ENV;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -32,43 +33,44 @@ describe('auth-related API routes', () => {
 
   afterEach(() => {
     process.env.NODE_ENV = originalNodeEnv;
+    if (originalVercelEnv === undefined) {
+      delete process.env.VERCEL_ENV;
+    } else {
+      process.env.VERCEL_ENV = originalVercelEnv;
+    }
   });
 
-  it('auth/access-token keeps test compatibility path', async () => {
-    process.env.NODE_ENV = 'test';
-    requireBffAuthMock.mockResolvedValue({
-      ok: true,
-      accessToken: 'tok',
-      cookies: null,
-    });
+  it('auth/access-token returns 410 in local development', async () => {
+    process.env.NODE_ENV = 'development';
+    delete process.env.VERCEL_ENV;
     const { GET } = await import('@/app/api/auth/access-token/route');
-    const res = await GET(
-      new MockNextRequest('http://localhost/api/auth/access-token'),
-    );
-    expect(res.status).toBe(200);
+    const res = await GET();
+    expect(res.status).toBe(410);
+    expect((res as unknown as { body: unknown }).body).toEqual({
+      message: 'This endpoint has been disabled.',
+    });
   });
 
-  it('auth/access-token returns 404 in production', async () => {
+  it('auth/access-token returns 404 in preview/prod', async () => {
     process.env.NODE_ENV = 'production';
+    process.env.VERCEL_ENV = 'preview';
     const { GET } = await import('@/app/api/auth/access-token/route');
-    const res = await GET(
-      new MockNextRequest('http://localhost/api/auth/access-token'),
-    );
+    const res = await GET();
     expect(res.status).toBe(404);
+    expect((res as unknown as { body: unknown }).body).toEqual({
+      message: 'Not found',
+    });
   });
 
-  it('dev/access-token keeps test compatibility path', async () => {
-    process.env.NODE_ENV = 'test';
-    requireBffAuthMock.mockResolvedValue({
-      ok: true,
-      accessToken: 'dev',
-      cookies: null,
-    });
+  it('dev/access-token returns 410 in local development', async () => {
+    process.env.NODE_ENV = 'development';
+    delete process.env.VERCEL_ENV;
     const { GET } = await import('@/app/api/dev/access-token/route');
-    const res = await GET(
-      new MockNextRequest('http://localhost/api/dev/access-token'),
-    );
-    expect(res.status).toBe(200);
+    const res = await GET();
+    expect(res.status).toBe(410);
+    expect((res as unknown as { body: unknown }).body).toEqual({
+      message: 'This endpoint has been disabled.',
+    });
   });
 
   it('auth/me forwards profile request with request id', async () => {
