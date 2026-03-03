@@ -1,4 +1,3 @@
-import { getAuthToken } from '../../auth';
 import { request } from './request';
 import { isSameOriginRequest } from './origin';
 import type {
@@ -12,7 +11,7 @@ const isApiClientOptions = (arg: unknown): arg is ApiClientOptions =>
   Boolean(
     arg &&
     typeof arg === 'object' &&
-    ('basePath' in (arg as object) || 'authToken' in (arg as object)),
+    ('basePath' in (arg as object) || 'skipAuth' in (arg as object)),
   );
 
 export function authedRequest<T>(
@@ -20,15 +19,7 @@ export function authedRequest<T>(
   options: { method: HttpMethod; body?: unknown } & RequestOptions,
   clientOptions?: ApiClientOptions,
 ) {
-  const token =
-    clientOptions?.skipAuth === true
-      ? (clientOptions?.authToken ?? null)
-      : (clientOptions?.authToken ?? getAuthToken());
-  return request<T>(
-    path,
-    { ...options },
-    { ...clientOptions, authToken: token },
-  );
+  return request<T>(path, { ...options }, clientOptions);
 }
 
 export function splitArgs(

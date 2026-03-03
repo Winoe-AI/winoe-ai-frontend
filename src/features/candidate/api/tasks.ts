@@ -1,5 +1,5 @@
 import { requestWithMeta } from '@/lib/api/client/request';
-import { ensureAuthToken, withCandidateAuth } from './base';
+import { candidateClientOptions } from './base';
 import type {
   CandidateCurrentTaskResponse,
   CandidateTaskSubmitResponse,
@@ -9,10 +9,8 @@ import { mapCurrentTaskError, mapSubmitTaskError } from './taskErrors';
 
 export async function getCandidateCurrentTask(
   candidateSessionId: number,
-  token: string,
   options?: { skipCache?: boolean; cacheTtlMs?: number; dedupeKey?: string },
 ) {
-  ensureAuthToken(token);
   const path = `/candidate/session/${candidateSessionId}/current_task`;
   try {
     const { data } = await requestWithMeta<CandidateCurrentTaskResponse>(
@@ -24,7 +22,7 @@ export async function getCandidateCurrentTask(
         cacheTtlMs: options?.cacheTtlMs,
         dedupeKey: options?.dedupeKey,
       },
-      withCandidateAuth(token),
+      candidateClientOptions,
     );
     const currentTask = normalizeTask(data?.currentTask);
     return {
@@ -40,12 +38,10 @@ export async function getCandidateCurrentTask(
 
 export async function submitCandidateTask(params: {
   taskId: number;
-  token: string;
   candidateSessionId: number;
   contentText?: string;
 }) {
-  const { taskId, token, candidateSessionId, contentText } = params;
-  ensureAuthToken(token);
+  const { taskId, candidateSessionId, contentText } = params;
   const path = `/tasks/${taskId}/submit`;
   const payload = typeof contentText === 'string' ? { contentText } : {};
 
@@ -61,7 +57,7 @@ export async function submitCandidateTask(params: {
         },
         cache: 'no-store',
       },
-      withCandidateAuth(token),
+      candidateClientOptions,
     );
     return data;
   } catch (err) {

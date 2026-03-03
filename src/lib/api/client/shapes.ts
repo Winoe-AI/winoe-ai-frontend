@@ -2,7 +2,6 @@ export type HttpMethod = 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 
 export interface ApiClientOptions {
   basePath?: string;
-  authToken?: string | null;
   skipAuth?: boolean;
 }
 

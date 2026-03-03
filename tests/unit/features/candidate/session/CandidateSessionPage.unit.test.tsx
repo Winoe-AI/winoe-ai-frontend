@@ -105,19 +105,7 @@ describe('CandidateSessionPage unit flow', () => {
     expect(screen.queryByText(/Retry/i)).not.toBeInTheDocument();
   });
 
-  it('shows auth prompt when access token is missing', async () => {
-    mockUseCandidateSession.mockReturnValue(
-      buildSession({ token: null, authStatus: 'ready' }),
-    );
-
-    render(<CandidateSessionPage token="invite-token" />);
-
-    await waitFor(() =>
-      expect(screen.getByText('Sign in to continue')).toBeInTheDocument(),
-    );
-  });
-
-  it('handles 401 errors by clearing token and showing auth', async () => {
+  it('handles 401 errors by showing auth view', async () => {
     const session = buildSession();
     mockUseCandidateSession.mockReturnValue(session);
     mockResolveInvite.mockRejectedValueOnce({ status: 401 });
@@ -127,11 +115,10 @@ describe('CandidateSessionPage unit flow', () => {
     await waitFor(() =>
       expect(screen.getByText('Sign in to continue')).toBeInTheDocument(),
     );
-    expect(session.setToken).toHaveBeenCalledWith(null);
     expect(screen.getByText('Please sign in again.')).toBeInTheDocument();
   });
 
-  it('handles 403 errors by clearing token and showing auth', async () => {
+  it('handles 403 errors by showing auth view', async () => {
     const session = buildSession();
     mockUseCandidateSession.mockReturnValue(session);
     mockResolveInvite.mockRejectedValueOnce({ status: 403 });
@@ -141,7 +128,6 @@ describe('CandidateSessionPage unit flow', () => {
     await waitFor(() =>
       expect(screen.getByText('Sign in to continue')).toBeInTheDocument(),
     );
-    expect(session.setToken).toHaveBeenCalledWith(null);
   });
 
   it.each([400, 404, 409, 410])(

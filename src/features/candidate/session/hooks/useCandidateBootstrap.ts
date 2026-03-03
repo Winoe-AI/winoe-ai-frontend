@@ -7,7 +7,6 @@ export type BootstrapState = 'idle' | 'loading' | 'ready' | 'error';
 export function useCandidateBootstrap(params: {
   inviteToken?: string | null;
   token?: string | null;
-  authToken?: string | null;
   onResolved?: (data: unknown) => void;
   onSetInviteToken?: (token: string) => void;
 }) {
@@ -22,8 +21,6 @@ export function useCandidateBootstrap(params: {
 
   const load = useCallback(async () => {
     const inviteToken = params.inviteToken ?? params.token ?? null;
-    const authToken = params.authToken ?? null;
-    if (!authToken) return;
     if (!inviteToken) {
       setState('error');
       setErrorMessage('Missing invite token.');
@@ -44,7 +41,7 @@ export function useCandidateBootstrap(params: {
 
     const exec = (async () => {
       try {
-        const data = await resolveCandidateInviteToken(inviteToken, authToken);
+        const data = await resolveCandidateInviteToken(inviteToken);
         params.onSetInviteToken?.(inviteToken);
         params.onResolved?.(data);
         setState('ready');

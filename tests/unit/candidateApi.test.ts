@@ -33,26 +33,16 @@ describe('candidateApi', () => {
     global.fetch = fetchMock as unknown as typeof fetch;
 
     const { resolveCandidateInviteToken } = await importApi();
-    const result = await resolveCandidateInviteToken('tok_123', 'auth-token');
+    const result = await resolveCandidateInviteToken('tok_123');
 
     expect(result.candidateSessionId).toBe(10);
     expect(fetchMock).toHaveBeenCalledWith(
-      'http://api.example.com/candidate/session/tok_123',
+      '/api/backend/candidate/session/tok_123',
       expect.objectContaining({
         method: 'GET',
         cache: 'no-store',
-        headers: expect.objectContaining({
-          Authorization: 'Bearer auth-token',
-        }),
       }),
     );
-  });
-
-  it('requires auth token for bootstrap', async () => {
-    const { resolveCandidateInviteToken, HttpError } = await importApi();
-    await expect(
-      resolveCandidateInviteToken('tok_123', ''),
-    ).rejects.toBeInstanceOf(HttpError);
   });
 
   it('lists candidate invites with bearer auth', async () => {
@@ -73,7 +63,7 @@ describe('candidateApi', () => {
     global.fetch = fetchMock as unknown as typeof fetch;
 
     const { listCandidateInvites } = await importApi();
-    const invites = await listCandidateInvites('auth-token');
+    const invites = await listCandidateInvites();
 
     expect(invites[0]).toMatchObject({
       candidateSessionId: 9,
@@ -84,12 +74,9 @@ describe('candidateApi', () => {
       isExpired: true,
     });
     expect(fetchMock).toHaveBeenCalledWith(
-      'http://api.example.com/candidate/invites',
+      '/api/backend/candidate/invites',
       expect.objectContaining({
         method: 'GET',
-        headers: expect.objectContaining({
-          Authorization: 'Bearer auth-token',
-        }),
       }),
     );
   });
@@ -101,9 +88,9 @@ describe('candidateApi', () => {
 
     const { resolveCandidateInviteToken, HttpError } = await importApi();
 
-    await expect(
-      resolveCandidateInviteToken('bad', 'auth-token'),
-    ).rejects.toBeInstanceOf(HttpError);
+    await expect(resolveCandidateInviteToken('bad')).rejects.toBeInstanceOf(
+      HttpError,
+    );
   });
 
   it('fetches current task with bearer and session headers', async () => {
@@ -125,23 +112,15 @@ describe('candidateApi', () => {
 
     const { getCandidateCurrentTask } = await importApi();
 
-    const result = await getCandidateCurrentTask(44, 'token-abc');
+    const result = await getCandidateCurrentTask(44);
     expect(result.currentTask?.id).toBe(2);
     expect(fetchMock).toHaveBeenCalledWith(
-      'http://api.example.com/candidate/session/44/current_task',
+      '/api/backend/candidate/session/44/current_task',
       expect.objectContaining({
         headers: expect.objectContaining({
-          Authorization: 'Bearer token-abc',
           'x-candidate-session-id': '44',
         }),
       }),
-    );
-  });
-
-  it('requires bearer token for current task requests', async () => {
-    const { getCandidateCurrentTask, HttpError } = await importApi();
-    await expect(getCandidateCurrentTask(1, '')).rejects.toBeInstanceOf(
-      HttpError,
     );
   });
 
@@ -152,7 +131,7 @@ describe('candidateApi', () => {
 
     const { getCandidateCurrentTask } = await importApi();
 
-    await expect(getCandidateCurrentTask(10, 'token')).rejects.toMatchObject({
+    await expect(getCandidateCurrentTask(10)).rejects.toMatchObject({
       status: 0,
     });
   });
@@ -175,33 +154,18 @@ describe('candidateApi', () => {
 
     await submitCandidateTask({
       taskId: 7,
-      token: 'token-abc',
       candidateSessionId: 1,
       contentText: 'Answer',
     });
 
     expect(fetchMock).toHaveBeenCalledWith(
-      'http://api.example.com/tasks/7/submit',
+      '/api/backend/tasks/7/submit',
       expect.objectContaining({
         headers: expect.objectContaining({
-          Authorization: 'Bearer token-abc',
           'x-candidate-session-id': '1',
         }),
       }),
     );
-  });
-
-  it('requires bearer token for submitting tasks', async () => {
-    const { submitCandidateTask, HttpError } = await importApi();
-
-    await expect(
-      submitCandidateTask({
-        taskId: 7,
-        token: '',
-        candidateSessionId: 1,
-        contentText: 'Answer',
-      }),
-    ).rejects.toBeInstanceOf(HttpError);
   });
 
   it('surfaces submit errors for network TypeError', async () => {
@@ -214,7 +178,6 @@ describe('candidateApi', () => {
     await expect(
       submitCandidateTask({
         taskId: 5,
-        token: 'token-abc',
         candidateSessionId: 9,
         contentText: 'Ok',
       }),
@@ -236,7 +199,6 @@ describe('candidateApi', () => {
 
     const commonParams = {
       taskId: 5,
-      token: 'token-abc',
       candidateSessionId: 9,
       contentText: 'Ok',
     };

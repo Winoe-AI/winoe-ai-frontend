@@ -8,7 +8,6 @@ import type { PollResult } from '../../task/hooks/runTestsTypes';
 type Props = {
   currentTask: CandidateTask | null;
   candidateSessionId: number | null;
-  authToken: string | null;
   resourceLink: string | null;
   submitting: boolean;
   showWorkspacePanel: boolean;
@@ -27,7 +26,6 @@ type Props = {
 export function RunningPanelsSection({
   currentTask,
   candidateSessionId,
-  authToken,
   resourceLink,
   submitting,
   showWorkspacePanel,
@@ -45,7 +43,6 @@ export function RunningPanelsSection({
       <WorkspaceSection
         task={currentTask}
         candidateSessionId={candidateSessionId}
-        authToken={authToken}
         showWorkspacePanel={showWorkspacePanel}
         onStartTests={onStartTests}
         onPollTests={onPollTests}

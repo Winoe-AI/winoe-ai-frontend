@@ -1,10 +1,5 @@
 import { apiClient, login, safeRequest } from '@/lib/api/client';
-import { getAuthToken } from '@/lib/auth';
 import { responseHelpers } from '../../setup';
-
-jest.mock('@/lib/auth', () => ({
-  getAuthToken: jest.fn(),
-}));
 
 const fetchMock = jest.fn();
 
@@ -12,11 +7,9 @@ describe('apiClient request helpers', () => {
   beforeEach(() => {
     fetchMock.mockReset();
     global.fetch = fetchMock as unknown as typeof fetch;
-    (getAuthToken as jest.Mock).mockReset();
   });
 
-  it('attaches stored auth token by default and normalizes URLs', async () => {
-    (getAuthToken as jest.Mock).mockReturnValue('token-123');
+  it('does not attach browser auth token headers and normalizes URLs', async () => {
     fetchMock.mockResolvedValue(
       responseHelpers.jsonResponse({ ok: true, data: { message: 'hi' } }),
     );
@@ -27,7 +20,7 @@ describe('apiClient request helpers', () => {
       '/api/backend/jobs',
       expect.objectContaining({
         method: 'GET',
-        headers: { Authorization: 'Bearer token-123' },
+        headers: {},
         body: undefined,
         credentials: 'include',
         cache: 'no-store',
@@ -188,7 +181,7 @@ describe('apiClient request helpers', () => {
     );
   });
 
-  it('passes through provided authToken to request helper', async () => {
+  it('ignores provided authToken in browser request options', async () => {
     fetchMock.mockResolvedValue(responseHelpers.jsonResponse({}, 200));
 
     await apiClient.post('/auth', { ok: true }, { authToken: 'tok' });
@@ -198,7 +191,6 @@ describe('apiClient request helpers', () => {
       expect.objectContaining({
         method: 'POST',
         headers: {
-          Authorization: 'Bearer tok',
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ ok: true }),
@@ -208,8 +200,7 @@ describe('apiClient request helpers', () => {
     );
   });
 
-  it('respects provided authToken over stored token', async () => {
-    (getAuthToken as jest.Mock).mockReturnValue('ignored');
+  it('keeps GET headers empty even if authToken option is passed', async () => {
     fetchMock.mockResolvedValue(responseHelpers.jsonResponse({ ok: true }));
 
     await apiClient.get('/auth-pref', { authToken: 'from-opts' });
@@ -218,7 +209,7 @@ describe('apiClient request helpers', () => {
       '/api/backend/auth-pref',
       expect.objectContaining({
         method: 'GET',
-        headers: { Authorization: 'Bearer from-opts' },
+        headers: {},
         body: undefined,
         credentials: 'include',
         cache: 'no-store',
@@ -226,7 +217,7 @@ describe('apiClient request helpers', () => {
     );
   });
 
-  it('uses explicit authToken and merges headers for put/patch/delete', async () => {
+  it('merges explicit request headers for put/patch/delete without auth headers', async () => {
     fetchMock
       .mockResolvedValueOnce(responseHelpers.jsonResponse({ ok: true }))
       .mockResolvedValueOnce(responseHelpers.jsonResponse({ ok: true }))
@@ -250,7 +241,6 @@ describe('apiClient request helpers', () => {
     expect(putCall[1]).toMatchObject({
       method: 'PUT',
       headers: {
-        Authorization: 'Bearer custom-token',
         'Content-Type': 'application/json',
         'X-Test': 'one',
       },
@@ -259,7 +249,6 @@ describe('apiClient request helpers', () => {
     expect(patchCall[1]).toMatchObject({
       method: 'PATCH',
       headers: {
-        Authorization: 'Bearer custom-token',
         'Content-Type': 'application/json',
       },
     });

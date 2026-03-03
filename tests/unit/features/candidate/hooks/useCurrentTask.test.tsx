@@ -15,18 +15,15 @@ const getTaskMock = jest.requireMock('@/features/candidate/api')
   .getCandidateCurrentTask as jest.Mock;
 
 function Harness({
-  token,
   candidateSessionId,
   setTaskLoaded,
   setTaskError,
 }: {
-  token: string | null;
   candidateSessionId: number | null;
   setTaskLoaded: jest.Mock;
   setTaskError: jest.Mock;
 }) {
   const { fetchCurrentTask } = useCurrentTask({
-    token,
     candidateSessionId,
     setTaskLoading: jest.fn(),
     setTaskLoaded,
@@ -59,7 +56,6 @@ describe('useCurrentTask', () => {
 
     render(
       <Harness
-        token="auth"
         candidateSessionId={99}
         setTaskLoaded={setTaskLoaded}
         setTaskError={setTaskError}
@@ -70,7 +66,7 @@ describe('useCurrentTask', () => {
       screen.getByText('fetch').click();
     });
 
-    expect(getTaskMock).toHaveBeenCalledWith(99, 'auth');
+    expect(getTaskMock).toHaveBeenCalledWith(99);
     expect(setTaskLoaded).toHaveBeenCalledWith({
       isComplete: false,
       completedTaskIds: [1],
@@ -92,7 +88,6 @@ describe('useCurrentTask', () => {
 
     render(
       <Harness
-        token="auth"
         candidateSessionId={100}
         setTaskLoaded={setTaskLoaded}
         setTaskError={setTaskError}

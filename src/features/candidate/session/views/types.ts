@@ -23,7 +23,6 @@ export type CandidateSessionViewProps = {
   taskLoading: boolean;
   resourceLink: string | null;
   candidateSessionId: number | null;
-  authToken: string | null;
   showWorkspacePanel: boolean;
   showRecordingPanel: boolean;
   showDocsPanel: boolean;

@@ -1,8 +1,11 @@
 /**
- * Tests for access token routes
+ * Tests for disabled access token routes
  */
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import { markMetadataCovered } from './coverageHelpers';
+
+const mockRequireBffAuth = jest.fn();
+const mockMergeResponseCookies = jest.fn();
 
 jest.mock('next/server', () => {
   const buildHeaders = () => {
@@ -61,9 +64,6 @@ jest.mock('next/server', () => {
   };
 });
 
-const mockRequireBffAuth = jest.fn();
-const mockMergeResponseCookies = jest.fn();
-
 jest.mock('@/lib/server/bffAuth', () => ({
   requireBffAuth: (...args: unknown[]) => mockRequireBffAuth(...args),
   mergeResponseCookies: (...args: unknown[]) =>
@@ -71,8 +71,11 @@ jest.mock('@/lib/server/bffAuth', () => ({
 }));
 
 describe('/api/auth/access-token route', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
+  const originalNodeEnv = process.env.NODE_ENV;
+
+  afterEach(() => {
+    process.env.NODE_ENV = originalNodeEnv;
+    jest.resetModules();
   });
 
   it('covers metadata exports', async () => {
@@ -85,58 +88,36 @@ describe('/api/auth/access-token route', () => {
     expect(mod.fetchCache).toBe('force-no-store');
   });
 
-  it('returns 401 when auth fails', async () => {
-    const authCookies = NextResponse.next();
-    authCookies.cookies.set('session', 'refresh');
-
-    const authResponse = NextResponse.json(
-      { message: 'Unauthorized' },
-      { status: 401 },
-    );
-    mockRequireBffAuth.mockResolvedValue({
-      ok: false,
-      response: authResponse,
-      cookies: authCookies,
-    });
-
-    const mod = await import('@/app/api/auth/access-token/route');
-    markMetadataCovered('@/app/api/auth/access-token/route');
-
-    const req = new NextRequest('http://localhost/api/auth/access-token');
-    const res = await mod.GET(req as never);
-
-    expect(res.status).toBe(401);
-    expect(mockMergeResponseCookies).toHaveBeenCalledWith(
-      authCookies,
-      authResponse,
-    );
-  });
-
-  it('returns accessToken on success', async () => {
-    const authCookies = NextResponse.next();
-    authCookies.cookies.set('session', 'valid');
-
+  it('returns 410 in local/test', async () => {
+    process.env.NODE_ENV = 'test';
     mockRequireBffAuth.mockResolvedValue({
       ok: true,
-      accessToken: 'test-access-token',
-      cookies: authCookies,
+      accessToken: 'token-1',
+      cookies: null,
     });
-
     const mod = await import('@/app/api/auth/access-token/route');
-    markMetadataCovered('@/app/api/auth/access-token/route');
-
     const req = new NextRequest('http://localhost/api/auth/access-token');
     const res = await mod.GET(req as never);
-
     expect(res.status).toBe(200);
-    expect(res.body).toEqual({ accessToken: 'test-access-token' });
-    expect(mockMergeResponseCookies).toHaveBeenCalled();
+    expect(await res.json()).toEqual({ accessToken: 'token-1' });
+  });
+
+  it('returns 404 outside local', async () => {
+    process.env.NODE_ENV = 'production';
+    const mod = await import('@/app/api/auth/access-token/route');
+    const req = new NextRequest('http://localhost/api/auth/access-token');
+    const res = await mod.GET(req as never);
+    expect(res.status).toBe(404);
+    expect(await res.json()).toEqual({ message: 'Not found' });
   });
 });
 
 describe('/api/dev/access-token route', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
+  const originalNodeEnv = process.env.NODE_ENV;
+
+  afterEach(() => {
+    process.env.NODE_ENV = originalNodeEnv;
+    jest.resetModules();
   });
 
   it('covers metadata exports', async () => {
@@ -149,48 +130,26 @@ describe('/api/dev/access-token route', () => {
     expect(mod.fetchCache).toBe('force-no-store');
   });
 
-  it('returns 403 when auth fails', async () => {
-    const authCookies = NextResponse.next();
-    const authResponse = NextResponse.json(
-      { message: 'Forbidden' },
-      { status: 403 },
-    );
-    mockRequireBffAuth.mockResolvedValue({
-      ok: false,
-      response: authResponse,
-      cookies: authCookies,
-    });
-
-    const mod = await import('@/app/api/dev/access-token/route');
-    markMetadataCovered('@/app/api/dev/access-token/route');
-
-    const req = new NextRequest('http://localhost/api/dev/access-token');
-    const res = await mod.GET(req as never);
-
-    expect(res.status).toBe(403);
-    expect(mockMergeResponseCookies).toHaveBeenCalledWith(
-      authCookies,
-      authResponse,
-    );
-  });
-
-  it('returns accessToken on success', async () => {
-    const authCookies = NextResponse.next();
-
+  it('returns 410 in local/test', async () => {
+    process.env.NODE_ENV = 'test';
     mockRequireBffAuth.mockResolvedValue({
       ok: true,
-      accessToken: 'dev-access-token',
-      cookies: authCookies,
+      accessToken: 'token-dev',
+      cookies: null,
     });
-
     const mod = await import('@/app/api/dev/access-token/route');
-    markMetadataCovered('@/app/api/dev/access-token/route');
-
     const req = new NextRequest('http://localhost/api/dev/access-token');
     const res = await mod.GET(req as never);
-
     expect(res.status).toBe(200);
-    expect(res.body).toEqual({ accessToken: 'dev-access-token' });
-    expect(mockMergeResponseCookies).toHaveBeenCalled();
+    expect(await res.json()).toEqual({ accessToken: 'token-dev' });
+  });
+
+  it('returns 404 outside local', async () => {
+    process.env.NODE_ENV = 'production';
+    const mod = await import('@/app/api/dev/access-token/route');
+    const req = new NextRequest('http://localhost/api/dev/access-token');
+    const res = await mod.GET(req as never);
+    expect(res.status).toBe(404);
+    expect(await res.json()).toEqual({ message: 'Not found' });
   });
 });

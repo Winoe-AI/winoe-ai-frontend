@@ -8,39 +8,32 @@ import type { PollResult } from '../task/hooks/runTestsTypes';
 
 type Params = {
   candidateSessionId: number | null;
-  token: string | null;
   currentTask: CandidateTask | null;
 };
 
-export function useTestHandlers({
-  candidateSessionId,
-  token,
-  currentTask,
-}: Params) {
+export function useTestHandlers({ candidateSessionId, currentTask }: Params) {
   const handleStartTests = useCallback(async () => {
-    if (!candidateSessionId || !token || !currentTask) {
+    if (!candidateSessionId || !currentTask) {
       throw new Error('Missing session context.');
     }
     return startCandidateTestRun({
       taskId: currentTask.id,
-      token,
       candidateSessionId,
     });
-  }, [candidateSessionId, currentTask, token]);
+  }, [candidateSessionId, currentTask]);
 
   const handlePollTests = useCallback(
     async (runId: string): Promise<PollResult> => {
-      if (!candidateSessionId || !token || !currentTask) {
+      if (!candidateSessionId || !currentTask) {
         throw new Error('Missing session context.');
       }
       return pollCandidateTestRun({
         taskId: currentTask.id,
         runId,
-        token,
         candidateSessionId,
       });
     },
-    [candidateSessionId, currentTask, token],
+    [candidateSessionId, currentTask],
   );
 
   return { handleStartTests, handlePollTests };

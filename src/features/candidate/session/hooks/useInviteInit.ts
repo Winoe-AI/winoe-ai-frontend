@@ -15,11 +15,7 @@ export function useInviteInit(params: Params) {
   });
   const runInitCore = createInviteInit(params);
 
-  const runInit = async (
-    initToken: string,
-    allowRetry = false,
-    authOverride?: string | null,
-  ) => {
+  const runInit = async (initToken: string, allowRetry = false) => {
     if (
       !allowRetry &&
       initRef.current.inFlight &&
@@ -34,8 +30,8 @@ export function useInviteInit(params: Params) {
       return;
     initRef.current = { token: initToken, inFlight: true, done: false };
     try {
-      const result = await runInitCore(initToken, allowRetry, authOverride);
-      if (result !== 'skip') initRef.current.done = true;
+      await runInitCore(initToken, allowRetry);
+      initRef.current.done = true;
     } finally {
       initRef.current.inFlight = false;
     }

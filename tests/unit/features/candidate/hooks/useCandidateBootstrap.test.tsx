@@ -16,18 +16,15 @@ const resolveMock = jest.requireMock('@/features/candidate/api')
 
 function Harness({
   inviteToken,
-  authToken,
   onResolved,
   onSetInviteToken,
 }: {
   inviteToken: string | null;
-  authToken: string | null;
   onResolved: jest.Mock;
   onSetInviteToken?: jest.Mock;
 }) {
   const { state, errorMessage, load } = useCandidateBootstrap({
     inviteToken,
-    authToken,
     onResolved,
     onSetInviteToken,
   });
@@ -55,19 +52,13 @@ describe('useCandidateBootstrap', () => {
       simulation: { title: 'Sim', role: 'Eng' },
     });
 
-    render(
-      <Harness
-        inviteToken={inviteToken}
-        authToken="auth"
-        onResolved={onResolved}
-      />,
-    );
+    render(<Harness inviteToken={inviteToken} onResolved={onResolved} />);
 
     await act(async () => {
       screen.getByText('load').click();
     });
 
-    expect(resolveMock).toHaveBeenCalledWith(inviteToken, 'auth');
+    expect(resolveMock).toHaveBeenCalledWith(inviteToken);
     expect(onResolved).toHaveBeenCalledWith({
       candidateSessionId: 9,
       status: 'in_progress',
@@ -82,13 +73,7 @@ describe('useCandidateBootstrap', () => {
       Object.assign(new Error('bad'), { status: 404 }),
     );
 
-    render(
-      <Harness
-        inviteToken="tok_err"
-        authToken="auth"
-        onResolved={onResolved}
-      />,
-    );
+    render(<Harness inviteToken="tok_err" onResolved={onResolved} />);
 
     await act(async () => {
       screen.getByText('load').click();

@@ -1,6 +1,6 @@
 'use client';
 
-import { useCallback, useEffect, useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { buildLoginHref } from '@/features/auth/authPaths';
 import type { CandidateInvite } from '@/features/candidate/api';
@@ -18,21 +18,14 @@ export default function CandidateDashboardPage({
   signedInEmail?: string | null;
 }) {
   const router = useRouter();
-  const { state, loadAccessToken } = useCandidateSession();
+  const { state } = useCandidateSession();
+  const handleAuthRequired = useCallback(() => {
+    router.replace(buildLoginHref('/candidate/dashboard', 'candidate'));
+  }, [router]);
   const { sortedInvites, loading, error, refresh, setError } =
-    useCandidateInvites(state.token);
+    useCandidateInvites(handleAuthRequired);
 
   const displayEmail = useMemo(() => signedInEmail ?? '', [signedInEmail]);
-
-  useEffect(() => {
-    if (state.authStatus !== 'unauthenticated') return;
-    router.replace(buildLoginHref('/candidate/dashboard', 'candidate'));
-  }, [router, state.authStatus]);
-
-  useEffect(() => {
-    if (state.token || state.authStatus !== 'idle') return;
-    void loadAccessToken();
-  }, [loadAccessToken, state.authStatus, state.token]);
 
   const handleContinue = useCallback(
     (invite: CandidateInvite) => {

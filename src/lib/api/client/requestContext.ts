@@ -1,4 +1,3 @@
-import { getAuthToken } from '../../auth';
 import { buildCacheKey, DEFAULT_CACHE_TTL_MS } from './cache';
 import type {
   ApiClientOptions,
@@ -22,12 +21,6 @@ export function buildRequestContext(
   options: InternalRequestOptions,
   clientOptions?: ApiClientOptions,
 ): RequestContext {
-  const token =
-    clientOptions?.skipAuth === true
-      ? (clientOptions?.authToken ?? null)
-      : (clientOptions?.authToken ?? getAuthToken());
-
-  const hasAuthToken = Boolean(token);
   const headers: Record<string, string> = { ...(options.headers ?? {}) };
   const isForm = options.body instanceof FormData;
   const hasBody = options.body !== undefined;
@@ -35,7 +28,6 @@ export function buildRequestContext(
     headers['Content-Type'] = 'application/json';
   if ((!hasBody || isForm) && headers['Content-Type'] === undefined)
     delete headers['Content-Type'];
-  if (token) headers.Authorization = `Bearer ${token}`;
 
   const skipCache = options.skipCache === true;
   const dedupeEnabled = options.disableDedupe !== true;
@@ -51,7 +43,7 @@ export function buildRequestContext(
   const method = (options.method ?? 'GET') as HttpMethod;
   const dedupeKey =
     method && dedupeEnabled
-      ? buildCacheKey(method, targetUrl, hasAuthToken, options.dedupeKey)
+      ? buildCacheKey(method, targetUrl, false, options.dedupeKey)
       : null;
   const cacheKey = !skipCache && cacheTtlMs > 0 ? dedupeKey : null;
 

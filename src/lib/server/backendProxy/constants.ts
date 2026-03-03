@@ -7,6 +7,7 @@ export const HOP_BY_HOP_HEADERS = new Set([
   'keep-alive',
   'transfer-encoding',
   'cookie',
+  'authorization',
 ]);
 
 export const MAX_PROXY_BODY_BYTES = Number(

@@ -33,11 +33,8 @@ afterAll(() => {
 });
 
 describe('CandidateSessionPage (auth flow)', () => {
-  it('loads the simulation after fetching the Auth0 access token', async () => {
+  it('loads the simulation through /api/backend proxy', async () => {
     fetchMock.mockImplementation(async (url: RequestInfo | URL) => {
-      if (String(url).endsWith('/api/auth/access-token')) {
-        return jsonResponse({ accessToken: 'candidate-token' });
-      }
       if (String(url).endsWith('/candidate/session/valid-token')) {
         return jsonResponse({
           candidateSessionId: 321,
@@ -65,20 +62,16 @@ describe('CandidateSessionPage (auth flow)', () => {
     sessionStorage.removeItem('tenon:candidate_session_v1');
     renderCandidateWithProviders(<CandidateSessionPage token="valid-token" />);
 
-    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(3));
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(2));
     expect(fetchMock).toHaveBeenCalledWith(
       '/api/backend/candidate/session/valid-token',
-      expect.objectContaining({
-        headers: expect.objectContaining({
-          Authorization: 'Bearer candidate-token',
-        }),
-      }),
+      expect.objectContaining({ method: 'GET' }),
     );
     expect(fetchMock).toHaveBeenCalledWith(
       '/api/backend/candidate/session/321/current_task',
       expect.objectContaining({
         headers: expect.objectContaining({
-          Authorization: 'Bearer candidate-token',
+          'x-candidate-session-id': '321',
         }),
       }),
     );
@@ -98,7 +91,7 @@ describe('CandidateSessionPage (auth flow)', () => {
 
   it('redirects to login when unauthenticated', async () => {
     fetchMock.mockImplementation(async (url: RequestInfo | URL) => {
-      if (String(url).endsWith('/api/auth/access-token')) {
+      if (String(url).endsWith('/candidate/session/valid-token')) {
         return jsonResponse({ message: 'Not authenticated' }, 401);
       }
       throw new Error(`Unexpected fetch ${String(url)}`);
@@ -113,7 +106,7 @@ describe('CandidateSessionPage (auth flow)', () => {
     );
     expect(
       fetchMock.mock.calls.filter(([url]) =>
-        String(url).endsWith('/api/auth/access-token'),
+        String(url).endsWith('/candidate/session/valid-token'),
       ),
     ).toHaveLength(1);
   });

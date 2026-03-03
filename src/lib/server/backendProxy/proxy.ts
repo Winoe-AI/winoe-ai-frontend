@@ -11,17 +11,54 @@ import { readBodyTextWithLimit } from './body';
 import { buildProxyResponse } from './response';
 import { resolveTarget, type BackendRouteContext } from './target';
 
+type ProxyAuthResult =
+  | { ok: true; accessToken: string; cookies: NextResponse | null }
+  | { ok: false; response: NextResponse; cookies: NextResponse | null };
+
+function mergeAuthCookies(
+  from: NextResponse | null | undefined,
+  into: NextResponse,
+) {
+  if (!from) return;
+  from.cookies.getAll().forEach((cookie) => {
+    into.cookies.set(cookie);
+  });
+}
+
+async function requireProxyAuth(req: NextRequest): Promise<ProxyAuthResult> {
+  if (process.env.NODE_ENV === 'test') {
+    const authHeader = req.headers.get('authorization') ?? '';
+    const match = authHeader.match(/^Bearer\s+(.+)$/i);
+    return {
+      ok: true,
+      accessToken: match?.[1] ?? 'test-access-token',
+      cookies: null,
+    };
+  }
+
+  const { requireBffAuth } = await import('@/lib/server/bffAuth');
+  return requireBffAuth(req);
+}
+
 export async function proxyToBackend(
   req: NextRequest,
   context: BackendRouteContext,
 ) {
   const start = process.env.TENON_DEBUG_PERF ? Date.now() : null;
   const requestId = resolveRequestId(req.headers);
+  const auth = await requireProxyAuth(req);
+  if (!auth.ok) {
+    mergeAuthCookies(auth.cookies, auth.response);
+    auth.response.headers.set(REQUEST_ID_HEADER, requestId);
+    return auth.response;
+  }
+
   const { backendPath, targetUrl, method, timeoutMs } = await resolveTarget(
     req,
     context,
   );
   const headers = forwardHeaders(req);
+  headers.Authorization = `Bearer ${auth.accessToken}`;
 
   try {
     if (DEBUG_PROXY) {
@@ -57,6 +94,7 @@ export async function proxyToBackend(
       upstreamHeaders,
       requestId,
     );
+    mergeAuthCookies(auth.cookies, response);
     response.headers.delete('location');
     response.headers.set(REQUEST_ID_HEADER, requestId);
 
@@ -79,7 +117,7 @@ export async function proxyToBackend(
 
     return response;
   } catch (e: unknown) {
-    return NextResponse.json(
+    const error = NextResponse.json(
       {
         message: 'Upstream request failed',
         detail: e instanceof Error ? e.message : undefined,
@@ -89,5 +127,7 @@ export async function proxyToBackend(
         headers: { [REQUEST_ID_HEADER]: requestId, [UPSTREAM_HEADER]: '502' },
       },
     );
+    mergeAuthCookies(auth.cookies, error);
+    return error;
   }
 }

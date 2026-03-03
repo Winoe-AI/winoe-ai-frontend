@@ -75,7 +75,6 @@ export function useCandidateSessionController(token: string) {
     started: session.state.started,
     submitting: actions.submitting,
     taskError: session.state.taskState.error,
-    authToken: session.state.token,
     candidateSessionId: session.state.candidateSessionId,
     taskLoading: session.state.taskState.loading,
     onStart: handleStart,

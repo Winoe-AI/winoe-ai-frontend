@@ -1,17 +1,7 @@
-import { BRAND_SLUG } from '@/lib/brand';
-
-const TOKEN_KEY = `${BRAND_SLUG}_token`;
-
 export function getAuthToken(): string | null {
-  if (typeof window === 'undefined') return null;
-  return window.localStorage.getItem(TOKEN_KEY);
+  return null;
 }
 
-export function setAuthToken(token: string | null) {
-  if (typeof window === 'undefined') return;
-  if (token) {
-    window.localStorage.setItem(TOKEN_KEY, token);
-  } else {
-    window.localStorage.removeItem(TOKEN_KEY);
-  }
+export function setAuthToken(_token: string | null) {
+  return;
 }

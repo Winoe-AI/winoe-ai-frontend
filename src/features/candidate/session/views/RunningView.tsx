@@ -11,7 +11,6 @@ type Props = {
   currentDayIndex: number;
   currentTask: CandidateTask | null;
   candidateSessionId: number | null;
-  authToken: string | null;
   taskError: string | null;
   taskLoading: boolean;
   resourceLink: string | null;
@@ -35,7 +34,6 @@ export function RunningView({
   currentDayIndex,
   currentTask,
   candidateSessionId,
-  authToken,
   taskError,
   taskLoading,
   resourceLink,
@@ -65,7 +63,6 @@ export function RunningView({
       <RunningPanelsSection
         currentTask={currentTask}
         candidateSessionId={candidateSessionId}
-        authToken={authToken}
         resourceLink={resourceLink}
         submitting={submitting}
         showWorkspacePanel={showWorkspacePanel}

@@ -8,26 +8,19 @@ import {
   extractBackendMessage,
   fallbackStatus,
 } from '@/lib/api/errors/errors';
-import {
-  ensureAuthToken,
-  mapCandidateApiError,
-  withCandidateAuth,
-} from './base';
+import { candidateClientOptions, mapCandidateApiError } from './base';
 import { normalizeCandidateInvite } from './inviteNormalize';
 import type {
   CandidateInvite,
   CandidateSessionBootstrapResponse,
 } from './types';
 
-export async function listCandidateInvites(
-  authToken: string,
-): Promise<CandidateInvite[]> {
-  ensureAuthToken(authToken);
+export async function listCandidateInvites(): Promise<CandidateInvite[]> {
   try {
     const data = await apiClient.get<unknown[]>(
       '/candidate/invites',
       { cache: 'no-store' },
-      withCandidateAuth(authToken),
+      candidateClientOptions,
     );
     return Array.isArray(data) ? data.map(normalizeCandidateInvite) : [];
   } catch (err) {
@@ -37,16 +30,14 @@ export async function listCandidateInvites(
 
 export async function resolveCandidateInviteToken(
   token: string,
-  authToken: string,
   options?: { skipCache?: boolean },
 ) {
-  ensureAuthToken(authToken);
   const path = `/candidate/session/${encodeURIComponent(token)}`;
   try {
     return await apiClient.get<CandidateSessionBootstrapResponse>(
       path,
       { cache: 'no-store', skipCache: options?.skipCache },
-      withCandidateAuth(authToken),
+      candidateClientOptions,
     );
   } catch (err) {
     if (err && typeof err === 'object') {

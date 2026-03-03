@@ -26,7 +26,6 @@ describe('useCandidateBootstrap', () => {
     const { result } = renderHook(() =>
       useCandidateBootstrap({
         inviteToken: null,
-        authToken: null,
         onResolved,
       }),
     );
@@ -36,12 +35,14 @@ describe('useCandidateBootstrap', () => {
     expect(result.current.errorStatus).toBeNull();
   });
 
-  it('does nothing when authToken is missing', async () => {
+  it('loads invite bootstrap without requiring an access token argument', async () => {
+    resolveCandidateInviteTokenMock.mockResolvedValue({
+      candidateSessionId: 99,
+    });
     const onResolved = jest.fn();
     const { result } = renderHook(() =>
       useCandidateBootstrap({
         inviteToken: 'invite-token',
-        authToken: null,
         onResolved,
       }),
     );
@@ -50,8 +51,10 @@ describe('useCandidateBootstrap', () => {
       await result.current.load();
     });
 
-    expect(result.current.state).toBe('idle');
-    expect(resolveCandidateInviteTokenMock).not.toHaveBeenCalled();
+    expect(result.current.state).toBe('ready');
+    expect(resolveCandidateInviteTokenMock).toHaveBeenCalledWith(
+      'invite-token',
+    );
   });
 
   it('sets error when inviteToken is missing', async () => {
@@ -59,7 +62,6 @@ describe('useCandidateBootstrap', () => {
     const { result } = renderHook(() =>
       useCandidateBootstrap({
         inviteToken: null,
-        authToken: 'auth-token',
         onResolved,
       }),
     );
@@ -83,7 +85,6 @@ describe('useCandidateBootstrap', () => {
     const { result } = renderHook(() =>
       useCandidateBootstrap({
         inviteToken: 'invite-token',
-        authToken: 'auth-token',
         onResolved,
         onSetInviteToken,
       }),
@@ -99,7 +100,6 @@ describe('useCandidateBootstrap', () => {
     expect(onResolved).toHaveBeenCalledWith(mockData);
     expect(resolveCandidateInviteTokenMock).toHaveBeenCalledWith(
       'invite-token',
-      'auth-token',
     );
   });
 
@@ -113,7 +113,6 @@ describe('useCandidateBootstrap', () => {
     const { result } = renderHook(() =>
       useCandidateBootstrap({
         inviteToken: 'invite-token',
-        authToken: 'auth-token',
         onResolved,
       }),
     );
@@ -137,7 +136,6 @@ describe('useCandidateBootstrap', () => {
     const { result } = renderHook(() =>
       useCandidateBootstrap({
         inviteToken: 'invite-token',
-        authToken: 'auth-token',
         onResolved,
       }),
     );
@@ -164,7 +162,6 @@ describe('useCandidateBootstrap', () => {
     const { result } = renderHook(() =>
       useCandidateBootstrap({
         inviteToken: 'same-token',
-        authToken: 'auth-token',
         onResolved,
       }),
     );
@@ -199,7 +196,6 @@ describe('useCandidateBootstrap', () => {
       ({ token }) =>
         useCandidateBootstrap({
           inviteToken: token,
-          authToken: 'auth-token',
           onResolved,
         }),
       { initialProps: { token: 'token-1' } },
@@ -232,7 +228,6 @@ describe('useCandidateBootstrap', () => {
     const { result } = renderHook(() =>
       useCandidateBootstrap({
         inviteToken: 'token',
-        authToken: 'auth',
         onResolved,
         // onSetInviteToken not provided
       }),

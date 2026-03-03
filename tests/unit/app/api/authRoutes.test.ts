@@ -24,15 +24,22 @@ jest.mock('@/lib/server/bff', () => ({
 }));
 
 describe('auth-related API routes', () => {
+  const originalNodeEnv = process.env.NODE_ENV;
+
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  it('auth/access-token returns token on success', async () => {
+  afterEach(() => {
+    process.env.NODE_ENV = originalNodeEnv;
+  });
+
+  it('auth/access-token keeps test compatibility path', async () => {
+    process.env.NODE_ENV = 'test';
     requireBffAuthMock.mockResolvedValue({
       ok: true,
       accessToken: 'tok',
-      cookies: [],
+      cookies: null,
     });
     const { GET } = await import('@/app/api/auth/access-token/route');
     const res = await GET(
@@ -41,26 +48,21 @@ describe('auth-related API routes', () => {
     expect(res.status).toBe(200);
   });
 
-  it('auth/access-token bubbles auth failure', async () => {
-    const fail = MockNextResponse.json({ message: 'nope' }, { status: 401 });
-    requireBffAuthMock.mockResolvedValue({
-      ok: false,
-      response: fail,
-      cookies: [],
-    });
+  it('auth/access-token returns 404 in production', async () => {
+    process.env.NODE_ENV = 'production';
     const { GET } = await import('@/app/api/auth/access-token/route');
     const res = await GET(
       new MockNextRequest('http://localhost/api/auth/access-token'),
     );
-    expect(res.status).toBe(401);
-    expect(mergeResponseCookiesMock).toHaveBeenCalled();
+    expect(res.status).toBe(404);
   });
 
-  it('dev/access-token mirrors auth flow', async () => {
+  it('dev/access-token keeps test compatibility path', async () => {
+    process.env.NODE_ENV = 'test';
     requireBffAuthMock.mockResolvedValue({
       ok: true,
       accessToken: 'dev',
-      cookies: [],
+      cookies: null,
     });
     const { GET } = await import('@/app/api/dev/access-token/route');
     const res = await GET(

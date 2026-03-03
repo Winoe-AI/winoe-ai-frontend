@@ -10,10 +10,7 @@ type Params = {
   setAuthMessage: (m: string | null) => void;
   setErrorMessage: (m: string | null) => void;
   setErrorStatus: (s: number | null) => void;
-  fetchCurrentTask: (overrides?: {
-    authToken?: string;
-    sessionId?: number;
-  }) => Promise<void>;
+  fetchCurrentTask: (overrides?: { sessionId?: number }) => Promise<void>;
   markStart: (label: string) => void;
   markEnd: (label: string, extra?: Record<string, unknown>) => void;
 };
@@ -21,10 +18,8 @@ type Params = {
 export function useCandidateInviteActions(params: Params) {
   const { runInit, loginHref, inviteErrorCopy } = useInviteResolver({
     token: params.token,
-    authToken: params.session.state.token,
     setCandidateSessionId: params.session.setCandidateSessionId,
     setBootstrap: params.session.setBootstrap,
-    setToken: params.session.setToken,
     clearTaskError: params.session.clearTaskError,
     setView: params.setView,
     setAuthMessage: params.setAuthMessage,

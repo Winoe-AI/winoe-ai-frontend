@@ -244,7 +244,6 @@ describe('CandidateSessionPage test run handlers', () => {
     await waitFor(() =>
       expect(startTestRunMock).toHaveBeenCalledWith({
         taskId: 1,
-        token: 'auth-token',
         candidateSessionId: 99,
       }),
     );
@@ -268,7 +267,6 @@ describe('CandidateSessionPage test run handlers', () => {
       expect(pollTestRunMock).toHaveBeenCalledWith({
         taskId: 1,
         runId: 'test-run-id',
-        token: 'auth-token',
         candidateSessionId: 99,
       }),
     );
@@ -388,13 +386,12 @@ describe('CandidateSessionPage test run handlers', () => {
 
     expect(submitTaskMock).toHaveBeenCalledWith({
       taskId: 1,
-      token: 'auth-token',
       candidateSessionId: 99,
       contentText: undefined,
     });
     await waitFor(() => {
       const hasSkipCache = getCurrentTaskMock.mock.calls.some(
-        (call) => (call[2] as { skipCache?: boolean } | undefined)?.skipCache,
+        (call) => (call[1] as { skipCache?: boolean } | undefined)?.skipCache,
       );
       expect(hasSkipCache).toBe(true);
     });

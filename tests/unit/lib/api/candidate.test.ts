@@ -57,7 +57,7 @@ describe('candidate api helpers', () => {
     ]);
 
     const { listCandidateInvites } = await import('@/features/candidate/api');
-    const invites = await listCandidateInvites('auth');
+    const invites = await listCandidateInvites();
 
     expect(mockGet).toHaveBeenCalled();
     expect(invites[0]).toMatchObject({
@@ -70,16 +70,12 @@ describe('candidate api helpers', () => {
 
   it('resolves invite token and maps 404 to HttpError', async () => {
     mockGet.mockRejectedValueOnce({ status: 404 });
-    const { resolveCandidateInviteToken, HttpError } =
+    const { resolveCandidateInviteToken } =
       await import('@/features/candidate/api');
 
-    await expect(
-      resolveCandidateInviteToken('tok', 'auth'),
-    ).rejects.toMatchObject({ status: 404 });
-
-    await expect(resolveCandidateInviteToken('tok', '')).rejects.toBeInstanceOf(
-      HttpError,
-    );
+    await expect(resolveCandidateInviteToken('tok')).rejects.toMatchObject({
+      status: 404,
+    });
   });
 
   it('resolves invite token and maps 410 to HttpError', async () => {
@@ -87,18 +83,16 @@ describe('candidate api helpers', () => {
     const { resolveCandidateInviteToken } =
       await import('@/features/candidate/api');
 
-    await expect(
-      resolveCandidateInviteToken('tok', 'auth'),
-    ).rejects.toMatchObject({ status: 410 });
+    await expect(resolveCandidateInviteToken('tok')).rejects.toMatchObject({
+      status: 410,
+    });
   });
 
   it('maps resolveCandidateInviteToken auth errors', async () => {
     mockGet.mockRejectedValueOnce({ status: 401 });
     const { resolveCandidateInviteToken } =
       await import('@/features/candidate/api');
-    await expect(
-      resolveCandidateInviteToken('tok', 'auth'),
-    ).rejects.toMatchObject({
+    await expect(resolveCandidateInviteToken('tok')).rejects.toMatchObject({
       status: 401,
       message: 'Please sign in again.',
     });
@@ -107,9 +101,7 @@ describe('candidate api helpers', () => {
       status: 403,
       details: { message: 'Email verification required' },
     });
-    await expect(
-      resolveCandidateInviteToken('tok', 'auth'),
-    ).rejects.toMatchObject({
+    await expect(resolveCandidateInviteToken('tok')).rejects.toMatchObject({
       status: 403,
       message: 'Please verify your email, then try again.',
     });
@@ -123,9 +115,7 @@ describe('candidate api helpers', () => {
     const { resolveCandidateInviteToken } =
       await import('@/features/candidate/api');
 
-    await expect(
-      resolveCandidateInviteToken('tok', 'auth'),
-    ).rejects.toMatchObject({
+    await expect(resolveCandidateInviteToken('tok')).rejects.toMatchObject({
       status: 403,
       message: 'We could not confirm your email. Please sign in again.',
     });
@@ -139,9 +129,7 @@ describe('candidate api helpers', () => {
     const { resolveCandidateInviteToken } =
       await import('@/features/candidate/api');
 
-    await expect(
-      resolveCandidateInviteToken('tok', 'auth'),
-    ).rejects.toMatchObject({
+    await expect(resolveCandidateInviteToken('tok')).rejects.toMatchObject({
       status: 403,
       message: 'You do not have access to this invite.',
     });
@@ -152,7 +140,7 @@ describe('candidate api helpers', () => {
     const { getCandidateCurrentTask } =
       await import('@/features/candidate/api');
 
-    await expect(getCandidateCurrentTask(1, 'auth')).rejects.toMatchObject({
+    await expect(getCandidateCurrentTask(1)).rejects.toMatchObject({
       status: 0,
     });
   });
@@ -162,7 +150,7 @@ describe('candidate api helpers', () => {
     const { getCandidateCurrentTask } =
       await import('@/features/candidate/api');
 
-    await expect(getCandidateCurrentTask(2, 'auth')).rejects.toMatchObject({
+    await expect(getCandidateCurrentTask(2)).rejects.toMatchObject({
       status: 404,
     });
   });
@@ -172,7 +160,7 @@ describe('candidate api helpers', () => {
     const { getCandidateCurrentTask } =
       await import('@/features/candidate/api');
 
-    await expect(getCandidateCurrentTask(3, 'auth')).rejects.toMatchObject({
+    await expect(getCandidateCurrentTask(3)).rejects.toMatchObject({
       status: 410,
     });
   });
@@ -184,7 +172,6 @@ describe('candidate api helpers', () => {
     await expect(
       submitCandidateTask({
         taskId: 1,
-        token: 'auth',
         candidateSessionId: 1,
       }),
     ).rejects.toMatchObject({ status: 400 });
@@ -196,7 +183,6 @@ describe('candidate api helpers', () => {
 
     await submitCandidateTask({
       taskId: 8,
-      token: 'auth',
       candidateSessionId: 8,
     });
 
@@ -209,7 +195,7 @@ describe('candidate api helpers', () => {
           'x-candidate-session-id': '8',
         },
       }),
-      expect.objectContaining({ authToken: 'auth' }),
+      expect.objectContaining({ basePath: '/api/backend' }),
     );
   });
 
@@ -219,7 +205,6 @@ describe('candidate api helpers', () => {
 
     await submitCandidateTask({
       taskId: 9,
-      token: 'auth',
       candidateSessionId: 9,
       contentText: 'Hello world',
     });
@@ -233,7 +218,7 @@ describe('candidate api helpers', () => {
           'x-candidate-session-id': '9',
         },
       }),
-      expect.objectContaining({ authToken: 'auth' }),
+      expect.objectContaining({ basePath: '/api/backend' }),
     );
   });
 
@@ -245,7 +230,6 @@ describe('candidate api helpers', () => {
     await expect(
       submitCandidateTask({
         taskId: 2,
-        token: 'auth',
         candidateSessionId: 2,
       }),
     ).rejects.toMatchObject({ status: 409 });
@@ -253,7 +237,6 @@ describe('candidate api helpers', () => {
     await expect(
       submitCandidateTask({
         taskId: 3,
-        token: 'auth',
         candidateSessionId: 3,
       }),
     ).rejects.toMatchObject({ status: 0 });
@@ -267,7 +250,6 @@ describe('candidate api helpers', () => {
     await expect(
       submitCandidateTask({
         taskId: 4,
-        token: 'auth',
         candidateSessionId: 4,
       }),
     ).rejects.toMatchObject({ status: 404 });
@@ -275,7 +257,6 @@ describe('candidate api helpers', () => {
     await expect(
       submitCandidateTask({
         taskId: 5,
-        token: 'auth',
         candidateSessionId: 5,
       }),
     ).rejects.toMatchObject({ status: 410 });
@@ -284,7 +265,7 @@ describe('candidate api helpers', () => {
   it('returns empty list when invites response is not an array', async () => {
     mockGet.mockResolvedValueOnce({ not: 'array' });
     const { listCandidateInvites } = await import('@/features/candidate/api');
-    const invites = await listCandidateInvites('auth');
+    const invites = await listCandidateInvites();
     expect(invites).toEqual([]);
   });
 
@@ -292,9 +273,7 @@ describe('candidate api helpers', () => {
     mockGet.mockRejectedValueOnce(new Error('fetch'));
     const { listCandidateInvites, HttpError } =
       await import('@/features/candidate/api');
-    await expect(listCandidateInvites('auth')).rejects.toBeInstanceOf(
-      HttpError,
-    );
+    await expect(listCandidateInvites()).rejects.toBeInstanceOf(HttpError);
   });
 
   it('propagates resolve invite backend errors', async () => {
@@ -302,9 +281,9 @@ describe('candidate api helpers', () => {
     const { resolveCandidateInviteToken } =
       await import('@/features/candidate/api');
 
-    await expect(
-      resolveCandidateInviteToken('tok', 'auth'),
-    ).rejects.toMatchObject({ status: 500 });
+    await expect(resolveCandidateInviteToken('tok')).rejects.toMatchObject({
+      status: 500,
+    });
   });
 
   it('maps current task generic errors', async () => {
@@ -312,7 +291,7 @@ describe('candidate api helpers', () => {
     const { getCandidateCurrentTask } =
       await import('@/features/candidate/api');
 
-    await expect(getCandidateCurrentTask(9, 'auth')).rejects.toMatchObject({
+    await expect(getCandidateCurrentTask(9)).rejects.toMatchObject({
       status: 500,
     });
   });
@@ -325,7 +304,6 @@ describe('candidate api helpers', () => {
     await expect(
       submitCandidateTask({
         taskId: 6,
-        token: 'auth',
         candidateSessionId: 6,
       }),
     ).rejects.toBeInstanceOf(HttpError);
@@ -352,9 +330,9 @@ describe('candidate api helpers', () => {
     const { resolveCandidateInviteToken, HttpError } =
       await import('@/features/candidate/api');
 
-    await expect(
-      resolveCandidateInviteToken('tok', 'auth'),
-    ).rejects.toBeInstanceOf(HttpError);
+    await expect(resolveCandidateInviteToken('tok')).rejects.toBeInstanceOf(
+      HttpError,
+    );
   });
 
   it('treats current task errors without numeric status as network issues', async () => {
@@ -362,7 +340,7 @@ describe('candidate api helpers', () => {
     const { getCandidateCurrentTask } =
       await import('@/features/candidate/api');
 
-    await expect(getCandidateCurrentTask(1, 'auth')).rejects.toMatchObject({
+    await expect(getCandidateCurrentTask(1)).rejects.toMatchObject({
       status: 0,
     });
   });
@@ -372,9 +350,7 @@ describe('candidate api helpers', () => {
     const { getCandidateCurrentTask, HttpError } =
       await import('@/features/candidate/api');
 
-    await expect(getCandidateCurrentTask(1, 'auth')).rejects.toBeInstanceOf(
-      HttpError,
-    );
+    await expect(getCandidateCurrentTask(1)).rejects.toBeInstanceOf(HttpError);
   });
 
   it('handles submitCandidateTask unexpected status with generic message', async () => {
@@ -384,7 +360,6 @@ describe('candidate api helpers', () => {
     await expect(
       submitCandidateTask({
         taskId: 7,
-        token: 'auth',
         candidateSessionId: 7,
       }),
     ).rejects.toMatchObject({
@@ -403,7 +378,6 @@ describe('candidate api helpers', () => {
     const { initCandidateWorkspace } = await import('@/features/candidate/api');
     const result = await initCandidateWorkspace({
       taskId: 11,
-      token: 'auth',
       candidateSessionId: 77,
     });
 
@@ -413,7 +387,7 @@ describe('candidate api helpers', () => {
       expect.objectContaining({
         headers: { 'x-candidate-session-id': '77' },
       }),
-      expect.objectContaining({ authToken: 'auth' }),
+      expect.objectContaining({ basePath: '/api/backend' }),
     );
     expect(result).toEqual({
       repoUrl: 'https://github.com/acme/repo',
@@ -433,7 +407,6 @@ describe('candidate api helpers', () => {
       await import('@/features/candidate/api');
     const result = await getCandidateWorkspaceStatus({
       taskId: 12,
-      token: 'auth',
       candidateSessionId: 88,
     });
 
@@ -442,7 +415,7 @@ describe('candidate api helpers', () => {
       expect.objectContaining({
         headers: { 'x-candidate-session-id': '88' },
       }),
-      expect.objectContaining({ authToken: 'auth' }),
+      expect.objectContaining({ basePath: '/api/backend' }),
     );
     expect(result).toEqual({
       repoUrl: 'https://github.com/acme/repo2',
@@ -459,7 +432,6 @@ describe('candidate api helpers', () => {
       await import('@/features/candidate/api');
     const result = await getCandidateWorkspaceStatus({
       taskId: 15,
-      token: 'auth',
       candidateSessionId: 66,
     });
 
@@ -483,7 +455,6 @@ describe('candidate api helpers', () => {
       await import('@/features/candidate/api');
     const result = await getCandidateWorkspaceStatus({
       taskId: 14,
-      token: 'auth',
       candidateSessionId: 55,
     });
 
@@ -515,7 +486,6 @@ describe('candidate api helpers', () => {
 
     const start = await startCandidateTestRun({
       taskId: 13,
-      token: 'auth',
       candidateSessionId: 99,
     });
     expect(start).toEqual({ runId: 'run-xyz' });
@@ -525,13 +495,12 @@ describe('candidate api helpers', () => {
       expect.objectContaining({
         headers: { 'x-candidate-session-id': '99' },
       }),
-      expect.objectContaining({ authToken: 'auth' }),
+      expect.objectContaining({ basePath: '/api/backend' }),
     );
 
     const polled = await pollCandidateTestRun({
       taskId: 13,
       runId: 'run-xyz',
-      token: 'auth',
       candidateSessionId: 99,
     });
     expect(polled).toEqual({
@@ -554,7 +523,6 @@ describe('candidate api helpers', () => {
 
     const start = await startCandidateTestRun({
       taskId: 21,
-      token: 'auth',
       candidateSessionId: 77,
     });
 
@@ -579,7 +547,6 @@ describe('candidate api helpers', () => {
 
     const start = await startCandidateTestRun({
       taskId: 22,
-      token: 'auth',
       candidateSessionId: 88,
     });
 
@@ -603,7 +570,6 @@ describe('candidate api helpers', () => {
     const running = await pollCandidateTestRun({
       taskId: 14,
       runId: 'run-a',
-      token: 'auth',
       candidateSessionId: 1,
     });
     expect(running).toEqual({
@@ -621,7 +587,6 @@ describe('candidate api helpers', () => {
     const timeout = await pollCandidateTestRun({
       taskId: 14,
       runId: 'run-b',
-      token: 'auth',
       candidateSessionId: 1,
     });
     expect(timeout).toEqual({
@@ -639,7 +604,6 @@ describe('candidate api helpers', () => {
     const timeoutFlag = await pollCandidateTestRun({
       taskId: 14,
       runId: 'run-c',
-      token: 'auth',
       candidateSessionId: 1,
     });
     expect(timeoutFlag).toEqual({
@@ -657,7 +621,6 @@ describe('candidate api helpers', () => {
     const error = await pollCandidateTestRun({
       taskId: 14,
       runId: 'run-d',
-      token: 'auth',
       candidateSessionId: 1,
     });
     expect(error).toEqual({
@@ -674,7 +637,6 @@ describe('candidate api helpers', () => {
     const failed = await pollCandidateTestRun({
       taskId: 14,
       runId: 'run-e',
-      token: 'auth',
       candidateSessionId: 1,
     });
     expect(failed).toEqual({
@@ -692,7 +654,6 @@ describe('candidate api helpers', () => {
     const completedFailure = await pollCandidateTestRun({
       taskId: 14,
       runId: 'run-f',
-      token: 'auth',
       candidateSessionId: 1,
     });
     expect(completedFailure).toEqual({
@@ -710,7 +671,6 @@ describe('candidate api helpers', () => {
     const completedSuccess = await pollCandidateTestRun({
       taskId: 14,
       runId: 'run-g',
-      token: 'auth',
       candidateSessionId: 1,
     });
     expect(completedSuccess).toEqual({
@@ -728,7 +688,6 @@ describe('candidate api helpers', () => {
     const completedTimeout = await pollCandidateTestRun({
       taskId: 14,
       runId: 'run-h',
-      token: 'auth',
       candidateSessionId: 1,
     });
     expect(completedTimeout).toEqual({
@@ -746,7 +705,6 @@ describe('candidate api helpers', () => {
     const completedUnknown = await pollCandidateTestRun({
       taskId: 14,
       runId: 'run-i',
-      token: 'auth',
       candidateSessionId: 1,
     });
     expect(completedUnknown).toEqual({
@@ -778,7 +736,6 @@ describe('candidate api helpers', () => {
     await expect(
       initCandidateWorkspace({
         taskId: 20,
-        token: 'auth',
         candidateSessionId: 2,
       }),
     ).rejects.toMatchObject({ status: 0 });
@@ -786,7 +743,6 @@ describe('candidate api helpers', () => {
     await expect(
       getCandidateWorkspaceStatus({
         taskId: 20,
-        token: 'auth',
         candidateSessionId: 2,
       }),
     ).rejects.toMatchObject({ status: 0 });
@@ -794,7 +750,6 @@ describe('candidate api helpers', () => {
     await expect(
       startCandidateTestRun({
         taskId: 21,
-        token: 'auth',
         candidateSessionId: 3,
       }),
     ).rejects.toMatchObject({ status: 0 });
@@ -803,7 +758,6 @@ describe('candidate api helpers', () => {
       pollCandidateTestRun({
         taskId: 21,
         runId: 'run-x',
-        token: 'auth',
         candidateSessionId: 3,
       }),
     ).rejects.toMatchObject({ status: 0 });
@@ -817,7 +771,6 @@ describe('candidate api helpers', () => {
     await expect(
       startCandidateTestRun({
         taskId: 30,
-        token: 'auth',
         candidateSessionId: 4,
       }),
     ).rejects.toBeInstanceOf(HttpError);
@@ -838,7 +791,6 @@ describe('candidate api helpers', () => {
     await expect(
       initCandidateWorkspace({
         taskId: 40,
-        token: 'auth',
         candidateSessionId: 4,
       }),
     ).rejects.toBeInstanceOf(HttpError);
@@ -846,7 +798,6 @@ describe('candidate api helpers', () => {
     await expect(
       getCandidateWorkspaceStatus({
         taskId: 40,
-        token: 'auth',
         candidateSessionId: 4,
       }),
     ).rejects.toBeInstanceOf(HttpError);
@@ -855,7 +806,6 @@ describe('candidate api helpers', () => {
       pollCandidateTestRun({
         taskId: 41,
         runId: 'run-y',
-        token: 'auth',
         candidateSessionId: 4,
       }),
     ).rejects.toBeInstanceOf(HttpError);

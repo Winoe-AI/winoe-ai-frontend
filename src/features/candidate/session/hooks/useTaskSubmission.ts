@@ -3,7 +3,6 @@ import { useTaskSubmitHandler } from './useTaskSubmitHandler';
 import type { Task } from '../task/types';
 
 type Params = {
-  token: string | null;
   candidateSessionId: number | null;
   currentTask: Task | null;
   clearTaskError: () => void;
@@ -12,7 +11,6 @@ type Params = {
 };
 
 export function useTaskSubmission({
-  token,
   candidateSessionId,
   currentTask,
   clearTaskError,
@@ -31,7 +29,6 @@ export function useTaskSubmission({
   }, []);
 
   const { handleSubmit } = useTaskSubmitHandler({
-    token,
     candidateSessionId,
     currentTask,
     clearTaskError,

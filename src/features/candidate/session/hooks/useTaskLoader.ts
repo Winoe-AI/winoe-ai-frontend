@@ -5,7 +5,6 @@ import type { CandidateTask } from '../CandidateSessionProvider';
 
 type TaskLoaderDeps = {
   candidateSessionId: number | null;
-  token: string | null;
   clearTaskError: () => void;
   setTaskLoading: () => void;
   setTaskLoaded: (payload: {
@@ -20,7 +19,6 @@ type TaskLoaderDeps = {
 
 export function useTaskLoader({
   candidateSessionId,
-  token,
   clearTaskError,
   setTaskLoading,
   setTaskLoaded,
@@ -32,12 +30,11 @@ export function useTaskLoader({
 
   const fetchCurrentTask = useCallback(
     async (
-      overrides?: { authToken?: string; sessionId?: number },
+      overrides?: { sessionId?: number },
       options?: { skipCache?: boolean },
     ) => {
-      const authToken = overrides?.authToken ?? token;
       const sessionId = overrides?.sessionId ?? candidateSessionId;
-      if (!authToken || !sessionId) return;
+      if (!sessionId) return;
       if (taskInFlightRef.current) return;
 
       taskInFlightRef.current = true;
@@ -47,8 +44,8 @@ export function useTaskLoader({
 
       try {
         const dto = options
-          ? await getCandidateCurrentTask(sessionId, authToken, options)
-          : await getCandidateCurrentTask(sessionId, authToken);
+          ? await getCandidateCurrentTask(sessionId, options)
+          : await getCandidateCurrentTask(sessionId);
         if (!dto) throw new Error('Unable to load current task.');
         setTaskLoaded({
           isComplete: Boolean(dto.isComplete),
@@ -72,7 +69,6 @@ export function useTaskLoader({
       setTaskError,
       setTaskLoaded,
       setTaskLoading,
-      token,
     ],
   );
 

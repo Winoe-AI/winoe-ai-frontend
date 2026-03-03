@@ -8,7 +8,7 @@ type Params = {
   view: ViewState;
   state: CandidateSessionState;
   fetchCurrentTask: (
-    overrides?: { authToken?: string; sessionId?: number },
+    overrides?: { sessionId?: number },
     options?: { skipCache?: boolean },
   ) => Promise<void>;
   setErrorMessage: (m: string | null) => void;
@@ -24,7 +24,7 @@ export function useTaskAutoload({
 }: Params) {
   useEffect(() => {
     if (view === 'auth' || view === 'error') return;
-    if (!state.token || !state.candidateSessionId) return;
+    if (!state.candidateSessionId) return;
     if (
       state.taskState.loading ||
       state.taskState.isComplete ||

@@ -23,7 +23,6 @@ jest.mock('@/features/candidate/session/utils/errorMessages', () => {
 type HookReturn = ReturnType<typeof useCurrentTask>;
 
 type HarnessProps = {
-  token: string | null;
   candidateSessionId: number | null;
   setTaskLoading: jest.Mock;
   setTaskLoaded: jest.Mock;
@@ -41,7 +40,6 @@ const HookHarness = forwardRef<HookReturn, HarnessProps>(
 
 describe('useCurrentTask', () => {
   const baseProps = () => ({
-    token: 'tok',
     candidateSessionId: 9,
     setTaskLoading: jest.fn(),
     setTaskLoaded: jest.fn(),
@@ -53,9 +51,9 @@ describe('useCurrentTask', () => {
     jest.clearAllMocks();
   });
 
-  it('skips fetch when token or session id missing', async () => {
+  it('skips fetch when session id missing', async () => {
     const props = baseProps();
-    props.token = null;
+    props.candidateSessionId = null;
     const ref = React.createRef<HookReturn>();
     render(<HookHarness ref={ref} {...props} />);
 
