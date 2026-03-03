@@ -173,7 +173,6 @@ describe('app/api auth token routes', () => {
   });
 
   it('returns 404 outside local', async () => {
-    process.env.NODE_ENV = 'production';
     process.env.VERCEL_ENV = 'preview';
     const mod = await import('@/app/api/auth/access-token/route');
     markMetadataCovered('@/app/api/auth/access-token/route.ts');

@@ -51,7 +51,6 @@ describe('auth/access-token route', () => {
   });
 
   it('returns 404 in preview/prod', async () => {
-    process.env.NODE_ENV = 'production';
     process.env.VERCEL_ENV = 'preview';
     const res = await GET();
     expect(res.status).toBe(404);

@@ -96,7 +96,6 @@ describe('/api/auth/access-token route', () => {
   });
 
   it('returns 404 outside local', async () => {
-    process.env.NODE_ENV = 'production';
     process.env.VERCEL_ENV = 'preview';
     const mod = await import('@/app/api/auth/access-token/route');
     const res = await mod.GET();
@@ -141,7 +140,6 @@ describe('/api/dev/access-token route', () => {
   });
 
   it('returns 404 outside local', async () => {
-    process.env.NODE_ENV = 'production';
     process.env.VERCEL_ENV = 'preview';
     const mod = await import('@/app/api/dev/access-token/route');
     const res = await mod.GET();

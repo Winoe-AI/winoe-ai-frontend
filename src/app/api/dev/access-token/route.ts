@@ -1,3 +1,4 @@
+import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { isLocalEnvironment } from '@/app/api/accessTokenRouteEnvironment';
 
@@ -6,7 +7,7 @@ export const runtime = 'nodejs';
 export const revalidate = 0;
 export const fetchCache = 'force-no-store';
 
-export function GET() {
+export function GET(_req: NextRequest) {
   if (!isLocalEnvironment()) {
     // eslint-disable-next-line no-console
     console.warn('[security] /api/dev/access-token is disabled outside local');

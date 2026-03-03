@@ -46,18 +46,17 @@ describe('auth-related API routes', () => {
     const { GET } = await import('@/app/api/auth/access-token/route');
     const res = await GET();
     expect(res.status).toBe(410);
-    expect((res as unknown as { body: unknown }).body).toEqual({
+    expect(await res.json()).toEqual({
       message: 'This endpoint has been disabled.',
     });
   });
 
   it('auth/access-token returns 404 in preview/prod', async () => {
-    process.env.NODE_ENV = 'production';
     process.env.VERCEL_ENV = 'preview';
     const { GET } = await import('@/app/api/auth/access-token/route');
     const res = await GET();
     expect(res.status).toBe(404);
-    expect((res as unknown as { body: unknown }).body).toEqual({
+    expect(await res.json()).toEqual({
       message: 'Not found',
     });
   });
@@ -68,7 +67,7 @@ describe('auth-related API routes', () => {
     const { GET } = await import('@/app/api/dev/access-token/route');
     const res = await GET();
     expect(res.status).toBe(410);
-    expect((res as unknown as { body: unknown }).body).toEqual({
+    expect(await res.json()).toEqual({
       message: 'This endpoint has been disabled.',
     });
   });

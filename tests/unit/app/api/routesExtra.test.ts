@@ -173,7 +173,6 @@ describe('API routes extra coverage', () => {
     });
 
     it('returns 404 outside local', async () => {
-      process.env.NODE_ENV = 'production';
       process.env.VERCEL_ENV = 'preview';
       const mod = await import('@/app/api/dev/access-token/route');
       markMetadataCovered('@/app/api/dev/access-token/route');

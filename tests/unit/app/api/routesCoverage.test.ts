@@ -503,7 +503,6 @@ describe('API Routes Coverage - auth/access-token', () => {
   });
 
   it('covers non-local not-found path', async () => {
-    process.env.NODE_ENV = 'production';
     process.env.VERCEL_ENV = 'preview';
     const mod = await import('@/app/api/auth/access-token/route');
     const res = await mod.GET();

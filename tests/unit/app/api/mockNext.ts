@@ -47,6 +47,10 @@ export class MockNextResponse {
       headers: init?.headers,
     });
   }
+
+  async json() {
+    return this.body;
+  }
 }
 
 export class MockNextRequest {
