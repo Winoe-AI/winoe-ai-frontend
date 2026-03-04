@@ -95,6 +95,11 @@ describe('Simulation detail terminate flow', () => {
       ).toBeInTheDocument();
     });
 
+    await user.click(screen.getByRole('button', { name: /invite candidate/i }));
+    expect(
+      await screen.findByRole('button', { name: /^send invite$/i }),
+    ).toBeInTheDocument();
+
     await user.click(
       screen.getByRole('button', { name: /^terminate simulation$/i }),
     );
@@ -123,6 +128,9 @@ describe('Simulation detail terminate flow', () => {
     expect(
       screen.getByRole('button', { name: /resend invite/i }),
     ).toBeDisabled();
+    expect(
+      screen.queryByRole('button', { name: /^send invite$/i }),
+    ).not.toBeInTheDocument();
 
     expect(
       fetchMock.mock.calls.some(

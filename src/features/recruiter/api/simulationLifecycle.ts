@@ -84,6 +84,14 @@ function toCleanupJobIds(data: Record<string, unknown>): string[] | undefined {
   return ids.length ? ids : undefined;
 }
 
+function toTerminateStatus(value: unknown): string {
+  return toStringOrNull(value)?.toLowerCase() ?? ('unknown' as const);
+}
+
+function isTerminatedStatus(status: string | null | undefined): boolean {
+  return status?.toLowerCase() === 'terminated';
+}
+
 function toTerminateResponse(
   data: unknown,
   fallbackSimulationId: string,
@@ -95,8 +103,7 @@ function toTerminateResponse(
     }
     return toStringOrNull(value);
   };
-  const status =
-    toStringOrNull(record?.status)?.toLowerCase() ?? ('terminated' as const);
+  const status = toTerminateStatus(record?.status);
   const simulationId =
     toId(record?.simulationId ?? record?.simulation_id ?? record?.id) ??
     fallbackSimulationId;
@@ -112,11 +119,11 @@ function maybeIdempotentTerminateFromError(
   simulationId: string,
 ): TerminateSimulationResponse | null {
   const errorRecord = asRecord(error);
-  const candidate = toTerminateResponse(
-    errorRecord?.details ?? errorRecord?.data ?? error,
-    simulationId,
-  );
-  return candidate.status.toLowerCase() === 'terminated' ? candidate : null;
+  const payload = errorRecord?.details ?? errorRecord?.data ?? error;
+  const payloadRecord = asRecord(payload);
+  const explicitStatus = toStringOrNull(payloadRecord?.status);
+  if (!isTerminatedStatus(explicitStatus)) return null;
+  return toTerminateResponse(payload, simulationId);
 }
 
 async function tryPostWithFallback(
@@ -262,18 +269,15 @@ export async function terminateSimulation(
       `/simulations/${encodeURIComponent(id)}/terminate`,
       {
         method: 'POST',
-        body: { confirm: true },
       },
     );
 
     const normalized = toTerminateResponse(data, id);
+    const terminated = isTerminatedStatus(normalized.status);
     return {
-      ok: normalized.status.toLowerCase() === 'terminated',
+      ok: terminated,
       statusCode: 200,
-      message:
-        normalized.status.toLowerCase() === 'terminated'
-          ? null
-          : 'Unable to terminate simulation.',
+      message: terminated ? null : 'Unable to terminate simulation.',
       data: normalized,
     };
   } catch (error) {

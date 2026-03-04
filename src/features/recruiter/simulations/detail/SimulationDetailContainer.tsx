@@ -104,6 +104,8 @@ export default function SimulationDetailContainer() {
     simulationId,
     reloadCandidates: reload,
   });
+  const closeInviteModal = inviteModal.close;
+  const submitInvite = inviteModal.submitInvite;
   const cooldownTick = useCooldownTick(rowStates);
   const labels = useSimulationLabels(plan, detail, simulationId);
 
@@ -261,6 +263,35 @@ export default function SimulationDetailContainer() {
     simulationStatus,
   ]);
 
+  const onSubmitInvite = useCallback(
+    async (candidateName: string, inviteEmail: string) => {
+      if (isTerminated) {
+        const message =
+          inviteDisabledReason ??
+          'This simulation has been terminated. Invites are disabled immediately.';
+        setActionError(message);
+        notify({
+          id: `invite-disabled-${simulationId}`,
+          tone: 'error',
+          title: 'Invites are disabled',
+          description: message,
+        });
+        closeInviteModal();
+        return;
+      }
+
+      await submitInvite(candidateName, inviteEmail);
+    },
+    [
+      closeInviteModal,
+      inviteDisabledReason,
+      isTerminated,
+      notify,
+      simulationId,
+      submitInvite,
+    ],
+  );
+
   const onSetTerminateModalOpen = useCallback(
     (open: boolean) => {
       if (open && !terminateModalOpen) {
@@ -304,6 +335,7 @@ export default function SimulationDetailContainer() {
           : [];
         setStatusOverride('terminated');
         setCleanupJobIds(returnedCleanup);
+        closeInviteModal();
         setTerminateModalOpen(false);
         notify({
           id: `terminate-success-${simulationId}`,
@@ -371,6 +403,7 @@ export default function SimulationDetailContainer() {
       setTerminatePending(false);
     }
   }, [
+    closeInviteModal,
     notify,
     scenarioVersionIndex,
     simulationId,
@@ -437,7 +470,7 @@ export default function SimulationDetailContainer() {
       inviteModalOpen={inviteModal.open}
       setInviteModalOpen={inviteModal.setOpen}
       inviteFlowState={inviteModal.inviteFlowState}
-      submitInvite={inviteModal.submitInvite}
+      submitInvite={onSubmitInvite}
       resetInviteFlow={inviteModal.resetInviteFlow}
     />
   );
