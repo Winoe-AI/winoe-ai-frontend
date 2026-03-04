@@ -34,7 +34,7 @@ describe('SimulationCreatePage', () => {
     render(<SimulationCreatePage />);
 
     await user.clear(screen.getByLabelText(/Title/i));
-    await user.clear(screen.getByLabelText(/Role/i));
+    await user.clear(screen.getByLabelText(/^Role$/i));
     await user.clear(screen.getByLabelText(/Tech stack/i));
 
     await user.click(
@@ -58,15 +58,19 @@ describe('SimulationCreatePage', () => {
     render(<SimulationCreatePage />);
 
     await user.type(screen.getByLabelText(/Title/i), ' Backend Payments ');
-    await user.clear(screen.getByLabelText(/Role/i));
-    await user.type(screen.getByLabelText(/Role/i), ' Backend Engineer ');
+    await user.clear(screen.getByLabelText(/^Role$/i));
+    await user.type(screen.getByLabelText(/^Role$/i), ' Backend Engineer ');
     await user.clear(screen.getByLabelText(/Tech stack/i));
     await user.type(screen.getByLabelText(/Tech stack/i), ' Node + Postgres ');
+    await user.selectOptions(screen.getByLabelText(/Role level/i), 'senior');
     await user.selectOptions(
       screen.getByLabelText(/Template/i),
       'node-express-ts',
     );
+    await user.type(screen.getByLabelText(/Company domain/i), ' fintech ');
+    await user.type(screen.getByLabelText(/Product area/i), ' payments ');
     await user.type(screen.getByLabelText(/Focus /i), 'Messaging focus');
+    await user.click(screen.getByLabelText(/Day 4/i));
 
     await user.click(
       screen.getByRole('button', { name: /Create simulation/i }),
@@ -77,9 +81,23 @@ describe('SimulationCreatePage', () => {
         title: 'Backend Payments',
         role: 'Backend Engineer',
         techStack: 'Node + Postgres',
-        seniority: 'Mid',
+        seniority: 'senior',
         templateKey: 'node-express-ts',
         focus: 'Messaging focus',
+        companyContext: {
+          domain: 'fintech',
+          productArea: 'payments',
+        },
+        ai: {
+          noticeVersion: 'mvp1',
+          evalEnabledByDay: {
+            '1': true,
+            '2': true,
+            '3': true,
+            '4': false,
+            '5': true,
+          },
+        },
       });
     });
 
@@ -147,6 +165,35 @@ describe('SimulationCreatePage', () => {
 
     expect(await screen.findByText(/Server exploded/i)).toBeInTheDocument();
     expect(routerMock.refresh).not.toHaveBeenCalled();
+  });
+
+  it('maps 422 backend validation errors to inline fields', async () => {
+    const user = userEvent.setup();
+    createSimulationMock.mockResolvedValueOnce({
+      ok: false,
+      status: 422,
+      id: '',
+      details: {
+        detail: [
+          { loc: ['body', 'seniority'], msg: 'Invalid role level' },
+          { loc: ['body', 'companyContext', 'domain'], msg: 'Invalid domain' },
+          {
+            loc: ['body', 'ai', 'evalEnabledByDay', '4'],
+            msg: 'Day 4 toggle is invalid',
+          },
+        ],
+      },
+    });
+
+    render(<SimulationCreatePage />);
+    await user.type(screen.getByLabelText(/Title/i), 'Backend Sim');
+    await user.click(
+      screen.getByRole('button', { name: /Create simulation/i }),
+    );
+
+    expect(await screen.findByText(/Invalid role level/i)).toBeInTheDocument();
+    expect(screen.getByText(/Invalid domain/i)).toBeInTheDocument();
+    expect(screen.getByText(/Day 4 toggle is invalid/i)).toBeInTheDocument();
   });
 
   it('navigates back to dashboard via header Back button', async () => {

@@ -1,10 +1,14 @@
-import type { FieldErrors, FormValues } from '../utils/createFormConfig';
+import {
+  MAX_FOCUS_NOTES_CHARS,
+  type FieldErrors,
+  type FormValues,
+} from '../utils/createFormConfig';
 
 type Props = {
   values: FormValues;
   errors: FieldErrors;
   isSubmitting: boolean;
-  onChange: (key: keyof FormValues, value: string) => void;
+  onChange: (key: 'focus', value: string) => void;
 };
 
 export function SimulationFocusField({
@@ -19,7 +23,7 @@ export function SimulationFocusField({
         htmlFor="focus"
         className="text-xs font-medium uppercase tracking-wide text-gray-500"
       >
-        Focus / notes (optional)
+        Focus / notes
       </label>
       <textarea
         id="focus"
@@ -31,8 +35,13 @@ export function SimulationFocusField({
         rows={4}
         placeholder="Optional context or what to emphasize"
         disabled={isSubmitting}
-        aria-describedby={errors.focus ? 'focus-error' : undefined}
+        aria-invalid={Boolean(errors.focus)}
+        aria-describedby={errors.focus ? 'focus-error' : 'focus-helper'}
       />
+      <p id="focus-helper" className="mt-1 text-xs text-gray-500">
+        Recommended: include constraints, quality bar, and what to emphasize.{' '}
+        {values.focus.length}/{MAX_FOCUS_NOTES_CHARS}
+      </p>
       {errors.focus ? (
         <p id="focus-error" className="mt-1 text-sm text-red-700" role="alert">
           {errors.focus}

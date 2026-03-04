@@ -8,8 +8,8 @@ type Props = {
   isSubmitting: boolean;
   options: CreateSimulationInput['seniority'][];
   onChange: (
-    key: keyof FormValues,
-    value: string | CreateSimulationInput['seniority'],
+    key: 'seniority',
+    value: CreateSimulationInput['seniority'],
   ) => void;
 };
 
@@ -26,7 +26,7 @@ export function SimulationSenioritySelect({
         htmlFor="seniority"
         className="text-xs font-medium uppercase tracking-wide text-gray-500"
       >
-        Seniority
+        Role level
       </label>
       <select
         id="seniority"
@@ -44,7 +44,8 @@ export function SimulationSenioritySelect({
       >
         {options.map((opt) => (
           <option key={opt} value={opt}>
-            {opt}
+            {opt[0].toUpperCase()}
+            {opt.slice(1)}
           </option>
         ))}
       </select>

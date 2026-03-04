@@ -1,15 +1,17 @@
 import Input from '@/shared/ui/Input';
 import type { FieldErrors, FormValues } from '../utils/createFormConfig';
 
+type TextFieldKey = 'title' | 'role' | 'techStack';
+
 type Props = {
   values: FormValues;
   errors: FieldErrors;
   isSubmitting: boolean;
-  onChange: (key: keyof FormValues, value: string) => void;
+  onChange: (key: TextFieldKey, value: string) => void;
 };
 
 const textFields: Array<{
-  key: keyof FormValues;
+  key: TextFieldKey;
   label: string;
   placeholder: string;
 }> = [

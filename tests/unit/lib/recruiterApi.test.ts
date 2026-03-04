@@ -368,7 +368,7 @@ describe('recruiterApi', () => {
         title: '',
         role: ' ',
         techStack: '',
-        seniority: 'Mid',
+        seniority: 'mid',
         templateKey: 'python-fastapi',
       });
 
@@ -391,9 +391,23 @@ describe('recruiterApi', () => {
         title: '  Backend Sim ',
         role: ' Backend ',
         techStack: ' Node ',
-        seniority: 'Senior',
+        seniority: 'senior',
         templateKey: 'node-express-ts',
         focus: '  Focus ',
+        companyContext: {
+          domain: ' fintech ',
+          productArea: ' payments ',
+        },
+        ai: {
+          noticeVersion: ' mvp1 ',
+          evalEnabledByDay: {
+            '1': true,
+            '2': true,
+            '3': false,
+            '4': true,
+            '5': true,
+          },
+        },
       });
 
       expect(mockRecruiterRequest).toHaveBeenCalledWith(
@@ -404,9 +418,23 @@ describe('recruiterApi', () => {
             title: 'Backend Sim',
             role: 'Backend',
             techStack: 'Node',
-            seniority: 'Senior',
+            seniority: 'senior',
             templateKey: 'node-express-ts',
             focus: 'Focus',
+            companyContext: {
+              domain: 'fintech',
+              productArea: 'payments',
+            },
+            ai: {
+              noticeVersion: 'mvp1',
+              evalEnabledByDay: {
+                '1': true,
+                '2': true,
+                '3': false,
+                '4': true,
+                '5': true,
+              },
+            },
           },
         }),
       );
@@ -429,7 +457,7 @@ describe('recruiterApi', () => {
         title: 'Sim',
         role: 'Backend',
         techStack: 'Node',
-        seniority: 'Junior',
+        seniority: 'junior',
         templateKey: 'python-fastapi',
       });
 
@@ -451,9 +479,13 @@ describe('recruiterApi', () => {
         title: 'Sim',
         role: 'Backend',
         techStack: 'Node',
-        seniority: 'Junior',
+        seniority: 'junior',
         templateKey: 'python-fastapi',
         focus: '   ',
+        companyContext: {
+          domain: '   ',
+          productArea: '',
+        },
       });
 
       expect(result).toEqual({
@@ -462,6 +494,19 @@ describe('recruiterApi', () => {
         status: 201,
         message: undefined,
       });
+      expect(mockRecruiterRequest).toHaveBeenCalledWith(
+        '/simulations',
+        expect.objectContaining({
+          method: 'POST',
+          body: {
+            title: 'Sim',
+            role: 'Backend',
+            techStack: 'Node',
+            seniority: 'junior',
+            templateKey: 'python-fastapi',
+          },
+        }),
+      );
     });
 
     it('posts to BFF base even when public API base is absolute', async () => {
@@ -476,7 +521,7 @@ describe('recruiterApi', () => {
         title: 'Env Sim',
         role: 'Backend',
         techStack: 'Node',
-        seniority: 'Junior',
+        seniority: 'junior',
         templateKey: 'python-fastapi',
       });
 
@@ -493,7 +538,7 @@ describe('recruiterApi', () => {
         title: 'Sim Name',
         role: 'Backend',
         techStack: 'Node',
-        seniority: 'Junior',
+        seniority: 'junior',
         templateKey: 'python-fastapi',
       });
 
@@ -515,7 +560,7 @@ describe('recruiterApi', () => {
         title: 'Sim',
         role: 'Backend',
         techStack: 'Node',
-        seniority: 'Junior',
+        seniority: 'junior',
         templateKey: 'python-fastapi',
       });
 

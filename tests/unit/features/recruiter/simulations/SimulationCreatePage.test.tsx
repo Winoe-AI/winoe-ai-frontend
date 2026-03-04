@@ -50,7 +50,7 @@ describe('SimulationCreatePage', () => {
     fireEvent.change(screen.getByLabelText(/Title/i), {
       target: { value: 'Title' },
     });
-    fireEvent.change(screen.getByLabelText(/^Role/i), {
+    fireEvent.change(screen.getByLabelText(/^Role$/i), {
       target: { value: 'Role' },
     });
     fireEvent.change(screen.getByLabelText(/Tech stack/i), {

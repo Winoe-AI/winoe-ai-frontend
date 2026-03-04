@@ -10,8 +10,10 @@ import {
 } from '@/lib/auth/routing';
 import { toUserMessage } from '@/lib/errors/errors';
 import {
+  AI_DAY_FIELD_MAP,
   SENIORITY_OPTIONS,
   initialValues,
+  mapSimulationValidationErrors,
   validateSimulationInput,
   type FieldErrors,
   type FormValues,
@@ -31,13 +33,35 @@ export function useSimulationCreateForm(onSuccess: (id: string) => void) {
 
   const handleSubmit = async (e?: React.FormEvent<HTMLFormElement>) => {
     e?.preventDefault();
+    const trimmedDomain = values.companyDomain.trim();
+    const trimmedProductArea = values.companyProductArea.trim();
+    const trimmedFocus = values.focus.trim();
     const payload: CreateSimulationInput = {
       title: values.title.trim(),
       role: values.role.trim(),
       techStack: values.techStack.trim(),
       seniority: values.seniority,
       templateKey: values.templateKey,
-      focus: values.focus.trim() ? values.focus.trim() : undefined,
+      focus: trimmedFocus ? trimmedFocus : undefined,
+      companyContext:
+        trimmedDomain || trimmedProductArea
+          ? {
+              ...(trimmedDomain ? { domain: trimmedDomain } : {}),
+              ...(trimmedProductArea
+                ? { productArea: trimmedProductArea }
+                : {}),
+            }
+          : undefined,
+      ai: {
+        noticeVersion: values.noticeVersion.trim(),
+        evalEnabledByDay: {
+          '1': values[AI_DAY_FIELD_MAP['1']],
+          '2': values[AI_DAY_FIELD_MAP['2']],
+          '3': values[AI_DAY_FIELD_MAP['3']],
+          '4': values[AI_DAY_FIELD_MAP['4']],
+          '5': values[AI_DAY_FIELD_MAP['5']],
+        },
+      },
     };
 
     const nextErrors = validateSimulationInput(payload);
@@ -62,6 +86,13 @@ export function useSimulationCreateForm(onSuccess: (id: string) => void) {
         if (status === 403) {
           window.location.assign(buildNotAuthorizedUrl('recruiter', returnTo));
           return;
+        }
+        if (status === 422) {
+          const validationErrors = mapSimulationValidationErrors(res.details);
+          if (Object.keys(validationErrors).length > 0) {
+            setErrors(validationErrors);
+            return;
+          }
         }
         const fallback = res.message
           ? res.message

@@ -9,10 +9,7 @@ type Props = {
   errors: FieldErrors;
   isSubmitting: boolean;
   seniorityOptions: CreateSimulationInput['seniority'][];
-  onChange: (
-    key: keyof FormValues,
-    value: string | CreateSimulationInput['seniority'],
-  ) => void;
+  onChange: <K extends keyof FormValues>(key: K, value: FormValues[K]) => void;
   onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
   onCancel: () => void;
 };
@@ -44,7 +41,7 @@ export function SimulationCreateForm({
         values={values}
         errors={errors}
         isSubmitting={isSubmitting}
-        onChange={(key, value) => onChange(key, value)}
+        onChange={onChange}
       />
 
       <SimulationCreateOptions
