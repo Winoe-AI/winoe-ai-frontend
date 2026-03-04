@@ -22,6 +22,8 @@ type Props = {
   onApprove: () => void;
   regenerateLoading: boolean;
   onRegenerate: () => void;
+  terminatePending: boolean;
+  onOpenTerminateModal: () => void;
   onInvite: () => void;
 };
 
@@ -49,6 +51,8 @@ export function SimulationDetailHeaderCore({
   onApprove,
   regenerateLoading,
   onRegenerate,
+  terminatePending,
+  onOpenTerminateModal,
   onInvite,
 }: Props) {
   const status = statusMeta(simulationStatus ?? 'draft', 'Unknown');
@@ -88,6 +92,19 @@ export function SimulationDetailHeaderCore({
             }
           >
             Invite candidate
+          </Button>
+          <Button
+            type="button"
+            size="sm"
+            variant="secondary"
+            className="border-red-300 text-red-700 hover:bg-red-50 focus:ring-red-500"
+            onClick={onOpenTerminateModal}
+            disabled={simulationStatus === 'terminated' || terminatePending}
+            loading={terminatePending}
+          >
+            {simulationStatus === 'terminated'
+              ? 'Simulation terminated'
+              : 'Terminate simulation'}
           </Button>
           <Link
             className="text-sm text-blue-600 hover:underline"

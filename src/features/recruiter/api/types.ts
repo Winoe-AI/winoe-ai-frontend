@@ -10,6 +10,13 @@ export type SimulationListItem = {
   templateKey?: string | null;
 };
 
+export type SimulationLifecycleStatus =
+  | 'draft'
+  | 'generating'
+  | 'ready_for_review'
+  | 'active_inviting'
+  | 'terminated';
+
 export type InviteCandidateResponse = {
   candidateSessionId: string;
   token: string;
@@ -64,6 +71,12 @@ export type ResendInviteResult = {
   rateLimited?: boolean;
   notFound?: boolean;
   body?: unknown;
+};
+
+export type TerminateSimulationResponse = {
+  simulationId: string;
+  status: SimulationLifecycleStatus | string;
+  cleanupJobIds?: string[];
 };
 
 export type CandidateListOptions = {

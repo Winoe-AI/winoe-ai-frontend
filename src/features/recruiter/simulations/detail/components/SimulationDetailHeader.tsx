@@ -20,7 +20,8 @@ type Props = Pick<
   | 'onApprove'
   | 'regenerateLoading'
   | 'onRegenerate'
-> & { onInvite: () => void };
+  | 'terminatePending'
+> & { onInvite: () => void; onOpenTerminateModal: () => void };
 
 export function SimulationDetailHeader({
   simulationId,
@@ -38,6 +39,8 @@ export function SimulationDetailHeader({
   onApprove,
   regenerateLoading,
   onRegenerate,
+  terminatePending,
+  onOpenTerminateModal,
   onInvite,
 }: Props) {
   return (
@@ -57,6 +60,8 @@ export function SimulationDetailHeader({
       onApprove={onApprove}
       regenerateLoading={regenerateLoading}
       onRegenerate={onRegenerate}
+      terminatePending={terminatePending}
+      onOpenTerminateModal={onOpenTerminateModal}
       onInvite={onInvite}
     />
   );

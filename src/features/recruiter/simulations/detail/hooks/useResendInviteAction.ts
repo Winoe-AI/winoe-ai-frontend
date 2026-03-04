@@ -14,12 +14,23 @@ export function useResendInviteAction(
     updater: (prev: CandidateSession[]) => CandidateSession[],
   ) => void,
   notify: Notify,
+  inviteResendEnabled: boolean,
+  inviteResendDisabledReason: string | null,
 ) {
   const startCooldown = useInviteCooldown(updateRow);
 
   const handleResend = useCallback(
     async (candidate: CandidateSession) => {
       const id = String(candidate.candidateSessionId);
+      if (!inviteResendEnabled) {
+        const message =
+          inviteResendDisabledReason ??
+          'Invites and resends are disabled for this simulation.';
+        finishRow(updateRow, id, { resending: false, error: message });
+        notifyError(notify, id, message);
+        return false;
+      }
+
       markPending(updateRow, id);
       try {
         const outcome = await fetchResendOutcome(simulationId, candidate);
@@ -47,7 +58,16 @@ export function useResendInviteAction(
         return false;
       }
     },
-    [notify, refresh, simulationId, startCooldown, updateLocal, updateRow],
+    [
+      inviteResendDisabledReason,
+      inviteResendEnabled,
+      notify,
+      refresh,
+      simulationId,
+      startCooldown,
+      updateLocal,
+      updateRow,
+    ],
   );
 
   return { handleResend };

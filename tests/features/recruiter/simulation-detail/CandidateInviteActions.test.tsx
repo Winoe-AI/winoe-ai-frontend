@@ -30,6 +30,8 @@ describe('CandidateInviteActions', () => {
         rowState={{ ...baseRowState, cooldownUntilMs: Date.now() + 5000 }}
         inviteLink="http://x"
         cooldownNow={Date.now()}
+        inviteResendEnabled={true}
+        inviteResendDisabledReason={null}
         onCopy={() => {}}
         onResend={onResend}
         onCloseManual={() => {}}
@@ -39,5 +41,29 @@ describe('CandidateInviteActions', () => {
     const resend = screen.getByRole('button', { name: /resend invite/i });
     fireEvent.click(resend);
     expect(onResend).not.toHaveBeenCalled();
+  });
+
+  it('disables invite actions when resend is blocked at simulation level', () => {
+    render(
+      <CandidateInviteActions
+        candidate={candidate}
+        rowState={baseRowState}
+        inviteLink="http://x"
+        cooldownNow={Date.now()}
+        inviteResendEnabled={false}
+        inviteResendDisabledReason="Terminated"
+        onCopy={() => {}}
+        onResend={() => {}}
+        onCloseManual={() => {}}
+      />,
+    );
+
+    expect(
+      screen.getByRole('button', { name: /copy invite link/i }),
+    ).toBeDisabled();
+    expect(
+      screen.getByRole('button', { name: /resend invite/i }),
+    ).toBeDisabled();
+    expect(screen.getByText('Terminated')).toBeInTheDocument();
   });
 });

@@ -1,7 +1,11 @@
 export type SimulationDetailEventName =
   | 'approve_clicked'
   | 'regenerate_clicked'
-  | 'retry_generate_clicked';
+  | 'retry_generate_clicked'
+  | 'terminate_clicked'
+  | 'terminate_confirmed'
+  | 'terminate_success'
+  | 'terminate_failure';
 
 type EventPayload = {
   simulationId: string;
