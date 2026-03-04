@@ -7,7 +7,9 @@ import {
   regenerateSimulationScenario,
   retrySimulationGeneration,
 } from '@/features/recruiter/api';
+import { toUserMessage } from '@/lib/errors/errors';
 import { SimulationDetailView } from './components/SimulationDetailView';
+import { SimulationDetailBlockedState } from './components/SimulationDetailBlockedState';
 import { useSimulationPlan } from './hooks/useSimulationPlan';
 import { useSimulationCandidates } from './hooks/useSimulationCandidates';
 import { useCandidatesSearch } from './hooks/useCandidatesSearch';
@@ -38,8 +40,11 @@ export default function SimulationDetailContainer() {
     isGenerating,
     reload: reloadPlan,
   } = useSimulationPlan({ simulationId });
+  const pageBlocked = planStatusCode === 403 || planStatusCode === 404;
+  const candidatesEnabled =
+    !pageBlocked && (detail != null || planStatusCode != null || !planLoading);
   const { candidates, loading, error, reload, setCandidates } =
-    useSimulationCandidates({ simulationId });
+    useSimulationCandidates({ simulationId, enabled: candidatesEnabled });
   const search = useCandidatesSearch({ candidates, pageSize: 25 });
   const { rowStates, handleCopy, handleResend, closeManualCopy } =
     useCandidateRowActions(simulationId, reload, setCandidates);
@@ -101,6 +106,19 @@ export default function SimulationDetailContainer() {
         return;
       }
       await refreshPlan();
+    } catch (caught: unknown) {
+      setActionError(
+        buildActionError(
+          toUserMessage(
+            caught,
+            'Unable to activate inviting for this simulation.',
+            {
+              includeDetail: false,
+            },
+          ),
+          'Unable to activate inviting for this simulation.',
+        ),
+      );
     } finally {
       setApproveLoading(false);
     }
@@ -141,6 +159,15 @@ export default function SimulationDetailContainer() {
         return;
       }
       await refreshPlan();
+    } catch (caught: unknown) {
+      setActionError(
+        buildActionError(
+          toUserMessage(caught, 'Unable to regenerate scenario.', {
+            includeDetail: false,
+          }),
+          'Unable to regenerate scenario.',
+        ),
+      );
     } finally {
       setRegenerateLoading(false);
     }
@@ -173,6 +200,15 @@ export default function SimulationDetailContainer() {
         return;
       }
       await refreshPlan();
+    } catch (caught: unknown) {
+      setActionError(
+        buildActionError(
+          toUserMessage(caught, 'Unable to retry generation.', {
+            includeDetail: false,
+          }),
+          'Unable to retry generation.',
+        ),
+      );
     } finally {
       setRetryGenerateLoading(false);
     }
@@ -183,6 +219,12 @@ export default function SimulationDetailContainer() {
     simulationId,
     simulationStatus,
   ]);
+
+  if (pageBlocked) {
+    return (
+      <SimulationDetailBlockedState statusCode={planStatusCode as 403 | 404} />
+    );
+  }
 
   return (
     <SimulationDetailView

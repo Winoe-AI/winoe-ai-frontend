@@ -76,6 +76,8 @@ export function useSimulationPlan({ simulationId }: Params) {
         if (!mountedRef.current) return;
 
         const status = toStatus(caught);
+        setDetail(null);
+        setJobStatusHint(null);
         setStatusCode(status);
 
         if (status === 404) {
@@ -101,6 +103,9 @@ export function useSimulationPlan({ simulationId }: Params) {
   useEffect(() => {
     pollAttemptRef.current = 0;
     clearPollTimer();
+    setDetail(null);
+    setJobStatusHint(null);
+    setStatusCode(null);
     void loadPlan();
     return clearPollTimer;
   }, [clearPollTimer, loadPlan]);
@@ -133,7 +138,13 @@ export function useSimulationPlan({ simulationId }: Params) {
   useEffect(() => {
     clearPollTimer();
 
-    if (!detail || detail.hasJobFailure || !isGenerating) {
+    if (
+      statusCode === 403 ||
+      statusCode === 404 ||
+      !detail ||
+      detail.hasJobFailure ||
+      !isGenerating
+    ) {
       pollAttemptRef.current = 0;
       return;
     }
@@ -153,23 +164,34 @@ export function useSimulationPlan({ simulationId }: Params) {
       void (async () => {
         const jobId = effectiveJob?.jobId ?? detail.generationJob?.jobId;
         if (jobId) {
-          const job = await getSimulationJobStatus(jobId);
-          if (job && mountedRef.current) {
-            setJobStatusHint({
-              jobId: job.jobId,
-              status: job.status,
-              pollAfterMs: job.pollAfterMs,
-              errorMessage: job.errorMessage,
-              errorCode: job.errorCode,
-            });
-          }
+          try {
+            const job = await getSimulationJobStatus(jobId);
+            if (job && mountedRef.current) {
+              setJobStatusHint({
+                jobId: job.jobId,
+                status: job.status,
+                pollAfterMs: job.pollAfterMs,
+                errorMessage: job.errorMessage,
+                errorCode: job.errorCode,
+              });
+            }
+          } catch {}
         }
-        await loadPlan({ skipCache: true, silent: true });
+        try {
+          await loadPlan({ skipCache: true, silent: true });
+        } catch {}
       })();
     }, delayMs);
 
     return clearPollTimer;
-  }, [clearPollTimer, detail, effectiveJob, isGenerating, loadPlan]);
+  }, [
+    clearPollTimer,
+    detail,
+    effectiveJob,
+    isGenerating,
+    loadPlan,
+    statusCode,
+  ]);
 
   return {
     detail: detailWithJobHint,
