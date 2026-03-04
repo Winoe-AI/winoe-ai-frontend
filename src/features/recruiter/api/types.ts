@@ -17,19 +17,41 @@ export type InviteCandidateResponse = {
   outcome: 'created' | 'resent';
 };
 
+export type SimulationRoleLevel =
+  | 'intern'
+  | 'junior'
+  | 'mid'
+  | 'senior'
+  | 'staff';
+
+export type SimulationEvalDayKey = '1' | '2' | '3' | '4' | '5';
+
+export type SimulationAiConfigInput = {
+  noticeVersion: string;
+  evalEnabledByDay: Record<SimulationEvalDayKey, boolean>;
+};
+
+export type SimulationCompanyContextInput = {
+  domain?: string;
+  productArea?: string;
+};
+
 export type CreateSimulationInput = {
   title: string;
   role: string;
   techStack: string;
-  seniority: 'Junior' | 'Mid' | 'Senior';
+  seniority: SimulationRoleLevel;
   templateKey: TemplateKey;
   focus?: string;
+  companyContext?: SimulationCompanyContextInput;
+  ai?: SimulationAiConfigInput;
 };
 
 export type CreateSimulationResponse = {
   ok: boolean;
   status?: number;
   message?: string;
+  details?: unknown;
   id: string;
 };
 

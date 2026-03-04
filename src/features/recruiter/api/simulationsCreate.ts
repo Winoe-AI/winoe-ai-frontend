@@ -5,6 +5,8 @@ import { isRecord } from './simUtils';
 import { throwMappedApiError } from '@/lib/api/errors/errorMapping';
 import { requestRecruiterBff } from './requestRecruiterBff';
 
+const AI_DAY_KEYS = ['1', '2', '3', '4', '5'] as const;
+
 export async function createSimulation(
   input: CreateSimulationInput,
   options?: { signal?: AbortSignal; cache?: RequestCache },
@@ -13,6 +15,10 @@ export async function createSimulation(
   const safeRole = input.role.trim();
   const safeTechStack = input.techStack.trim();
   const safeTemplateKey = input.templateKey.trim();
+  const safeFocus = input.focus?.trim() ? input.focus.trim() : undefined;
+  const safeCompanyDomain = input.companyContext?.domain?.trim();
+  const safeProductArea = input.companyContext?.productArea?.trim();
+  const safeNoticeVersion = input.ai?.noticeVersion?.trim();
 
   if (!safeTitle || !safeRole || !safeTechStack || !safeTemplateKey) {
     return {
@@ -23,16 +29,42 @@ export async function createSimulation(
     };
   }
 
-  try {
-    const payload = {
-      title: safeTitle,
-      role: safeRole,
-      techStack: safeTechStack,
-      seniority: input.seniority,
-      templateKey: safeTemplateKey,
-      focus: input.focus?.trim() ? input.focus.trim() : undefined,
-    };
+  const evalEnabledByDay =
+    input.ai?.evalEnabledByDay && isRecord(input.ai.evalEnabledByDay)
+      ? AI_DAY_KEYS.reduce<Record<string, boolean>>((acc, day) => {
+          if (typeof input.ai?.evalEnabledByDay?.[day] === 'boolean') {
+            acc[day] = input.ai.evalEnabledByDay[day];
+          }
+          return acc;
+        }, {})
+      : undefined;
 
+  const payload = {
+    title: safeTitle,
+    role: safeRole,
+    techStack: safeTechStack,
+    seniority: input.seniority,
+    templateKey: safeTemplateKey,
+    ...(safeFocus ? { focus: safeFocus } : {}),
+    ...(safeCompanyDomain || safeProductArea
+      ? {
+          companyContext: {
+            ...(safeCompanyDomain ? { domain: safeCompanyDomain } : {}),
+            ...(safeProductArea ? { productArea: safeProductArea } : {}),
+          },
+        }
+      : {}),
+    ...(safeNoticeVersion || evalEnabledByDay
+      ? {
+          ai: {
+            ...(safeNoticeVersion ? { noticeVersion: safeNoticeVersion } : {}),
+            ...(evalEnabledByDay ? { evalEnabledByDay } : {}),
+          },
+        }
+      : {}),
+  };
+
+  try {
     const { data } = await requestRecruiterBff<unknown>('/simulations', {
       method: 'POST',
       body: payload,
@@ -68,17 +100,16 @@ export async function createSimulation(
         const message =
           (mapped as { message?: string }).message ??
           'Unable to create simulation right now.';
-        return { ok: false, status, id: '', message };
+        const details = (mapped as { details?: unknown }).details;
+        return { ok: false, status, id: '', message, details };
       }
     }
     const status = fallbackStatus(caught, 0);
+    const details = (caught as { details?: unknown })?.details;
     const message =
-      extractBackendMessage(
-        (caught as { details?: unknown })?.details ?? caught,
-        true,
-      ) ??
+      extractBackendMessage(details ?? caught, true) ??
       (caught instanceof Error ? caught.message : null) ??
       'Unable to create simulation right now.';
-    return { ok: false, status, id: '', message };
+    return { ok: false, status, id: '', message, details };
   }
 }

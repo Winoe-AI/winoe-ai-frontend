@@ -48,10 +48,15 @@ export const normalizeCreateSimulationResponse = (
       : typeof raw.detail === 'string'
         ? raw.detail
         : (extractBackendMessage(raw, true) ?? undefined);
+  const details =
+    raw.details ??
+    (typeof raw.detail === 'string' ? undefined : raw.detail) ??
+    undefined;
   return {
     ok: status >= 200 && status < 300 && Boolean(id),
     status,
     id,
     message,
+    details,
   };
 };

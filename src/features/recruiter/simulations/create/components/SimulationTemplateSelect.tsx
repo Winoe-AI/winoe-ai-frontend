@@ -6,7 +6,7 @@ type Props = {
   values: FormValues;
   errors: FieldErrors;
   isSubmitting: boolean;
-  onChange: (key: keyof FormValues, value: string) => void;
+  onChange: (key: 'templateKey', value: FormValues['templateKey']) => void;
 };
 
 export function SimulationTemplateSelect({
@@ -28,7 +28,7 @@ export function SimulationTemplateSelect({
         className="mt-1 w-full rounded border border-gray-300 px-3 py-2 text-sm"
         value={values.templateKey}
         onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-          onChange('templateKey', e.target.value)
+          onChange('templateKey', e.target.value as FormValues['templateKey'])
         }
         disabled={isSubmitting}
         aria-invalid={Boolean(errors.templateKey)}
