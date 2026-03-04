@@ -18,11 +18,11 @@ export type InviteCandidateResponse = {
 };
 
 export type SimulationRoleLevel =
-  | 'intern'
   | 'junior'
   | 'mid'
   | 'senior'
-  | 'staff';
+  | 'staff'
+  | 'principal';
 
 export type SimulationEvalDayKey = '1' | '2' | '3' | '4' | '5';
 

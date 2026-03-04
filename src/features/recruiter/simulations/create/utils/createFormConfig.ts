@@ -61,11 +61,11 @@ export type FormValues = {
 };
 
 export const SENIORITY_OPTIONS: SimulationRoleLevel[] = [
-  'intern',
   'junior',
   'mid',
   'senior',
   'staff',
+  'principal',
 ];
 
 const SENIORITY_SET = new Set<SimulationRoleLevel>(SENIORITY_OPTIONS);
@@ -106,7 +106,7 @@ export function validateSimulationInput(
     next.seniority = 'Role level is required.';
   } else if (!SENIORITY_SET.has(input.seniority)) {
     next.seniority =
-      'Role level must be one of: intern, junior, mid, senior, staff.';
+      'Role level must be one of: junior, mid, senior, staff, principal.';
   }
 
   const safeFocus = trimOrUndefined(input.focus);

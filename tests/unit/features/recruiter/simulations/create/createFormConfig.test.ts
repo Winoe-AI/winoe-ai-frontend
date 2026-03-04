@@ -32,14 +32,16 @@ describe('createFormConfig', () => {
     expect(initialValues.evalDay5).toBe(true);
   });
 
-  it('rejects invalid role level enum values', () => {
+  it('rejects backend-invalid role level enum values', () => {
     const payload = buildValidInput();
     const invalid = {
       ...payload,
-      seniority: 'manager',
+      seniority: 'intern',
     } as unknown as CreateSimulationInput;
 
     const errors = validateSimulationInput(invalid);
-    expect(errors.seniority).toMatch(/Role level must be one of/i);
+    expect(errors.seniority).toBe(
+      'Role level must be one of: junior, mid, senior, staff, principal.',
+    );
   });
 });
