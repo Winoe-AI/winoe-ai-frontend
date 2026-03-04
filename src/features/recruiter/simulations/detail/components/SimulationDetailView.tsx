@@ -1,13 +1,29 @@
 'use client';
+import dynamic from 'next/dynamic';
 import { CandidatesSection } from './sections/CandidatesSection';
 import { SimulationPlanSection } from './SimulationPlanSection';
-import { SimulationInviteModal } from './SimulationInviteModal';
 import { SimulationDetailHeader } from './SimulationDetailHeader';
 import { useInviteModalActions } from './InviteModalActions';
 import type { SimulationDetailViewProps } from './types';
 
+const SimulationInviteModal = dynamic(
+  () =>
+    import('./SimulationInviteModal').then((mod) => mod.SimulationInviteModal),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/30">
+        <div className="rounded bg-white px-4 py-3 text-sm text-gray-700 shadow">
+          Loading invite form…
+        </div>
+      </div>
+    ),
+  },
+);
+
 export function SimulationDetailView(props: SimulationDetailViewProps) {
   const { openInviteModal, closeInviteModal } = useInviteModalActions({
+    inviteEnabled: props.inviteEnabled,
     resetInviteFlow: props.resetInviteFlow,
     setInviteModalOpen: props.setInviteModalOpen,
   });
@@ -16,18 +32,44 @@ export function SimulationDetailView(props: SimulationDetailViewProps) {
     <div className="flex flex-col gap-4 py-8">
       <SimulationDetailHeader
         simulationId={props.simulationId}
+        simulationStatus={props.simulationStatus}
+        scenarioVersionLabel={props.scenarioVersionLabel}
+        scenarioIdLabel={props.scenarioIdLabel}
+        scenarioLocked={props.scenarioLocked}
+        scenarioLockedAt={props.scenarioLockedAt}
         titleLabel={props.titleLabel}
         templateKeyLabel={props.templateKeyLabel}
+        inviteEnabled={props.inviteEnabled}
+        inviteDisabledReason={props.inviteDisabledReason}
+        canApprove={props.canApprove}
+        approveLoading={props.approveLoading}
+        onApprove={props.onApprove}
+        regenerateLoading={props.regenerateLoading}
+        onRegenerate={props.onRegenerate}
         onInvite={openInviteModal}
       />
       <SimulationPlanSection
+        status={props.simulationStatus}
+        scenarioVersionLabel={props.scenarioVersionLabel}
+        scenarioIdLabel={props.scenarioIdLabel}
+        scenarioLocked={props.scenarioLocked}
         templateKeyLabel={props.templateKeyLabel}
         roleLabel={props.roleLabel}
         stackLabel={props.stackLabel}
+        levelLabel={props.levelLabel}
         focusLabel={props.focusLabel}
+        companyContextLabel={props.companyContextLabel}
         scenarioLabel={props.scenarioLabel}
+        rubricSummary={props.rubricSummary}
         planDays={props.planDays}
         loading={props.planLoading}
+        statusCode={props.planStatusCode}
+        generating={props.generating}
+        actionError={props.actionError}
+        retryGenerateLoading={props.retryGenerateLoading}
+        onRetryGenerate={props.onRetryGenerate}
+        jobFailureMessage={props.jobFailureMessage}
+        jobFailureCode={props.jobFailureCode}
         error={props.planError}
         onRetry={props.reloadPlan}
       />
@@ -43,16 +85,20 @@ export function SimulationDetailView(props: SimulationDetailViewProps) {
         onCloseManual={props.onCloseManual}
         cooldownNow={props.cooldownNow}
         simulationId={props.simulationId}
+        inviteEnabled={props.inviteEnabled}
+        inviteDisabledReason={props.inviteDisabledReason}
         onInvite={openInviteModal}
       />
 
-      <SimulationInviteModal
-        simulationId={props.simulationId}
-        open={props.inviteModalOpen}
-        inviteFlowState={props.inviteFlowState}
-        onClose={closeInviteModal}
-        onSubmit={props.submitInvite}
-      />
+      {props.inviteModalOpen ? (
+        <SimulationInviteModal
+          simulationId={props.simulationId}
+          open={props.inviteModalOpen}
+          inviteFlowState={props.inviteFlowState}
+          onClose={closeInviteModal}
+          onSubmit={props.submitInvite}
+        />
+      ) : null}
     </div>
   );
 }

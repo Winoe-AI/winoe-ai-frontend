@@ -536,6 +536,7 @@ describe('RecruiterSimulationDetailPage component', () => {
     ]);
     listSimulationCandidatesMock.mockResolvedValue([]);
     recruiterGetMock.mockResolvedValue({
+      status: 'active_inviting',
       title: 'Test Simulation',
       templateKey: 'template-1',
       role: 'Developer',
@@ -677,7 +678,7 @@ describe('RecruiterSimulationDetailPage component', () => {
       screen.getByRole('button', { name: /Invite your first candidate/i }),
     );
 
-    expect(screen.getByTestId('invite-modal')).toBeInTheDocument();
+    expect(await screen.findByTestId('invite-modal')).toBeInTheDocument();
   });
 
   it('handles search filtering', async () => {

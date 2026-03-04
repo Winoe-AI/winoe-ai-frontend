@@ -14,14 +14,36 @@ export type SearchState = {
 
 export type SimulationDetailViewProps = {
   simulationId: string;
+  simulationStatus: string | null;
+  scenarioVersionLabel: string;
+  scenarioIdLabel: string | null;
+  scenarioLocked: boolean;
+  scenarioLockedAt: string | null;
+  inviteEnabled: boolean;
+  inviteDisabledReason: string | null;
+  actionError: string | null;
+  canApprove: boolean;
+  approveLoading: boolean;
+  onApprove: () => void;
+  regenerateLoading: boolean;
+  onRegenerate: () => void;
+  retryGenerateLoading: boolean;
+  onRetryGenerate: () => void;
   templateKeyLabel: string;
   titleLabel: string;
   roleLabel: string;
   stackLabel: string;
+  levelLabel: string;
   focusLabel: string;
+  companyContextLabel: string;
   scenarioLabel: string | null;
+  rubricSummary: string | null;
   planDays: { dayIndex: number; task: SimulationPlan['days'][number] | null }[];
   planLoading: boolean;
+  planStatusCode: number | null;
+  generating: boolean;
+  jobFailureMessage: string | null;
+  jobFailureCode: string | null;
   planError: string | null;
   reloadPlan: () => void;
   candidates: CandidateSession[];

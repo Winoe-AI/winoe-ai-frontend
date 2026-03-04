@@ -13,6 +13,8 @@ type Props = {
   onCloseManual: SimulationDetailViewProps['onCloseManual'];
   cooldownNow: SimulationDetailViewProps['cooldownNow'];
   simulationId: SimulationDetailViewProps['simulationId'];
+  inviteEnabled: SimulationDetailViewProps['inviteEnabled'];
+  inviteDisabledReason: SimulationDetailViewProps['inviteDisabledReason'];
   onInvite: () => void;
 };
 
@@ -28,6 +30,8 @@ export function CandidatesSection({
   onCloseManual,
   cooldownNow,
   simulationId,
+  inviteEnabled,
+  inviteDisabledReason,
   onInvite,
 }: Props) {
   return (
@@ -50,6 +54,8 @@ export function CandidatesSection({
       cooldownNow={cooldownNow}
       simulationId={simulationId}
       onInvite={onInvite}
+      inviteEnabled={inviteEnabled}
+      inviteDisabledReason={inviteDisabledReason}
     />
   );
 }

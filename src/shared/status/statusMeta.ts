@@ -24,6 +24,11 @@ const STATUS_META: Record<string, StatusMeta> = {
   submitted: { label: 'Submitted', tone: 'success' },
   report_ready: { label: 'Report ready', tone: 'success' },
   report_missing: { label: 'Report not ready', tone: 'muted' },
+  draft: { label: 'Draft', tone: 'muted' },
+  generating: { label: 'Generating', tone: 'info' },
+  ready_for_review: { label: 'Ready for review', tone: 'warning' },
+  active_inviting: { label: 'Active inviting', tone: 'success' },
+  terminated: { label: 'Terminated', tone: 'warning' },
   locked: { label: 'Locked', tone: 'muted' },
 };
 

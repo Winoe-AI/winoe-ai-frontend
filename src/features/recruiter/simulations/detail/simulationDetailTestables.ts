@@ -21,6 +21,12 @@ import {
   normalizeSimulationPlan,
   safeParseResponse,
 } from './utils/plan';
+import {
+  normalizeSimulationDetailPreview,
+  scenarioVersionLabel,
+  isPreviewGenerating,
+  isPreviewEmpty,
+} from './utils/detail';
 
 export const __testables = {
   formatDateTime,
@@ -40,4 +46,8 @@ export const __testables = {
   extractDayTasks,
   normalizeSimulationPlan,
   safeParseResponse,
+  normalizeSimulationDetailPreview,
+  scenarioVersionLabel,
+  isPreviewGenerating,
+  isPreviewEmpty,
 };

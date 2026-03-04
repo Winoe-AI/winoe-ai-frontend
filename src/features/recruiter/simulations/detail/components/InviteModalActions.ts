@@ -5,17 +5,19 @@ import type { SimulationDetailViewProps } from './types';
 
 type InviteModalDeps = Pick<
   SimulationDetailViewProps,
-  'resetInviteFlow' | 'setInviteModalOpen'
+  'resetInviteFlow' | 'setInviteModalOpen' | 'inviteEnabled'
 >;
 
 export function useInviteModalActions({
   resetInviteFlow,
   setInviteModalOpen,
+  inviteEnabled,
 }: InviteModalDeps) {
   const openInviteModal = useCallback(() => {
+    if (!inviteEnabled) return;
     resetInviteFlow();
     setInviteModalOpen(true);
-  }, [resetInviteFlow, setInviteModalOpen]);
+  }, [inviteEnabled, resetInviteFlow, setInviteModalOpen]);
 
   const closeInviteModal = useCallback(() => {
     resetInviteFlow();
