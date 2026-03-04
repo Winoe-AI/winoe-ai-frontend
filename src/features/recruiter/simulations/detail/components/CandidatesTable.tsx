@@ -24,6 +24,8 @@ type Props = {
   cooldownNow: number;
   simulationId: string;
   onInvite: () => void;
+  inviteEnabled: boolean;
+  inviteDisabledReason: string | null;
 };
 
 export function CandidatesTable(props: Props) {
@@ -46,6 +48,8 @@ export function CandidatesTable(props: Props) {
     cooldownNow,
     simulationId,
     onInvite,
+    inviteEnabled,
+    inviteDisabledReason,
   } = props;
 
   if (loading) return <CandidatesTableSkeleton />;
@@ -60,7 +64,14 @@ export function CandidatesTable(props: Props) {
         </div>
       </div>
     );
-  if (totalCount === 0) return <CandidatesEmptyState onInvite={onInvite} />;
+  if (totalCount === 0)
+    return (
+      <CandidatesEmptyState
+        onInvite={onInvite}
+        inviteEnabled={inviteEnabled}
+        inviteDisabledReason={inviteDisabledReason}
+      />
+    );
 
   return (
     <CandidatesTableContent

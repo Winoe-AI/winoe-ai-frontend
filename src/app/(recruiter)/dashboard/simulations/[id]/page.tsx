@@ -4,7 +4,8 @@ import { BRAND_NAME } from '@/lib/brand';
 
 export const metadata: Metadata = {
   title: `Simulation detail | ${BRAND_NAME}`,
-  description: 'Review candidates and submissions for this simulation.',
+  description:
+    'Preview scenario output, approve simulation, and invite candidates.',
 };
 
 export default function Page() {

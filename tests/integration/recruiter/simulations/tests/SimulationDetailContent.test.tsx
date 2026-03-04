@@ -35,6 +35,7 @@ const simulationListResponse = () =>
 const simulationDetailResponse = () =>
   jsonResponse({
     id: '1',
+    status: 'active_inviting',
     title: 'Simulation 1',
     templateKey: 'python-fastapi',
     role: 'Backend Engineer',

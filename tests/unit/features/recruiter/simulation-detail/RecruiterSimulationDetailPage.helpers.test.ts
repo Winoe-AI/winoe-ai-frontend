@@ -277,4 +277,38 @@ describe('RecruiterSimulationDetailPage helpers', () => {
     } as unknown as Response;
     await expect(__testables.safeParseResponse(plainText)).resolves.toBe('ok');
   });
+
+  it('normalizes detail metadata and preview helpers', () => {
+    const detail = __testables.normalizeSimulationDetailPreview({
+      id: 7,
+      status: 'generating',
+      seniority: 'mid',
+      companyContext: { domain: 'Fintech', productArea: 'Payments' },
+      scenario: {
+        id: 10,
+        versionIndex: 2,
+        status: 'generating',
+        lockedAt: '2026-03-01T00:00:00.000Z',
+        storyline: 'Generated storyline',
+      },
+      scenarioJob: {
+        jobId: 'job-123',
+        status: 'running',
+        pollAfterMs: 1500,
+      },
+      tasks: [{ dayIndex: 1, title: 'Day 1' }],
+    });
+
+    expect(detail.status).toBe('generating');
+    expect(detail.level).toBe('mid');
+    expect(detail.companyContext).toContain('Fintech');
+    expect(detail.scenarioVersion.id).toBe('10');
+    expect(detail.scenarioVersion.versionIndex).toBe(2);
+    expect(detail.scenarioVersion.isLocked).toBe(true);
+    expect(detail.generationJob?.jobId).toBe('job-123');
+    expect(__testables.scenarioVersionLabel(2)).toBe('v2');
+    expect(__testables.scenarioVersionLabel(null)).toBe('v—');
+    expect(__testables.isPreviewGenerating(detail)).toBe(true);
+    expect(__testables.isPreviewEmpty(detail)).toBe(false);
+  });
 });

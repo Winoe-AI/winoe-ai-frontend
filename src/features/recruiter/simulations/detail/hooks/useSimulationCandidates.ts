@@ -5,7 +5,10 @@ import { listSimulationCandidates } from '@/features/recruiter/api';
 
 type Params = { simulationId: string };
 
-export function useSimulationCandidates({ simulationId }: Params) {
+export function useSimulationCandidates({
+  simulationId,
+  enabled = true,
+}: Params & { enabled?: boolean }) {
   const [candidates, setCandidates] = useState<CandidateSession[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -22,10 +25,14 @@ export function useSimulationCandidates({ simulationId }: Params) {
     setCandidates([]);
     setError(null);
     setLoading(true);
-  }, [simulationId]);
+  }, [enabled, simulationId]);
 
   const loadCandidates = useCallback(
     async (opts?: { skipCache?: boolean }) => {
+      if (!enabled) {
+        return;
+      }
+
       setLoading(true);
       setError(null);
       try {
@@ -61,12 +68,13 @@ export function useSimulationCandidates({ simulationId }: Params) {
         if (mountedRef.current) setLoading(false);
       }
     },
-    [simulationId],
+    [enabled, simulationId],
   );
 
   useEffect(() => {
+    if (!enabled) return;
     void loadCandidates();
-  }, [loadCandidates]);
+  }, [enabled, loadCandidates]);
 
   return {
     candidates,

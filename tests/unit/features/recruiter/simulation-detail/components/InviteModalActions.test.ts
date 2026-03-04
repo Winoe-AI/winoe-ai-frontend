@@ -7,7 +7,11 @@ describe('useInviteModalActions', () => {
     const setInviteModalOpen = jest.fn();
 
     const { result } = renderHook(() =>
-      useInviteModalActions({ resetInviteFlow, setInviteModalOpen }),
+      useInviteModalActions({
+        resetInviteFlow,
+        setInviteModalOpen,
+        inviteEnabled: true,
+      }),
     );
 
     act(() => {
@@ -23,7 +27,11 @@ describe('useInviteModalActions', () => {
     const setInviteModalOpen = jest.fn();
 
     const { result } = renderHook(() =>
-      useInviteModalActions({ resetInviteFlow, setInviteModalOpen }),
+      useInviteModalActions({
+        resetInviteFlow,
+        setInviteModalOpen,
+        inviteEnabled: true,
+      }),
     );
 
     act(() => {
@@ -32,5 +40,25 @@ describe('useInviteModalActions', () => {
 
     expect(resetInviteFlow).toHaveBeenCalledTimes(1);
     expect(setInviteModalOpen).toHaveBeenCalledWith(false);
+  });
+
+  it('does not open modal when invites are disabled', () => {
+    const resetInviteFlow = jest.fn();
+    const setInviteModalOpen = jest.fn();
+
+    const { result } = renderHook(() =>
+      useInviteModalActions({
+        resetInviteFlow,
+        setInviteModalOpen,
+        inviteEnabled: false,
+      }),
+    );
+
+    act(() => {
+      result.current.openInviteModal();
+    });
+
+    expect(resetInviteFlow).not.toHaveBeenCalled();
+    expect(setInviteModalOpen).not.toHaveBeenCalled();
   });
 });

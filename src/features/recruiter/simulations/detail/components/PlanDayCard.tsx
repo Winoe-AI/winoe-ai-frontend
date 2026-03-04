@@ -1,4 +1,5 @@
 'use client';
+import { MarkdownPreview } from '@/shared/ui/Markdown';
 import { SimulationPlanDay } from '../utils/plan';
 import { PlanDayRubric } from './PlanDayRubric';
 import { PlanDayWorkspace } from './PlanDayWorkspace';
@@ -43,9 +44,9 @@ export function PlanDayCard({ slot }: Props) {
       {day.prompt ? (
         <div className="mt-3 text-sm text-gray-700">
           <div className="text-xs font-medium uppercase tracking-wide text-gray-500">
-            Prompt
+            Task description
           </div>
-          <p className="mt-1 whitespace-pre-wrap">{day.prompt}</p>
+          <MarkdownPreview content={day.prompt} className="mt-1" />
         </div>
       ) : null}
 

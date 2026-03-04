@@ -1,38 +1,116 @@
 'use client';
 import Link from 'next/link';
 import Button from '@/shared/ui/Button';
+import { InlineBadge } from '@/shared/ui/InlineBadge';
 import PageHeader from '@/shared/ui/PageHeader';
+import { StatusPill } from '@/shared/ui/StatusPill';
+import { statusMeta } from '@/shared/status/statusMeta';
 
 type Props = {
   simulationId: string;
+  simulationStatus: string | null;
+  scenarioVersionLabel: string;
+  scenarioIdLabel: string | null;
+  scenarioLocked: boolean;
+  scenarioLockedAt: string | null;
   title: string;
   templateKey: string;
+  inviteEnabled: boolean;
+  inviteDisabledReason: string | null;
+  canApprove: boolean;
+  approveLoading: boolean;
+  onApprove: () => void;
+  regenerateLoading: boolean;
+  onRegenerate: () => void;
   onInvite: () => void;
 };
 
+function lockLabel(locked: boolean, lockedAt: string | null): string {
+  if (!locked) return 'Unlocked';
+  if (!lockedAt) return 'Locked';
+  const parsed = new Date(lockedAt);
+  if (Number.isNaN(parsed.getTime())) return 'Locked';
+  return `Locked ${parsed.toLocaleDateString()}`;
+}
+
 export function SimulationDetailHeaderCore({
   simulationId,
+  simulationStatus,
+  scenarioVersionLabel,
+  scenarioIdLabel,
+  scenarioLocked,
+  scenarioLockedAt,
   title,
   templateKey,
+  inviteEnabled,
+  inviteDisabledReason,
+  canApprove,
+  approveLoading,
+  onApprove,
+  regenerateLoading,
+  onRegenerate,
   onInvite,
 }: Props) {
+  const status = statusMeta(simulationStatus ?? 'draft', 'Unknown');
+
   return (
-    <div className="flex items-center justify-between gap-4">
-      <PageHeader
-        title={title}
-        subtitle={`Simulation ID: ${simulationId} · Template: ${templateKey}`}
-      />
-      <div className="flex items-center gap-2">
-        <Button onClick={onInvite} size="sm">
-          Invite candidate
-        </Button>
-        <Link
-          className="text-sm text-blue-600 hover:underline"
-          href="/dashboard"
-        >
-          ← Back to dashboard
-        </Link>
+    <div className="flex flex-col gap-3">
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <PageHeader
+          title={title}
+          subtitle={`Simulation ID: ${simulationId} · Template: ${templateKey}`}
+        />
+        <div className="flex flex-wrap items-center justify-end gap-2">
+          {canApprove ? (
+            <Button
+              onClick={onApprove}
+              size="sm"
+              loading={approveLoading}
+              disabled={!canApprove}
+            >
+              Approve / Activate inviting
+            </Button>
+          ) : null}
+          <Button
+            onClick={onRegenerate}
+            size="sm"
+            variant="secondary"
+            loading={regenerateLoading}
+          >
+            Regenerate scenario
+          </Button>
+          <Button
+            onClick={onInvite}
+            size="sm"
+            disabled={!inviteEnabled}
+            title={
+              inviteEnabled ? undefined : (inviteDisabledReason ?? undefined)
+            }
+          >
+            Invite candidate
+          </Button>
+          <Link
+            className="text-sm text-blue-600 hover:underline"
+            href="/dashboard"
+          >
+            ← Back to dashboard
+          </Link>
+        </div>
       </div>
+      <div className="flex flex-wrap items-center gap-2">
+        <StatusPill label={status.label} tone={status.tone} />
+        <InlineBadge label={`Scenario ${scenarioVersionLabel}`} tone="info" />
+        {scenarioIdLabel ? (
+          <InlineBadge label={`ID: ${scenarioIdLabel}`} tone="muted" />
+        ) : null}
+        <InlineBadge
+          label={lockLabel(scenarioLocked, scenarioLockedAt)}
+          tone={scenarioLocked ? 'warning' : 'muted'}
+        />
+      </div>
+      {!inviteEnabled && inviteDisabledReason ? (
+        <p className="text-xs text-gray-600">{inviteDisabledReason}</p>
+      ) : null}
     </div>
   );
 }

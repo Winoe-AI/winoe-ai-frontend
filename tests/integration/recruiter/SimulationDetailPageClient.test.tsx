@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import RecruiterSimulationDetailPage from '@/features/recruiter/simulations/detail/RecruiterSimulationDetailPage';
 import { NotificationsProvider } from '@/shared/notifications';
@@ -18,6 +18,7 @@ const realFetch = global.fetch;
 const simulationDetailResponse = () =>
   jsonResponse({
     id: params.id,
+    status: 'active_inviting',
     title: `Simulation ${params.id}`,
     templateKey: 'python-fastapi',
     role: 'Backend Engineer',
@@ -90,7 +91,9 @@ beforeEach(() => {
   __resetHttpClientCache();
 });
 
-afterEach(() => {});
+afterEach(() => {
+  jest.useRealTimers();
+});
 
 afterAll(() => {
   global.fetch = realFetch;
@@ -149,6 +152,457 @@ describe('RecruiterSimulationDetailPage', () => {
     expect(await screen.findByText('2 / 5')).toBeInTheDocument();
     const completed = await screen.findAllByText(/Completed/i);
     expect(completed.length).toBeGreaterThanOrEqual(2);
+  });
+
+  it('gates approve and invite actions by lifecycle status', async () => {
+    const user = userEvent.setup();
+    let detailFetchCount = 0;
+
+    mockFetchHandlers({
+      '/api/simulations': jsonResponse([
+        {
+          id: 'sim-1',
+          title: 'Simulation sim-1',
+          templateKey: 'python-fastapi',
+        },
+      ]),
+      '/api/simulations/sim-1': () => {
+        detailFetchCount += 1;
+        if (detailFetchCount === 1) {
+          return jsonResponse({
+            id: 'sim-1',
+            status: 'ready_for_review',
+            title: 'Simulation sim-1',
+            templateKey: 'python-fastapi',
+            scenario: {
+              id: 10,
+              versionIndex: 1,
+              status: 'ready',
+            },
+            tasks: [
+              {
+                dayIndex: 1,
+                title: 'Discovery',
+                description: 'Define requirements.',
+              },
+            ],
+          });
+        }
+        return jsonResponse({
+          id: 'sim-1',
+          status: 'active_inviting',
+          title: 'Simulation sim-1',
+          templateKey: 'python-fastapi',
+          scenario: {
+            id: 10,
+            versionIndex: 1,
+            status: 'ready',
+          },
+          tasks: [
+            {
+              dayIndex: 1,
+              title: 'Discovery',
+              description: 'Define requirements.',
+            },
+          ],
+        });
+      },
+      '/api/simulations/sim-1/candidates': jsonResponse([]),
+      '/api/backend/simulations/sim-1/activate': jsonResponse({
+        simulationId: 'sim-1',
+        status: 'active_inviting',
+      }),
+    });
+
+    renderPage();
+
+    const approveBtn = await screen.findByRole('button', {
+      name: /Approve \/ Activate inviting/i,
+    });
+    const inviteBtn = await screen.findByRole('button', {
+      name: /Invite candidate/i,
+    });
+    const emptyInviteBtn = await screen.findByRole('button', {
+      name: /Invite your first candidate/i,
+    });
+
+    expect(approveBtn).toBeEnabled();
+    expect(inviteBtn).toBeDisabled();
+    expect(emptyInviteBtn).toBeDisabled();
+
+    await user.click(approveBtn);
+
+    await waitFor(() => {
+      const activateCalls = fetchMock.mock.calls.filter(
+        (call) => getUrl(call[0]) === '/api/backend/simulations/sim-1/activate',
+      );
+      expect(activateCalls.length).toBe(1);
+    });
+
+    await waitFor(() => {
+      expect(
+        screen.queryByRole('button', {
+          name: /Approve \/ Activate inviting/i,
+        }),
+      ).not.toBeInTheDocument();
+    });
+
+    expect(
+      screen.getByRole('button', { name: /Invite candidate/i }),
+    ).toBeEnabled();
+    expect(
+      screen.getByRole('button', { name: /Invite your first candidate/i }),
+    ).toBeEnabled();
+  });
+
+  it('shows regenerate confirmation for locked scenarios', async () => {
+    const user = userEvent.setup();
+    const confirmSpy = jest.spyOn(window, 'confirm').mockReturnValue(false);
+
+    mockFetchHandlers({
+      '/api/simulations': jsonResponse([
+        {
+          id: 'sim-1',
+          title: 'Simulation sim-1',
+          templateKey: 'python-fastapi',
+        },
+      ]),
+      '/api/simulations/sim-1': jsonResponse({
+        id: 'sim-1',
+        status: 'active_inviting',
+        title: 'Simulation sim-1',
+        templateKey: 'python-fastapi',
+        scenario: {
+          id: 101,
+          versionIndex: 2,
+          status: 'ready',
+          lockedAt: '2026-03-01T12:00:00.000Z',
+        },
+        tasks: [
+          {
+            dayIndex: 1,
+            title: 'Discovery',
+            description: 'Define requirements.',
+          },
+        ],
+      }),
+      '/api/simulations/sim-1/candidates': jsonResponse([]),
+      '/api/backend/simulations/sim-1/scenario/regenerate': jsonResponse({
+        status: 'generating',
+      }),
+    });
+
+    renderPage();
+
+    const regenerateBtn = await screen.findByRole('button', {
+      name: /Regenerate scenario/i,
+    });
+
+    await user.click(regenerateBtn);
+    expect(confirmSpy).toHaveBeenCalledTimes(1);
+    expect(
+      fetchMock.mock.calls.filter(
+        (call) =>
+          getUrl(call[0]) ===
+          '/api/backend/simulations/sim-1/scenario/regenerate',
+      ).length,
+    ).toBe(0);
+
+    confirmSpy.mockReturnValue(true);
+    await user.click(regenerateBtn);
+
+    await waitFor(() => {
+      const calls = fetchMock.mock.calls.filter(
+        (call) =>
+          getUrl(call[0]) ===
+          '/api/backend/simulations/sim-1/scenario/regenerate',
+      );
+      expect(calls.length).toBe(1);
+    });
+
+    confirmSpy.mockRestore();
+  });
+
+  it('shows action error when approve request fails', async () => {
+    const user = userEvent.setup();
+
+    mockFetchHandlers({
+      '/api/simulations': jsonResponse([
+        {
+          id: 'sim-1',
+          title: 'Simulation sim-1',
+          templateKey: 'python-fastapi',
+        },
+      ]),
+      '/api/simulations/sim-1': jsonResponse({
+        id: 'sim-1',
+        status: 'ready_for_review',
+        title: 'Simulation sim-1',
+        templateKey: 'python-fastapi',
+        scenario: {
+          id: 10,
+          versionIndex: 1,
+          status: 'ready',
+        },
+        tasks: [
+          {
+            dayIndex: 1,
+            title: 'Discovery',
+            description: 'Define requirements.',
+          },
+        ],
+      }),
+      '/api/simulations/sim-1/candidates': jsonResponse([]),
+      '/api/backend/simulations/sim-1/activate': () => {
+        return Promise.reject('approve failed');
+      },
+    });
+
+    renderPage();
+
+    const approveBtn = await screen.findByRole('button', {
+      name: /Approve \/ Activate inviting/i,
+    });
+    await user.click(approveBtn);
+
+    expect(await screen.findByText(/Request failed/i)).toBeInTheDocument();
+  });
+
+  it('shows page-level not found state and skips candidates/actions on 404', async () => {
+    mockFetchHandlers({
+      '/api/simulations': jsonResponse([
+        {
+          id: 'sim-1',
+          title: 'Simulation sim-1',
+          templateKey: 'python-fastapi',
+        },
+      ]),
+      '/api/simulations/sim-1': jsonResponse({ message: 'Not found' }, 404),
+    });
+
+    renderPage();
+
+    expect(
+      await screen.findByText(/Simulation not found/i),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: /Invite candidate/i }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: /Invite your first candidate/i }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: /Approve \/ Activate inviting/i }),
+    ).not.toBeInTheDocument();
+
+    const calledUrls = fetchMock.mock.calls.map((call) => getUrl(call[0]));
+    expect(calledUrls).not.toContain('/api/simulations/sim-1/candidates');
+  });
+
+  it('shows page-level access denied state and skips candidates/actions on 403', async () => {
+    mockFetchHandlers({
+      '/api/simulations': jsonResponse([
+        {
+          id: 'sim-1',
+          title: 'Simulation sim-1',
+          templateKey: 'python-fastapi',
+        },
+      ]),
+      '/api/simulations/sim-1': jsonResponse({ message: 'Forbidden' }, 403),
+    });
+
+    renderPage();
+
+    expect(
+      await screen.findByText(/You don't have access to this simulation/i),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: /Invite candidate/i }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: /Invite your first candidate/i }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: /Approve \/ Activate inviting/i }),
+    ).not.toBeInTheDocument();
+
+    const calledUrls = fetchMock.mock.calls.map((call) => getUrl(call[0]));
+    expect(calledUrls).not.toContain('/api/simulations/sim-1/candidates');
+  });
+
+  it('polls while generating and stops after ready_for_review', async () => {
+    jest.useFakeTimers();
+    let detailCalls = 0;
+
+    mockFetchHandlers({
+      '/api/simulations': jsonResponse([
+        {
+          id: 'sim-1',
+          title: 'Simulation sim-1',
+          templateKey: 'python-fastapi',
+        },
+      ]),
+      '/api/simulations/sim-1': () => {
+        detailCalls += 1;
+        if (detailCalls === 1) {
+          return jsonResponse({
+            id: 'sim-1',
+            status: 'generating',
+            title: 'Simulation sim-1',
+            templateKey: 'python-fastapi',
+            scenario: {
+              id: 301,
+              versionIndex: 1,
+              status: 'generating',
+            },
+            scenarioJob: {
+              jobId: 'job-1',
+              status: 'running',
+              pollAfterMs: 2000,
+            },
+            tasks: [],
+          });
+        }
+        return jsonResponse({
+          id: 'sim-1',
+          status: 'ready_for_review',
+          title: 'Simulation sim-1',
+          templateKey: 'python-fastapi',
+          scenario: {
+            id: 301,
+            versionIndex: 1,
+            status: 'ready',
+          },
+          tasks: [
+            {
+              dayIndex: 1,
+              title: 'Discovery',
+              description: 'Define requirements.',
+            },
+          ],
+        });
+      },
+      '/api/simulations/sim-1/candidates': jsonResponse([]),
+      '/api/backend/jobs/job-1': jsonResponse({
+        jobId: 'job-1',
+        jobType: 'scenario_generation',
+        status: 'running',
+        pollAfterMs: 2000,
+        error: null,
+      }),
+    });
+
+    renderPage();
+
+    expect(
+      await screen.findByText(/Scenario generation is in progress/i),
+    ).toBeInTheDocument();
+
+    await act(async () => {
+      jest.advanceTimersByTime(2200);
+    });
+
+    await waitFor(() => {
+      expect(detailCalls).toBeGreaterThanOrEqual(2);
+    });
+
+    await waitFor(() => {
+      expect(
+        screen.queryByText(/Scenario generation is in progress/i),
+      ).not.toBeInTheDocument();
+    });
+
+    const callsAtReady = detailCalls;
+    await act(async () => {
+      jest.advanceTimersByTime(15000);
+    });
+    expect(detailCalls).toBe(callsAtReady);
+
+    jest.useRealTimers();
+  });
+
+  it('continues polling detail when job status request fails', async () => {
+    jest.useFakeTimers();
+    let detailCalls = 0;
+
+    mockFetchHandlers({
+      '/api/simulations': jsonResponse([
+        {
+          id: 'sim-1',
+          title: 'Simulation sim-1',
+          templateKey: 'python-fastapi',
+        },
+      ]),
+      '/api/simulations/sim-1': () => {
+        detailCalls += 1;
+        if (detailCalls === 1) {
+          return jsonResponse({
+            id: 'sim-1',
+            status: 'generating',
+            title: 'Simulation sim-1',
+            templateKey: 'python-fastapi',
+            scenario: {
+              id: 301,
+              versionIndex: 1,
+              status: 'generating',
+            },
+            scenarioJob: {
+              jobId: 'job-1',
+              status: 'running',
+              pollAfterMs: 2000,
+            },
+            tasks: [],
+          });
+        }
+        return jsonResponse({
+          id: 'sim-1',
+          status: 'ready_for_review',
+          title: 'Simulation sim-1',
+          templateKey: 'python-fastapi',
+          scenario: {
+            id: 301,
+            versionIndex: 1,
+            status: 'ready',
+          },
+          tasks: [
+            {
+              dayIndex: 1,
+              title: 'Discovery',
+              description: 'Define requirements.',
+            },
+          ],
+        });
+      },
+      '/api/simulations/sim-1/candidates': jsonResponse([]),
+      '/api/backend/jobs/job-1': () => {
+        throw new Error('job status failed');
+      },
+    });
+
+    renderPage();
+
+    expect(
+      await screen.findByText(/Scenario generation is in progress/i),
+    ).toBeInTheDocument();
+
+    await act(async () => {
+      jest.advanceTimersByTime(2200);
+    });
+
+    await waitFor(() => {
+      expect(detailCalls).toBeGreaterThanOrEqual(2);
+    });
+
+    expect(
+      await screen.findByRole('button', {
+        name: /Approve \/ Activate inviting/i,
+      }),
+    ).toBeInTheDocument();
+
+    const calledUrls = fetchMock.mock.calls.map((call) => getUrl(call[0]));
+    expect(calledUrls).toContain('/api/backend/jobs/job-1');
+
+    jest.useRealTimers();
   });
 
   it('does not fetch or render submission content on simulation overview', async () => {

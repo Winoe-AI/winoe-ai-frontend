@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { MarkdownPreview } from '@/shared/ui/Markdown';
+import { MarkdownPreview, sanitizeMarkdownUrl } from '@/shared/ui/Markdown';
 import { LazyMarkdownPreview } from '@/shared/ui/LazyMarkdownPreview';
 import { StatusPill } from '@/shared/ui/StatusPill';
 
@@ -36,6 +36,26 @@ describe('MarkdownPreview extras', () => {
     // @ts-expect-error intentional null to hit safeContent branch
     render(<MarkdownPreview content={null} />);
     expect(screen.getByText(/Nothing to preview yet/i)).toBeInTheDocument();
+  });
+
+  it('does not render executable HTML tags from markdown input', () => {
+    const { container } = render(
+      <MarkdownPreview
+        content={`<script>alert('xss')</script>\n<img src=x onerror=alert(1) />`}
+      />,
+    );
+    expect(container.querySelector('script')).not.toBeInTheDocument();
+    expect(container.querySelector('img')).not.toBeInTheDocument();
+  });
+
+  it('sanitizes unsafe markdown link URLs', () => {
+    expect(sanitizeMarkdownUrl('javascript:alert(1)')).toBe('');
+    expect(sanitizeMarkdownUrl('data:text/html;base64,abc')).toBe('');
+    expect(sanitizeMarkdownUrl('https://example.com')).toBe(
+      'https://example.com',
+    );
+    expect(sanitizeMarkdownUrl('/dashboard')).toBe('/dashboard');
+    expect(sanitizeMarkdownUrl('#section')).toBe('#section');
   });
 });
 

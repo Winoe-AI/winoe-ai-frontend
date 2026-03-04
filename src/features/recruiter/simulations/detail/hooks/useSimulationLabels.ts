@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import type { SimulationPlan } from '../utils/plan';
+import type { SimulationDetailPreview } from '../utils/detail';
 
 type PlanDay = {
   dayIndex: number;
@@ -8,6 +9,7 @@ type PlanDay = {
 
 export function useSimulationLabels(
   plan: SimulationPlan | null,
+  detail: SimulationDetailPreview | null,
   simulationId: string,
 ) {
   const planDays = useMemo<PlanDay[]>(() => {
@@ -21,12 +23,16 @@ export function useSimulationLabels(
     }));
   }, [plan]);
 
-  const templateKeyLabel = plan?.templateKey?.trim() || 'N/A';
+  const templateKeyLabel = plan?.templateKey?.trim() || '—';
   const titleLabel = plan?.title?.trim() || `Simulation ${simulationId}`;
-  const roleLabel = plan?.role?.trim() || 'N/A';
-  const stackLabel = plan?.techStack?.trim() || 'N/A';
-  const focusLabel = plan?.focus?.trim() || 'N/A';
-  const scenarioLabel = plan?.scenario?.trim() || null;
+  const roleLabel = plan?.role?.trim() || '—';
+  const stackLabel = plan?.techStack?.trim() || '—';
+  const levelLabel = detail?.level?.trim() || '—';
+  const focusLabel = plan?.focus?.trim() || '—';
+  const companyContextLabel = detail?.companyContext?.trim() || '—';
+  const scenarioLabel =
+    detail?.storyline?.trim() || plan?.scenario?.trim() || null;
+  const rubricSummary = detail?.rubricSummary?.trim() || null;
 
   return {
     planDays,
@@ -34,7 +40,10 @@ export function useSimulationLabels(
     titleLabel,
     roleLabel,
     stackLabel,
+    levelLabel,
     focusLabel,
+    companyContextLabel,
     scenarioLabel,
+    rubricSummary,
   };
 }
