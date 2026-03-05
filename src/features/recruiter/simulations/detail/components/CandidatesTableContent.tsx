@@ -21,6 +21,8 @@ type Props = {
   onCloseManual: (id: number) => void;
   cooldownNow: number;
   simulationId: string;
+  inviteResendEnabled: boolean;
+  inviteResendDisabledReason: string | null;
 };
 
 export function CandidatesTableContent({
@@ -38,6 +40,8 @@ export function CandidatesTableContent({
   onCloseManual,
   cooldownNow,
   simulationId,
+  inviteResendEnabled,
+  inviteResendDisabledReason,
 }: Props) {
   const { rowStateFor, pageSummary } = useCandidatesTableView({
     rowStates,
@@ -64,6 +68,8 @@ export function CandidatesTableContent({
           rowStateFor={rowStateFor}
           cooldownNow={cooldownNow}
           simulationId={simulationId}
+          inviteResendEnabled={inviteResendEnabled}
+          inviteResendDisabledReason={inviteResendDisabledReason}
           onCopy={onCopy}
           onResend={onResend}
           onCloseManual={onCloseManual}

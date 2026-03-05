@@ -11,6 +11,8 @@ export function useCandidateRowActions(
   updateLocal: (
     updater: (prev: CandidateSession[]) => CandidateSession[],
   ) => void,
+  inviteResendEnabled: boolean,
+  inviteResendDisabledReason: string | null,
 ) {
   const { notify } = useNotifications();
   const { rows, updateRow } = useCandidateRowState(simulationId);
@@ -24,6 +26,8 @@ export function useCandidateRowActions(
     refresh,
     updateLocal,
     notify,
+    inviteResendEnabled,
+    inviteResendDisabledReason,
   );
 
   return { rowStates: rows, handleCopy, handleResend, closeManualCopy };

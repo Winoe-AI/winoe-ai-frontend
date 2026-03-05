@@ -26,6 +26,8 @@ type Props = {
   onInvite: () => void;
   inviteEnabled: boolean;
   inviteDisabledReason: string | null;
+  inviteResendEnabled: boolean;
+  inviteResendDisabledReason: string | null;
 };
 
 export function CandidatesTable(props: Props) {
@@ -50,6 +52,8 @@ export function CandidatesTable(props: Props) {
     onInvite,
     inviteEnabled,
     inviteDisabledReason,
+    inviteResendEnabled,
+    inviteResendDisabledReason,
   } = props;
 
   if (loading) return <CandidatesTableSkeleton />;
@@ -89,6 +93,8 @@ export function CandidatesTable(props: Props) {
       onCloseManual={onCloseManual}
       cooldownNow={cooldownNow}
       simulationId={simulationId}
+      inviteResendEnabled={inviteResendEnabled}
+      inviteResendDisabledReason={inviteResendDisabledReason}
     />
   );
 }

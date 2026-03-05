@@ -15,6 +15,8 @@ type Props = {
   simulationId: SimulationDetailViewProps['simulationId'];
   inviteEnabled: SimulationDetailViewProps['inviteEnabled'];
   inviteDisabledReason: SimulationDetailViewProps['inviteDisabledReason'];
+  inviteResendEnabled: SimulationDetailViewProps['inviteResendEnabled'];
+  inviteResendDisabledReason: SimulationDetailViewProps['inviteResendDisabledReason'];
   onInvite: () => void;
 };
 
@@ -32,6 +34,8 @@ export function CandidatesSection({
   simulationId,
   inviteEnabled,
   inviteDisabledReason,
+  inviteResendEnabled,
+  inviteResendDisabledReason,
   onInvite,
 }: Props) {
   return (
@@ -56,6 +60,8 @@ export function CandidatesSection({
       onInvite={onInvite}
       inviteEnabled={inviteEnabled}
       inviteDisabledReason={inviteDisabledReason}
+      inviteResendEnabled={inviteResendEnabled}
+      inviteResendDisabledReason={inviteResendDisabledReason}
     />
   );
 }

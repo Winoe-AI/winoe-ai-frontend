@@ -9,6 +9,8 @@ type Props = {
   candidate: CandidateSession;
   rowState: RowState;
   cooldownNow: number;
+  inviteResendEnabled: boolean;
+  inviteResendDisabledReason: string | null;
   onCopy: (candidate: CandidateSession) => void;
   onResend: (candidate: CandidateSession) => void;
   onCloseManual: (id: number) => void;
@@ -18,6 +20,8 @@ export function CandidateInviteCell({
   candidate,
   rowState,
   cooldownNow,
+  inviteResendEnabled,
+  inviteResendDisabledReason,
   onCopy,
   onResend,
   onCloseManual,
@@ -43,6 +47,8 @@ export function CandidateInviteCell({
           rowState={rowState}
           inviteLink={inviteLink}
           cooldownNow={cooldownNow}
+          inviteResendEnabled={inviteResendEnabled}
+          inviteResendDisabledReason={inviteResendDisabledReason}
           onCopy={onCopy}
           onResend={onResend}
           onCloseManual={onCloseManual}

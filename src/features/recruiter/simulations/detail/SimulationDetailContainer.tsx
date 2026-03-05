@@ -1,13 +1,15 @@
 'use client';
 
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useParams } from 'next/navigation';
 import {
   activateSimulationInviting,
   regenerateSimulationScenario,
   retrySimulationGeneration,
+  terminateSimulation,
 } from '@/features/recruiter/api';
 import { toUserMessage } from '@/lib/errors/errors';
+import { useNotifications } from '@/shared/notifications';
 import { SimulationDetailView } from './components/SimulationDetailView';
 import { SimulationDetailBlockedState } from './components/SimulationDetailBlockedState';
 import { useSimulationPlan } from './hooks/useSimulationPlan';
@@ -31,6 +33,7 @@ function buildActionError(
 
 export default function SimulationDetailContainer() {
   const simulationId = useParams<{ id: string }>().id;
+  const { notify } = useNotifications();
   const {
     detail,
     plan,
@@ -40,31 +43,71 @@ export default function SimulationDetailContainer() {
     isGenerating,
     reload: reloadPlan,
   } = useSimulationPlan({ simulationId });
-  const pageBlocked = planStatusCode === 403 || planStatusCode === 404;
+  const [actionError, setActionError] = useState<string | null>(null);
+  const [approveLoading, setApproveLoading] = useState(false);
+  const [regenerateLoading, setRegenerateLoading] = useState(false);
+  const [retryGenerateLoading, setRetryGenerateLoading] = useState(false);
+  const [terminatePending, setTerminatePending] = useState(false);
+  const [terminateModalOpen, setTerminateModalOpen] = useState(false);
+  const [terminateBlockedStatus, setTerminateBlockedStatus] = useState<
+    403 | 404 | null
+  >(null);
+  const [statusOverride, setStatusOverride] = useState<string | null>(null);
+  const [cleanupJobIds, setCleanupJobIds] = useState<string[]>([]);
+
+  useEffect(() => {
+    setActionError(null);
+    setTerminatePending(false);
+    setTerminateModalOpen(false);
+    setTerminateBlockedStatus(null);
+    setStatusOverride(null);
+    setCleanupJobIds([]);
+  }, [simulationId]);
+
+  const simulationStatus =
+    statusOverride ?? detail?.status ?? detail?.statusRaw ?? null;
+  const isTerminated = simulationStatus === 'terminated';
+  const inviteEnabled = simulationStatus === 'active_inviting' && !isTerminated;
+  const inviteDisabledReason = inviteEnabled
+    ? null
+    : isTerminated
+      ? 'This simulation has been terminated. Invites are disabled immediately.'
+      : 'Invites stay disabled until the simulation is active inviting.';
+  const inviteResendEnabled = !isTerminated;
+  const inviteResendDisabledReason = inviteResendEnabled
+    ? null
+    : 'This simulation has been terminated. Invites and resends are disabled.';
+
+  const pageBlocked =
+    terminateBlockedStatus != null ||
+    planStatusCode === 403 ||
+    planStatusCode === 404;
+  const blockedStatusCode =
+    terminateBlockedStatus ??
+    (planStatusCode === 403 || planStatusCode === 404
+      ? (planStatusCode as 403 | 404)
+      : null);
   const candidatesEnabled =
     !pageBlocked && (detail != null || planStatusCode != null || !planLoading);
   const { candidates, loading, error, reload, setCandidates } =
     useSimulationCandidates({ simulationId, enabled: candidatesEnabled });
   const search = useCandidatesSearch({ candidates, pageSize: 25 });
   const { rowStates, handleCopy, handleResend, closeManualCopy } =
-    useCandidateRowActions(simulationId, reload, setCandidates);
+    useCandidateRowActions(
+      simulationId,
+      reload,
+      setCandidates,
+      inviteResendEnabled,
+      inviteResendDisabledReason,
+    );
   const inviteModal = useSimulationInviteModal({
     simulationId,
     reloadCandidates: reload,
   });
+  const closeInviteModal = inviteModal.close;
+  const submitInvite = inviteModal.submitInvite;
   const cooldownTick = useCooldownTick(rowStates);
   const labels = useSimulationLabels(plan, detail, simulationId);
-
-  const [actionError, setActionError] = useState<string | null>(null);
-  const [approveLoading, setApproveLoading] = useState(false);
-  const [regenerateLoading, setRegenerateLoading] = useState(false);
-  const [retryGenerateLoading, setRetryGenerateLoading] = useState(false);
-
-  const simulationStatus = detail?.status ?? detail?.statusRaw ?? null;
-  const inviteEnabled = simulationStatus === 'active_inviting';
-  const inviteDisabledReason = inviteEnabled
-    ? null
-    : 'Invites stay disabled until the simulation is active inviting.';
 
   const scenarioVersionIndex = detail?.scenarioVersion.versionIndex ?? null;
   const canApprove = simulationStatus === 'ready_for_review';
@@ -220,10 +263,156 @@ export default function SimulationDetailContainer() {
     simulationStatus,
   ]);
 
-  if (pageBlocked) {
-    return (
-      <SimulationDetailBlockedState statusCode={planStatusCode as 403 | 404} />
-    );
+  const onSubmitInvite = useCallback(
+    async (candidateName: string, inviteEmail: string) => {
+      if (isTerminated) {
+        const message =
+          inviteDisabledReason ??
+          'This simulation has been terminated. Invites are disabled immediately.';
+        setActionError(message);
+        notify({
+          id: `invite-disabled-${simulationId}`,
+          tone: 'error',
+          title: 'Invites are disabled',
+          description: message,
+        });
+        closeInviteModal();
+        return;
+      }
+
+      await submitInvite(candidateName, inviteEmail);
+    },
+    [
+      closeInviteModal,
+      inviteDisabledReason,
+      isTerminated,
+      notify,
+      simulationId,
+      submitInvite,
+    ],
+  );
+
+  const onSetTerminateModalOpen = useCallback(
+    (open: boolean) => {
+      if (open && !terminateModalOpen) {
+        logSimulationDetailEvent('terminate_clicked', {
+          simulationId,
+          status: simulationStatus,
+          scenarioVersion: scenarioVersionIndex,
+        });
+      }
+      setTerminateModalOpen(open);
+    },
+    [
+      scenarioVersionIndex,
+      simulationId,
+      simulationStatus,
+      terminateModalOpen,
+      setTerminateModalOpen,
+    ],
+  );
+
+  const onTerminate = useCallback(async () => {
+    if (terminatePending) return;
+
+    setActionError(null);
+    setTerminatePending(true);
+    logSimulationDetailEvent('terminate_confirmed', {
+      simulationId,
+      status: simulationStatus,
+      scenarioVersion: scenarioVersionIndex,
+    });
+
+    try {
+      const result = await terminateSimulation(simulationId);
+
+      if (result.ok) {
+        const returnedCleanup = Array.isArray(result.data?.cleanupJobIds)
+          ? result.data.cleanupJobIds.filter(
+              (id): id is string =>
+                typeof id === 'string' && id.trim().length > 0,
+            )
+          : [];
+        setStatusOverride('terminated');
+        setCleanupJobIds(returnedCleanup);
+        closeInviteModal();
+        setTerminateModalOpen(false);
+        notify({
+          id: `terminate-success-${simulationId}`,
+          tone: 'success',
+          title: 'Simulation terminated',
+          description: returnedCleanup.length
+            ? 'Cleanup started in the background.'
+            : 'Invites are now disabled for this simulation.',
+        });
+        logSimulationDetailEvent('terminate_success', {
+          simulationId,
+          status: 'terminated',
+          scenarioVersion: scenarioVersionIndex,
+        });
+        return;
+      }
+
+      if (result.statusCode === 403 || result.statusCode === 404) {
+        setTerminateModalOpen(false);
+        setTerminateBlockedStatus(result.statusCode);
+        logSimulationDetailEvent('terminate_failure', {
+          simulationId,
+          status: simulationStatus,
+          scenarioVersion: scenarioVersionIndex,
+        });
+        return;
+      }
+
+      const message = buildActionError(
+        result.message,
+        'Unable to terminate this simulation.',
+      );
+      setActionError(message);
+      notify({
+        id: `terminate-error-${simulationId}`,
+        tone: 'error',
+        title: 'Failed to terminate simulation',
+        description: message,
+      });
+      logSimulationDetailEvent('terminate_failure', {
+        simulationId,
+        status: simulationStatus,
+        scenarioVersion: scenarioVersionIndex,
+      });
+    } catch (caught: unknown) {
+      const message = buildActionError(
+        toUserMessage(caught, 'Unable to terminate this simulation.', {
+          includeDetail: false,
+        }),
+        'Unable to terminate this simulation.',
+      );
+      setActionError(message);
+      notify({
+        id: `terminate-error-${simulationId}`,
+        tone: 'error',
+        title: 'Failed to terminate simulation',
+        description: message,
+      });
+      logSimulationDetailEvent('terminate_failure', {
+        simulationId,
+        status: simulationStatus,
+        scenarioVersion: scenarioVersionIndex,
+      });
+    } finally {
+      setTerminatePending(false);
+    }
+  }, [
+    closeInviteModal,
+    notify,
+    scenarioVersionIndex,
+    simulationId,
+    simulationStatus,
+    terminatePending,
+  ]);
+
+  if (pageBlocked && blockedStatusCode) {
+    return <SimulationDetailBlockedState statusCode={blockedStatusCode} />;
   }
 
   return (
@@ -236,12 +425,19 @@ export default function SimulationDetailContainer() {
       scenarioLockedAt={detail?.scenarioVersion.lockedAt ?? null}
       inviteEnabled={inviteEnabled}
       inviteDisabledReason={inviteDisabledReason}
+      inviteResendEnabled={inviteResendEnabled}
+      inviteResendDisabledReason={inviteResendDisabledReason}
       actionError={actionError}
       canApprove={canApprove}
       approveLoading={approveLoading}
       onApprove={onApprove}
       regenerateLoading={regenerateLoading}
       onRegenerate={onRegenerate}
+      terminatePending={terminatePending}
+      terminateModalOpen={terminateModalOpen}
+      setTerminateModalOpen={onSetTerminateModalOpen}
+      onTerminate={onTerminate}
+      cleanupJobIds={cleanupJobIds}
       retryGenerateLoading={retryGenerateLoading}
       onRetryGenerate={onRetryGenerate}
       templateKeyLabel={labels.templateKeyLabel}
@@ -274,7 +470,7 @@ export default function SimulationDetailContainer() {
       inviteModalOpen={inviteModal.open}
       setInviteModalOpen={inviteModal.setOpen}
       inviteFlowState={inviteModal.inviteFlowState}
-      submitInvite={inviteModal.submitInvite}
+      submitInvite={onSubmitInvite}
       resetInviteFlow={inviteModal.resetInviteFlow}
     />
   );

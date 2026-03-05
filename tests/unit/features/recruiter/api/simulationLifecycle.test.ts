@@ -2,6 +2,7 @@ import {
   activateSimulationInviting,
   regenerateSimulationScenario,
   retrySimulationGeneration,
+  terminateSimulation,
 } from '@/features/recruiter/api/simulationLifecycle';
 
 const mockRequestRecruiterBff = jest.fn();
@@ -47,5 +48,96 @@ describe('simulationLifecycle', () => {
     expect(result.ok).toBe(false);
     expect(result.statusCode).toBe(503);
     expect(result.message).toBe('Service unavailable');
+  });
+
+  it('terminateSimulation posts to terminate endpoint and returns cleanup IDs', async () => {
+    mockRequestRecruiterBff.mockResolvedValueOnce({
+      data: {
+        simulationId: 42,
+        status: 'terminated',
+        cleanupJobIds: ['job-1', 'job-2'],
+      },
+    });
+
+    const result = await terminateSimulation('sim-1');
+    expect(result.ok).toBe(true);
+    expect(result.data).toEqual({
+      simulationId: '42',
+      status: 'terminated',
+      cleanupJobIds: ['job-1', 'job-2'],
+    });
+    expect(mockRequestRecruiterBff).toHaveBeenCalledWith(
+      '/simulations/sim-1/terminate',
+      { method: 'POST', body: { confirm: true } },
+    );
+  });
+
+  it('terminateSimulation sends confirm:true payload', async () => {
+    mockRequestRecruiterBff.mockResolvedValueOnce({
+      data: {
+        simulationId: 'sim-1',
+        status: 'terminated',
+      },
+    });
+
+    await terminateSimulation('sim-1');
+    expect(mockRequestRecruiterBff).toHaveBeenCalledTimes(1);
+    expect(mockRequestRecruiterBff.mock.calls[0][1]).toEqual({
+      method: 'POST',
+      body: { confirm: true },
+    });
+  });
+
+  it('terminateSimulation returns ok:false when status is missing from success payload', async () => {
+    mockRequestRecruiterBff.mockResolvedValueOnce({
+      data: {
+        simulationId: 42,
+        cleanupJobIds: ['job-1'],
+      },
+    });
+
+    const result = await terminateSimulation('sim-1');
+    expect(result.ok).toBe(false);
+    expect(result.message).toBe('Unable to terminate simulation.');
+    expect(result.data).toEqual({
+      simulationId: '42',
+      status: 'unknown',
+      cleanupJobIds: ['job-1'],
+    });
+  });
+
+  it('terminateSimulation treats idempotent conflict with terminated payload as success', async () => {
+    mockRequestRecruiterBff.mockRejectedValueOnce({
+      status: 409,
+      details: {
+        simulationId: 'sim-1',
+        status: 'terminated',
+        cleanupJobIds: ['cleanup-1'],
+      },
+    });
+
+    const result = await terminateSimulation('sim-1');
+    expect(result.ok).toBe(true);
+    expect(result.statusCode).toBe(200);
+    expect(result.data).toEqual({
+      simulationId: 'sim-1',
+      status: 'terminated',
+      cleanupJobIds: ['cleanup-1'],
+    });
+  });
+
+  it('terminateSimulation returns ok:false for 409 when payload is missing explicit terminated status', async () => {
+    mockRequestRecruiterBff.mockRejectedValueOnce({
+      status: 409,
+      details: {
+        simulationId: 'sim-1',
+        cleanupJobIds: ['cleanup-1'],
+      },
+    });
+
+    const result = await terminateSimulation('sim-1');
+    expect(result.ok).toBe(false);
+    expect(result.statusCode).toBe(409);
+    expect(result.message).toBe('Unable to terminate simulation.');
   });
 });

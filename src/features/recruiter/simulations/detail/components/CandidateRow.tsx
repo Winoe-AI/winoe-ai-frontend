@@ -15,6 +15,8 @@ type Props = {
   simulationId: string;
   rowState: RowState;
   cooldownNow: number;
+  inviteResendEnabled: boolean;
+  inviteResendDisabledReason: string | null;
   onCopy: (candidate: CandidateSession) => void;
   onResend: (candidate: CandidateSession) => void;
   onCloseManual: (id: number) => void;
@@ -25,6 +27,8 @@ export function CandidateRow({
   simulationId,
   rowState,
   cooldownNow,
+  inviteResendEnabled,
+  inviteResendDisabledReason,
   onCopy,
   onResend,
   onCloseManual,
@@ -38,6 +42,8 @@ export function CandidateRow({
         candidate={candidate}
         rowState={rowState}
         cooldownNow={cooldownNow}
+        inviteResendEnabled={inviteResendEnabled}
+        inviteResendDisabledReason={inviteResendDisabledReason}
         onCopy={onCopy}
         onResend={onResend}
         onCloseManual={onCloseManual}

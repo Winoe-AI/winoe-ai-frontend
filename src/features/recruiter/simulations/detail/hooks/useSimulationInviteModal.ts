@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useInviteCandidateFlow } from '@/features/recruiter/dashboard/hooks/useInviteCandidateFlow';
 import { useInviteSubmit } from './useInviteSubmit';
 
@@ -23,10 +23,10 @@ export function useSimulationInviteModal({
       : null,
   );
 
-  const close = () => {
+  const close = useCallback(() => {
     inviteFlow.reset();
     setOpen(false);
-  };
+  }, [inviteFlow]);
 
   const submitInvite = useInviteSubmit({
     simulationId,
@@ -37,10 +37,10 @@ export function useSimulationInviteModal({
 
   return {
     open,
-    openModal: () => {
+    openModal: useCallback(() => {
       inviteFlow.reset();
       setOpen(true);
-    },
+    }, [inviteFlow]),
     close,
     setOpen,
     inviteFlowState: inviteFlow.state,

@@ -3,6 +3,7 @@ import {
   toNumberOrNull,
   toStringOrNull,
 } from '@/features/recruiter/simulations/detail/utils/parsing';
+import type { TerminateSimulationResponse } from './types';
 import { requestRecruiterBff } from './requestRecruiterBff';
 import { safeId } from './simUtils';
 
@@ -23,6 +24,7 @@ export type SimulationJobStatus = {
 };
 
 const UNSUPPORTED_STATUSES = new Set([404, 405, 501]);
+const TERMINATE_UNSUPPORTED_STATUSES = new Set([405, 501]);
 
 function asRecord(value: unknown): Record<string, unknown> | null {
   if (!value || typeof value !== 'object') return null;
@@ -32,10 +34,12 @@ function asRecord(value: unknown): Record<string, unknown> | null {
 function mapActionError(
   error: unknown,
   fallback: string,
+  opts?: { unsupportedStatuses?: Set<number> },
 ): SimulationActionResult {
   try {
     const statusCode = toStatus(error);
-    if (statusCode !== null && UNSUPPORTED_STATUSES.has(statusCode)) {
+    const unsupported = opts?.unsupportedStatuses ?? UNSUPPORTED_STATUSES;
+    if (statusCode !== null && unsupported.has(statusCode)) {
       return {
         ok: false,
         statusCode,
@@ -69,6 +73,57 @@ function mapActionError(
       message: fallback,
     };
   }
+}
+
+function toCleanupJobIds(data: Record<string, unknown>): string[] | undefined {
+  const raw = data.cleanupJobIds ?? data.cleanup_job_ids;
+  if (!Array.isArray(raw)) return undefined;
+  const ids = raw
+    .map((item) => toStringOrNull(item))
+    .filter((item): item is string => Boolean(item));
+  return ids.length ? ids : undefined;
+}
+
+function toTerminateStatus(value: unknown): string {
+  return toStringOrNull(value)?.toLowerCase() ?? ('unknown' as const);
+}
+
+function isTerminatedStatus(status: string | null | undefined): boolean {
+  return status?.toLowerCase() === 'terminated';
+}
+
+function toTerminateResponse(
+  data: unknown,
+  fallbackSimulationId: string,
+): TerminateSimulationResponse {
+  const record = asRecord(data);
+  const toId = (value: unknown): string | null => {
+    if (typeof value === 'number' && Number.isFinite(value)) {
+      return String(value);
+    }
+    return toStringOrNull(value);
+  };
+  const status = toTerminateStatus(record?.status);
+  const simulationId =
+    toId(record?.simulationId ?? record?.simulation_id ?? record?.id) ??
+    fallbackSimulationId;
+  return {
+    simulationId,
+    status,
+    cleanupJobIds: record ? toCleanupJobIds(record) : undefined,
+  };
+}
+
+function maybeIdempotentTerminateFromError(
+  error: unknown,
+  simulationId: string,
+): TerminateSimulationResponse | null {
+  const errorRecord = asRecord(error);
+  const payload = errorRecord?.details ?? errorRecord?.data ?? error;
+  const payloadRecord = asRecord(payload);
+  const explicitStatus = toStringOrNull(payloadRecord?.status);
+  if (!isTerminatedStatus(explicitStatus)) return null;
+  return toTerminateResponse(payload, simulationId);
 }
 
 async function tryPostWithFallback(
@@ -193,6 +248,62 @@ export async function retrySimulationGeneration(
       ok: false,
       statusCode: null,
       message: 'Unable to retry generation.',
+    };
+  }
+}
+
+export async function terminateSimulation(
+  simulationId: string | number,
+): Promise<SimulationActionResult & { data?: TerminateSimulationResponse }> {
+  try {
+    const id = safeId(simulationId);
+    if (!id) {
+      return {
+        ok: false,
+        statusCode: 400,
+        message: 'Simulation ID is required.',
+      };
+    }
+
+    const { data } = await requestRecruiterBff<unknown>(
+      `/simulations/${encodeURIComponent(id)}/terminate`,
+      {
+        method: 'POST',
+        body: { confirm: true },
+      },
+    );
+
+    const normalized = toTerminateResponse(data, id);
+    const terminated = isTerminatedStatus(normalized.status);
+    return {
+      ok: terminated,
+      statusCode: 200,
+      message: terminated ? null : 'Unable to terminate simulation.',
+      data: normalized,
+    };
+  } catch (error) {
+    const statusCode = toStatus(error);
+    if (statusCode === 409) {
+      const id = safeId(simulationId);
+      const idempotent = maybeIdempotentTerminateFromError(error, id);
+      if (idempotent) {
+        return {
+          ok: true,
+          statusCode: 200,
+          message: null,
+          data: idempotent,
+        };
+      }
+    }
+
+    const mapped = mapActionError(error, 'Unable to terminate simulation.', {
+      unsupportedStatuses: TERMINATE_UNSUPPORTED_STATUSES,
+    });
+    return {
+      ok: mapped.ok,
+      statusCode: mapped.statusCode,
+      message: mapped.message,
+      unsupported: mapped.unsupported,
     };
   }
 }

@@ -4,6 +4,8 @@ import { CandidatesSection } from './sections/CandidatesSection';
 import { SimulationPlanSection } from './SimulationPlanSection';
 import { SimulationDetailHeader } from './SimulationDetailHeader';
 import { useInviteModalActions } from './InviteModalActions';
+import { TerminateSimulationModal } from './TerminateSimulationModal';
+import { CleanupInProgressPanel } from './CleanupInProgressPanel';
 import type { SimulationDetailViewProps } from './types';
 
 const SimulationInviteModal = dynamic(
@@ -46,8 +48,11 @@ export function SimulationDetailView(props: SimulationDetailViewProps) {
         onApprove={props.onApprove}
         regenerateLoading={props.regenerateLoading}
         onRegenerate={props.onRegenerate}
+        terminatePending={props.terminatePending}
+        onOpenTerminateModal={() => props.setTerminateModalOpen(true)}
         onInvite={openInviteModal}
       />
+      <CleanupInProgressPanel cleanupJobIds={props.cleanupJobIds} />
       <SimulationPlanSection
         status={props.simulationStatus}
         scenarioVersionLabel={props.scenarioVersionLabel}
@@ -88,6 +93,8 @@ export function SimulationDetailView(props: SimulationDetailViewProps) {
         inviteEnabled={props.inviteEnabled}
         inviteDisabledReason={props.inviteDisabledReason}
         onInvite={openInviteModal}
+        inviteResendEnabled={props.inviteResendEnabled}
+        inviteResendDisabledReason={props.inviteResendDisabledReason}
       />
 
       {props.inviteModalOpen ? (
@@ -97,6 +104,15 @@ export function SimulationDetailView(props: SimulationDetailViewProps) {
           inviteFlowState={props.inviteFlowState}
           onClose={closeInviteModal}
           onSubmit={props.submitInvite}
+        />
+      ) : null}
+
+      {props.terminateModalOpen ? (
+        <TerminateSimulationModal
+          open={props.terminateModalOpen}
+          pending={props.terminatePending}
+          onClose={() => props.setTerminateModalOpen(false)}
+          onConfirm={props.onTerminate}
         />
       ) : null}
     </div>

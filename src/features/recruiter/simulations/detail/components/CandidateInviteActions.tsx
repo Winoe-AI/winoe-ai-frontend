@@ -11,6 +11,8 @@ type Props = {
   rowState: RowState;
   inviteLink: string | null;
   cooldownNow: number;
+  inviteResendEnabled: boolean;
+  inviteResendDisabledReason: string | null;
   onCopy: (candidate: CandidateSession) => void;
   onResend: (candidate: CandidateSession) => void;
   onCloseManual: (id: number) => void;
@@ -21,6 +23,8 @@ export function CandidateInviteActions({
   rowState,
   inviteLink,
   cooldownNow,
+  inviteResendEnabled,
+  inviteResendDisabledReason,
   onCopy,
   onResend,
   onCloseManual,
@@ -31,7 +35,10 @@ export function CandidateInviteActions({
   const cooldownRemainingMs = cooldownActive
     ? Math.max(0, (rowState.cooldownUntilMs ?? 0) - cooldownNow)
     : null;
-  const resendDisabled = rowState.resending || cooldownActive;
+  const resendDisabled =
+    rowState.resending || cooldownActive || !inviteResendEnabled;
+  const copyDisabled =
+    rowState.resending || !inviteLink || !inviteResendEnabled;
 
   return (
     <div className="flex flex-col gap-2">
@@ -41,7 +48,12 @@ export function CandidateInviteActions({
           variant="secondary"
           size="sm"
           onClick={() => onCopy(candidate)}
-          disabled={rowState.resending || !inviteLink}
+          disabled={copyDisabled}
+          title={
+            inviteResendEnabled
+              ? undefined
+              : (inviteResendDisabledReason ?? undefined)
+          }
         >
           {rowState.copied ? 'Copied' : 'Copy invite link'}
         </Button>
@@ -51,10 +63,21 @@ export function CandidateInviteActions({
           size="sm"
           onClick={() => onResend(candidate)}
           disabled={resendDisabled}
+          title={
+            inviteResendEnabled
+              ? undefined
+              : (inviteResendDisabledReason ?? undefined)
+          }
         >
           {rowState.resending ? 'Resending…' : 'Resend invite'}
         </Button>
       </div>
+
+      {!inviteResendEnabled && inviteResendDisabledReason ? (
+        <div className="text-xs text-gray-600">
+          {inviteResendDisabledReason}
+        </div>
+      ) : null}
 
       {!inviteLink && (
         <div className="text-xs text-gray-600">
