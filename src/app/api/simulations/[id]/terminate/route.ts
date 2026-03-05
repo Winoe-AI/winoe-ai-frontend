@@ -12,6 +12,7 @@ export async function POST(
   context: { params: Promise<{ id: string }> },
 ) {
   const { id } = await context.params;
+  const body = await req.json().catch(() => null);
 
   return withRecruiterAuth(
     req,
@@ -21,6 +22,7 @@ export async function POST(
         path: `/api/simulations/${encodeURIComponent(id)}/terminate`,
         method: 'POST',
         cache: 'no-store',
+        ...(body === null ? {} : { body }),
         accessToken: auth.accessToken,
         requestId: auth.requestId,
       }),

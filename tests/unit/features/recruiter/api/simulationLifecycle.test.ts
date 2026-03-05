@@ -68,9 +68,24 @@ describe('simulationLifecycle', () => {
     });
     expect(mockRequestRecruiterBff).toHaveBeenCalledWith(
       '/simulations/sim-1/terminate',
-      { method: 'POST' },
+      { method: 'POST', body: { confirm: true } },
     );
-    expect(mockRequestRecruiterBff.mock.calls[0][1]).not.toHaveProperty('body');
+  });
+
+  it('terminateSimulation sends confirm:true payload', async () => {
+    mockRequestRecruiterBff.mockResolvedValueOnce({
+      data: {
+        simulationId: 'sim-1',
+        status: 'terminated',
+      },
+    });
+
+    await terminateSimulation('sim-1');
+    expect(mockRequestRecruiterBff).toHaveBeenCalledTimes(1);
+    expect(mockRequestRecruiterBff.mock.calls[0][1]).toEqual({
+      method: 'POST',
+      body: { confirm: true },
+    });
   });
 
   it('terminateSimulation returns ok:false when status is missing from success payload', async () => {

@@ -269,6 +269,7 @@ export async function terminateSimulation(
       `/simulations/${encodeURIComponent(id)}/terminate`,
       {
         method: 'POST',
+        body: { confirm: true },
       },
     );
 
