@@ -10,6 +10,7 @@ import type { SessionActionsParams as Params } from './useCandidateSessionAction
 export function useCandidateSessionActions({
   session,
   token,
+  redirectToLogin,
   view,
   setView,
   setErrorMessage,
@@ -23,6 +24,7 @@ export function useCandidateSessionActions({
   const inviteActions = useCandidateInviteActions({
     token,
     session,
+    redirectToLogin,
     setView,
     setAuthMessage,
     setErrorMessage,

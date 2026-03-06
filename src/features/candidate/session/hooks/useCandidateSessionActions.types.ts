@@ -7,6 +7,7 @@ export type SessionCtx = ReturnType<typeof useCandidateSession>;
 export type SessionActionsParams = {
   session: SessionCtx;
   token: string;
+  redirectToLogin: () => void;
   view: ViewState;
   setView: Dispatch<SetStateAction<ViewState>>;
   setErrorMessage: (m: string | null) => void;

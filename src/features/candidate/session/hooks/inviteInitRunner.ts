@@ -10,6 +10,7 @@ import {
   friendlyBootstrapError,
   friendlyTaskError,
 } from '../utils/errorMessages';
+import { hasScheduleConfigured, isScheduleLocked } from '../utils/schedule';
 import type { ViewState } from '../CandidateSessionView';
 
 export type InviteInitParams = {
@@ -20,6 +21,7 @@ export type InviteInitParams = {
   setAuthMessage: (m: string | null) => void;
   setErrorMessage: (m: string | null) => void;
   setErrorStatus: (s: number | null) => void;
+  redirectToLogin: () => void;
   fetchTask: (opts?: { sessionId?: number }) => Promise<void>;
   markStart: (label: string) => void;
   markEnd: (label: string, extra?: Record<string, unknown>) => void;
@@ -27,6 +29,12 @@ export type InviteInitParams = {
 
 export const inviteErrorCopy = (status: number | null, msg: string | null) =>
   msg ?? (status === 410 ? INVITE_EXPIRED_MESSAGE : INVITE_UNAVAILABLE_MESSAGE);
+
+const hasSchedulePayload = (resp: CandidateSessionBootstrapResponse): boolean =>
+  'scheduledStartAt' in resp ||
+  'candidateTimezone' in resp ||
+  'dayWindows' in resp ||
+  'scheduleLockedAt' in resp;
 
 export function createInviteInit(params: InviteInitParams) {
   const runInit = async (initToken: string, allowRetry = false) => {
@@ -51,8 +59,30 @@ export function createInviteInit(params: InviteInitParams) {
         candidateSessionId: resp.candidateSessionId,
         status: resp.status,
         simulation: resp.simulation,
+        scheduledStartAt: resp.scheduledStartAt ?? null,
+        candidateTimezone: resp.candidateTimezone ?? null,
+        dayWindows: resp.dayWindows ?? [],
+        scheduleLockedAt: resp.scheduleLockedAt ?? null,
+        currentDayWindow: resp.currentDayWindow ?? null,
       });
       params.clearTaskError();
+      if (resp.status === 'expired') {
+        params.setErrorStatus(410);
+        params.setErrorMessage(INVITE_EXPIRED_MESSAGE);
+        params.setView('expired');
+        params.markEnd('candidate:init', { status: 'expired' });
+        return;
+      }
+      if (!hasScheduleConfigured(resp) && hasSchedulePayload(resp)) {
+        params.setView('scheduling');
+        params.markEnd('candidate:init', { status: 'schedule_required' });
+        return;
+      }
+      if (isScheduleLocked(resp)) {
+        params.setView('locked');
+        params.markEnd('candidate:init', { status: 'locked' });
+        return;
+      }
       params.setView('starting');
       params.markEnd('candidate:init', { status: 'success' });
       await params
@@ -64,11 +94,19 @@ export function createInviteInit(params: InviteInitParams) {
         });
     } catch (err) {
       const status = (err as { status?: number }).status;
-      if (status === 401 || status === 403) {
-        params.setAuthMessage(friendlyBootstrapError(err));
-        params.setErrorStatus(status ?? null);
-        params.setView('auth');
-        params.markEnd('candidate:init', { status: 'auth' });
+      if (status === 401) {
+        params.markEnd('candidate:init', { status: 'auth_redirect' });
+        params.redirectToLogin();
+      } else if (status === 403) {
+        params.setErrorStatus(403);
+        params.setErrorMessage(friendlyBootstrapError(err));
+        params.setView('accessDenied');
+        params.markEnd('candidate:init', { status: 'access_denied' });
+      } else if (status === 410) {
+        params.setErrorStatus(410);
+        params.setErrorMessage(friendlyBootstrapError(err));
+        params.setView('expired');
+        params.markEnd('candidate:init', { status: 'expired' });
       } else {
         params.setErrorStatus(status ?? null);
         params.setErrorMessage(friendlyBootstrapError(err));

@@ -1,5 +1,6 @@
 export * from './types';
 export * from './invites';
+export * from './schedule';
 export * from './tasks';
 export * from './workspace';
 export * from './tests';

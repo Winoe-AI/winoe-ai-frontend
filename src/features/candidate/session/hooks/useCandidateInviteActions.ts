@@ -6,6 +6,7 @@ import type { ViewState } from '../views/types';
 type Params = {
   session: SessionCtx;
   token: string;
+  redirectToLogin: () => void;
   setView: Dispatch<SetStateAction<ViewState>>;
   setAuthMessage: (m: string | null) => void;
   setErrorMessage: (m: string | null) => void;
@@ -21,6 +22,7 @@ export function useCandidateInviteActions(params: Params) {
     setCandidateSessionId: params.session.setCandidateSessionId,
     setBootstrap: params.session.setBootstrap,
     clearTaskError: params.session.clearTaskError,
+    redirectToLogin: params.redirectToLogin,
     setView: params.setView,
     setAuthMessage: params.setAuthMessage,
     setErrorMessage: params.setErrorMessage,
