@@ -1,8 +1,23 @@
+import type {
+  CandidateCurrentDayWindow,
+  CandidateDayWindow,
+} from '@/features/candidate/api';
 import type { CandidateTask } from '../CandidateSessionProvider';
 import type { SubmitPayload, SubmitResponse } from '../task/types';
 import type { PollResult } from '../task/hooks/runTestsTypes';
 
-export type ViewState = 'loading' | 'auth' | 'starting' | 'error' | 'running';
+export type ViewState =
+  | 'loading'
+  | 'auth'
+  | 'accessDenied'
+  | 'expired'
+  | 'scheduling'
+  | 'scheduleConfirm'
+  | 'scheduleSubmitting'
+  | 'locked'
+  | 'starting'
+  | 'error'
+  | 'running';
 
 export type CandidateSessionViewProps = {
   view: ViewState;
@@ -27,11 +42,32 @@ export type CandidateSessionViewProps = {
   showRecordingPanel: boolean;
   showDocsPanel: boolean;
   loginHref: string;
+  scheduleDate: string;
+  scheduleTimezone: string;
+  scheduleTimezoneDetected: string | null;
+  scheduleTimezoneOptions: string[];
+  scheduleDateError: string | null;
+  scheduleTimezoneError: string | null;
+  scheduleSubmitError: string | null;
+  schedulePreviewWindows: CandidateDayWindow[];
+  scheduleResponseWindows: CandidateDayWindow[];
+  scheduleCurrentDayWindow: CandidateCurrentDayWindow | null;
+  scheduleCountdownLabel: string;
+  scheduleCountdownTargetAt: string | null;
+  scheduleDisplayTimezone: string | null;
+  scheduleDisplayStartAt: string | null;
   onStart: () => void;
   onDashboard: () => void;
   onRetryInit: () => void;
   onGoHome: () => void;
   onRetryTask: () => void;
+  onScheduleDateChange: (value: string) => void;
+  onScheduleTimezoneChange: (value: string) => void;
+  onScheduleContinue: () => void;
+  onScheduleBack: () => void;
+  onScheduleConfirm: () => void;
+  onScheduleRetry: () => void;
+  onRefreshScheduleLock: () => void;
   onSubmit: (
     payload: SubmitPayload,
   ) => Promise<SubmitResponse | void> | SubmitResponse | void;

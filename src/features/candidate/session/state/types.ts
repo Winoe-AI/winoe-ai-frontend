@@ -1,4 +1,8 @@
 import type { Dispatch, Reducer } from 'react';
+import type {
+  CandidateCurrentDayWindow,
+  CandidateDayWindow,
+} from '@/features/candidate/api';
 
 export type SimulationSummary = { title: string; role: string };
 
@@ -6,6 +10,11 @@ export type CandidateBootstrap = {
   candidateSessionId: number;
   status: 'not_started' | 'in_progress' | 'completed' | 'expired';
   simulation: SimulationSummary;
+  scheduledStartAt?: string | null;
+  candidateTimezone?: string | null;
+  dayWindows?: CandidateDayWindow[];
+  scheduleLockedAt?: string | null;
+  currentDayWindow?: CandidateCurrentDayWindow | null;
 };
 
 export type TaskType =

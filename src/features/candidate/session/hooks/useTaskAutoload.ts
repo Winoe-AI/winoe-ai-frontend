@@ -23,7 +23,17 @@ export function useTaskAutoload({
   setView,
 }: Params) {
   useEffect(() => {
-    if (view === 'auth' || view === 'error') return;
+    if (
+      view === 'auth' ||
+      view === 'error' ||
+      view === 'accessDenied' ||
+      view === 'expired' ||
+      view === 'scheduling' ||
+      view === 'scheduleConfirm' ||
+      view === 'scheduleSubmitting' ||
+      view === 'locked'
+    )
+      return;
     if (!state.candidateSessionId) return;
     if (
       state.taskState.loading ||

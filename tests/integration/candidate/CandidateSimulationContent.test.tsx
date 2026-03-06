@@ -114,11 +114,16 @@ describe('CandidateSessionPage', () => {
     );
   });
 
-  it('returns to auth state when invite bootstrap is rejected', async () => {
+  it('does not render auth card when invite bootstrap is rejected with 401', async () => {
     resolveMock.mockRejectedValueOnce({ status: 401 });
 
     renderWithProvider(<CandidateSessionPage token="VALID_TOKEN" />);
 
-    expect(await screen.findByText(/sign in to continue/i)).toBeInTheDocument();
+    await waitFor(() =>
+      expect(routerMock.replace).toHaveBeenCalledWith(
+        expect.stringContaining('/auth/login?'),
+      ),
+    );
+    expect(screen.queryByText(/sign in to continue/i)).not.toBeInTheDocument();
   });
 });

@@ -186,7 +186,7 @@ describe('CandidateSessionPage auth/error states', () => {
     expect(screen.queryByTestId('state-message')).not.toBeInTheDocument();
   });
 
-  it('shows invite expired error with sign-in link when unauthenticated', async () => {
+  it('shows invite expired state when unauthenticated', async () => {
     resolveInviteMock.mockRejectedValue(new HttpError(410));
     useCandidateSessionMock.mockReturnValue({
       ...baseState(),
@@ -199,12 +199,10 @@ describe('CandidateSessionPage auth/error states', () => {
 
     await waitFor(() =>
       expect(screen.getByTestId('state-message')).toHaveTextContent(
-        'Invite link unavailable',
+        'Invite expired',
       ),
     );
-    expect(
-      screen.getByRole('button', { name: /Go to sign in/i }),
-    ).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Go to sign in/i })).toBeNull();
   });
 
   it('shows invite error with go home action when authenticated', async () => {
@@ -224,7 +222,7 @@ describe('CandidateSessionPage auth/error states', () => {
     expect(routerMock.push).toHaveBeenCalledWith('/');
   });
 
-  it('sends user back to auth when resolve fails with 401', async () => {
+  it('redirects to login when resolve fails with 401', async () => {
     resolveInviteMock.mockRejectedValue({ status: 401 });
     useCandidateSessionMock.mockReturnValue({
       ...baseState(),
@@ -235,13 +233,13 @@ describe('CandidateSessionPage auth/error states', () => {
     });
 
     await waitFor(() =>
-      expect(screen.getByTestId('state-message')).toHaveTextContent(
-        'Sign in to continue',
+      expect(routerMock.replace).toHaveBeenCalledWith(
+        expect.stringContaining('/auth/login?'),
       ),
     );
   });
 
-  it('sends user back to auth when resolve fails with 403', async () => {
+  it('shows access denied view when resolve fails with 403', async () => {
     resolveInviteMock.mockRejectedValue({ status: 403 });
     useCandidateSessionMock.mockReturnValue({
       ...baseState(),
@@ -253,7 +251,7 @@ describe('CandidateSessionPage auth/error states', () => {
 
     await waitFor(() =>
       expect(screen.getByTestId('state-message')).toHaveTextContent(
-        'Sign in to continue',
+        'Access denied',
       ),
     );
   });

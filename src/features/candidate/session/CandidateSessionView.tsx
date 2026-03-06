@@ -1,9 +1,13 @@
 import { AuthView } from './views/AuthView';
 import { CompleteView } from './views/CompleteView';
 import { ErrorView } from './views/ErrorView';
+import { LockedView } from './views/LockedView';
 import { LoadingView } from './views/LoadingView';
 import { RunningView } from './views/RunningView';
+import { SchedulingView } from './views/SchedulingView';
 import { StartView } from './views/StartView';
+import { StateMessage } from './components/StateMessage';
+import Button from '@/shared/ui/Button';
 import type {
   CandidateSessionViewProps as Props,
   ViewState,
@@ -24,6 +28,79 @@ export function CandidateSessionView(props: Props) {
     return <LoadingView message="Checking your invite and signing you in." />;
   if (view === 'auth')
     return <AuthView loginHref={props.loginHref} message={authMessage} />;
+  if (view === 'accessDenied')
+    return (
+      <StateMessage
+        title="Access denied"
+        description={
+          errorMessage ??
+          'You do not have access to this invite. Please confirm you are signed in with the matching email.'
+        }
+        action={
+          <a href={props.loginHref}>
+            <Button variant="secondary">Go to sign in</Button>
+          </a>
+        }
+      />
+    );
+  if (view === 'expired')
+    return (
+      <StateMessage
+        title="Invite expired"
+        description={
+          errorMessage ??
+          'This invite has expired. Please contact your recruiter for a new link.'
+        }
+      />
+    );
+  if (
+    view === 'scheduling' ||
+    view === 'scheduleConfirm' ||
+    view === 'scheduleSubmitting'
+  )
+    return (
+      <SchedulingView
+        title={props.title}
+        role={props.role}
+        step={
+          view === 'scheduling'
+            ? 'form'
+            : view === 'scheduleSubmitting'
+              ? 'submitting'
+              : 'confirm'
+        }
+        scheduleDate={props.scheduleDate}
+        scheduleTimezone={props.scheduleTimezone}
+        scheduleTimezoneDetected={props.scheduleTimezoneDetected}
+        scheduleTimezoneOptions={props.scheduleTimezoneOptions}
+        scheduleDateError={props.scheduleDateError}
+        scheduleTimezoneError={props.scheduleTimezoneError}
+        scheduleSubmitError={props.scheduleSubmitError}
+        schedulePreviewWindows={props.schedulePreviewWindows}
+        onScheduleDateChange={props.onScheduleDateChange}
+        onScheduleTimezoneChange={props.onScheduleTimezoneChange}
+        onScheduleContinue={props.onScheduleContinue}
+        onScheduleBack={props.onScheduleBack}
+        onScheduleConfirm={props.onScheduleConfirm}
+        onScheduleRetry={props.onScheduleRetry}
+        onDashboard={props.onDashboard}
+      />
+    );
+  if (view === 'locked')
+    return (
+      <LockedView
+        title={props.title}
+        role={props.role}
+        countdownLabel={props.scheduleCountdownLabel}
+        countdownTargetAt={props.scheduleCountdownTargetAt}
+        timezone={props.scheduleDisplayTimezone}
+        scheduledStartAt={props.scheduleDisplayStartAt}
+        dayWindows={props.scheduleResponseWindows}
+        currentDayWindow={props.scheduleCurrentDayWindow}
+        errorMessage={props.scheduleSubmitError}
+        onRetry={props.onRefreshScheduleLock}
+      />
+    );
   if (view === 'starting')
     return <LoadingView message="Loading your tasks and workspace." />;
 

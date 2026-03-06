@@ -10,6 +10,7 @@ type Params = {
   setCandidateSessionId: (id: number | null) => void;
   setBootstrap: (b: CandidateSessionBootstrapResponse) => void;
   clearTaskError: () => void;
+  redirectToLogin: () => void;
   setView: React.Dispatch<React.SetStateAction<ViewState>>;
   setAuthMessage: (m: string | null) => void;
   setErrorMessage: (m: string | null) => void;
