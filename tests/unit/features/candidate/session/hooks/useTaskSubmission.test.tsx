@@ -42,6 +42,8 @@ type HarnessProps = {
   clearTaskError: jest.Mock;
   setTaskError: jest.Mock;
   refreshTask: jest.Mock;
+  onTaskWindowClosed: jest.Mock;
+  onSubmissionRecorded: jest.Mock;
 };
 
 const HookHarness = forwardRef<HookReturn, HarnessProps>(
@@ -65,6 +67,8 @@ describe('useTaskSubmission', () => {
     clearTaskError: jest.fn(),
     setTaskError: jest.fn(),
     refreshTask: jest.fn(),
+    onTaskWindowClosed: jest.fn(),
+    onSubmissionRecorded: jest.fn(),
   });
 
   beforeEach(() => {
@@ -132,12 +136,40 @@ describe('useTaskSubmission', () => {
     });
     expect(resp).toEqual({ ok: true });
     expect(props.clearTaskError).toHaveBeenCalled();
+    expect(props.onSubmissionRecorded).not.toHaveBeenCalled();
     expect(notifyMock).toHaveBeenCalledWith(
       expect.objectContaining({ id: 'submit-2', tone: 'success' }),
     );
 
     jest.advanceTimersByTime(900);
     expect(props.refreshTask).toHaveBeenCalledWith({ skipCache: true });
+  });
+
+  it('records submission metadata when submit returns submission payload', async () => {
+    const props = baseProps();
+    props.currentTask = {
+      id: 12,
+      dayIndex: 1,
+      type: 'design',
+      title: 'Design',
+      description: '',
+    };
+    const ref = React.createRef<HookReturn>();
+    submitCandidateTaskMock.mockResolvedValue({
+      submissionId: 55,
+      submittedAt: '2099-01-03T14:10:00Z',
+    });
+
+    render(<HookHarness ref={ref} {...props} />);
+
+    await act(async () => {
+      await ref.current?.handleSubmit({ contentText: 'answer' });
+    });
+
+    expect(props.onSubmissionRecorded).toHaveBeenCalledWith({
+      submissionId: 55,
+      submittedAt: '2099-01-03T14:10:00Z',
+    });
   });
 
   it('wraps submit errors and notifies', async () => {
@@ -169,6 +201,83 @@ describe('useTaskSubmission', () => {
       );
     });
   });
+
+  it('maps TASK_WINDOW_CLOSED to callback and friendly comeback copy', async () => {
+    const props = baseProps();
+    props.currentTask = {
+      id: 8,
+      dayIndex: 2,
+      type: 'code',
+      title: 'Code',
+      description: '',
+    };
+    const ref = React.createRef<HookReturn>();
+    submitCandidateTaskMock.mockImplementation(() =>
+      Promise.reject({
+        status: 409,
+        message: 'Task is closed outside the scheduled window.',
+        details: {
+          errorCode: 'TASK_WINDOW_CLOSED',
+          detail: 'Task is closed outside the scheduled window.',
+          details: {
+            windowStartAt: '2099-01-03T14:00:00Z',
+            windowEndAt: '2099-01-03T22:00:00Z',
+            nextOpenAt: '2099-01-03T14:00:00Z',
+          },
+        },
+      }),
+    );
+
+    render(<HookHarness ref={ref} {...props} />);
+    expect(ref.current).not.toBeNull();
+
+    await act(async () => {
+      await ref.current?.handleSubmit({ contentText: 'body' }).catch(() => {});
+    });
+
+    await waitFor(() => {
+      expect(props.onTaskWindowClosed).toHaveBeenCalledTimes(1);
+      expect(props.setTaskError).toHaveBeenCalledWith(
+        expect.stringMatching(/come back at/i),
+      );
+    });
+  });
+
+  it.each([
+    { status: 401, message: 'Please sign in again.' },
+    {
+      status: 403,
+      message: 'We could not confirm your email. Please sign in again.',
+    },
+  ])(
+    'does not map non-window auth error %s to TASK_WINDOW_CLOSED behavior',
+    async ({ status, message }) => {
+      const props = baseProps();
+      props.currentTask = {
+        id: 9,
+        dayIndex: 1,
+        type: 'design',
+        title: 'Design',
+        description: '',
+      };
+      const ref = React.createRef<HookReturn>();
+      submitCandidateTaskMock.mockImplementation(() =>
+        Promise.reject({ status, message }),
+      );
+
+      render(<HookHarness ref={ref} {...props} />);
+      expect(ref.current).not.toBeNull();
+
+      await act(async () => {
+        await ref
+          .current!.handleSubmit({ contentText: 'body' })
+          .catch(() => {});
+      });
+
+      expect(submitCandidateTaskMock).toHaveBeenCalled();
+      expect(props.onTaskWindowClosed).not.toHaveBeenCalled();
+    },
+  );
 
   it('clears pending refresh timer on unmount', async () => {
     const props = baseProps();

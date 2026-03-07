@@ -8,6 +8,16 @@ import { useCandidateDerivedInfo } from './useCandidateDerivedInfo';
 import { useTokenSync } from './useTokenSync';
 import { useCandidateSessionActions } from './useCandidateSessionActions';
 import { friendlyTaskError } from '../utils/errorMessages';
+import { loadTextDraftSavedAt } from '../task/utils/draftStorage';
+import {
+  loadRecordedSubmissionReference,
+  saveRecordedSubmissionReference,
+} from '../task/utils/submissionReferenceStorage';
+import { useWindowState } from './useWindowState';
+import {
+  extractTaskWindowClosedOverride,
+  type TaskWindowClosedOverride,
+} from '../lib/windowState';
 import {
   buildSchedulePreview,
   countdownFromUtc,
@@ -39,6 +49,31 @@ function scheduleErrorCode(err: unknown): string | null {
 
 export function useCandidateSessionController(token: string) {
   const session = useCandidateSession();
+  const sessionTokenMismatch =
+    session.state.inviteToken !== null && session.state.inviteToken !== token;
+  const state = useMemo(
+    () =>
+      sessionTokenMismatch
+        ? {
+            ...session.state,
+            candidateSessionId: null,
+            bootstrap: null,
+            started: false,
+            taskState: {
+              loading: false,
+              error: null,
+              isComplete: false,
+              completedTaskIds: [],
+              currentTask: null,
+            },
+          }
+        : session.state,
+    [session.state, sessionTokenMismatch],
+  );
+  const sessionForActions = useMemo(
+    () => (sessionTokenMismatch ? { ...session, state } : session),
+    [session, sessionTokenMismatch, state],
+  );
   const router = useRouter();
   const loginHref = useMemo(
     () =>
@@ -69,8 +104,19 @@ export function useCandidateSessionController(token: string) {
   const [scheduleSubmitError, setScheduleSubmitError] = useState<string | null>(
     null,
   );
+  const [taskWindowOverride, setTaskWindowOverride] = useState<{
+    taskId: number;
+    value: TaskWindowClosedOverride;
+  } | null>(null);
+  const [lastSubmissionAt, setLastSubmissionAt] = useState<string | null>(null);
+  const [lastSubmissionId, setLastSubmissionId] = useState<number | null>(null);
+  const [lastSubmissionTaskId, setLastSubmissionTaskId] = useState<
+    number | null
+  >(null);
   const [clockNowMs, setClockNowMs] = useState<number>(() => Date.now());
   const unlockRefreshRef = useRef<string | null>(null);
+  const candidateSessionId = state.candidateSessionId ?? null;
+  const currentTaskId = state.taskState.currentTask?.id ?? null;
 
   const clearScheduleErrors = useCallback(() => {
     setScheduleDateError(null);
@@ -89,10 +135,40 @@ export function useCandidateSessionController(token: string) {
     setErrorStatus(null);
     setAuthMessage(null);
     setView('loading');
+    setTaskWindowOverride(null);
+    setLastSubmissionAt(null);
+    setLastSubmissionId(null);
+    setLastSubmissionTaskId(null);
     resetScheduleDraft();
     session.clearTaskError();
     if (typeof session.reset === 'function') session.reset();
   }, [resetScheduleDraft, session]);
+
+  const handleTaskWindowClosed = useCallback(
+    (err: unknown) => {
+      if (!currentTaskId) return;
+      const override = extractTaskWindowClosedOverride(err);
+      if (!override) return;
+      setTaskWindowOverride({ taskId: currentTaskId, value: override });
+    },
+    [currentTaskId],
+  );
+
+  const handleSubmissionRecorded = useCallback(
+    (payload: { submissionId: number; submittedAt: string }) => {
+      if (!currentTaskId) return;
+      setLastSubmissionTaskId(currentTaskId);
+      setLastSubmissionId(payload.submissionId);
+      setLastSubmissionAt(payload.submittedAt);
+      if (candidateSessionId !== null) {
+        saveRecordedSubmissionReference(candidateSessionId, currentTaskId, {
+          submissionId: payload.submissionId,
+          submittedAt: payload.submittedAt,
+        });
+      }
+    },
+    [candidateSessionId, currentTaskId],
+  );
 
   useTokenSync({
     token,
@@ -103,9 +179,11 @@ export function useCandidateSessionController(token: string) {
   });
 
   const actions = useCandidateSessionActions({
-    session,
+    session: sessionForActions,
     token,
     redirectToLogin,
+    onTaskWindowClosed: handleTaskWindowClosed,
+    onSubmissionRecorded: handleSubmissionRecorded,
     view,
     setView,
     setErrorMessage,
@@ -121,28 +199,26 @@ export function useCandidateSessionController(token: string) {
     return () => window.clearInterval(timer);
   }, [view]);
 
-  const bootstrapScheduleTimezone =
-    session.state.bootstrap?.candidateTimezone ?? null;
+  const bootstrapScheduleTimezone = state.bootstrap?.candidateTimezone ?? null;
   const scheduleTimezoneValue =
     scheduleTimezone ?? bootstrapScheduleTimezone ?? detectedTimezone ?? '';
   const bootstrapScheduleDate =
-    session.state.bootstrap?.scheduledStartAt && scheduleTimezoneValue
+    state.bootstrap?.scheduledStartAt && scheduleTimezoneValue
       ? toDateInputInTimezone(
-          session.state.bootstrap.scheduledStartAt,
+          state.bootstrap.scheduledStartAt,
           scheduleTimezoneValue,
         )
       : null;
   const scheduleDateValue = scheduleDate ?? bootstrapScheduleDate ?? '';
 
   const scheduleResponseWindows = useMemo(
-    () => normalizeDayWindows(session.state.bootstrap?.dayWindows),
-    [session.state.bootstrap?.dayWindows],
+    () => normalizeDayWindows(state.bootstrap?.dayWindows),
+    [state.bootstrap?.dayWindows],
   );
-  const scheduleCurrentDayWindow =
-    session.state.bootstrap?.currentDayWindow ?? null;
+  const scheduleCurrentDayWindow = state.bootstrap?.currentDayWindow ?? null;
   const scheduleCountdownTargetAt = firstWindowStartAt({
-    scheduledStartAt: session.state.bootstrap?.scheduledStartAt,
-    dayWindows: session.state.bootstrap?.dayWindows,
+    scheduledStartAt: state.bootstrap?.scheduledStartAt,
+    dayWindows: state.bootstrap?.dayWindows,
     currentDayWindow: scheduleCurrentDayWindow,
   });
   const scheduleCountdown = useMemo(
@@ -155,10 +231,9 @@ export function useCandidateSessionController(token: string) {
   );
   const fallbackTimezone = scheduleTimezoneValue.trim();
   const scheduleDisplayTimezone =
-    session.state.bootstrap?.candidateTimezone ??
+    state.bootstrap?.candidateTimezone ??
     (fallbackTimezone ? fallbackTimezone : null);
-  const scheduleDisplayStartAt =
-    session.state.bootstrap?.scheduledStartAt ?? null;
+  const scheduleDisplayStartAt = state.bootstrap?.scheduledStartAt ?? null;
 
   useEffect(() => {
     if (view !== 'locked') {
@@ -271,7 +346,7 @@ export function useCandidateSessionController(token: string) {
         scheduledStartAt: scheduledStartAtUtc,
         candidateTimezone: timezoneValue,
       });
-      const current = session.state.bootstrap;
+      const current = state.bootstrap;
       session.setBootstrap({
         candidateSessionId: response.candidateSessionId,
         status: current?.status ?? 'in_progress',
@@ -363,6 +438,7 @@ export function useCandidateSessionController(token: string) {
     scheduleDateValue,
     scheduleTimezoneValue,
     session,
+    state.bootstrap,
     token,
     validateScheduleForm,
   ]);
@@ -379,27 +455,65 @@ export function useCandidateSessionController(token: string) {
 
   const handleStart = useCallback(() => {
     session.setStarted(true);
-    if (!session.state.taskState.currentTask) {
+    if (!state.taskState.currentTask) {
       void actions.fetchCurrentTask().catch(() => setView('error'));
     }
-  }, [actions, session]);
+  }, [actions, session, state.taskState.currentTask]);
 
-  const derived = useCandidateDerivedInfo(
-    session.state,
-    errorStatus,
-    errorMessage,
-  );
+  const derived = useCandidateDerivedInfo(state, errorStatus, errorMessage);
+
+  const windowState = useWindowState({
+    dayWindows: state.bootstrap?.dayWindows,
+    currentDayIndex: derived.currentDayIndex,
+    currentDayWindow: state.bootstrap?.currentDayWindow ?? null,
+    override:
+      currentTaskId !== null &&
+      taskWindowOverride &&
+      taskWindowOverride.taskId === currentTaskId
+        ? taskWindowOverride.value
+        : null,
+  });
+  const lastDraftSavedAt =
+    currentTaskId !== null ? loadTextDraftSavedAt(currentTaskId) : null;
+  const inMemorySubmission =
+    currentTaskId !== null && lastSubmissionTaskId === currentTaskId
+      ? { submittedAt: lastSubmissionAt, submissionId: lastSubmissionId }
+      : null;
+  const canonicalSubmission =
+    state.taskState.currentTask?.recordedSubmission ?? null;
+  const canonicalSubmissionId = canonicalSubmission?.submissionId ?? null;
+  const canonicalSubmittedAt = canonicalSubmission?.submittedAt ?? null;
+  const storedSubmission =
+    candidateSessionId !== null && currentTaskId !== null
+      ? loadRecordedSubmissionReference(candidateSessionId, currentTaskId)
+      : null;
+  const activeSubmission =
+    canonicalSubmission ?? inMemorySubmission ?? storedSubmission;
+
+  useEffect(() => {
+    if (canonicalSubmissionId === null || !canonicalSubmittedAt) return;
+    if (candidateSessionId === null || currentTaskId === null) return;
+    saveRecordedSubmissionReference(candidateSessionId, currentTaskId, {
+      submissionId: canonicalSubmissionId,
+      submittedAt: canonicalSubmittedAt,
+    });
+  }, [
+    candidateSessionId,
+    canonicalSubmissionId,
+    canonicalSubmittedAt,
+    currentTaskId,
+  ]);
 
   const resolvedView: ViewState =
     (view === 'loading' || view === 'starting') &&
-    (session.state.taskState.isComplete || session.state.taskState.currentTask)
+    (state.taskState.isComplete || state.taskState.currentTask)
       ? 'running'
       : view;
 
   const hasSchedule =
-    hasScheduleConfigured(session.state.bootstrap) ||
-    (session.state.bootstrap?.scheduledStartAt != null &&
-      session.state.bootstrap?.candidateTimezone != null &&
+    hasScheduleConfigured(state.bootstrap) ||
+    (state.bootstrap?.scheduledStartAt != null &&
+      state.bootstrap?.candidateTimezone != null &&
       scheduleResponseWindows.length > 0);
   const lockEligibleViews: ViewState[] = [
     'loading',
@@ -415,10 +529,10 @@ export function useCandidateSessionController(token: string) {
     hasSchedule &&
     isScheduleLocked(
       {
-        scheduledStartAt: session.state.bootstrap?.scheduledStartAt,
-        candidateTimezone: session.state.bootstrap?.candidateTimezone,
-        dayWindows: session.state.bootstrap?.dayWindows,
-        currentDayWindow: session.state.bootstrap?.currentDayWindow ?? null,
+        scheduledStartAt: state.bootstrap?.scheduledStartAt,
+        candidateTimezone: state.bootstrap?.candidateTimezone,
+        dayWindows: state.bootstrap?.dayWindows,
+        currentDayWindow: state.bootstrap?.currentDayWindow ?? null,
       },
       clockNowMs,
     );
@@ -426,17 +540,17 @@ export function useCandidateSessionController(token: string) {
 
   return {
     view: finalView,
-    authStatus: session.state.authStatus,
+    authStatus: state.authStatus,
     authMessage,
     errorMessage,
     errorStatus,
     loginHref,
     ...derived,
-    started: session.state.started,
+    started: state.started,
     submitting: actions.submitting,
-    taskError: session.state.taskState.error,
-    candidateSessionId: session.state.candidateSessionId,
-    taskLoading: session.state.taskState.loading,
+    taskError: state.taskState.error,
+    candidateSessionId,
+    taskLoading: state.taskState.loading,
     scheduleDate: scheduleDateValue,
     scheduleTimezone: scheduleTimezoneValue,
     scheduleTimezoneDetected: detectedTimezone,
@@ -451,6 +565,11 @@ export function useCandidateSessionController(token: string) {
     scheduleCountdownTargetAt,
     scheduleDisplayTimezone,
     scheduleDisplayStartAt,
+    windowState,
+    actionGate: windowState.actionGate,
+    lastDraftSavedAt,
+    lastSubmissionAt: activeSubmission?.submittedAt ?? null,
+    lastSubmissionId: activeSubmission?.submissionId ?? null,
     onStart: handleStart,
     onDashboard: () => router.push('/candidate/dashboard'),
     onRetryInit: () => actions.runInit(token, true),
@@ -476,5 +595,6 @@ export function useCandidateSessionController(token: string) {
     onSubmit: actions.handleSubmit,
     onStartTests: actions.handleStartTests,
     onPollTests: actions.handlePollTests,
+    onTaskWindowClosed: handleTaskWindowClosed,
   };
 }

@@ -4,6 +4,10 @@ import {
   type CandidateWorkspaceStatus,
 } from '@/features/candidate/api';
 import { normalizeApiError, toStatus } from '@/lib/errors/errors';
+import {
+  extractTaskWindowClosedOverride,
+  formatComeBackMessage,
+} from '../../lib/windowState';
 import { buildWorkspaceMessage } from './workspaceMessages';
 import {
   provisioning,
@@ -19,6 +23,7 @@ type Params = {
   taskId: number;
   candidateSessionId: number;
   initAttempted: boolean;
+  onTaskWindowClosed?: (err: unknown) => void;
 };
 
 async function fetchOrInitWorkspace(
@@ -54,6 +59,7 @@ export async function loadWorkspaceStatus({
   taskId,
   candidateSessionId,
   initAttempted,
+  onTaskWindowClosed,
 }: Params): Promise<WorkspaceLoadResult> {
   try {
     const workspace = await fetchOrInitWorkspace(
@@ -67,6 +73,11 @@ export async function loadWorkspaceStatus({
     }
     return success(workspace);
   } catch (err) {
+    const windowClosed = extractTaskWindowClosedOverride(err);
+    if (windowClosed) {
+      onTaskWindowClosed?.(err);
+      return workspaceError(mode, formatComeBackMessage(windowClosed));
+    }
     const normalized = normalizeApiError(
       err,
       'Unable to load your workspace right now.',

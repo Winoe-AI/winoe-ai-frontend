@@ -22,6 +22,7 @@ export function toTask(
     type: dtoTask.type,
     title: dtoTask.title,
     description: dtoTask.description,
+    recordedSubmission: dtoTask.recordedSubmission ?? null,
   };
 }
 

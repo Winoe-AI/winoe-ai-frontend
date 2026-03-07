@@ -5,6 +5,7 @@ import type {
 import type { CandidateTask } from '../CandidateSessionProvider';
 import type { SubmitPayload, SubmitResponse } from '../task/types';
 import type { PollResult } from '../task/hooks/runTestsTypes';
+import type { DerivedWindowState, WindowActionGate } from '../lib/windowState';
 
 export type ViewState =
   | 'loading'
@@ -56,6 +57,11 @@ export type CandidateSessionViewProps = {
   scheduleCountdownTargetAt: string | null;
   scheduleDisplayTimezone: string | null;
   scheduleDisplayStartAt: string | null;
+  windowState: DerivedWindowState;
+  actionGate: WindowActionGate;
+  lastDraftSavedAt: number | null;
+  lastSubmissionAt: string | null;
+  lastSubmissionId: number | null;
   onStart: () => void;
   onDashboard: () => void;
   onRetryInit: () => void;
@@ -73,4 +79,5 @@ export type CandidateSessionViewProps = {
   ) => Promise<SubmitResponse | void> | SubmitResponse | void;
   onStartTests: () => Promise<{ runId: string }>;
   onPollTests: (runId: string) => Promise<PollResult>;
+  onTaskWindowClosed: (err: unknown) => void;
 };

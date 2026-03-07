@@ -66,6 +66,30 @@ const baseProps = (): CandidateSessionViewProps => ({
   scheduleCountdownTargetAt: '2099-01-01T14:00:00Z',
   scheduleDisplayTimezone: 'America/New_York',
   scheduleDisplayStartAt: '2099-01-01T14:00:00Z',
+  windowState: {
+    phase: 'open',
+    dayIndex: 1,
+    windowStartAt: '2099-01-01T14:00:00Z',
+    windowEndAt: '2099-01-01T22:00:00Z',
+    nextOpenAt: null,
+    countdownTargetAt: null,
+    countdownLabel: null,
+    actionGate: {
+      isReadOnly: false,
+      disabledReason: null,
+      comeBackAt: null,
+    },
+    correctedByBackend: false,
+    backendDetail: null,
+  },
+  actionGate: {
+    isReadOnly: false,
+    disabledReason: null,
+    comeBackAt: null,
+  },
+  lastDraftSavedAt: null,
+  lastSubmissionAt: null,
+  lastSubmissionId: null,
   onStart: jest.fn(),
   onDashboard: jest.fn(),
   onRetryInit: jest.fn(),
@@ -81,6 +105,7 @@ const baseProps = (): CandidateSessionViewProps => ({
   onSubmit: jest.fn(),
   onStartTests: jest.fn().mockResolvedValue({ runId: 'run-1' }),
   onPollTests: jest.fn().mockResolvedValue({ status: 'running' }),
+  onTaskWindowClosed: jest.fn(),
 });
 
 describe('CandidateSessionView scheduling states', () => {

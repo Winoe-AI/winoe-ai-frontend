@@ -12,6 +12,10 @@ export type Task = {
   type: TaskType;
   title: string;
   description: string;
+  recordedSubmission?: {
+    submissionId: number;
+    submittedAt: string;
+  } | null;
 };
 
 export type SubmitPayload = { contentText?: string };

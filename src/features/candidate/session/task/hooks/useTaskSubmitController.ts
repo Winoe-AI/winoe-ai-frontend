@@ -3,11 +3,13 @@ import { useMemo, useState } from 'react';
 import { useSubmitHandler, useTaskDrafts } from './taskHooks';
 import { isCodeTask, isGithubNativeDay } from '../utils/taskGuards';
 import type { SubmitPayload, SubmitResponse, Task } from '../types';
+import type { WindowActionGate } from '../../lib/windowState';
 
 type Args = {
   task: Task;
   submitting: boolean;
   submitError?: string | null;
+  actionGate: WindowActionGate;
   onSubmit: (
     payload: SubmitPayload,
   ) => Promise<SubmitResponse | void> | SubmitResponse | void;
@@ -17,6 +19,7 @@ export function useTaskSubmitController({
   task,
   submitting,
   submitError,
+  actionGate,
   onSubmit,
 }: Args) {
   const { textTask, text, setText, savedAt, saveDraftNow, clearDrafts } =
@@ -32,8 +35,14 @@ export function useTaskSubmitController({
 
   const displayStatus = submitting ? 'submitting' : submitStatus;
 
+  const readOnly = actionGate.isReadOnly;
+  const disabled = Boolean(
+    readOnly || submitting || submitStatus === 'submitted',
+  );
+  const disabledReason = readOnly ? actionGate.disabledReason : null;
+
   const saveAndSubmit = async () => {
-    if (displayStatus !== 'idle') return;
+    if (disabled || displayStatus !== 'idle') return;
 
     if (githubNative) {
       setLocalError(null);
@@ -60,7 +69,6 @@ export function useTaskSubmitController({
   };
 
   const errorToShow = localError ?? submitError ?? null;
-
   return {
     textTask,
     text,
@@ -70,7 +78,9 @@ export function useTaskSubmitController({
     displayStatus,
     lastProgress,
     githubNative,
-    disabled: submitting || submitStatus === 'submitted',
+    readOnly,
+    disabled,
+    disabledReason,
     errorToShow,
     saveAndSubmit,
   };

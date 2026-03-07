@@ -4,6 +4,7 @@ import { ResourceSections } from '../ResourceSections';
 import type { CandidateTask } from '../../CandidateSessionProvider';
 import type { SubmitPayload, SubmitResponse } from '../../task/types';
 import type { PollResult } from '../../task/hooks/runTestsTypes';
+import type { WindowActionGate } from '../../lib/windowState';
 
 type Props = {
   currentTask: CandidateTask | null;
@@ -13,6 +14,7 @@ type Props = {
   showWorkspacePanel: boolean;
   showRecordingPanel: boolean;
   showDocsPanel: boolean;
+  actionGate: WindowActionGate;
   taskError: string | null;
   onSubmit: (
     payload: SubmitPayload,
@@ -21,6 +23,7 @@ type Props = {
   onStartTests: () => Promise<{ runId: string }>;
   onPollTests: (runId: string) => Promise<PollResult>;
   onDashboard: () => void;
+  onTaskWindowClosed: (err: unknown) => void;
 };
 
 export function RunningPanelsSection({
@@ -31,12 +34,14 @@ export function RunningPanelsSection({
   showWorkspacePanel,
   showRecordingPanel,
   showDocsPanel,
+  actionGate,
   taskError,
   onSubmit,
   onRetryTask,
   onStartTests,
   onPollTests,
   onDashboard,
+  onTaskWindowClosed,
 }: Props) {
   return (
     <>
@@ -44,8 +49,10 @@ export function RunningPanelsSection({
         task={currentTask}
         candidateSessionId={candidateSessionId}
         showWorkspacePanel={showWorkspacePanel}
+        actionGate={actionGate}
         onStartTests={onStartTests}
         onPollTests={onPollTests}
+        onTaskWindowClosed={onTaskWindowClosed}
       />
 
       <ResourceSections
@@ -59,6 +66,7 @@ export function RunningPanelsSection({
         candidateSessionId={candidateSessionId}
         submitting={submitting}
         submitError={taskError}
+        actionGate={actionGate}
         onSubmit={onSubmit}
         onRetryTask={onRetryTask}
         onDashboard={onDashboard}

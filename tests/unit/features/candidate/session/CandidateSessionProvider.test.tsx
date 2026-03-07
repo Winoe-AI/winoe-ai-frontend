@@ -13,6 +13,14 @@ const renderWithProvider = () =>
     ),
   });
 
+function setSessionPath(token: string) {
+  window.history.replaceState(
+    {},
+    '',
+    `/candidate/session/${encodeURIComponent(token)}`,
+  );
+}
+
 describe('CandidateSessionProvider', () => {
   let consoleErrorSpy: jest.SpyInstance;
 
@@ -20,6 +28,7 @@ describe('CandidateSessionProvider', () => {
     jest.useFakeTimers();
     jest.clearAllMocks();
     sessionStorage.clear();
+    setSessionPath('invite-token');
     consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
   });
 
@@ -34,6 +43,7 @@ describe('CandidateSessionProvider', () => {
     sessionStorage.setItem(
       storageKey,
       JSON.stringify({
+        inviteToken: 'invite-token',
         candidateSessionId: 9,
         bootstrap: {
           candidateSessionId: 9,
@@ -41,14 +51,26 @@ describe('CandidateSessionProvider', () => {
           simulation: { title: 'Sim', role: 'Role' },
         },
         started: true,
+        taskState: {
+          isComplete: false,
+          completedTaskIds: [1],
+          currentTask: {
+            id: 55,
+            dayIndex: 1,
+            type: 'design',
+            title: 'Task',
+            description: 'Prompt',
+          },
+        },
       }),
     );
 
     const { result } = renderWithProvider();
-    expect(result.current.state.inviteToken).toBeNull();
+    expect(result.current.state.inviteToken).toBe('invite-token');
     expect(result.current.state.candidateSessionId).toBe(9);
     expect(result.current.state.bootstrap?.simulation.title).toBe('Sim');
     expect(result.current.state.started).toBe(true);
+    expect(result.current.state.taskState.currentTask?.id).toBe(55);
   });
 
   it('persists minimal state on changes', () => {
@@ -64,8 +86,49 @@ describe('CandidateSessionProvider', () => {
       result.current.setStarted(true);
     });
     const stored = JSON.parse(sessionStorage.getItem(storageKey) ?? '{}');
-    expect(stored.inviteToken).toBeUndefined();
+    expect(stored.inviteToken).toBe('new');
     expect(stored.candidateSessionId).toBe(7);
     expect(stored.started).toBe(true);
+    expect(stored.taskState).toEqual({
+      isComplete: false,
+      completedTaskIds: [],
+      currentTask: null,
+    });
+  });
+
+  it('ignores mismatched persisted token payload on session routes', () => {
+    setSessionPath('new-token');
+    sessionStorage.setItem(
+      storageKey,
+      JSON.stringify({
+        inviteToken: 'old-token',
+        candidateSessionId: 9,
+        bootstrap: {
+          candidateSessionId: 9,
+          status: 'in_progress',
+          simulation: { title: 'Sim', role: 'Role' },
+        },
+        started: true,
+        taskState: {
+          isComplete: false,
+          completedTaskIds: [1],
+          currentTask: {
+            id: 55,
+            dayIndex: 1,
+            type: 'design',
+            title: 'Task',
+            description: 'Prompt',
+          },
+        },
+      }),
+    );
+
+    const { result } = renderWithProvider();
+    expect(result.current.state.inviteToken).toBeNull();
+    expect(result.current.state.candidateSessionId).toBeNull();
+    expect(result.current.state.started).toBe(false);
+    const stored = JSON.parse(sessionStorage.getItem(storageKey) ?? '{}');
+    expect(stored.inviteToken).toBeNull();
+    expect(stored.candidateSessionId).toBeNull();
   });
 });

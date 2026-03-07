@@ -10,6 +10,8 @@ type Props = {
   refreshing: boolean;
   onRefresh: () => void;
   message: string;
+  readOnly: boolean;
+  readOnlyReason: string | null;
 };
 
 export function WorkspacePanelBody({
@@ -20,6 +22,8 @@ export function WorkspacePanelBody({
   refreshing,
   onRefresh,
   message,
+  readOnly,
+  readOnlyReason,
 }: Props) {
   const repoLabel = workspace?.repoFullName ?? workspace?.repoName;
   const cta = workspace?.codespaceUrl
@@ -43,7 +47,12 @@ export function WorkspacePanelBody({
       <div className="mt-3 rounded border border-red-200 bg-red-50 p-3 text-sm text-red-800">
         <div>{error}</div>
         <div className="mt-2 flex gap-2">
-          <Button size="sm" variant="secondary" onClick={onRefresh}>
+          <Button
+            size="sm"
+            variant="secondary"
+            onClick={onRefresh}
+            disabled={readOnly || refreshing}
+          >
             {refreshing ? 'Refreshing…' : 'Retry'}
           </Button>
         </div>
@@ -59,8 +68,14 @@ export function WorkspacePanelBody({
         </div>
       ) : null}
       <div>{message}</div>
+      {readOnly ? (
+        <div className="rounded border border-gray-300 bg-gray-200 p-2 text-xs text-gray-700">
+          {readOnlyReason ??
+            'Day closed. Workspace links are hidden until the next window opens.'}
+        </div>
+      ) : null}
       {repoLabel ? <div>Repo: {repoLabel}</div> : null}
-      {workspace?.repoUrl ? (
+      {!readOnly && workspace?.repoUrl ? (
         <div className="break-all text-xs text-gray-600">
           Repo URL:{' '}
           <a
@@ -74,7 +89,7 @@ export function WorkspacePanelBody({
           </a>
         </div>
       ) : null}
-      {cta ? (
+      {!readOnly && cta ? (
         <a
           className="block text-blue-600 hover:underline"
           href={cta.href}

@@ -20,8 +20,13 @@ export function useTokenSync({
   useEffect(() => {
     if (lastToken.current === token) return;
     lastToken.current = token;
-    if (inviteToken && inviteToken !== token) setCandidateSessionId(null);
-    setInviteToken(token);
+    if (!inviteToken) {
+      setInviteToken(token);
+      return;
+    }
+    if (inviteToken === token) return;
+    setCandidateSessionId(null);
     onReset();
+    setInviteToken(token);
   }, [inviteToken, onReset, setCandidateSessionId, setInviteToken, token]);
 }

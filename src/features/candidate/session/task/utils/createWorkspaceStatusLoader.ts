@@ -9,6 +9,7 @@ type LoaderRefs = {
 type LoaderParams = LoaderRefs & {
   taskId: number;
   candidateSessionId: number;
+  onTaskWindowClosed?: (err: unknown) => void;
 };
 
 export function createWorkspaceStatusLoader({
@@ -16,6 +17,7 @@ export function createWorkspaceStatusLoader({
   candidateSessionId,
   modeRef,
   initAttemptedRef,
+  onTaskWindowClosed,
 }: LoaderParams) {
   return (): Promise<WorkspaceLoadResult> => {
     return loadWorkspaceStatus({
@@ -23,6 +25,7 @@ export function createWorkspaceStatusLoader({
       taskId,
       candidateSessionId,
       initAttempted: initAttemptedRef.current,
+      onTaskWindowClosed,
     });
   };
 }

@@ -135,4 +135,27 @@ describe('WorkspacePanel', () => {
     renderPanel({ dayIndex: 3 });
     expect(await screen.findByText(/Day 3 workspace/i)).toBeInTheDocument();
   });
+
+  it('keeps workspace panel read-only and skips api loads when day is closed', async () => {
+    render(
+      <WorkspacePanel
+        taskId={1}
+        candidateSessionId={2}
+        dayIndex={2}
+        readOnly
+        readOnlyReason="Day closed for this task."
+      />,
+    );
+
+    expect(screen.getByText(/Day 2 workspace/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Workspace actions are paused/i),
+    ).toBeInTheDocument();
+    expect(screen.getByText(/Day closed for this task/i)).toBeInTheDocument();
+    expect(getStatusMock).not.toHaveBeenCalled();
+    expect(initWorkspaceMock).not.toHaveBeenCalled();
+    expect(
+      screen.queryByRole('link', { name: /Open Codespace/i }),
+    ).not.toBeInTheDocument();
+  });
 });

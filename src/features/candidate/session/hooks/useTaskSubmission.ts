@@ -8,6 +8,11 @@ type Params = {
   clearTaskError: () => void;
   setTaskError: (msg: string) => void;
   refreshTask: (opts?: { skipCache?: boolean }) => Promise<void>;
+  onTaskWindowClosed?: (err: unknown) => void;
+  onSubmissionRecorded?: (payload: {
+    submissionId: number;
+    submittedAt: string;
+  }) => void;
 };
 
 export function useTaskSubmission({
@@ -16,6 +21,8 @@ export function useTaskSubmission({
   clearTaskError,
   setTaskError,
   refreshTask,
+  onTaskWindowClosed = () => {},
+  onSubmissionRecorded = () => {},
 }: Params) {
   const [submitting, setSubmitting] = useState(false);
   const refreshTimerRef = useRef<number | null>(null);
@@ -35,6 +42,8 @@ export function useTaskSubmission({
     setTaskError,
     refreshTask,
     setSubmitting,
+    onTaskWindowClosed,
+    onSubmissionRecorded,
     setRefreshTimer: (cb) => {
       if (refreshTimerRef.current) window.clearTimeout(refreshTimerRef.current);
       refreshTimerRef.current = window.setTimeout(cb, 900);

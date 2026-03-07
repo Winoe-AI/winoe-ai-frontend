@@ -1,5 +1,6 @@
 import type { Dispatch, Reducer } from 'react';
 import type {
+  CandidateRecordedSubmission,
   CandidateCurrentDayWindow,
   CandidateDayWindow,
 } from '@/features/candidate/api';
@@ -31,6 +32,7 @@ export type CandidateTask = {
   type: TaskType;
   title: string;
   description: string;
+  recordedSubmission?: CandidateRecordedSubmission | null;
 };
 
 export type TaskState = {
@@ -91,9 +93,15 @@ export type Ctx = {
 };
 
 export type PersistedState = {
+  inviteToken: string | null;
   candidateSessionId: number | null;
   bootstrap: CandidateBootstrap | null;
   started: boolean;
+  taskState: {
+    isComplete: boolean;
+    completedTaskIds: number[];
+    currentTask: CandidateTask | null;
+  };
 };
 
 export type ReducerPair = {
