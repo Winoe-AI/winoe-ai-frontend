@@ -2,12 +2,14 @@ import CandidateTaskView from '../../task/CandidateTaskView';
 import { TaskFallback } from '../TaskFallback';
 import type { CandidateTask } from '../../CandidateSessionProvider';
 import type { SubmitPayload, SubmitResponse } from '../../task/types';
+import type { WindowActionGate } from '../../lib/windowState';
 
 type Props = {
   currentTask: CandidateTask | null;
   candidateSessionId: number | null;
   submitting: boolean;
   submitError: string | null;
+  actionGate: WindowActionGate;
   onSubmit: (
     payload: SubmitPayload,
   ) => Promise<SubmitResponse | void> | SubmitResponse | void;
@@ -20,6 +22,7 @@ export function TaskSection({
   candidateSessionId,
   submitting,
   submitError,
+  actionGate,
   onSubmit,
   onRetryTask,
   onDashboard,
@@ -30,6 +33,7 @@ export function TaskSection({
         task={currentTask}
         submitting={submitting}
         submitError={submitError}
+        actionGate={actionGate}
         onSubmit={onSubmit}
       />
     );

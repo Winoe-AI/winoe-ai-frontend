@@ -7,6 +7,10 @@ import {
   isGithubNativeDay,
   isTextTask,
 } from '../task/utils/taskGuards';
+import {
+  extractTaskWindowClosedOverride,
+  formatComeBackMessage,
+} from '../lib/windowState';
 import type { Task, SubmitPayload } from '../task/types';
 
 type Deps = {
@@ -16,6 +20,11 @@ type Deps = {
   setTaskError: (msg: string) => void;
   refreshTask: (opts?: { skipCache?: boolean }) => Promise<void>;
   setSubmitting: (v: boolean) => void;
+  onTaskWindowClosed?: (err: unknown) => void;
+  onSubmissionRecorded?: (payload: {
+    submissionId: number;
+    submittedAt: string;
+  }) => void;
   setRefreshTimer: (cb: () => void) => void;
 };
 
@@ -26,6 +35,8 @@ export function useTaskSubmitHandler({
   setTaskError,
   refreshTask,
   setSubmitting,
+  onTaskWindowClosed,
+  onSubmissionRecorded,
   setRefreshTimer,
 }: Deps) {
   const { notify } = useNotifications();
@@ -56,6 +67,18 @@ export function useTaskSubmitHandler({
         contentText: isGithubNative ? undefined : payload.contentText,
       });
 
+      if (
+        resp &&
+        typeof resp === 'object' &&
+        typeof (resp as { submissionId?: unknown }).submissionId === 'number' &&
+        typeof (resp as { submittedAt?: unknown }).submittedAt === 'string'
+      ) {
+        onSubmissionRecorded?.({
+          submissionId: (resp as { submissionId: number }).submissionId,
+          submittedAt: (resp as { submittedAt: string }).submittedAt,
+        });
+      }
+
       setRefreshTimer(() => {
         void refreshTask({ skipCache: true });
       });
@@ -69,11 +92,17 @@ export function useTaskSubmitHandler({
 
       return resp;
     } catch (err) {
+      const windowClosed = extractTaskWindowClosedOverride(err);
+      if (windowClosed) {
+        onTaskWindowClosed?.(err);
+      }
       const normalized = normalizeApiError(
         err,
         friendlySubmitError(err) ?? 'Submission failed.',
       );
-      setTaskError(normalized.message);
+      setTaskError(
+        windowClosed ? formatComeBackMessage(windowClosed) : normalized.message,
+      );
       notify({
         id: `submit-${currentTask?.id ?? 'unknown'}`,
         tone: 'error',

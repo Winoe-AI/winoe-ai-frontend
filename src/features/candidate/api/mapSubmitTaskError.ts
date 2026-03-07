@@ -3,6 +3,7 @@ import { toMappedHttpError } from '@/lib/api/errors/errorMapping';
 import { deriveBackendMessage, normalizeStatus } from './taskErrorMessages';
 
 const copyMapped = (
+  sourceDetails: unknown,
   mapped: HttpError,
   overrides?: { status?: number; message?: string },
 ): never => {
@@ -16,6 +17,9 @@ const copyMapped = (
   ).redirect;
   (next as { raw?: unknown }).raw = (mapped as { raw?: unknown }).raw;
   (next as { meta?: unknown }).meta = (mapped as { meta?: unknown }).meta;
+  if (sourceDetails !== undefined) {
+    (next as { details?: unknown }).details = sourceDetails;
+  }
   throw next;
 };
 
@@ -34,30 +38,34 @@ export const mapSubmitTaskError = (err: unknown): never => {
     'candidate',
   );
   const status = normalizeStatus(err, mapped.status);
+  const sourceDetails =
+    err && typeof err === 'object'
+      ? (err as { details?: unknown }).details
+      : undefined;
 
   if (status === 400)
-    return copyMapped(mapped, {
+    return copyMapped(sourceDetails, mapped, {
       status: 400,
       message: backendMsg ?? 'Task out of order.',
     });
   if (status === 404)
-    return copyMapped(mapped, {
+    return copyMapped(sourceDetails, mapped, {
       status: 404,
       message:
         backendMsg ?? 'Session mismatch. Please reopen your invite link.',
     });
   if (status === 409)
-    return copyMapped(mapped, {
+    return copyMapped(sourceDetails, mapped, {
       status: 409,
       message: backendMsg ?? 'Task already submitted.',
     });
   if (status === 410)
-    return copyMapped(mapped, {
+    return copyMapped(sourceDetails, mapped, {
       status: 410,
       message: backendMsg ?? 'That invite link has expired.',
     });
   if (!Number.isFinite(status))
-    return copyMapped(mapped, {
+    return copyMapped(sourceDetails, mapped, {
       status: 0,
       message:
         backendMsg ??
@@ -66,5 +74,5 @@ export const mapSubmitTaskError = (err: unknown): never => {
 
   const fallbackMessage =
     backendMsg ?? 'Something went wrong submitting your task.';
-  throw copyMapped(mapped, { message: fallbackMessage });
+  throw copyMapped(sourceDetails, mapped, { message: fallbackMessage });
 };

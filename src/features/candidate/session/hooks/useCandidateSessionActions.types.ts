@@ -8,6 +8,11 @@ export type SessionActionsParams = {
   session: SessionCtx;
   token: string;
   redirectToLogin: () => void;
+  onTaskWindowClosed: (err: unknown) => void;
+  onSubmissionRecorded: (payload: {
+    submissionId: number;
+    submittedAt: string;
+  }) => void;
   view: ViewState;
   setView: Dispatch<SetStateAction<ViewState>>;
   setErrorMessage: (m: string | null) => void;

@@ -320,4 +320,57 @@ describe('TaskView', () => {
       screen.getByRole('button', { name: /submit & continue/i }),
     ).toBeEnabled();
   });
+
+  it('locks the text task surface in read-only mode', () => {
+    render(
+      <TaskView
+        task={textTask}
+        submitting={false}
+        onSubmit={jest.fn()}
+        actionGate={{
+          isReadOnly: true,
+          disabledReason:
+            'Day closed. This panel is read-only outside the scheduled window.',
+          comeBackAt: null,
+        }}
+      />,
+    );
+
+    expect(screen.queryByRole('textbox')).toBeNull();
+    expect(
+      screen.getAllByText(/panel is read-only outside the scheduled window/i)
+        .length,
+    ).toBeGreaterThanOrEqual(1);
+    expect(screen.getByRole('button', { name: /save draft/i })).toBeDisabled();
+    expect(
+      screen.getByRole('button', { name: /submit & continue/i }),
+    ).toBeDisabled();
+  });
+
+  it('replaces GitHub-native action copy with immutable copy when closed', () => {
+    render(
+      <TaskView
+        task={githubNativeTask}
+        submitting={false}
+        onSubmit={jest.fn()}
+        actionGate={{
+          isReadOnly: true,
+          disabledReason:
+            'Day closed. This panel is read-only outside the scheduled window.',
+          comeBackAt: null,
+        }}
+      />,
+    );
+
+    expect(
+      screen.queryByText(/Work in your GitHub repository or Codespace/i),
+    ).toBeNull();
+    expect(
+      screen.getAllByText(/panel is read-only outside the scheduled window/i)
+        .length,
+    ).toBeGreaterThanOrEqual(1);
+    expect(
+      screen.getByRole('button', { name: /submit & continue/i }),
+    ).toBeDisabled();
+  });
 });

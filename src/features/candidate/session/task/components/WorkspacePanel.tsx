@@ -8,12 +8,27 @@ type WorkspacePanelProps = {
   taskId: number;
   candidateSessionId: number;
   dayIndex: number;
+  readOnly?: boolean;
+  readOnlyReason?: string | null;
+  onTaskWindowClosed?: (err: unknown) => void;
 };
 
 export function WorkspacePanel(props: WorkspacePanelProps) {
-  const { dayIndex, taskId, candidateSessionId } = props;
+  const {
+    dayIndex,
+    taskId,
+    candidateSessionId,
+    readOnly = false,
+    readOnlyReason = null,
+    onTaskWindowClosed,
+  } = props;
   const { workspace, loading, refreshing, error, notice, refresh } =
-    useWorkspaceStatus({ taskId, candidateSessionId });
+    useWorkspaceStatus({
+      taskId,
+      candidateSessionId,
+      enabled: !readOnly,
+      onTaskWindowClosed,
+    });
 
   const workspaceMessage = buildWorkspaceMessage(workspace);
 
@@ -24,6 +39,7 @@ export function WorkspacePanel(props: WorkspacePanelProps) {
         loading={loading}
         refreshing={refreshing}
         onRefresh={refresh}
+        readOnly={readOnly}
       />
       <WorkspacePanelBody
         workspace={workspace}
@@ -33,6 +49,8 @@ export function WorkspacePanel(props: WorkspacePanelProps) {
         refreshing={refreshing}
         onRefresh={refresh}
         message={workspaceMessage}
+        readOnly={readOnly}
+        readOnlyReason={readOnlyReason}
       />
     </div>
   );

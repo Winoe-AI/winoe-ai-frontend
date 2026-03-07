@@ -34,12 +34,18 @@ export type CandidateInvite = {
   isExpired: boolean;
 };
 
+export type CandidateRecordedSubmission = {
+  submissionId: number;
+  submittedAt: string;
+};
+
 export type CandidateTask = {
   id: number;
   dayIndex: number;
   type: string;
   title: string;
   description: string;
+  recordedSubmission?: CandidateRecordedSubmission | null;
 };
 
 export type CandidateCurrentTaskResponse = {

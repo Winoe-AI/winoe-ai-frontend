@@ -1,6 +1,7 @@
 import {
   clearTextDraft,
   loadTextDraft,
+  loadTextDraftSavedAt,
   saveTextDraft,
 } from '@/features/candidate/session/task/utils/draftStorage';
 
@@ -11,10 +12,13 @@ describe('draftStorage helpers', () => {
 
   it('handles text drafts via sessionStorage', () => {
     expect(loadTextDraft(1)).toBe('');
+    expect(loadTextDraftSavedAt(1)).toBeNull();
     saveTextDraft(1, 'hello');
     expect(loadTextDraft(1)).toBe('hello');
+    expect(loadTextDraftSavedAt(1)).toEqual(expect.any(Number));
     clearTextDraft(1);
     expect(loadTextDraft(1)).toBe('');
+    expect(loadTextDraftSavedAt(1)).toBeNull();
   });
 
   it('returns safe defaults when storage calls fail', () => {
@@ -30,6 +34,7 @@ describe('draftStorage helpers', () => {
       });
 
     expect(loadTextDraft(9)).toBe('');
+    expect(loadTextDraftSavedAt(9)).toBeNull();
     expect(() => clearTextDraft(9)).not.toThrow();
 
     getItem.mockRestore();
@@ -42,6 +47,7 @@ describe('draftStorage helpers', () => {
     globalWithWindow.window = undefined;
 
     expect(loadTextDraft(5)).toBe('');
+    expect(loadTextDraftSavedAt(5)).toBeNull();
     expect(() => saveTextDraft(5, 'x')).not.toThrow();
     expect(() => clearTextDraft(5)).not.toThrow();
 

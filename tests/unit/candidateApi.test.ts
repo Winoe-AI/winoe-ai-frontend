@@ -124,6 +124,36 @@ describe('candidateApi', () => {
     );
   });
 
+  it('hydrates current task recorded submission metadata when present', async () => {
+    const fetchMock = jest.fn() as FetchMock;
+    fetchMock.mockResolvedValue(
+      jsonRes({
+        isComplete: false,
+        completedTaskIds: [],
+        currentTask: {
+          id: 2,
+          dayIndex: 1,
+          type: 'design',
+          title: 'Plan',
+          description: 'Draw it',
+          recordedSubmission: {
+            submissionId: 77,
+            submittedAt: '2026-03-04T20:00:00Z',
+          },
+        },
+      }),
+    );
+    global.fetch = fetchMock as unknown as typeof fetch;
+
+    const { getCandidateCurrentTask } = await importApi();
+    const result = await getCandidateCurrentTask(44);
+
+    expect(result.currentTask?.recordedSubmission).toEqual({
+      submissionId: 77,
+      submittedAt: '2026-03-04T20:00:00Z',
+    });
+  });
+
   it('maps current task network failures to status 0', async () => {
     const fetchMock = jest.fn() as FetchMock;
     fetchMock.mockRejectedValue(new TypeError('offline'));

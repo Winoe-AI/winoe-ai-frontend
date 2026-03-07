@@ -11,6 +11,8 @@ export function useCandidateSessionActions({
   session,
   token,
   redirectToLogin,
+  onTaskWindowClosed,
+  onSubmissionRecorded,
   view,
   setView,
   setErrorMessage,
@@ -19,7 +21,13 @@ export function useCandidateSessionActions({
   markStart,
   markEnd,
 }: Params) {
-  const taskActions = useCandidateTaskActions({ session, markStart, markEnd });
+  const taskActions = useCandidateTaskActions({
+    session,
+    markStart,
+    markEnd,
+    onTaskWindowClosed,
+    onSubmissionRecorded,
+  });
 
   const inviteActions = useCandidateInviteActions({
     token,
@@ -34,7 +42,7 @@ export function useCandidateSessionActions({
     markEnd,
   });
 
-  const testActions = useCandidateTestActions({ session });
+  const testActions = useCandidateTestActions({ session, onTaskWindowClosed });
 
   useRunInit(inviteActions.runInit, token);
   useTaskAutoload({

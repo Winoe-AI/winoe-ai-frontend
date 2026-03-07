@@ -7,12 +7,19 @@ type Params = {
   session: SessionCtx;
   markStart: (label: string) => void;
   markEnd: (label: string, extra?: Record<string, unknown>) => void;
+  onTaskWindowClosed: (err: unknown) => void;
+  onSubmissionRecorded: (payload: {
+    submissionId: number;
+    submittedAt: string;
+  }) => void;
 };
 
 export function useCandidateTaskActions({
   session,
   markStart,
   markEnd,
+  onTaskWindowClosed,
+  onSubmissionRecorded,
 }: Params) {
   const { fetchCurrentTask } = useTaskLoader({
     candidateSessionId: session.state.candidateSessionId,
@@ -30,6 +37,8 @@ export function useCandidateTaskActions({
     clearTaskError: session.clearTaskError,
     setTaskError: session.setTaskError,
     refreshTask: (opts) => fetchCurrentTask(undefined, opts),
+    onTaskWindowClosed,
+    onSubmissionRecorded,
   });
 
   return useMemo(

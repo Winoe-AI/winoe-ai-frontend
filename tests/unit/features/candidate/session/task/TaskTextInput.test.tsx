@@ -83,4 +83,24 @@ describe('TaskTextInput', () => {
     expect(screen.getByText(/Draft saved/i)).toBeInTheDocument();
     expect(screen.getByText(/characters/)).toHaveTextContent('12');
   });
+
+  it('renders immutable preview in read-only mode', () => {
+    render(
+      <TaskTextInput
+        value="**Locked** response"
+        onChange={jest.fn()}
+        disabled={true}
+        readOnly={true}
+        readOnlyReason="Day closed. This panel is read-only outside the scheduled window."
+        savedAt={null}
+      />,
+    );
+
+    expect(
+      screen.getByText(/panel is read-only outside the scheduled window/i),
+    ).toBeInTheDocument();
+    expect(screen.queryByRole('textbox')).toBeNull();
+    expect(screen.queryByRole('button', { name: /write/i })).toBeNull();
+    expect(screen.getByText('Locked', { exact: false })).toBeInTheDocument();
+  });
 });

@@ -28,6 +28,8 @@ type TaskTextInputProps = {
   value: string;
   onChange: (value: string) => void;
   disabled: boolean;
+  readOnly?: boolean;
+  readOnlyReason?: string | null;
   savedAt: number | null;
 };
 
@@ -35,9 +37,29 @@ export function TaskTextInput({
   value,
   onChange,
   disabled,
+  readOnly = false,
+  readOnlyReason = null,
   savedAt,
 }: TaskTextInputProps) {
   const [mode, setMode] = useState<'write' | 'preview'>('write');
+
+  if (readOnly) {
+    return (
+      <>
+        <p className="mb-2 text-xs text-gray-600">
+          {readOnlyReason ??
+            'This day is closed. Your draft is shown in read-only mode.'}
+        </p>
+        <div className="w-full min-h-[360px] md:min-h-[420px] rounded-md border bg-white p-3">
+          <PreviewComponent
+            content={value}
+            emptyPlaceholder="No saved draft is available for this day."
+          />
+        </div>
+        <TaskTextFooter length={value.length} savedAt={savedAt} />
+      </>
+    );
+  }
 
   return (
     <>

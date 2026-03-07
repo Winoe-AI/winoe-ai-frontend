@@ -4,6 +4,7 @@ type Props = {
   dayIndex: number;
   loading: boolean;
   refreshing: boolean;
+  readOnly: boolean;
   onRefresh: () => void;
 };
 
@@ -11,6 +12,7 @@ export function WorkspacePanelHeader({
   dayIndex,
   loading,
   refreshing,
+  readOnly,
   onRefresh,
 }: Props) {
   return (
@@ -20,13 +22,15 @@ export function WorkspacePanelHeader({
           Day {dayIndex} workspace
         </div>
         <div className="text-xs text-gray-600">
-          Provisioned GitHub repo + Codespace link.
+          {readOnly
+            ? 'Workspace actions are paused while this day is closed.'
+            : 'Provisioned GitHub repo + Codespace link.'}
         </div>
       </div>
       <Button
         variant="secondary"
         onClick={onRefresh}
-        disabled={loading || refreshing}
+        disabled={readOnly || loading || refreshing}
       >
         {refreshing ? 'Refreshing…' : 'Refresh'}
       </Button>

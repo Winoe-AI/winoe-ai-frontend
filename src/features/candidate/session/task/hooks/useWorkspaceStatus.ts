@@ -8,9 +8,16 @@ import { createWorkspaceStatusLoader } from '../utils/createWorkspaceStatusLoade
 type Params = {
   taskId: number;
   candidateSessionId: number;
+  enabled?: boolean;
+  onTaskWindowClosed?: (err: unknown) => void;
 };
 
-export function useWorkspaceStatus({ taskId, candidateSessionId }: Params) {
+export function useWorkspaceStatus({
+  taskId,
+  candidateSessionId,
+  enabled = true,
+  onTaskWindowClosed,
+}: Params) {
   const { notify } = useNotifications();
   const [workspace, setWorkspace] = useState<CandidateWorkspaceStatus | null>(
     null,
@@ -28,9 +35,10 @@ export function useWorkspaceStatus({ taskId, candidateSessionId }: Params) {
       candidateSessionId,
       modeRef,
       initAttemptedRef,
+      onTaskWindowClosed,
     });
     return run();
-  }, [candidateSessionId, taskId]);
+  }, [candidateSessionId, onTaskWindowClosed, taskId]);
 
   const { load, abort } = useAsyncLoader(loader, {
     immediate: false,
@@ -64,6 +72,10 @@ export function useWorkspaceStatus({ taskId, candidateSessionId }: Params) {
   });
 
   useEffect(() => {
+    if (!enabled) {
+      abort();
+      return;
+    }
     modeRef.current = 'init';
     const id = window.setTimeout(() => {
       void load(true);
@@ -72,14 +84,22 @@ export function useWorkspaceStatus({ taskId, candidateSessionId }: Params) {
       window.clearTimeout(id);
       abort();
     };
-  }, [abort, load]);
+  }, [abort, enabled, load]);
 
   const refresh = () => {
+    if (!enabled) return;
     if (loading || refreshing) return;
     modeRef.current = 'refresh';
     setRefreshing(true);
     void load(true);
   };
 
-  return { workspace, loading, refreshing, error, notice, refresh };
+  return {
+    workspace,
+    loading: enabled ? loading : false,
+    refreshing: enabled ? refreshing : false,
+    error: enabled ? error : null,
+    notice: enabled ? notice : null,
+    refresh,
+  };
 }

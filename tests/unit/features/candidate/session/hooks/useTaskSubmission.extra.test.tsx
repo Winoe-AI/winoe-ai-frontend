@@ -45,6 +45,8 @@ type HarnessProps = {
   clearTaskError: jest.Mock;
   setTaskError: jest.Mock;
   refreshTask: jest.Mock;
+  onTaskWindowClosed: jest.Mock;
+  onSubmissionRecorded: jest.Mock;
 };
 
 const HookHarness = forwardRef<HookReturn, HarnessProps>(
@@ -68,6 +70,8 @@ describe('useTaskSubmission extra coverage', () => {
     clearTaskError: jest.fn(),
     setTaskError: jest.fn(),
     refreshTask: jest.fn().mockResolvedValue(undefined),
+    onTaskWindowClosed: jest.fn(),
+    onSubmissionRecorded: jest.fn(),
   });
 
   beforeEach(() => {

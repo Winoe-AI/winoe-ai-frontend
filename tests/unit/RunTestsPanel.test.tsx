@@ -139,6 +139,27 @@ describe('RunTestsPanel', () => {
     expect(screen.getByRole('button', { name: /re-run tests/i })).toBeEnabled();
   });
 
+  it('disables start button when window gate is read-only', async () => {
+    const onStart = jest.fn().mockResolvedValue({ runId: 'run-disabled' });
+    const onPoll = jest
+      .fn()
+      .mockResolvedValue({ ...baseResult, status: 'running' as const });
+
+    render(
+      <RunTestsPanel
+        onStart={onStart}
+        onPoll={onPoll}
+        disabled
+        disabledReason="This day is not open yet."
+      />,
+    );
+
+    const cta = screen.getByRole('button', { name: /run tests unavailable/i });
+    expect(cta).toBeDisabled();
+    expect(screen.getByText(/This day is not open yet/i)).toBeInTheDocument();
+    expect(onStart).not.toHaveBeenCalled();
+  });
+
   it('stops polling once a terminal status is reached', async () => {
     useFakeTimers();
     const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
