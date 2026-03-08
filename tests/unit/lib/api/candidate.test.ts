@@ -222,6 +222,49 @@ describe('candidate api helpers', () => {
     );
   });
 
+  it('submits day 5 reflection payload with structured sections', async () => {
+    mockPost.mockResolvedValueOnce({ submissionId: 12 });
+    const { submitCandidateTask } = await import('@/features/candidate/api');
+
+    await submitCandidateTask({
+      taskId: 10,
+      candidateSessionId: 10,
+      contentText: '## Challenges\n...\n## Decisions\n...',
+      reflection: {
+        challenges:
+          'Handled changing constraints by validating assumptions and details.',
+        decisions:
+          'Chose explicit schemas to keep frontend and backend validation aligned.',
+        tradeoffs:
+          'Accepted stricter structure to improve review consistency for evaluators.',
+        communication:
+          'Documented risks and handoff context clearly at each implementation step.',
+        next: 'Would add richer evidence pointers and summary metadata in follow-up.',
+      },
+    });
+
+    expect(mockPost).toHaveBeenCalledWith(
+      '/tasks/10/submit',
+      expect.objectContaining({
+        contentText: expect.stringContaining('## Challenges'),
+        reflection: expect.objectContaining({
+          challenges: expect.any(String),
+          decisions: expect.any(String),
+          tradeoffs: expect.any(String),
+          communication: expect.any(String),
+          next: expect.any(String),
+        }),
+      }),
+      expect.objectContaining({
+        headers: {
+          'Content-Type': 'application/json',
+          'x-candidate-session-id': '10',
+        },
+      }),
+      expect.objectContaining({ basePath: '/api/backend' }),
+    );
+  });
+
   it('handles submitCandidateTask conflict and network errors', async () => {
     mockPost.mockRejectedValueOnce({ status: 409, details: 'dup' });
     mockPost.mockRejectedValueOnce(new TypeError('offline'));

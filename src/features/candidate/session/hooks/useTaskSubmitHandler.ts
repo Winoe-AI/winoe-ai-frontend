@@ -7,6 +7,7 @@ import {
   isGithubNativeDay,
   isTextTask,
 } from '../task/utils/taskGuards';
+import { isDay5ReflectionTask } from '../task/utils/day5Reflection';
 import {
   extractTaskWindowClosedOverride,
   formatComeBackMessage,
@@ -48,8 +49,9 @@ export function useTaskSubmitHandler({
     const wantsText = isTextTask(type);
     const isCode = isCodeTask(type);
     const isGithubNative = isGithubNativeDay(currentTask.dayIndex) || isCode;
+    const day5Reflection = isDay5ReflectionTask(currentTask);
 
-    if (!isGithubNative && wantsText) {
+    if (!isGithubNative && wantsText && !day5Reflection) {
       const trimmed = (payload.contentText ?? '').trim();
       if (!trimmed) {
         setTaskError('Please enter an answer before submitting.');
@@ -61,11 +63,21 @@ export function useTaskSubmitHandler({
     clearTaskError();
 
     try {
-      const resp = await submitCandidateTask({
+      const submitArgs: {
+        taskId: number;
+        candidateSessionId: number;
+        contentText?: string;
+        reflection?: SubmitPayload['reflection'];
+      } = {
         taskId: currentTask.id,
         candidateSessionId,
         contentText: isGithubNative ? undefined : payload.contentText,
-      });
+      };
+      if (!isGithubNative && payload.reflection) {
+        submitArgs.reflection = payload.reflection;
+      }
+
+      const resp = await submitCandidateTask(submitArgs);
 
       if (
         resp &&

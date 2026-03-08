@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { useBackoffPolling } from '@/shared/polling';
 import { isSubmitResponse } from '../utils/taskGuards';
+import type { SubmitPayload } from '../types';
 
 type SubmitStatus = 'idle' | 'submitting' | 'submitted';
-type SubmitPayload = { contentText?: string };
 
 export function useSubmitHandler(
   onSubmit: (payload: SubmitPayload) => Promise<unknown> | unknown,
@@ -13,6 +13,7 @@ export function useSubmitHandler(
     completed: number;
     total: number;
   } | null>(null);
+  const [lastError, setLastError] = useState<unknown>(null);
 
   const resetTimer = useBackoffPolling<void>({
     initialDelayMs: 900,
@@ -20,10 +21,12 @@ export function useSubmitHandler(
     run: () => {
       setSubmitStatus('idle');
       setLastProgress(null);
+      setLastError(null);
       return false;
     },
   });
   const inFlightRef = useRef(false);
+  const lastErrorRef = useRef<unknown>(null);
 
   useEffect(() => {
     return () => resetTimer.cancel();
@@ -35,6 +38,8 @@ export function useSubmitHandler(
 
     inFlightRef.current = true;
     setSubmitStatus('submitting');
+    setLastError(null);
+    lastErrorRef.current = null;
     try {
       const resp = await onSubmit(payload);
       if (isSubmitResponse(resp)) {
@@ -45,7 +50,9 @@ export function useSubmitHandler(
         setSubmitStatus('idle');
       }
       return resp;
-    } catch {
+    } catch (err) {
+      setLastError(err);
+      lastErrorRef.current = err;
       setSubmitStatus('idle');
       return 'submit-failed';
     } finally {
@@ -53,5 +60,11 @@ export function useSubmitHandler(
     }
   };
 
-  return { submitStatus, lastProgress, handleSubmit };
+  return {
+    submitStatus,
+    lastProgress,
+    lastError,
+    getLastError: () => lastErrorRef.current,
+    handleSubmit,
+  };
 }

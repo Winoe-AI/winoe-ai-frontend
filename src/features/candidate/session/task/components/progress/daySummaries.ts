@@ -22,8 +22,8 @@ export const DAY_SUMMARIES = [
     hint: 'Recording link.',
   },
   {
-    title: 'Write documentation',
-    detail: 'Summarize decisions and next steps.',
-    hint: 'Documentation link.',
+    title: 'Write reflection',
+    detail: 'Capture challenges, decisions, and next steps.',
+    hint: 'Reflection prompt.',
   },
 ];

@@ -9,7 +9,9 @@ import { TaskStatus } from './components/TaskStatus';
 import { TaskPanelErrorBanner } from './components/TaskPanelErrorBanner';
 import { TaskActions } from './components/TaskActions';
 import { DraftSaveStatus } from './components/DraftSaveStatus';
+import { Day5ReflectionPanel } from './components/Day5ReflectionPanel';
 import { useTaskSubmitController } from './hooks/useTaskSubmitController';
+import { isDay5ReflectionTask } from './utils/day5Reflection';
 import type { WindowActionGate } from '../lib/windowState';
 
 export default function CandidateTaskView(props: {
@@ -23,6 +25,25 @@ export default function CandidateTaskView(props: {
     payload: SubmitPayload,
   ) => Promise<SubmitResponse | void> | SubmitResponse | void;
 }) {
+  const actionGate = props.actionGate ?? {
+    isReadOnly: false,
+    disabledReason: null,
+    comeBackAt: null,
+  };
+  if (isDay5ReflectionTask(props.task)) {
+    return (
+      <Day5ReflectionPanel
+        key={props.task.id}
+        candidateSessionId={props.candidateSessionId}
+        task={props.task}
+        submitting={props.submitting}
+        submitError={props.submitError}
+        actionGate={actionGate}
+        onTaskWindowClosed={props.onTaskWindowClosed}
+        onSubmit={props.onSubmit}
+      />
+    );
+  }
   return <CandidateTaskViewInner key={props.task.id} {...props} />;
 }
 

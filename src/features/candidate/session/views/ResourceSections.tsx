@@ -25,11 +25,11 @@ export function ResourceSections({
 
       {showDocs ? (
         <ResourcePanel
-          title="Day 5 documentation"
-          description="Capture your final notes and next steps."
+          title="Day 5 reflection"
+          description="Use the guided reflection prompt to submit your final notes."
           linkUrl={resourceLink}
-          linkLabel="Open documentation link"
-          emptyMessage="Look for the documentation link in your prompt."
+          linkLabel="Open reflection prompt"
+          emptyMessage="Look for the reflection prompt link in your task description."
         />
       ) : null}
     </>

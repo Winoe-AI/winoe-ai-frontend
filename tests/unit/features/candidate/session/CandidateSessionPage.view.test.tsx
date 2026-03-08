@@ -352,7 +352,7 @@ describe('CandidateSessionPage view rendering', () => {
     });
     await waitFor(() =>
       expect(
-        screen.getByTestId('resource-day-5-documentation'),
+        screen.getByTestId('resource-day-5-reflection'),
       ).toBeInTheDocument(),
     );
   });
