@@ -172,6 +172,45 @@ describe('useTaskSubmission', () => {
     });
   });
 
+  it('forwards day 5 reflection payload fields to submitCandidateTask', async () => {
+    const props = baseProps();
+    props.currentTask = {
+      id: 15,
+      dayIndex: 5,
+      type: 'documentation',
+      title: 'Reflection',
+      description: 'Structured reflection',
+    };
+    const ref = React.createRef<HookReturn>();
+    submitCandidateTaskMock.mockResolvedValue({ ok: true });
+
+    render(<HookHarness ref={ref} {...props} />);
+
+    const payload = {
+      contentText: '## Challenges\n...\n## Decisions\n...',
+      reflection: {
+        challenges: 'Handled ambiguity by validating assumptions early.',
+        decisions:
+          'Chose explicit contracts for predictable frontend handling.',
+        tradeoffs:
+          'Accepted stricter structure for consistent scoring quality.',
+        communication: 'Shared progress, risks, and handoff context clearly.',
+        next: 'Would add evaluator evidence links in follow-up.',
+      },
+    };
+
+    await act(async () => {
+      await ref.current?.handleSubmit(payload);
+    });
+
+    expect(submitCandidateTaskMock).toHaveBeenCalledWith({
+      taskId: 15,
+      candidateSessionId: 11,
+      contentText: payload.contentText,
+      reflection: payload.reflection,
+    });
+  });
+
   it('wraps submit errors and notifies', async () => {
     const props = baseProps();
     props.currentTask = {

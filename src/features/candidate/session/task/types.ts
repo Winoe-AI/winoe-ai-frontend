@@ -20,7 +20,18 @@ export type Task = {
   } | null;
 };
 
-export type SubmitPayload = { contentText?: string };
+export type Day5ReflectionPayload = {
+  challenges: string;
+  decisions: string;
+  tradeoffs: string;
+  communication: string;
+  next: string;
+};
+
+export type SubmitPayload = {
+  contentText?: string;
+  reflection?: Day5ReflectionPayload;
+};
 
 export type SubmitResponse = {
   submissionId: number;

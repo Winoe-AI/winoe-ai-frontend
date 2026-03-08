@@ -232,6 +232,57 @@ describe('candidateApi', () => {
     );
   });
 
+  it('submits day 5 reflection payload fields to backend', async () => {
+    const fetchMock = jest.fn() as FetchMock;
+    fetchMock.mockResolvedValue(
+      jsonRes({
+        submissionId: 4,
+        taskId: 5,
+        candidateSessionId: 1,
+        submittedAt: '2026-03-08T00:00:00Z',
+        progress: { completed: 5, total: 5 },
+        isComplete: true,
+      }),
+    );
+    global.fetch = fetchMock as unknown as typeof fetch;
+
+    const { submitCandidateTask } = await importApi();
+
+    await submitCandidateTask({
+      taskId: 5,
+      candidateSessionId: 1,
+      contentText: '## Challenges\n...\n## Decisions\n...',
+      reflection: {
+        challenges:
+          'Handled ambiguous requirements by validating assumptions early.',
+        decisions:
+          'Selected stable contracts for consistent frontend/backend behavior.',
+        tradeoffs:
+          'Accepted stricter input validation to improve evaluator consistency.',
+        communication:
+          'Shared risks and handoff context clearly across implementation steps.',
+        next: 'Would add richer evaluator evidence links in a follow-up.',
+      },
+    });
+
+    const requestInit = fetchMock.mock.calls[0]?.[1] as RequestInit;
+    const body = JSON.parse(String(requestInit.body ?? '{}')) as Record<
+      string,
+      unknown
+    >;
+
+    expect(body).toMatchObject({
+      contentText: expect.stringContaining('## Challenges'),
+      reflection: expect.objectContaining({
+        challenges: expect.any(String),
+        decisions: expect.any(String),
+        tradeoffs: expect.any(String),
+        communication: expect.any(String),
+        next: expect.any(String),
+      }),
+    });
+  });
+
   it('surfaces submit errors for network TypeError', async () => {
     const fetchMock = jest.fn() as FetchMock;
     fetchMock.mockRejectedValue(new TypeError('offline'));

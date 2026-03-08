@@ -40,10 +40,21 @@ export async function submitCandidateTask(params: {
   taskId: number;
   candidateSessionId: number;
   contentText?: string;
+  reflection?: {
+    challenges: string;
+    decisions: string;
+    tradeoffs: string;
+    communication: string;
+    next: string;
+  };
 }) {
-  const { taskId, candidateSessionId, contentText } = params;
+  const { taskId, candidateSessionId, contentText, reflection } = params;
   const path = `/tasks/${taskId}/submit`;
-  const payload = typeof contentText === 'string' ? { contentText } : {};
+  const payload: Record<string, unknown> = {};
+  if (typeof contentText === 'string') payload.contentText = contentText;
+  if (reflection && typeof reflection === 'object') {
+    payload.reflection = { ...reflection };
+  }
 
   try {
     const { data } = await requestWithMeta<CandidateTaskSubmitResponse>(
