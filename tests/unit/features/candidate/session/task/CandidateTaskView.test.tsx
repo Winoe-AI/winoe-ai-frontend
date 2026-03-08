@@ -1,215 +1,394 @@
-import React from 'react';
-import { render, screen, act } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from '@testing-library/react';
 import CandidateTaskView from '@/features/candidate/session/task/CandidateTaskView';
-import { Task } from '@/features/candidate/session/task/types';
+import type { Task } from '@/features/candidate/session/task/types';
 
-const useTaskDraftsMock = jest.fn();
-const useSubmitHandlerMock = jest.fn();
+const getCandidateTaskDraftMock = jest.fn();
+const putCandidateTaskDraftMock = jest.fn();
 
-jest.mock('@/features/candidate/session/task/hooks/taskHooks', () => {
-  const actual = jest.requireActual(
-    '@/features/candidate/session/task/hooks/taskHooks',
-  );
+jest.mock('@/features/candidate/api', () => {
+  const actual = jest.requireActual('@/features/candidate/api');
   return {
     ...actual,
-    useTaskDrafts: (...args: unknown[]) => useTaskDraftsMock(...args),
-    useSubmitHandler: (...args: unknown[]) => useSubmitHandlerMock(...args),
+    getCandidateTaskDraft: (...args: unknown[]) =>
+      getCandidateTaskDraftMock(...args),
+    putCandidateTaskDraft: (...args: unknown[]) =>
+      putCandidateTaskDraftMock(...args),
   };
 });
 
-jest.mock(
-  '@/features/candidate/session/task/components/TaskDescription',
-  () => ({
-    TaskDescription: ({ description }: { description: string }) => (
-      <div data-testid="desc">{description}</div>
-    ),
-  }),
-);
+describe('CandidateTaskView draft autosave integration', () => {
+  const baseTask: Task = {
+    id: 1,
+    dayIndex: 1,
+    type: 'design',
+    title: 'Design doc',
+    description: 'Write a design doc',
+  };
 
-jest.mock('@/features/candidate/session/task/components/TaskHeader', () => ({
-  TaskHeader: ({ task }: { task: { title: string } }) => (
-    <div data-testid="header">{task.title}</div>
-  ),
-}));
-
-jest.mock('@/features/candidate/session/task/components/TaskStatus', () => ({
-  TaskStatus: ({ displayStatus }: { displayStatus: string }) => (
-    <div data-testid="status">{displayStatus}</div>
-  ),
-}));
-
-jest.mock(
-  '@/features/candidate/session/task/components/TaskPanelErrorBanner',
-  () => ({
-    TaskPanelErrorBanner: ({ message }: { message: string | null }) => (
-      <div data-testid="error">{message}</div>
-    ),
-  }),
-);
-
-jest.mock('@/features/candidate/session/task/components/TaskActions', () => ({
-  TaskActions: ({
-    onSaveDraft,
-    onSubmit,
-  }: {
-    onSaveDraft?: () => void;
-    onSubmit: () => void;
-  }) => (
-    <div>
-      {onSaveDraft && <button onClick={onSaveDraft}>save</button>}
-      <button onClick={onSubmit}>submit</button>
-    </div>
-  ),
-}));
-
-jest.mock('@/features/candidate/session/task/components/TaskTextInput', () => ({
-  TaskTextInput: ({
-    onChange,
-    value,
-  }: {
-    onChange: (v: string) => void;
-    value: string;
-  }) => (
-    <textarea
-      data-testid="text-input"
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-    />
-  ),
-}));
-
-const baseTask: Task = {
-  id: 1,
-  dayIndex: 1,
-  type: 'write',
-  title: 'Write task',
-  description: 'desc',
-};
-
-describe('CandidateTaskView', () => {
   beforeEach(() => {
+    jest.useFakeTimers();
     jest.clearAllMocks();
+    getCandidateTaskDraftMock.mockResolvedValue(null);
+    putCandidateTaskDraftMock.mockResolvedValue({
+      taskId: 1,
+      updatedAt: '2026-03-07T10:00:00.000Z',
+    });
   });
 
-  it('renders github native task and clears drafts after submit', async () => {
-    useTaskDraftsMock.mockReturnValue({
-      text: '',
-      textTask: false,
-      setText: jest.fn(),
-      savedAt: null,
-      saveDraftNow: jest.fn(),
-      clearDrafts: jest.fn(),
-    });
-    const clearDrafts = useTaskDraftsMock().clearDrafts as jest.Mock;
-    useSubmitHandlerMock.mockReturnValue({
-      submitStatus: 'idle',
-      lastProgress: null,
-      handleSubmit: jest.fn().mockResolvedValue('ok'),
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
+  it('restores Day 1 draft on mount and shows restored messaging', async () => {
+    getCandidateTaskDraftMock.mockResolvedValue({
+      taskId: 1,
+      contentText: 'Recovered day 1 draft',
+      contentJson: null,
+      updatedAt: '2026-03-07T09:00:00.000Z',
+      finalizedAt: null,
+      finalizedSubmissionId: null,
     });
 
     render(
       <CandidateTaskView
-        task={{ ...baseTask, dayIndex: 2, type: 'code' }}
-        submitting={false}
-        onSubmit={jest.fn()}
-        submitError={null}
-      />,
-    );
-
-    await userEvent.click(screen.getByText('submit'));
-    await act(async () => Promise.resolve());
-    expect(useSubmitHandlerMock().handleSubmit).toHaveBeenCalledWith({});
-    expect(clearDrafts).toHaveBeenCalled();
-  });
-
-  it('requires text for text tasks and shows local error', async () => {
-    const setText = jest.fn();
-    useTaskDraftsMock.mockReturnValue({
-      text: '   ',
-      textTask: true,
-      setText,
-      savedAt: null,
-      saveDraftNow: jest.fn(),
-      clearDrafts: jest.fn(),
-    });
-    useSubmitHandlerMock.mockReturnValue({
-      submitStatus: 'idle',
-      lastProgress: null,
-      handleSubmit: jest.fn().mockResolvedValue('ok'),
-    });
-
-    render(
-      <CandidateTaskView
+        candidateSessionId={22}
         task={baseTask}
         submitting={false}
-        onSubmit={jest.fn()}
         submitError={null}
+        onSubmit={jest.fn()}
       />,
     );
 
-    await userEvent.click(screen.getByText('submit'));
-    expect(screen.getByTestId('error')).toHaveTextContent('Please enter');
+    await waitFor(() => {
+      expect(
+        screen.getByDisplayValue('Recovered day 1 draft'),
+      ).toBeInTheDocument();
+    });
+    expect(screen.getByText(/Draft restored/i)).toBeInTheDocument();
+    expect(screen.getByText(/Saved at/i)).toBeInTheDocument();
   });
 
-  it('submits trimmed text and respects submitting status', async () => {
-    const handleSubmit = jest.fn().mockResolvedValue({ status: 'success' });
-    const clearDrafts = jest.fn();
-    useTaskDraftsMock.mockReturnValue({
-      text: ' content ',
-      textTask: true,
-      setText: jest.fn(),
-      savedAt: null,
-      saveDraftNow: jest.fn(),
-      clearDrafts,
+  it('shows Day 1 autosave status transitions from saving to saved', async () => {
+    let resolvePut:
+      | ((value: { taskId: number; updatedAt: string }) => void)
+      | null = null;
+    putCandidateTaskDraftMock.mockReturnValue(
+      new Promise<{ taskId: number; updatedAt: string }>((resolve) => {
+        resolvePut = resolve;
+      }),
+    );
+
+    render(
+      <CandidateTaskView
+        candidateSessionId={22}
+        task={baseTask}
+        submitting={false}
+        submitError={null}
+        onSubmit={jest.fn()}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(getCandidateTaskDraftMock).toHaveBeenCalled();
     });
-    useSubmitHandlerMock.mockReturnValue({
-      submitStatus: 'idle',
-      lastProgress: null,
-      handleSubmit,
+
+    const textarea = screen.getByRole('textbox');
+    fireEvent.change(textarea, { target: { value: 'typing day 1...' } });
+
+    await act(async () => {
+      jest.advanceTimersByTime(1500);
+    });
+
+    expect(screen.getByText(/Saving/i)).toBeInTheDocument();
+    expect(putCandidateTaskDraftMock).toHaveBeenCalledTimes(1);
+
+    await act(async () => {
+      resolvePut?.({
+        taskId: 1,
+        updatedAt: '2026-03-07T10:30:00.000Z',
+      });
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText(/Saved at/i)).toBeInTheDocument();
+    });
+  });
+
+  it('restores Day 5 draft and renders save status in sticky footer', async () => {
+    getCandidateTaskDraftMock.mockResolvedValue({
+      taskId: 5,
+      contentText: null,
+      contentJson: { reflectionMarkdown: 'Recovered reflection' },
+      updatedAt: '2026-03-07T09:30:00.000Z',
+      finalizedAt: null,
+      finalizedSubmissionId: null,
     });
 
     render(
       <CandidateTaskView
-        task={baseTask}
+        candidateSessionId={22}
+        task={{
+          ...baseTask,
+          id: 5,
+          dayIndex: 5,
+          type: 'documentation',
+          title: 'Reflection',
+        }}
         submitting={false}
-        onSubmit={jest.fn()}
         submitError={null}
+        onSubmit={jest.fn()}
       />,
     );
 
-    await userEvent.click(screen.getByText('submit'));
-    await act(async () => Promise.resolve());
-    expect(handleSubmit).toHaveBeenCalledWith({ contentText: 'content' });
-    expect(clearDrafts).toHaveBeenCalled();
+    await waitFor(() => {
+      expect(
+        screen.getByDisplayValue('Recovered reflection'),
+      ).toBeInTheDocument();
+    });
+
+    const restored = screen.getByText(/Draft restored/i);
+    expect(restored.closest('div')?.className).toContain('sticky');
+    expect(screen.getByText(/Saved at/i)).toBeInTheDocument();
   });
 
-  it('does not submit when displayStatus not idle', async () => {
-    useTaskDraftsMock.mockReturnValue({
-      text: 'a',
-      textTask: true,
-      setText: jest.fn(),
-      savedAt: null,
-      saveDraftNow: jest.fn(),
-      clearDrafts: jest.fn(),
+  it('in closed/finalized mode uses embedded recorded submission content without draft calls', async () => {
+    render(
+      <CandidateTaskView
+        candidateSessionId={22}
+        task={{
+          ...baseTask,
+          recordedSubmission: {
+            submissionId: 99,
+            submittedAt: '2026-03-07T12:00:00.000Z',
+            contentText: 'Finalized submission body',
+          },
+        }}
+        submitting={false}
+        submitError={null}
+        actionGate={{
+          isReadOnly: true,
+          disabledReason: 'Day closed.',
+          comeBackAt: null,
+        }}
+        onSubmit={jest.fn()}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(
+        screen.getByText(/Finalized submission body/i),
+      ).toBeInTheDocument();
     });
-    useSubmitHandlerMock.mockReturnValue({
-      submitStatus: 'submitted',
-      lastProgress: null,
-      handleSubmit: jest.fn(),
+    expect(screen.queryByRole('textbox')).toBeNull();
+    expect(getCandidateTaskDraftMock).not.toHaveBeenCalled();
+  });
+
+  it('in closed mode falls back to structured finalized content when contentText is empty', async () => {
+    render(
+      <CandidateTaskView
+        candidateSessionId={22}
+        task={{
+          ...baseTask,
+          id: 5,
+          dayIndex: 5,
+          type: 'documentation',
+          recordedSubmission: {
+            submissionId: 101,
+            submittedAt: '2026-03-07T12:00:00.000Z',
+            contentText: '',
+            contentJson: {
+              reflectionMarkdown: 'Final reflection body',
+            },
+          },
+        }}
+        submitting={false}
+        submitError={null}
+        actionGate={{
+          isReadOnly: true,
+          disabledReason: 'Day closed.',
+          comeBackAt: null,
+        }}
+        onSubmit={jest.fn()}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText(/Final reflection body/i)).toBeInTheDocument();
+    });
+    expect(screen.queryByRole('textbox')).toBeNull();
+    expect(getCandidateTaskDraftMock).not.toHaveBeenCalled();
+  });
+
+  it('in closed mode prefers finalized contentText when both text and structured content exist', async () => {
+    render(
+      <CandidateTaskView
+        candidateSessionId={22}
+        task={{
+          ...baseTask,
+          id: 5,
+          dayIndex: 5,
+          type: 'documentation',
+          recordedSubmission: {
+            submissionId: 102,
+            submittedAt: '2026-03-07T12:00:00.000Z',
+            contentText: 'Finalized text body',
+            contentJson: {
+              reflectionMarkdown: 'Final reflection body',
+            },
+          },
+        }}
+        submitting={false}
+        submitError={null}
+        actionGate={{
+          isReadOnly: true,
+          disabledReason: 'Day closed.',
+          comeBackAt: null,
+        }}
+        onSubmit={jest.fn()}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText(/Finalized text body/i)).toBeInTheDocument();
+    });
+    expect(screen.queryByText(/Final reflection body/i)).toBeNull();
+    expect(screen.queryByRole('textbox')).toBeNull();
+    expect(getCandidateTaskDraftMock).not.toHaveBeenCalled();
+  });
+
+  it('keeps draft restore/autosave active when recordedSubmission exists but task is not read-only', async () => {
+    getCandidateTaskDraftMock.mockResolvedValue({
+      taskId: 1,
+      contentText: 'Recovered editable draft',
+      contentJson: null,
+      updatedAt: '2026-03-07T09:00:00.000Z',
+      finalizedAt: null,
+      finalizedSubmissionId: null,
     });
 
     render(
       <CandidateTaskView
-        task={baseTask}
+        candidateSessionId={22}
+        task={{
+          ...baseTask,
+          recordedSubmission: {
+            submissionId: 77,
+            submittedAt: '2026-03-07T08:00:00.000Z',
+          },
+        }}
         submitting={false}
+        submitError={null}
+        actionGate={{
+          isReadOnly: false,
+          disabledReason: null,
+          comeBackAt: null,
+        }}
         onSubmit={jest.fn()}
-        submitError="err"
       />,
     );
 
-    await userEvent.click(screen.getByText('submit'));
-    expect(useSubmitHandlerMock().handleSubmit).not.toHaveBeenCalled();
-    expect(screen.getByTestId('error')).toHaveTextContent('err');
+    await waitFor(() => {
+      expect(
+        screen.getByDisplayValue('Recovered editable draft'),
+      ).toBeInTheDocument();
+    });
+
+    const textarea = screen.getByRole('textbox');
+    fireEvent.change(textarea, { target: { value: 'Keep editing' } });
+
+    await act(async () => {
+      jest.advanceTimersByTime(1500);
+    });
+
+    expect(putCandidateTaskDraftMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('remounts task-local state across task switches so text/status do not leak and new drafts hydrate correctly', async () => {
+    const pendingSave = new Promise<{ taskId: number; updatedAt: string }>(
+      () => {},
+    );
+    putCandidateTaskDraftMock.mockReturnValue(pendingSave);
+    getCandidateTaskDraftMock
+      .mockResolvedValueOnce(null)
+      .mockResolvedValueOnce(null)
+      .mockResolvedValueOnce({
+        taskId: 3,
+        contentText: 'Recovered task 3 draft',
+        contentJson: null,
+        updatedAt: '2026-03-07T09:45:00.000Z',
+        finalizedAt: null,
+        finalizedSubmissionId: null,
+      });
+
+    const { rerender } = render(
+      <CandidateTaskView
+        candidateSessionId={22}
+        task={{ ...baseTask, id: 1 }}
+        submitting={false}
+        submitError={null}
+        onSubmit={jest.fn()}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(getCandidateTaskDraftMock).toHaveBeenCalledWith({
+        candidateSessionId: 22,
+        taskId: 1,
+      });
+    });
+
+    fireEvent.change(screen.getByRole('textbox'), {
+      target: { value: 'Task 1 draft text' },
+    });
+
+    await act(async () => {
+      jest.advanceTimersByTime(1500);
+    });
+
+    expect(screen.getByText(/Saving/i)).toBeInTheDocument();
+
+    rerender(
+      <CandidateTaskView
+        candidateSessionId={22}
+        task={{ ...baseTask, id: 2 }}
+        submitting={false}
+        submitError={null}
+        onSubmit={jest.fn()}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(getCandidateTaskDraftMock).toHaveBeenCalledWith({
+        candidateSessionId: 22,
+        taskId: 2,
+      });
+    });
+
+    expect(screen.queryByText(/Saving/i)).toBeNull();
+    expect(screen.queryByDisplayValue('Task 1 draft text')).toBeNull();
+    expect(screen.getByRole('textbox')).toHaveValue('');
+
+    rerender(
+      <CandidateTaskView
+        candidateSessionId={22}
+        task={{ ...baseTask, id: 3 }}
+        submitting={false}
+        submitError={null}
+        onSubmit={jest.fn()}
+      />,
+    );
+
+    await waitFor(() => {
+      expect(
+        screen.getByDisplayValue('Recovered task 3 draft'),
+      ).toBeInTheDocument();
+    });
+    expect(screen.getByText(/Draft restored/i)).toBeInTheDocument();
   });
 });

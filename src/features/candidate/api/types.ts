@@ -37,6 +37,8 @@ export type CandidateInvite = {
 export type CandidateRecordedSubmission = {
   submissionId: number;
   submittedAt: string;
+  contentText?: string | null;
+  contentJson?: Record<string, unknown> | null;
 };
 
 export type CandidateTask = {

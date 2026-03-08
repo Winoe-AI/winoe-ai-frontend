@@ -15,6 +15,8 @@ export type Task = {
   recordedSubmission?: {
     submissionId: number;
     submittedAt: string;
+    contentText?: string | null;
+    contentJson?: Record<string, unknown> | null;
   } | null;
 };
 

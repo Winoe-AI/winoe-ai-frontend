@@ -21,9 +21,16 @@ export function saveTextDraft(taskId: number, text: string) {
   if (typeof window === 'undefined') return;
   try {
     window.sessionStorage.setItem(textDraftKey(taskId), text);
+    markTextDraftSavedAt(taskId);
+  } catch {}
+}
+
+export function markTextDraftSavedAt(taskId: number, savedAtMs = Date.now()) {
+  if (typeof window === 'undefined') return;
+  try {
     window.sessionStorage.setItem(
       textDraftSavedAtKey(taskId),
-      String(Date.now()),
+      String(savedAtMs),
     );
   } catch {}
 }

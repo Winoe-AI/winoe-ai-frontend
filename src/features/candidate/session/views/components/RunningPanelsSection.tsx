@@ -67,6 +67,7 @@ export function RunningPanelsSection({
         submitting={submitting}
         submitError={taskError}
         actionGate={actionGate}
+        onTaskWindowClosed={onTaskWindowClosed}
         onSubmit={onSubmit}
         onRetryTask={onRetryTask}
         onDashboard={onDashboard}
