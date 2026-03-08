@@ -10,6 +10,7 @@ type Props = {
   submitting: boolean;
   submitError: string | null;
   actionGate: WindowActionGate;
+  onTaskWindowClosed: (err: unknown) => void;
   onSubmit: (
     payload: SubmitPayload,
   ) => Promise<SubmitResponse | void> | SubmitResponse | void;
@@ -23,6 +24,7 @@ export function TaskSection({
   submitting,
   submitError,
   actionGate,
+  onTaskWindowClosed,
   onSubmit,
   onRetryTask,
   onDashboard,
@@ -30,10 +32,12 @@ export function TaskSection({
   if (currentTask && candidateSessionId !== null) {
     return (
       <CandidateTaskView
+        candidateSessionId={candidateSessionId}
         task={currentTask}
         submitting={submitting}
         submitError={submitError}
         actionGate={actionGate}
+        onTaskWindowClosed={onTaskWindowClosed}
         onSubmit={onSubmit}
       />
     );

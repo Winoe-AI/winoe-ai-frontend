@@ -8,14 +8,17 @@ import { TaskTextInput } from './components/TaskTextInput';
 import { TaskStatus } from './components/TaskStatus';
 import { TaskPanelErrorBanner } from './components/TaskPanelErrorBanner';
 import { TaskActions } from './components/TaskActions';
+import { DraftSaveStatus } from './components/DraftSaveStatus';
 import { useTaskSubmitController } from './hooks/useTaskSubmitController';
 import type { WindowActionGate } from '../lib/windowState';
 
 export default function CandidateTaskView(props: {
+  candidateSessionId: number | null;
   task: Task;
   submitting: boolean;
   submitError?: string | null;
   actionGate?: WindowActionGate;
+  onTaskWindowClosed?: (err: unknown) => void;
   onSubmit: (
     payload: SubmitPayload,
   ) => Promise<SubmitResponse | void> | SubmitResponse | void;
@@ -24,16 +27,20 @@ export default function CandidateTaskView(props: {
 }
 
 function CandidateTaskViewInner({
+  candidateSessionId,
   task,
   onSubmit,
   submitting,
   submitError,
   actionGate,
+  onTaskWindowClosed,
 }: {
+  candidateSessionId: number | null;
   task: Task;
   submitting: boolean;
   submitError?: string | null;
   actionGate?: WindowActionGate;
+  onTaskWindowClosed?: (err: unknown) => void;
   onSubmit: (
     payload: SubmitPayload,
   ) => Promise<SubmitResponse | void> | SubmitResponse | void;
@@ -43,6 +50,9 @@ function CandidateTaskViewInner({
     text,
     setText,
     savedAt,
+    draftAutosaveStatus,
+    draftRestoreApplied,
+    draftError,
     saveDraftNow,
     displayStatus,
     lastProgress,
@@ -53,10 +63,12 @@ function CandidateTaskViewInner({
     errorToShow,
     saveAndSubmit,
   } = useTaskSubmitController({
+    candidateSessionId,
     task,
     onSubmit,
     submitting,
     submitError,
+    onTaskWindowClosed,
     actionGate: actionGate ?? {
       isReadOnly: false,
       disabledReason: null,
@@ -64,9 +76,24 @@ function CandidateTaskViewInner({
     },
   });
 
+  const showDay1DraftStatus = textTask && task.dayIndex === 1;
+  const showDay5DraftStatus = textTask && task.dayIndex === 5;
+
   return (
     <TaskContainer>
-      <TaskHeader task={task} />
+      <TaskHeader
+        task={task}
+        statusSlot={
+          showDay1DraftStatus ? (
+            <DraftSaveStatus
+              status={draftAutosaveStatus}
+              lastSavedAt={savedAt}
+              restoreApplied={draftRestoreApplied}
+              error={draftError}
+            />
+          ) : null
+        }
+      />
       <TaskDescription description={task.description} />
 
       <div className="mt-6">
@@ -93,6 +120,16 @@ function CandidateTaskViewInner({
           />
         )}
       </div>
+      {showDay5DraftStatus ? (
+        <div className="sticky bottom-2 z-20 mt-3 rounded-md border border-gray-200 bg-white/95 px-3 py-2 shadow-sm backdrop-blur">
+          <DraftSaveStatus
+            status={draftAutosaveStatus}
+            lastSavedAt={savedAt}
+            restoreApplied={draftRestoreApplied}
+            error={draftError}
+          />
+        </div>
+      ) : null}
 
       <TaskStatus displayStatus={displayStatus} progress={lastProgress} />
       <TaskPanelErrorBanner message={errorToShow} />

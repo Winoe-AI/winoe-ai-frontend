@@ -1,6 +1,11 @@
 import { toNumberOrNull, toStringOrNull } from './base';
 import type { CandidateTask } from './types';
 
+function asRecord(value: unknown): Record<string, unknown> | null {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
+  return value as Record<string, unknown>;
+}
+
 function toIsoOrNull(value: unknown): string | null {
   const iso = toStringOrNull(value);
   if (!iso) return null;
@@ -8,18 +13,49 @@ function toIsoOrNull(value: unknown): string | null {
   return Number.isFinite(ts) ? iso : null;
 }
 
+function readSubmissionText(
+  record: Record<string, unknown>,
+): string | undefined {
+  const candidates = [record.contentText, record.content_text];
+  for (const candidate of candidates) {
+    if (typeof candidate === 'string') return candidate;
+  }
+  return undefined;
+}
+
+function readSubmissionJson(
+  record: Record<string, unknown>,
+): Record<string, unknown> | undefined {
+  const candidates = [record.contentJson, record.content_json];
+  for (const candidate of candidates) {
+    const parsed = asRecord(candidate);
+    if (parsed) return { ...parsed };
+  }
+  return undefined;
+}
+
 function toSubmissionRef(
   raw: unknown,
 ): CandidateTask['recordedSubmission'] | null {
-  if (!raw || typeof raw !== 'object') return null;
-  const rec = raw as Record<string, unknown>;
+  const rec = asRecord(raw);
+  if (!rec) return null;
   const submissionId = toNumberOrNull(rec.submissionId);
   const submittedAt =
     toIsoOrNull(rec.submittedAt) ??
     toIsoOrNull(rec.submissionAt) ??
     toIsoOrNull(rec.recordedAt);
   if (submissionId === null || !submittedAt) return null;
-  return { submissionId, submittedAt };
+
+  const normalized: NonNullable<CandidateTask['recordedSubmission']> = {
+    submissionId,
+    submittedAt,
+  };
+  const contentText = readSubmissionText(rec);
+  if (contentText !== undefined) normalized.contentText = contentText;
+  const contentJson = readSubmissionJson(rec);
+  if (contentJson !== undefined) normalized.contentJson = contentJson;
+
+  return normalized;
 }
 
 function findRecordedSubmission(
@@ -28,6 +64,8 @@ function findRecordedSubmission(
   const directPair = toSubmissionRef({
     submissionId: taskRecord.submissionId,
     submittedAt: taskRecord.submittedAt,
+    contentText: taskRecord.contentText ?? taskRecord.content_text,
+    contentJson: taskRecord.contentJson ?? taskRecord.content_json,
   });
   if (directPair) return directPair;
 
