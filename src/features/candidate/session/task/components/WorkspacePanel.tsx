@@ -2,6 +2,7 @@
 import { useEffect, useRef } from 'react';
 import type { ReactNode } from 'react';
 import type { CandidateWorkspaceStatus } from '@/features/candidate/api';
+import { IntegrityCallout } from '@/shared/ui/IntegrityCallout';
 import { useWorkspaceStatus } from '../hooks/useWorkspaceStatus';
 import { buildWorkspaceMessage } from '../utils/workspaceMessages';
 import type {
@@ -18,6 +19,9 @@ type WorkspacePanelProps = {
   readOnly?: boolean;
   readOnlyReason?: string | null;
   codingWorkspace?: CodingWorkspace | null;
+  cutoffCommitSha?: string | null;
+  cutoffAt?: string | null;
+  isClosed?: boolean;
   integrityCallout?: ReactNode;
   onTaskWindowClosed?: (err: unknown) => void;
   onCodingWorkspaceSnapshot?: (snapshot: CodingWorkspaceSnapshot) => void;
@@ -31,15 +35,22 @@ export function WorkspacePanel(props: WorkspacePanelProps) {
     readOnly = false,
     readOnlyReason = null,
     codingWorkspace = null,
+    cutoffCommitSha = null,
+    cutoffAt = null,
+    isClosed = false,
     integrityCallout,
     onTaskWindowClosed,
     onCodingWorkspaceSnapshot,
   } = props;
+  const hasCutoffProps = Boolean(cutoffCommitSha || cutoffAt);
+  const isWorkspaceIntegrityDay = dayIndex === 2 || dayIndex === 3;
+  const shouldLoadWorkspace =
+    !readOnly || isClosed || hasCutoffProps || isWorkspaceIntegrityDay;
   const { workspace, loading, refreshing, error, notice, refresh } =
     useWorkspaceStatus({
       taskId,
       candidateSessionId,
-      enabled: !readOnly,
+      enabled: shouldLoadWorkspace,
       onTaskWindowClosed,
     });
   const lastSnapshotKeyRef = useRef<string | null>(null);
@@ -75,10 +86,22 @@ export function WorkspacePanel(props: WorkspacePanelProps) {
         }
       : null;
   const effectiveWorkspace = sharedWorkspace ?? workspace;
+  const effectiveCutoffCommitSha =
+    cutoffCommitSha ?? workspace?.cutoffCommitSha ?? null;
+  const effectiveCutoffAt = cutoffAt ?? workspace?.cutoffAt ?? null;
   const effectiveError = codingWorkspace?.error ?? error;
   const workspaceMessage = codingWorkspace?.error
     ? 'Unable to confirm a shared Day 2/Day 3 workspace identity.'
     : buildWorkspaceMessage(effectiveWorkspace);
+  const calloutNode = integrityCallout ?? (
+    <IntegrityCallout
+      repoUrl={effectiveWorkspace?.repoUrl ?? null}
+      codespaceUrl={effectiveWorkspace?.codespaceUrl ?? null}
+      cutoffCommitSha={effectiveCutoffCommitSha}
+      cutoffAt={effectiveCutoffAt}
+      isClosed={isClosed || Boolean(effectiveCutoffCommitSha)}
+    />
+  );
 
   return (
     <div className="rounded-md border border-gray-200 bg-white p-4 shadow-sm">
@@ -96,7 +119,7 @@ export function WorkspacePanel(props: WorkspacePanelProps) {
         refreshing={refreshing}
         onRefresh={refresh}
         message={workspaceMessage}
-        integrityCallout={integrityCallout}
+        integrityCallout={calloutNode}
         readOnly={readOnly}
         readOnlyReason={readOnlyReason}
       />

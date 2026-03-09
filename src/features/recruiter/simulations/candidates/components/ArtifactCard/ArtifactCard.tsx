@@ -1,6 +1,7 @@
 'use client';
 import { useMemo, useState } from 'react';
 import type { SubmissionArtifact } from '../../types';
+import { IntegrityCallout } from '@/shared/ui/IntegrityCallout';
 import {
   deriveRepoInfo,
   formatDateTime,
@@ -27,6 +28,10 @@ export function ArtifactCard({ artifact, repoLinkLabel }: Props) {
   const status = deriveTestStatus(artifact.testResults);
   const hasText = hasContent(artifact.contentText);
   const showGithub = shouldShowGithubSection(artifact);
+  const showIntegrity =
+    artifact.task.dayIndex === 2 ||
+    artifact.task.dayIndex === 3 ||
+    Boolean(artifact.cutoffCommitSha);
 
   const [expanded, setExpanded] = useState(false);
   const [showOutput, setShowOutput] = useState(false);
@@ -44,6 +49,16 @@ export function ArtifactCard({ artifact, repoLinkLabel }: Props) {
         status={status}
         submittedAt={submittedAt}
       />
+
+      {showIntegrity ? (
+        <IntegrityCallout
+          className="mt-3"
+          repoUrl={repoUrl}
+          cutoffCommitSha={artifact.cutoffCommitSha ?? null}
+          cutoffAt={artifact.cutoffAt ?? null}
+          isClosed={Boolean(artifact.cutoffCommitSha)}
+        />
+      ) : null}
 
       {showGithub && (
         <ArtifactGithubSection

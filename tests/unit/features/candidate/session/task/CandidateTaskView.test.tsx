@@ -323,6 +323,43 @@ describe('CandidateTaskView draft autosave integration', () => {
     expect(getCandidateTaskDraftMock).not.toHaveBeenCalled();
   });
 
+  it('treats cutoff commit as closed state for Day 2/Day 3 submit actions', () => {
+    const onSubmit = jest.fn();
+
+    render(
+      <CandidateTaskView
+        candidateSessionId={22}
+        task={{
+          ...baseTask,
+          id: 2,
+          dayIndex: 2,
+          type: 'code',
+          cutoffCommitSha: 'abc123def456',
+        }}
+        submitting={false}
+        submitError={null}
+        actionGate={{
+          isReadOnly: false,
+          disabledReason: null,
+          comeBackAt: null,
+        }}
+        onSubmit={onSubmit}
+      />,
+    );
+
+    expect(
+      screen.getAllByText(
+        /Day closed\. Work after cutoff will not be considered\./i,
+      ).length,
+    ).toBeGreaterThan(0);
+    const submitButton = screen.getByRole('button', {
+      name: /Submit & Continue/i,
+    });
+    expect(submitButton).toBeDisabled();
+    fireEvent.click(submitButton);
+    expect(onSubmit).not.toHaveBeenCalled();
+  });
+
   it('in closed mode renders structured finalized reflection sections', async () => {
     render(
       <CandidateTaskView

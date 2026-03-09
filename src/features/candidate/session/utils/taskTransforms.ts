@@ -23,6 +23,8 @@ export function toTask(
     title: dtoTask.title,
     description: dtoTask.description,
     recordedSubmission: dtoTask.recordedSubmission ?? null,
+    cutoffCommitSha: dtoTask.cutoffCommitSha ?? null,
+    cutoffAt: dtoTask.cutoffAt ?? null,
   };
 }
 
