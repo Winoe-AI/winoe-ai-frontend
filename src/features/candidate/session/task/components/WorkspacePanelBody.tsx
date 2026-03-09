@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import Button from '@/shared/ui/Button';
 import { Skeleton } from '@/shared/ui/Skeleton';
 import type { CandidateWorkspaceStatus } from '@/features/candidate/api';
@@ -10,6 +11,7 @@ type Props = {
   refreshing: boolean;
   onRefresh: () => void;
   message: string;
+  integrityCallout?: ReactNode;
   readOnly: boolean;
   readOnlyReason: string | null;
 };
@@ -22,6 +24,7 @@ export function WorkspacePanelBody({
   refreshing,
   onRefresh,
   message,
+  integrityCallout,
   readOnly,
   readOnlyReason,
 }: Props) {
@@ -65,6 +68,11 @@ export function WorkspacePanelBody({
       {notice ? (
         <div className="rounded border border-amber-200 bg-amber-50 p-2 text-sm text-amber-800">
           {notice}
+        </div>
+      ) : null}
+      {integrityCallout ? (
+        <div className="rounded border border-sky-200 bg-sky-50 p-2 text-sm text-sky-800">
+          {integrityCallout}
         </div>
       ) : null}
       <div>{message}</div>

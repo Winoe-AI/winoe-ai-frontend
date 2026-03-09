@@ -5,6 +5,10 @@ import type { CandidateTask } from '../../CandidateSessionProvider';
 import type { SubmitPayload, SubmitResponse } from '../../task/types';
 import type { PollResult } from '../../task/hooks/runTestsTypes';
 import type { WindowActionGate } from '../../lib/windowState';
+import type {
+  CodingWorkspace,
+  CodingWorkspaceSnapshot,
+} from '../../task/utils/codingWorkspace';
 
 type Props = {
   currentTask: CandidateTask | null;
@@ -15,6 +19,7 @@ type Props = {
   showRecordingPanel: boolean;
   showDocsPanel: boolean;
   actionGate: WindowActionGate;
+  codingWorkspace?: CodingWorkspace | null;
   taskError: string | null;
   onSubmit: (
     payload: SubmitPayload,
@@ -24,6 +29,7 @@ type Props = {
   onPollTests: (runId: string) => Promise<PollResult>;
   onDashboard: () => void;
   onTaskWindowClosed: (err: unknown) => void;
+  onCodingWorkspaceSnapshot?: (snapshot: CodingWorkspaceSnapshot) => void;
 };
 
 export function RunningPanelsSection({
@@ -35,6 +41,7 @@ export function RunningPanelsSection({
   showRecordingPanel,
   showDocsPanel,
   actionGate,
+  codingWorkspace,
   taskError,
   onSubmit,
   onRetryTask,
@@ -42,6 +49,7 @@ export function RunningPanelsSection({
   onPollTests,
   onDashboard,
   onTaskWindowClosed,
+  onCodingWorkspaceSnapshot,
 }: Props) {
   return (
     <>
@@ -50,9 +58,11 @@ export function RunningPanelsSection({
         candidateSessionId={candidateSessionId}
         showWorkspacePanel={showWorkspacePanel}
         actionGate={actionGate}
+        codingWorkspace={codingWorkspace}
         onStartTests={onStartTests}
         onPollTests={onPollTests}
         onTaskWindowClosed={onTaskWindowClosed}
+        onCodingWorkspaceSnapshot={onCodingWorkspaceSnapshot}
       />
 
       <ResourceSections

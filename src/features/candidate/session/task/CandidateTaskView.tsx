@@ -75,12 +75,16 @@ function CandidateTaskViewInner({
     draftRestoreApplied,
     draftError,
     saveDraftNow,
+    actionStatus,
     displayStatus,
     lastProgress,
     githubNative,
     readOnly,
     disabled,
     disabledReason,
+    submittedLabel,
+    submittedShaLabel,
+    submittedSha,
     errorToShow,
     saveAndSubmit,
   } = useTaskSubmitController({
@@ -152,12 +156,18 @@ function CandidateTaskViewInner({
         </div>
       ) : null}
 
-      <TaskStatus displayStatus={displayStatus} progress={lastProgress} />
+      <TaskStatus
+        displayStatus={displayStatus}
+        progress={lastProgress}
+        submittedLabel={submittedLabel}
+        submittedShaLabel={submittedShaLabel}
+        submittedSha={submittedSha}
+      />
       <TaskPanelErrorBanner message={errorToShow} />
 
       <TaskActions
         isTextTask={textTask}
-        displayStatus={displayStatus}
+        displayStatus={actionStatus}
         disabled={disabled}
         disabledReason={disabledReason}
         onSaveDraft={textTask ? saveDraftNow : undefined}

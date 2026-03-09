@@ -26,6 +26,22 @@ describe('TaskStatus', () => {
     expect(screen.queryByText(/Progress:/)).toBeNull();
   });
 
+  it('renders custom recorded label and sha when provided', () => {
+    render(
+      <TaskStatus
+        displayStatus="submitted"
+        progress={{ completed: 1, total: 2 }}
+        submittedLabel="Checkpoint recorded"
+        submittedShaLabel="Checkpoint SHA"
+        submittedSha="abcdef123456"
+      />,
+    );
+    expect(screen.getByText(/Checkpoint recorded/)).toBeInTheDocument();
+    expect(screen.getByText(/Progress: 1\/2/)).toBeInTheDocument();
+    expect(screen.getByText(/Checkpoint SHA:/)).toBeInTheDocument();
+    expect(screen.getByText(/abcdef1/)).toBeInTheDocument();
+  });
+
   it('renders nothing when idle', () => {
     render(<TaskStatus displayStatus="idle" progress={null} />);
     expect(screen.queryByText(/Submitting/i)).toBeNull();

@@ -5,6 +5,12 @@ import type { SubmitPayload } from '../types';
 
 type SubmitStatus = 'idle' | 'submitting' | 'submitted';
 
+function toNullableString(value: unknown): string | null {
+  if (typeof value !== 'string') return null;
+  const trimmed = value.trim();
+  return trimmed.length > 0 ? trimmed : null;
+}
+
 export function useSubmitHandler(
   onSubmit: (payload: SubmitPayload) => Promise<unknown> | unknown,
 ) {
@@ -12,6 +18,11 @@ export function useSubmitHandler(
   const [lastProgress, setLastProgress] = useState<{
     completed: number;
     total: number;
+  } | null>(null);
+  const [lastShaRefs, setLastShaRefs] = useState<{
+    checkpointSha: string | null;
+    finalSha: string | null;
+    commitSha: string | null;
   } | null>(null);
   const [lastError, setLastError] = useState<unknown>(null);
 
@@ -21,6 +32,7 @@ export function useSubmitHandler(
     run: () => {
       setSubmitStatus('idle');
       setLastProgress(null);
+      setLastShaRefs(null);
       setLastError(null);
       return false;
     },
@@ -44,6 +56,11 @@ export function useSubmitHandler(
       const resp = await onSubmit(payload);
       if (isSubmitResponse(resp)) {
         setLastProgress(resp.progress);
+        setLastShaRefs({
+          checkpointSha: toNullableString(resp.checkpointSha),
+          finalSha: toNullableString(resp.finalSha),
+          commitSha: toNullableString(resp.commitSha),
+        });
         setSubmitStatus('submitted');
         resetTimer.start(undefined);
       } else {
@@ -63,6 +80,7 @@ export function useSubmitHandler(
   return {
     submitStatus,
     lastProgress,
+    lastShaRefs,
     lastError,
     getLastError: () => lastErrorRef.current,
     handleSubmit,

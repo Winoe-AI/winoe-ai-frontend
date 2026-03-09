@@ -1,7 +1,6 @@
 import Button from '@/shared/ui/Button';
 
 type Props = {
-  dayIndex: number;
   loading: boolean;
   refreshing: boolean;
   readOnly: boolean;
@@ -9,7 +8,6 @@ type Props = {
 };
 
 export function WorkspacePanelHeader({
-  dayIndex,
   loading,
   refreshing,
   readOnly,
@@ -19,12 +17,12 @@ export function WorkspacePanelHeader({
     <div className="flex items-start justify-between gap-3">
       <div>
         <div className="text-sm font-semibold text-gray-900">
-          Day {dayIndex} workspace
+          Coding workspace
         </div>
         <div className="text-xs text-gray-600">
           {readOnly
             ? 'Workspace actions are paused while this day is closed.'
-            : 'Provisioned GitHub repo + Codespace link.'}
+            : 'Shared GitHub repo + Codespace link for Day 2 and Day 3.'}
         </div>
       </div>
       <Button

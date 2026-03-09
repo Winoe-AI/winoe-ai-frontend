@@ -10,6 +10,9 @@ const buildResponse = () => ({
   submittedAt: new Date().toISOString(),
   progress: { completed: 1, total: 3 },
   isComplete: false,
+  commitSha: 'abc123def',
+  checkpointSha: 'abc123def',
+  finalSha: null,
 });
 
 describe('useSubmitHandler', () => {
@@ -24,6 +27,11 @@ describe('useSubmitHandler', () => {
     expect(onSubmit).toHaveBeenCalledTimes(1);
     expect(result.current.submitStatus).toBe('submitted');
     expect(result.current.lastProgress).toEqual({ completed: 1, total: 3 });
+    expect(result.current.lastShaRefs).toEqual({
+      commitSha: 'abc123def',
+      checkpointSha: 'abc123def',
+      finalSha: null,
+    });
 
     await act(async () => {
       jest.advanceTimersByTime(950);
@@ -32,6 +40,7 @@ describe('useSubmitHandler', () => {
 
     expect(result.current.submitStatus).toBe('idle');
     expect(result.current.lastProgress).toBeNull();
+    expect(result.current.lastShaRefs).toBeNull();
   });
 
   it('ignores duplicate submits while busy', async () => {

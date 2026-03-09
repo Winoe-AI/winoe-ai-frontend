@@ -25,6 +25,9 @@ export function isSubmitResponse(x: unknown): x is {
   submittedAt: string;
   progress: { completed: number; total: number };
   isComplete: boolean;
+  commitSha?: string | null;
+  checkpointSha?: string | null;
+  finalSha?: string | null;
 } {
   if (typeof x !== 'object' || x === null) return false;
   const rec = x as Record<string, unknown>;
@@ -34,6 +37,12 @@ export function isSubmitResponse(x: unknown): x is {
   if (typeof rec['candidateSessionId'] !== 'number') return false;
   if (typeof rec['submittedAt'] !== 'string') return false;
   if (typeof rec['isComplete'] !== 'boolean') return false;
+  const optionalShaFields = ['commitSha', 'checkpointSha', 'finalSha'] as const;
+  for (const field of optionalShaFields) {
+    const value = rec[field];
+    if (value === undefined || value === null) continue;
+    if (typeof value !== 'string') return false;
+  }
   if (typeof progress !== 'object' || progress === null) return false;
   const p = progress as Record<string, unknown>;
   return typeof p['completed'] === 'number' && typeof p['total'] === 'number';

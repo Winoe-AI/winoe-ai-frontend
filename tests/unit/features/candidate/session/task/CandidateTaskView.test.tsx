@@ -501,6 +501,98 @@ describe('CandidateTaskView draft autosave integration', () => {
     expect(putCandidateTaskDraftMock).toHaveBeenCalledTimes(1);
   });
 
+  it('shows "Checkpoint recorded" with checkpoint sha for Day 2 code submit', async () => {
+    const onSubmit = jest.fn().mockResolvedValue({
+      submissionId: 201,
+      taskId: 2,
+      candidateSessionId: 22,
+      submittedAt: '2026-03-08T14:00:00.000Z',
+      progress: { completed: 2, total: 5 },
+      isComplete: false,
+      commitSha: 'abc123def456',
+      checkpointSha: 'abc123def456',
+      finalSha: null,
+    });
+
+    render(
+      <CandidateTaskView
+        candidateSessionId={22}
+        task={{
+          id: 2,
+          dayIndex: 2,
+          type: 'code',
+          title: 'Code',
+          description: 'Work in GitHub',
+        }}
+        submitting={false}
+        submitError={null}
+        onSubmit={onSubmit}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: /submit & continue/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText(/Checkpoint recorded/i)).toBeInTheDocument();
+    });
+    expect(screen.getByText(/Checkpoint SHA:/i)).toBeInTheDocument();
+    expect(screen.getByText(/abc123d/i)).toBeInTheDocument();
+
+    await act(async () => {
+      jest.advanceTimersByTime(1200);
+    });
+
+    expect(screen.getByText(/Checkpoint recorded/i)).toBeInTheDocument();
+    expect(screen.getByText(/Checkpoint SHA:/i)).toBeInTheDocument();
+    expect(screen.getByText(/abc123d/i)).toBeInTheDocument();
+  });
+
+  it('shows "Final recorded" with neutral commit fallback for Day 3 debug submit', async () => {
+    const onSubmit = jest.fn().mockResolvedValue({
+      submissionId: 301,
+      taskId: 3,
+      candidateSessionId: 22,
+      submittedAt: '2026-03-08T14:10:00.000Z',
+      progress: { completed: 3, total: 5 },
+      isComplete: false,
+      commitSha: 'f00b4r777888',
+      checkpointSha: null,
+      finalSha: null,
+    });
+
+    render(
+      <CandidateTaskView
+        candidateSessionId={22}
+        task={{
+          id: 3,
+          dayIndex: 3,
+          type: 'debug',
+          title: 'Debug',
+          description: 'Fix and submit',
+        }}
+        submitting={false}
+        submitError={null}
+        onSubmit={onSubmit}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: /submit & continue/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText(/Final recorded/i)).toBeInTheDocument();
+    });
+    expect(screen.getByText(/Recorded commit:/i)).toBeInTheDocument();
+    expect(screen.getByText(/f00b4r7/i)).toBeInTheDocument();
+
+    await act(async () => {
+      jest.advanceTimersByTime(1200);
+    });
+
+    expect(screen.getByText(/Final recorded/i)).toBeInTheDocument();
+    expect(screen.getByText(/Recorded commit:/i)).toBeInTheDocument();
+    expect(screen.getByText(/f00b4r7/i)).toBeInTheDocument();
+  });
+
   it('remounts task-local state across task switches so text/status do not leak and new drafts hydrate correctly', async () => {
     const pendingSave = new Promise<{ taskId: number; updatedAt: string }>(
       () => {},

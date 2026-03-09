@@ -26,6 +26,24 @@ type Params = {
   onTaskWindowClosed?: (err: unknown) => void;
 };
 
+function getWorkspaceErrorCode(err: unknown): string | null {
+  if (!err || typeof err !== 'object') return null;
+  const rec = err as Record<string, unknown>;
+  if (typeof rec.errorCode === 'string' && rec.errorCode.trim())
+    return rec.errorCode.trim();
+  const details = rec.details;
+  if (!details || typeof details !== 'object') return null;
+  const detailRecord = details as Record<string, unknown>;
+  if (
+    typeof detailRecord.errorCode === 'string' &&
+    detailRecord.errorCode.trim()
+  )
+    return detailRecord.errorCode.trim();
+  if (typeof detailRecord.code === 'string' && detailRecord.code.trim())
+    return detailRecord.code.trim();
+  return null;
+}
+
 async function fetchOrInitWorkspace(
   mode: 'init' | 'refresh',
   initAttempted: boolean,
@@ -82,10 +100,12 @@ export async function loadWorkspaceStatus({
       err,
       'Unable to load your workspace right now.',
     );
+    const errorCode = getWorkspaceErrorCode(err) ?? normalized.code;
     const status = toStatus(err);
     const isSignin =
       status === 401 || status === 403 || normalized.action === 'signin';
     if (isSignin) return sessionExpired();
+    if (errorCode === 'WORKSPACE_NOT_INITIALIZED') return provisioning();
     if (status === 409) return provisioning();
     return workspaceError(mode, normalized.message);
   }
