@@ -33,6 +33,11 @@ import {
   supportedTimezones,
   toDateInputInTimezone,
 } from '../utils/schedule';
+import {
+  areWorkspaceStatusesEqual,
+  getCodingWorkspace,
+  type CodingWorkspaceSnapshot,
+} from '../task/utils/codingWorkspace';
 import type { ViewState } from '../CandidateSessionView';
 
 function scheduleErrorCode(err: unknown): string | null {
@@ -114,6 +119,13 @@ export function useCandidateSessionController(token: string) {
     number | null
   >(null);
   const [clockNowMs, setClockNowMs] = useState<number>(() => Date.now());
+  const [codingWorkspaceByDay, setCodingWorkspaceByDay] = useState<{
+    day2: CodingWorkspaceSnapshot['workspace'];
+    day3: CodingWorkspaceSnapshot['workspace'];
+  }>({
+    day2: null,
+    day3: null,
+  });
   const unlockRefreshRef = useRef<string | null>(null);
   const candidateSessionId = state.candidateSessionId ?? null;
   const currentTaskId = state.taskState.currentTask?.id ?? null;
@@ -139,10 +151,23 @@ export function useCandidateSessionController(token: string) {
     setLastSubmissionAt(null);
     setLastSubmissionId(null);
     setLastSubmissionTaskId(null);
+    setCodingWorkspaceByDay({ day2: null, day3: null });
     resetScheduleDraft();
     session.clearTaskError();
     if (typeof session.reset === 'function') session.reset();
   }, [resetScheduleDraft, session]);
+
+  const handleCodingWorkspaceSnapshot = useCallback(
+    (snapshot: CodingWorkspaceSnapshot) => {
+      const dayKey = snapshot.dayIndex === 2 ? 'day2' : 'day3';
+      setCodingWorkspaceByDay((prev) => {
+        if (areWorkspaceStatusesEqual(prev[dayKey], snapshot.workspace))
+          return prev;
+        return { ...prev, [dayKey]: snapshot.workspace };
+      });
+    },
+    [],
+  );
 
   const handleTaskWindowClosed = useCallback(
     (err: unknown) => {
@@ -537,6 +562,14 @@ export function useCandidateSessionController(token: string) {
       clockNowMs,
     );
   const finalView: ViewState = shouldKeepLocked ? 'locked' : resolvedView;
+  const codingWorkspace = useMemo(
+    () =>
+      getCodingWorkspace({
+        day2Workspace: codingWorkspaceByDay.day2,
+        day3Workspace: codingWorkspaceByDay.day3,
+      }),
+    [codingWorkspaceByDay.day2, codingWorkspaceByDay.day3],
+  );
 
   return {
     view: finalView,
@@ -567,6 +600,7 @@ export function useCandidateSessionController(token: string) {
     scheduleDisplayStartAt,
     windowState,
     actionGate: windowState.actionGate,
+    codingWorkspace,
     lastDraftSavedAt,
     lastSubmissionAt: activeSubmission?.submittedAt ?? null,
     lastSubmissionId: activeSubmission?.submissionId ?? null,
@@ -596,5 +630,6 @@ export function useCandidateSessionController(token: string) {
     onStartTests: actions.handleStartTests,
     onPollTests: actions.handlePollTests,
     onTaskWindowClosed: handleTaskWindowClosed,
+    onCodingWorkspaceSnapshot: handleCodingWorkspaceSnapshot,
   };
 }

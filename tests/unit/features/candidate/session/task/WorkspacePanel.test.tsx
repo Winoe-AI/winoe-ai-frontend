@@ -77,6 +77,18 @@ describe('WorkspacePanel', () => {
     );
   });
 
+  it('keeps workspace-not-initialized guidance clear when backend returns WORKSPACE_NOT_INITIALIZED', async () => {
+    const err = Object.assign(new Error('not ready'), {
+      status: 422,
+      details: { errorCode: 'WORKSPACE_NOT_INITIALIZED' },
+    });
+    getStatusMock.mockRejectedValueOnce(err);
+    renderPanel();
+    expect(
+      await screen.findByText(/Workspace repo not provisioned yet/i),
+    ).toBeInTheDocument();
+  });
+
   it('handles auth expiry by showing session expired error', async () => {
     const err = Object.assign(new Error('auth'), { status: 401 });
     getStatusMock.mockRejectedValueOnce(err);
@@ -130,10 +142,38 @@ describe('WorkspacePanel', () => {
     await screen.findByText(/Workspace provisioning is underway/i);
   });
 
-  it('renders day index in header', async () => {
+  it('reports day-specific workspace snapshots for shared normalization', async () => {
+    const onCodingWorkspaceSnapshot = jest.fn();
+    getStatusMock.mockResolvedValue({
+      repoUrl: 'https://github.com/acme/shared',
+      repoName: 'acme/shared',
+      repoFullName: 'acme/shared',
+      codespaceUrl: 'https://codespaces.new/acme/shared',
+    });
+
+    render(
+      <WorkspacePanel
+        taskId={1}
+        candidateSessionId={2}
+        dayIndex={2}
+        onCodingWorkspaceSnapshot={onCodingWorkspaceSnapshot}
+      />,
+    );
+
+    await screen.findByText(/Workspace is ready/i);
+    expect(onCodingWorkspaceSnapshot).toHaveBeenCalledWith({
+      dayIndex: 2,
+      workspace: expect.objectContaining({
+        repoFullName: 'acme/shared',
+        codespaceUrl: 'https://codespaces.new/acme/shared',
+      }),
+    });
+  });
+
+  it('renders shared coding workspace header', async () => {
     getStatusMock.mockResolvedValue(null);
     renderPanel({ dayIndex: 3 });
-    expect(await screen.findByText(/Day 3 workspace/i)).toBeInTheDocument();
+    expect(await screen.findByText(/Coding workspace/i)).toBeInTheDocument();
   });
 
   it('keeps workspace panel read-only and skips api loads when day is closed', async () => {
@@ -147,7 +187,7 @@ describe('WorkspacePanel', () => {
       />,
     );
 
-    expect(screen.getByText(/Day 2 workspace/i)).toBeInTheDocument();
+    expect(screen.getByText(/Coding workspace/i)).toBeInTheDocument();
     expect(
       screen.getByText(/Workspace actions are paused/i),
     ).toBeInTheDocument();
@@ -157,5 +197,102 @@ describe('WorkspacePanel', () => {
     expect(
       screen.queryByRole('link', { name: /Open Codespace/i }),
     ).not.toBeInTheDocument();
+  });
+
+  it('keeps shared workspace identity when moving from Day 2 to Day 3', async () => {
+    getStatusMock
+      .mockResolvedValueOnce({
+        repoUrl: 'https://github.com/local/day2-only',
+        repoName: 'day2-only',
+        codespaceUrl: null,
+      })
+      .mockResolvedValueOnce({
+        repoUrl: 'https://github.com/local/day3-only',
+        repoName: 'day3-only',
+        codespaceUrl: null,
+      });
+
+    const sharedWorkspace = {
+      repoFullName: 'acme/unified-workspace',
+      repoName: 'acme/unified-workspace',
+      repoUrl: 'https://github.com/acme/unified-workspace',
+      codespaceUrl: 'https://codespaces.new/acme/unified-workspace',
+      isInitialized: true,
+      error: null,
+    };
+
+    const { rerender } = render(
+      <WorkspacePanel
+        taskId={1}
+        candidateSessionId={2}
+        dayIndex={2}
+        codingWorkspace={sharedWorkspace}
+      />,
+    );
+
+    expect(await screen.findByText(/Workspace is ready/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Repo: acme\/unified-workspace/i),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /Repo URL/i })).toHaveAttribute(
+      'href',
+      'https://github.com/acme/unified-workspace',
+    );
+    expect(
+      screen.getByRole('link', { name: /Open Codespace/i }),
+    ).toHaveAttribute('href', 'https://codespaces.new/acme/unified-workspace');
+
+    rerender(
+      <WorkspacePanel
+        taskId={1}
+        candidateSessionId={2}
+        dayIndex={3}
+        codingWorkspace={sharedWorkspace}
+      />,
+    );
+
+    expect(
+      screen.getByText(/Repo: acme\/unified-workspace/i),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /Repo URL/i })).toHaveAttribute(
+      'href',
+      'https://github.com/acme/unified-workspace',
+    );
+    expect(
+      screen.getByRole('link', { name: /Open Codespace/i }),
+    ).toHaveAttribute('href', 'https://codespaces.new/acme/unified-workspace');
+  });
+
+  it('renders explicit inconsistency error when day identities conflict', async () => {
+    getStatusMock.mockResolvedValue({
+      repoUrl: 'https://github.com/acme/day3',
+      repoName: 'acme/day3',
+      codespaceUrl: 'https://codespaces.new/acme/day3',
+    });
+
+    render(
+      <WorkspacePanel
+        taskId={1}
+        candidateSessionId={2}
+        dayIndex={3}
+        codingWorkspace={{
+          repoFullName: null,
+          repoName: null,
+          repoUrl: null,
+          codespaceUrl: null,
+          isInitialized: false,
+          error:
+            'Workspace mismatch detected between Day 2 and Day 3. Refresh and contact support if this continues.',
+        }}
+      />,
+    );
+
+    expect(
+      await screen.findByText(
+        /Workspace mismatch detected between Day 2 and Day 3/i,
+      ),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Retry/i })).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /Repo URL/i })).toBeNull();
   });
 });

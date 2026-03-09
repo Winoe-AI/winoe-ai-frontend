@@ -5,6 +5,10 @@ import type { CandidateTask } from '../CandidateSessionProvider';
 import type { SubmitPayload, SubmitResponse } from '../task/types';
 import type { PollResult } from '../task/hooks/runTestsTypes';
 import type { DerivedWindowState, WindowActionGate } from '../lib/windowState';
+import type {
+  CodingWorkspace,
+  CodingWorkspaceSnapshot,
+} from '../task/utils/codingWorkspace';
 
 type Props = {
   title: string;
@@ -22,6 +26,7 @@ type Props = {
   showDocsPanel: boolean;
   windowState: DerivedWindowState;
   actionGate: WindowActionGate;
+  codingWorkspace?: CodingWorkspace | null;
   lastDraftSavedAt: number | null;
   lastSubmissionAt: string | null;
   lastSubmissionId: number | null;
@@ -33,6 +38,7 @@ type Props = {
   onPollTests: (runId: string) => Promise<PollResult>;
   onDashboard: () => void;
   onTaskWindowClosed: (err: unknown) => void;
+  onCodingWorkspaceSnapshot?: (snapshot: CodingWorkspaceSnapshot) => void;
 };
 
 export function RunningView({
@@ -51,6 +57,7 @@ export function RunningView({
   showDocsPanel,
   windowState,
   actionGate,
+  codingWorkspace,
   lastDraftSavedAt,
   lastSubmissionAt,
   lastSubmissionId,
@@ -60,6 +67,7 @@ export function RunningView({
   onPollTests,
   onDashboard,
   onTaskWindowClosed,
+  onCodingWorkspaceSnapshot,
 }: Props) {
   return (
     <div className="p-6 max-w-4xl mx-auto space-y-4">
@@ -89,6 +97,7 @@ export function RunningView({
         showRecordingPanel={showRecordingPanel}
         showDocsPanel={showDocsPanel}
         actionGate={actionGate}
+        codingWorkspace={codingWorkspace}
         taskError={taskError}
         onSubmit={onSubmit}
         onRetryTask={onRetryTask}
@@ -96,6 +105,7 @@ export function RunningView({
         onPollTests={onPollTests}
         onDashboard={onDashboard}
         onTaskWindowClosed={onTaskWindowClosed}
+        onCodingWorkspaceSnapshot={onCodingWorkspaceSnapshot}
       />
     </div>
   );

@@ -7,6 +7,25 @@ import type {
 import { normalizeTask } from './tasksNormalize';
 import { mapCurrentTaskError, mapSubmitTaskError } from './taskErrors';
 
+function asNullableString(value: unknown): string | null {
+  if (typeof value !== 'string') return null;
+  const trimmed = value.trim();
+  return trimmed.length > 0 ? trimmed : null;
+}
+
+function normalizeSubmitResponse(
+  payload: CandidateTaskSubmitResponse,
+): CandidateTaskSubmitResponse {
+  if (!payload || typeof payload !== 'object') return payload;
+  const rec = payload as Record<string, unknown>;
+  return {
+    ...payload,
+    commitSha: asNullableString(rec.commitSha ?? rec.commit_sha),
+    checkpointSha: asNullableString(rec.checkpointSha ?? rec.checkpoint_sha),
+    finalSha: asNullableString(rec.finalSha ?? rec.final_sha),
+  };
+}
+
 export async function getCandidateCurrentTask(
   candidateSessionId: number,
   options?: { skipCache?: boolean; cacheTtlMs?: number; dedupeKey?: string },
@@ -70,7 +89,7 @@ export async function submitCandidateTask(params: {
       },
       candidateClientOptions,
     );
-    return data;
+    return normalizeSubmitResponse(data);
   } catch (err) {
     mapSubmitTaskError(err);
   }

@@ -232,6 +232,36 @@ describe('candidateApi', () => {
     );
   });
 
+  it('normalizes submit sha fields for Day 2 and Day 3 compatibility', async () => {
+    const fetchMock = jest.fn() as FetchMock;
+    fetchMock.mockResolvedValue(
+      jsonRes({
+        submissionId: 6,
+        taskId: 7,
+        candidateSessionId: 1,
+        submittedAt: '2026-03-08T12:00:00Z',
+        progress: { completed: 2, total: 5 },
+        isComplete: false,
+        commit_sha: 'abc123',
+        checkpoint_sha: 'abc123',
+      }),
+    );
+    global.fetch = fetchMock as unknown as typeof fetch;
+
+    const { submitCandidateTask } = await importApi();
+    const result = await submitCandidateTask({
+      taskId: 7,
+      candidateSessionId: 1,
+      contentText: 'Answer',
+    });
+
+    expect(result).toMatchObject({
+      commitSha: 'abc123',
+      checkpointSha: 'abc123',
+      finalSha: null,
+    });
+  });
+
   it('submits day 5 reflection payload fields to backend', async () => {
     const fetchMock = jest.fn() as FetchMock;
     fetchMock.mockResolvedValue(

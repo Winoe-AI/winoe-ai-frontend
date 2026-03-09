@@ -153,6 +153,7 @@ export function CandidateSessionView(props: Props) {
       showDocsPanel={props.showDocsPanel}
       windowState={props.windowState}
       actionGate={props.actionGate}
+      codingWorkspace={props.codingWorkspace}
       lastDraftSavedAt={props.lastDraftSavedAt}
       lastSubmissionAt={props.lastSubmissionAt}
       lastSubmissionId={props.lastSubmissionId}
@@ -162,6 +163,7 @@ export function CandidateSessionView(props: Props) {
       onPollTests={props.onPollTests}
       onDashboard={props.onDashboard}
       onTaskWindowClosed={props.onTaskWindowClosed}
+      onCodingWorkspaceSnapshot={props.onCodingWorkspaceSnapshot}
     />
   );
 }

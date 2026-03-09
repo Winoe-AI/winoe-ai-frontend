@@ -3,7 +3,13 @@ import { useCallback, useMemo, useState } from 'react';
 import { markTextDraftSavedAt } from '../utils/draftStorage';
 import { useSubmitHandler } from './taskHooks';
 import { useTaskDraftAutosave } from './useTaskDraftAutosave';
-import { isCodeTask, isGithubNativeDay, isTextTask } from '../utils/taskGuards';
+import {
+  isCodeTask,
+  isGithubNativeDay,
+  isSubmitResponse,
+  isTextTask,
+} from '../utils/taskGuards';
+import { resolveCodingSubmissionStatus } from '../utils/submissionStatus';
 import type { SubmitPayload, SubmitResponse, Task } from '../types';
 import type { WindowActionGate } from '../../lib/windowState';
 
@@ -19,9 +25,35 @@ type Args = {
   ) => Promise<SubmitResponse | void> | SubmitResponse | void;
 };
 
+type CodingShaRefs = {
+  checkpointSha: string | null;
+  finalSha: string | null;
+  commitSha: string | null;
+};
+
+type DurableCodingSubmission = {
+  taskId: number;
+  progress: { completed: number; total: number } | null;
+  shaRefs: CodingShaRefs;
+};
+
 function asRecord(value: unknown): Record<string, unknown> | null {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
   return value as Record<string, unknown>;
+}
+
+function toNullableString(value: unknown): string | null {
+  if (typeof value !== 'string') return null;
+  const trimmed = value.trim();
+  return trimmed.length > 0 ? trimmed : null;
+}
+
+function toCodingShaRefs(response: SubmitResponse): CodingShaRefs {
+  return {
+    checkpointSha: toNullableString(response.checkpointSha),
+    finalSha: toNullableString(response.finalSha),
+    commitSha: toNullableString(response.commitSha),
+  };
 }
 
 function pickTextFromStructuredJson(value: unknown): string | null {
@@ -80,8 +112,10 @@ export function useTaskSubmitController({
   onTaskWindowClosed,
   onSubmit,
 }: Args) {
-  const { submitStatus, lastProgress, handleSubmit } =
+  const { submitStatus, lastProgress, lastShaRefs, handleSubmit } =
     useSubmitHandler(onSubmit);
+  const [recordedCodingSubmission, setRecordedCodingSubmission] =
+    useState<DurableCodingSubmission | null>(null);
   const [text, setText] = useState('');
   const [localError, setLocalError] = useState<string | null>(null);
 
@@ -91,7 +125,7 @@ export function useTaskSubmitController({
   );
   const textTask = !githubNative && isTextTask(task.type);
 
-  const displayStatus = submitting ? 'submitting' : submitStatus;
+  const actionStatus = submitting ? 'submitting' : submitStatus;
 
   const readOnly = actionGate.isReadOnly;
   const disabled = Boolean(
@@ -100,6 +134,23 @@ export function useTaskSubmitController({
   const disabledReason = readOnly ? actionGate.disabledReason : null;
 
   const finalized = useMemo(() => resolveFinalizedText(task), [task]);
+  const durableCodingSubmission =
+    recordedCodingSubmission && recordedCodingSubmission.taskId === task.id
+      ? recordedCodingSubmission
+      : null;
+  const statusHasDurableRecord = Boolean(
+    task.recordedSubmission || durableCodingSubmission,
+  );
+  const displayStatus =
+    githubNative &&
+    actionStatus !== 'submitting' &&
+    (actionStatus === 'submitted' || statusHasDurableRecord)
+      ? 'submitted'
+      : actionStatus;
+  const statusProgress =
+    githubNative && durableCodingSubmission?.progress
+      ? durableCodingSubmission.progress
+      : lastProgress;
 
   const draftAutosave = useTaskDraftAutosave<string>({
     taskId: task.id,
@@ -155,11 +206,18 @@ export function useTaskSubmitController({
       : disabledReason;
 
   const saveAndSubmit = async () => {
-    if (disabled || displayStatus !== 'idle') return;
+    if (disabled || actionStatus !== 'idle') return;
 
     if (githubNative) {
       setLocalError(null);
       const resp = await handleSubmit({});
+      if (isSubmitResponse(resp)) {
+        setRecordedCodingSubmission({
+          taskId: task.id,
+          progress: resp.progress,
+          shaRefs: toCodingShaRefs(resp),
+        });
+      }
       if (resp !== 'submit-failed') clearDrafts();
       return;
     }
@@ -182,6 +240,11 @@ export function useTaskSubmitController({
   };
 
   const errorToShow = localError ?? submitError ?? null;
+  const codingSubmissionStatus = resolveCodingSubmissionStatus(
+    task.dayIndex,
+    durableCodingSubmission?.shaRefs ?? lastShaRefs,
+  );
+
   return {
     textTask,
     text: textForRender,
@@ -191,12 +254,20 @@ export function useTaskSubmitController({
     draftRestoreApplied: draftAutosave.restoreApplied,
     draftError: draftAutosave.error,
     saveDraftNow,
+    actionStatus,
     displayStatus,
-    lastProgress,
+    lastProgress: statusProgress,
     githubNative,
     readOnly,
     disabled,
     disabledReason: readOnlyReason,
+    submittedLabel: githubNative ? codingSubmissionStatus.submittedLabel : null,
+    submittedShaLabel: githubNative
+      ? (codingSubmissionStatus.shaMeta?.label ?? null)
+      : null,
+    submittedSha: githubNative
+      ? (codingSubmissionStatus.shaMeta?.sha ?? null)
+      : null,
     errorToShow,
     saveAndSubmit,
   };

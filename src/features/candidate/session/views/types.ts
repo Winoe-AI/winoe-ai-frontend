@@ -6,6 +6,10 @@ import type { CandidateTask } from '../CandidateSessionProvider';
 import type { SubmitPayload, SubmitResponse } from '../task/types';
 import type { PollResult } from '../task/hooks/runTestsTypes';
 import type { DerivedWindowState, WindowActionGate } from '../lib/windowState';
+import type {
+  CodingWorkspace,
+  CodingWorkspaceSnapshot,
+} from '../task/utils/codingWorkspace';
 
 export type ViewState =
   | 'loading'
@@ -59,6 +63,7 @@ export type CandidateSessionViewProps = {
   scheduleDisplayStartAt: string | null;
   windowState: DerivedWindowState;
   actionGate: WindowActionGate;
+  codingWorkspace?: CodingWorkspace | null;
   lastDraftSavedAt: number | null;
   lastSubmissionAt: string | null;
   lastSubmissionId: number | null;
@@ -80,4 +85,5 @@ export type CandidateSessionViewProps = {
   onStartTests: () => Promise<{ runId: string }>;
   onPollTests: (runId: string) => Promise<PollResult>;
   onTaskWindowClosed: (err: unknown) => void;
+  onCodingWorkspaceSnapshot?: (snapshot: CodingWorkspaceSnapshot) => void;
 };

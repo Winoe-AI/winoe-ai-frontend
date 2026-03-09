@@ -64,6 +64,9 @@ export type CandidateTaskSubmitResponse = {
   submittedAt: string;
   progress: { completed: number; total: number };
   isComplete: boolean;
+  commitSha?: string | null;
+  checkpointSha?: string | null;
+  finalSha?: string | null;
 };
 
 export type CandidateWorkspaceStatus = {
