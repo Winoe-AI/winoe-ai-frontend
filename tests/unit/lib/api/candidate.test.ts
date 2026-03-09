@@ -411,6 +411,63 @@ describe('candidate api helpers', () => {
     });
   });
 
+  it('normalizes cutoff fields on current task responses', async () => {
+    mockGet.mockResolvedValueOnce({
+      isComplete: false,
+      completedTaskIds: [],
+      currentTask: {
+        id: 41,
+        dayIndex: 2,
+        type: 'code',
+        title: 'Code task',
+        description: 'Implement feature',
+        cutoff_commit_sha: 'abc123def456',
+        cutoff_at: '2026-03-08T17:45:00.000Z',
+      },
+    });
+
+    const { getCandidateCurrentTask } =
+      await import('@/features/candidate/api');
+    const result = await getCandidateCurrentTask(777);
+
+    expect(result?.currentTask).toMatchObject({
+      cutoffCommitSha: 'abc123def456',
+      cutoffAt: '2026-03-08T17:45:00.000Z',
+    });
+  });
+
+  it('normalizes cutoff fields from later nested current task records', async () => {
+    mockGet.mockResolvedValueOnce({
+      isComplete: false,
+      completedTaskIds: [],
+      currentTask: {
+        id: 42,
+        dayIndex: 3,
+        type: 'debug',
+        title: 'Debug task',
+        description: 'Fix failing tests',
+        workspaceStatus: { repoUrl: 'https://github.com/acme/repo' },
+        workspace_status: { codespaceUrl: 'https://codespaces.new/acme/repo' },
+        workspace: { status: 'ready' },
+        integrity: { status: 'ok' },
+        evaluationBasis: { source: 'latest' },
+        evaluation_basis: {
+          cutoff_commit_sha: 'laternestedsha123',
+          cutoff_at: '2026-03-08T18:15:00.000Z',
+        },
+      },
+    });
+
+    const { getCandidateCurrentTask } =
+      await import('@/features/candidate/api');
+    const result = await getCandidateCurrentTask(778);
+
+    expect(result?.currentTask).toMatchObject({
+      cutoffCommitSha: 'laternestedsha123',
+      cutoffAt: '2026-03-08T18:15:00.000Z',
+    });
+  });
+
   it('initializes workspace and normalizes response fields', async () => {
     mockPost.mockResolvedValueOnce({
       repoUrl: 'https://github.com/acme/repo',
@@ -437,6 +494,8 @@ describe('candidate api helpers', () => {
       repoName: 'acme/repo',
       repoFullName: null,
       codespaceUrl: 'https://codespaces.new/acme/repo',
+      cutoffCommitSha: null,
+      cutoffAt: null,
     });
   });
 
@@ -465,6 +524,8 @@ describe('candidate api helpers', () => {
       repoName: 'acme/repo2',
       repoFullName: null,
       codespaceUrl: null,
+      cutoffCommitSha: null,
+      cutoffAt: null,
     });
   });
 
@@ -483,6 +544,8 @@ describe('candidate api helpers', () => {
       repoName: null,
       repoFullName: null,
       codespaceUrl: null,
+      cutoffCommitSha: null,
+      cutoffAt: null,
     });
   });
 
@@ -506,7 +569,28 @@ describe('candidate api helpers', () => {
       repoName: 'acme/repo3',
       repoFullName: 'acme/repo3',
       codespaceUrl: 'https://codespaces.new/acme/repo3',
+      cutoffCommitSha: null,
+      cutoffAt: null,
     });
+  });
+
+  it('normalizes cutoff fields from workspace status payloads', async () => {
+    mockGet.mockResolvedValueOnce({
+      repoUrl: 'https://github.com/acme/repo4',
+      repoName: 'acme/repo4',
+      cutoff_commit_sha: 'abc123def456',
+      cutoff_at: '2026-03-08T17:45:00.000Z',
+    });
+
+    const { getCandidateWorkspaceStatus } =
+      await import('@/features/candidate/api');
+    const result = await getCandidateWorkspaceStatus({
+      taskId: 16,
+      candidateSessionId: 99,
+    });
+
+    expect(result.cutoffCommitSha).toBe('abc123def456');
+    expect(result.cutoffAt).toBe('2026-03-08T17:45:00.000Z');
   });
 
   it('starts and polls candidate test runs', async () => {

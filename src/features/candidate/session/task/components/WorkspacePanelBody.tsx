@@ -70,11 +70,7 @@ export function WorkspacePanelBody({
           {notice}
         </div>
       ) : null}
-      {integrityCallout ? (
-        <div className="rounded border border-sky-200 bg-sky-50 p-2 text-sm text-sky-800">
-          {integrityCallout}
-        </div>
-      ) : null}
+      {integrityCallout ? <div>{integrityCallout}</div> : null}
       <div>{message}</div>
       {readOnly ? (
         <div className="rounded border border-gray-300 bg-gray-200 p-2 text-xs text-gray-700">

@@ -13,6 +13,40 @@ function toIsoOrNull(value: unknown): string | null {
   return Number.isFinite(ts) ? iso : null;
 }
 
+function readCutoffCommitSha(record: Record<string, unknown>): string | null {
+  return (
+    toStringOrNull(record.cutoffCommitSha ?? record.cutoff_commit_sha) ?? null
+  );
+}
+
+function readCutoffAt(record: Record<string, unknown>): string | null {
+  return (
+    toIsoOrNull(record.cutoffAt) ??
+    toIsoOrNull(record.cutoff_at) ??
+    toIsoOrNull(record.cutoffTime) ??
+    toIsoOrNull(record.cutoff_time)
+  );
+}
+
+function findNestedCutoffRecord(
+  taskRecord: Record<string, unknown>,
+): Record<string, unknown> | null {
+  const nestedCandidates: unknown[] = [
+    taskRecord.workspaceStatus,
+    taskRecord.workspace_status,
+    taskRecord.workspace,
+    taskRecord.integrity,
+    taskRecord.evaluationBasis,
+    taskRecord.evaluation_basis,
+  ];
+  for (const candidate of nestedCandidates) {
+    const parsed = asRecord(candidate);
+    if (!parsed) continue;
+    if (readCutoffCommitSha(parsed) || readCutoffAt(parsed)) return parsed;
+  }
+  return null;
+}
+
 function readSubmissionText(
   record: Record<string, unknown>,
 ): string | undefined {
@@ -95,6 +129,13 @@ export const normalizeTask = (raw: unknown): CandidateTask | null => {
   const description = toStringOrNull(rec.description) ?? '';
   const type = toStringOrNull(rec.type) ?? 'code';
   const recordedSubmission = findRecordedSubmission(rec);
+  const nestedCutoffRecord = findNestedCutoffRecord(rec);
+  const cutoffCommitSha =
+    readCutoffCommitSha(rec) ??
+    (nestedCutoffRecord ? readCutoffCommitSha(nestedCutoffRecord) : null);
+  const cutoffAt =
+    readCutoffAt(rec) ??
+    (nestedCutoffRecord ? readCutoffAt(nestedCutoffRecord) : null);
   if (id === null || dayIndex === null) return null;
   return {
     id,
@@ -103,5 +144,7 @@ export const normalizeTask = (raw: unknown): CandidateTask | null => {
     description,
     type,
     recordedSubmission,
+    cutoffCommitSha,
+    cutoffAt,
   };
 };

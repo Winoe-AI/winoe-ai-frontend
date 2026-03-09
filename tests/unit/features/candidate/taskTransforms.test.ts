@@ -30,8 +30,12 @@ describe('taskTransforms', () => {
       type: 'code',
       title: 'Implement',
       description: 'Build it',
+      cutoffCommitSha: 'ff00cc',
+      cutoffAt: '2026-03-09T12:34:56.000Z',
     });
     expect(task?.id).toBe(9);
+    expect(task?.cutoffCommitSha).toBe('ff00cc');
+    expect(task?.cutoffAt).toBe('2026-03-09T12:34:56.000Z');
     expect(toTask(null)).toBeNull();
   });
 

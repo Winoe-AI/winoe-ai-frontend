@@ -498,7 +498,7 @@ describe('ArtifactCard coverage', () => {
     });
 
     render(<ArtifactCard artifact={artifact} />);
-    expect(screen.getByText(/owner\/repo/)).toBeInTheDocument();
+    expect(screen.getAllByText(/owner\/repo/).length).toBeGreaterThan(0);
   });
 
   it('handles code with http repoPath', () => {
@@ -511,8 +511,10 @@ describe('ArtifactCard coverage', () => {
 
     render(<ArtifactCard artifact={artifact} />);
     expect(
-      screen.getByRole('link', { name: /https:\/\/github.com\/tenon\/repo/ }),
-    ).toBeInTheDocument();
+      screen.getAllByRole('link', {
+        name: /https:\/\/github.com\/tenon\/repo/,
+      }).length,
+    ).toBeGreaterThan(0);
   });
 
   it('shows no text answer message for code task without content', () => {

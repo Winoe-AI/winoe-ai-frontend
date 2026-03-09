@@ -33,6 +33,8 @@ export type CandidateTask = {
   title: string;
   description: string;
   recordedSubmission?: CandidateRecordedSubmission | null;
+  cutoffCommitSha?: string | null;
+  cutoffAt?: string | null;
 };
 
 export type TaskState = {

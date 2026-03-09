@@ -48,6 +48,8 @@ export type CandidateTask = {
   title: string;
   description: string;
   recordedSubmission?: CandidateRecordedSubmission | null;
+  cutoffCommitSha?: string | null;
+  cutoffAt?: string | null;
 };
 
 export type CandidateCurrentTaskResponse = {
@@ -74,6 +76,8 @@ export type CandidateWorkspaceStatus = {
   repoName: string | null;
   repoFullName: string | null;
   codespaceUrl: string | null;
+  cutoffCommitSha?: string | null;
+  cutoffAt?: string | null;
 };
 
 export type CandidateTestRunStartResponse = { runId: string };

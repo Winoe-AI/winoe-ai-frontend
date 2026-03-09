@@ -27,8 +27,16 @@ describe('taskTransforms', () => {
       type: 'code',
       title: 'T',
       description: 'D',
+      cutoffCommitSha: 'abc123',
+      cutoffAt: '2026-03-09T00:00:00.000Z',
     });
-    expect(t).toMatchObject({ id: 1, dayIndex: 2, type: 'code' });
+    expect(t).toMatchObject({
+      id: 1,
+      dayIndex: 2,
+      type: 'code',
+      cutoffCommitSha: 'abc123',
+      cutoffAt: '2026-03-09T00:00:00.000Z',
+    });
   });
 
   it('derives current day index from completion flags', () => {

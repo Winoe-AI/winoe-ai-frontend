@@ -5,6 +5,8 @@ export type SubmissionListItem = {
   dayIndex: number;
   type: string;
   submittedAt: string;
+  cutoffCommitSha?: string | null;
+  cutoffAt?: string | null;
   repoUrl?: string | null;
   repoFullName?: string | null;
   workflowUrl?: string | null;
@@ -41,6 +43,8 @@ export type SubmissionTestResults = {
 export type SubmissionArtifact = {
   submissionId: number;
   candidateSessionId: number;
+  cutoffCommitSha?: string | null;
+  cutoffAt?: string | null;
   task: {
     taskId: number;
     dayIndex: number;

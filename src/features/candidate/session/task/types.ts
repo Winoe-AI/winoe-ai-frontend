@@ -18,6 +18,8 @@ export type Task = {
     contentText?: string | null;
     contentJson?: Record<string, unknown> | null;
   } | null;
+  cutoffCommitSha?: string | null;
+  cutoffAt?: string | null;
 };
 
 export type Day5ReflectionPayload = {

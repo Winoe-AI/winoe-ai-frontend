@@ -65,4 +65,66 @@ describe('ArtifactCard', () => {
     expect(screen.getByText(/Line 1/)).toBeInTheDocument();
     expect(screen.getByText(/Line 2/)).toBeInTheDocument();
   });
+
+  it('shows cutoff commit as the evaluation basis on recruiter artifacts', () => {
+    render(
+      <ArtifactCard
+        artifact={{
+          ...baseArtifact,
+          task: {
+            ...baseArtifact.task,
+            dayIndex: 2,
+            type: 'code',
+          },
+          repoUrl: 'https://github.com/acme/repo',
+          repoFullName: 'acme/repo',
+          cutoffCommitSha: 'abc123def456',
+          cutoffAt: '2026-03-08T17:45:00.000Z',
+        }}
+      />,
+    );
+
+    expect(
+      screen.getByText(/Evaluation is based on the commit shown below/i),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /abc123def456/i })).toHaveAttribute(
+      'href',
+      'https://github.com/acme/repo/commit/abc123def456',
+    );
+    expect(screen.getByText(/^Day closed$/i)).toBeInTheDocument();
+  });
+
+  it('does not imply a fixed evaluation basis before cutoff is recorded', () => {
+    render(
+      <ArtifactCard
+        artifact={{
+          ...baseArtifact,
+          task: {
+            ...baseArtifact.task,
+            dayIndex: 3,
+            type: 'code',
+          },
+          repoUrl: 'https://github.com/acme/repo',
+          repoFullName: 'acme/repo',
+          cutoffCommitSha: null,
+          cutoffAt: null,
+        }}
+      />,
+    );
+
+    expect(
+      screen.getByText(
+        /Only commits pushed before the cutoff time are evaluated/i,
+      ),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/Work after cutoff will not be considered/i),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByText(/Evaluation is based on the commit shown below/i),
+    ).toBeNull();
+    expect(screen.queryByText(/Cutoff commit:/i)).toBeNull();
+    expect(screen.queryByText(/Cutoff time:/i)).toBeNull();
+    expect(screen.queryByText(/^Day closed$/i)).toBeNull();
+  });
 });

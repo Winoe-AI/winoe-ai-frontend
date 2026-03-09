@@ -8,6 +8,60 @@ const isAbortError = (err: unknown) =>
     typeof err === 'object' &&
     (err as { name?: unknown }).name === 'AbortError');
 
+function toNullableString(value: unknown): string | null {
+  if (typeof value !== 'string') return null;
+  const trimmed = value.trim();
+  return trimmed.length > 0 ? trimmed : null;
+}
+
+function toIsoOrNull(value: unknown): string | null {
+  const iso = toNullableString(value);
+  if (!iso) return null;
+  const ts = Date.parse(iso);
+  return Number.isFinite(ts) ? iso : null;
+}
+
+function normalizeCutoffFields(record: Record<string, unknown>) {
+  return {
+    cutoffCommitSha:
+      toNullableString(record.cutoffCommitSha ?? record.cutoff_commit_sha) ??
+      null,
+    cutoffAt:
+      toIsoOrNull(record.cutoffAt) ??
+      toIsoOrNull(record.cutoff_at) ??
+      toIsoOrNull(record.cutoffTime) ??
+      toIsoOrNull(record.cutoff_time),
+  };
+}
+
+function normalizeListResponse(
+  data: SubmissionListResponse,
+): SubmissionListResponse {
+  const normalizedItems = Array.isArray(data?.items)
+    ? data.items.map((item) => {
+        if (!item || typeof item !== 'object') return item;
+        const rec = item as unknown as Record<string, unknown>;
+        return {
+          ...item,
+          ...normalizeCutoffFields(rec),
+        };
+      })
+    : [];
+
+  return {
+    items: normalizedItems,
+  };
+}
+
+function normalizeArtifact(data: SubmissionArtifact): SubmissionArtifact {
+  if (!data || typeof data !== 'object') return data;
+  const rec = data as unknown as Record<string, unknown>;
+  return {
+    ...data,
+    ...normalizeCutoffFields(rec),
+  };
+}
+
 export async function verifyCandidate(
   simulationId: string,
   candidateSessionId: string,
@@ -54,7 +108,7 @@ export async function fetchCandidateSubmissions(
     const encodedSim = encodeURIComponent(simulationId);
     parts.push(`simulationId=${encodedSim}`, `simulation_id=${encodedSim}`);
   }
-  return recruiterBffClient.get<SubmissionListResponse>(
+  const data = await recruiterBffClient.get<SubmissionListResponse>(
     `/submissions?${parts.join('&')}`,
     {
       cache: 'no-store',
@@ -64,6 +118,7 @@ export async function fetchCandidateSubmissions(
       disableDedupe: true,
     },
   );
+  return normalizeListResponse(data);
 }
 
 export async function fetchArtifactsWithLimit(
@@ -95,7 +150,7 @@ export async function fetchArtifactsWithLimit(
             dedupeKey: `submission-${current}`,
           },
         );
-        results[current] = artifact;
+        results[current] = normalizeArtifact(artifact);
       } catch {
         hadError = true;
       }

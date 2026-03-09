@@ -127,11 +127,17 @@ export function useTaskSubmitController({
 
   const actionStatus = submitting ? 'submitting' : submitStatus;
 
-  const readOnly = actionGate.isReadOnly;
+  const cutoffClosed = githubNative && Boolean(task.cutoffCommitSha);
+  const readOnly = actionGate.isReadOnly || cutoffClosed;
   const disabled = Boolean(
     readOnly || submitting || submitStatus === 'submitted',
   );
-  const disabledReason = readOnly ? actionGate.disabledReason : null;
+  const disabledReason = readOnly
+    ? (actionGate.disabledReason ??
+      (cutoffClosed
+        ? 'Day closed. Work after cutoff will not be considered.'
+        : null))
+    : null;
 
   const finalized = useMemo(() => resolveFinalizedText(task), [task]);
   const durableCodingSubmission =

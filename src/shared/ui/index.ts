@@ -10,3 +10,4 @@ export { MarkdownPreview } from './Markdown';
 export { LazyMarkdownPreview } from './LazyMarkdownPreview';
 export { EmptyState } from './EmptyState';
 export { InlineBadge } from './InlineBadge';
+export { IntegrityCallout, buildGithubCommitUrl } from './IntegrityCallout';

@@ -7,6 +7,13 @@ import {
 } from './base';
 import type { CandidateWorkspaceStatus } from './types';
 
+function toIsoOrNull(value: unknown): string | null {
+  const iso = toStringOrNull(value);
+  if (!iso) return null;
+  const ts = Date.parse(iso);
+  return Number.isFinite(ts) ? iso : null;
+}
+
 function normalizeWorkspaceStatus(data: unknown): CandidateWorkspaceStatus {
   if (!data || typeof data !== 'object') {
     return {
@@ -14,6 +21,8 @@ function normalizeWorkspaceStatus(data: unknown): CandidateWorkspaceStatus {
       repoName: null,
       repoFullName: null,
       codespaceUrl: null,
+      cutoffCommitSha: null,
+      cutoffAt: null,
     };
   }
   const rec = data as Record<string, unknown>;
@@ -24,7 +33,21 @@ function normalizeWorkspaceStatus(data: unknown): CandidateWorkspaceStatus {
     toStringOrNull(rec.repoName ?? rec.repo_name) ?? repoFullName ?? null;
   const codespaceUrl =
     toStringOrNull(rec.codespaceUrl ?? rec.codespace_url) ?? null;
-  return { repoUrl, repoName, repoFullName, codespaceUrl };
+  const cutoffCommitSha =
+    toStringOrNull(rec.cutoffCommitSha ?? rec.cutoff_commit_sha) ?? null;
+  const cutoffAt =
+    toIsoOrNull(rec.cutoffAt) ??
+    toIsoOrNull(rec.cutoff_at) ??
+    toIsoOrNull(rec.cutoffTime) ??
+    toIsoOrNull(rec.cutoff_time);
+  return {
+    repoUrl,
+    repoName,
+    repoFullName,
+    codespaceUrl,
+    cutoffCommitSha,
+    cutoffAt,
+  };
 }
 
 export async function initCandidateWorkspace(params: {

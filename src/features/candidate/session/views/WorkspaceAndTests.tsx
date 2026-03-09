@@ -29,15 +29,25 @@ export function WorkspaceAndTests({
   onTaskWindowClosed,
   onCodingWorkspaceSnapshot,
 }: Props) {
+  const closedByCutoff = Boolean(task.cutoffCommitSha);
+  const workspaceReadOnly = actionGate.isReadOnly || closedByCutoff;
+  const cutoffDisabledReason = closedByCutoff
+    ? 'Day closed. Work after cutoff will not be considered.'
+    : null;
+  const disabledReason = actionGate.disabledReason ?? cutoffDisabledReason;
+
   return (
     <div className="grid gap-3 md:grid-cols-2">
       <WorkspacePanel
         taskId={task.id}
         candidateSessionId={candidateSessionId}
         dayIndex={task.dayIndex}
-        readOnly={actionGate.isReadOnly}
-        readOnlyReason={actionGate.disabledReason}
+        readOnly={workspaceReadOnly}
+        readOnlyReason={disabledReason}
         codingWorkspace={codingWorkspace}
+        cutoffCommitSha={task.cutoffCommitSha ?? null}
+        cutoffAt={task.cutoffAt ?? null}
+        isClosed={closedByCutoff}
         onTaskWindowClosed={onTaskWindowClosed}
         onCodingWorkspaceSnapshot={onCodingWorkspaceSnapshot}
       />
@@ -45,8 +55,8 @@ export function WorkspaceAndTests({
         onStart={onStartTests}
         onPoll={onPollTests}
         storageKey={`tenon:taskRun:${task.id}`}
-        disabled={actionGate.isReadOnly}
-        disabledReason={actionGate.disabledReason}
+        disabled={workspaceReadOnly}
+        disabledReason={disabledReason}
       />
     </div>
   );

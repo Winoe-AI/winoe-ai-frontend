@@ -176,7 +176,13 @@ describe('WorkspacePanel', () => {
     expect(await screen.findByText(/Coding workspace/i)).toBeInTheDocument();
   });
 
-  it('keeps workspace panel read-only and skips api loads when day is closed', async () => {
+  it('keeps workspace panel read-only while still showing pre-cutoff integrity rules', async () => {
+    getStatusMock.mockResolvedValue({
+      repoUrl: 'https://github.com/acme/repo',
+      repoName: 'acme/repo',
+      codespaceUrl: 'https://codespaces.new/acme/repo',
+    });
+
     render(
       <WorkspacePanel
         taskId={1}
@@ -191,12 +197,103 @@ describe('WorkspacePanel', () => {
     expect(
       screen.getByText(/Workspace actions are paused/i),
     ).toBeInTheDocument();
+    expect(await screen.findByText(/Workspace is ready/i)).toBeInTheDocument();
     expect(screen.getByText(/Day closed for this task/i)).toBeInTheDocument();
-    expect(getStatusMock).not.toHaveBeenCalled();
+    expect(
+      screen.getByText(
+        /Only commits pushed before the cutoff time are evaluated/i,
+      ),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/Work after cutoff will not be considered/i),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByText(/Evaluation is based on the commit shown below/i),
+    ).toBeNull();
+    expect(screen.queryByText(/Cutoff commit:/i)).toBeNull();
+    expect(screen.queryByText(/Cutoff time:/i)).toBeNull();
+    expect(screen.queryByText(/^Day closed$/i)).toBeNull();
+    expect(getStatusMock).toHaveBeenCalledTimes(1);
     expect(initWorkspaceMock).not.toHaveBeenCalled();
     expect(
       screen.queryByRole('link', { name: /Open Codespace/i }),
     ).not.toBeInTheDocument();
+  });
+
+  it('shows cutoff commit and evaluation basis details when day is closed after cutoff', async () => {
+    getStatusMock.mockResolvedValue({
+      repoUrl: 'https://github.com/acme/repo',
+      repoName: 'acme/repo',
+      codespaceUrl: 'https://codespaces.new/acme/repo',
+      cutoffCommitSha: 'abc123def456',
+      cutoffAt: '2026-03-08T17:45:00.000Z',
+    });
+
+    render(
+      <WorkspacePanel
+        taskId={1}
+        candidateSessionId={2}
+        dayIndex={2}
+        readOnly
+        readOnlyReason="Day closed. Work after cutoff will not be considered."
+        cutoffCommitSha="abc123def456"
+        cutoffAt="2026-03-08T17:45:00.000Z"
+        isClosed
+      />,
+    );
+
+    expect(await screen.findByText(/^Day closed$/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        /Only commits pushed before the cutoff time are evaluated/i,
+      ),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/Evaluation is based on the commit shown below/i),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /abc123def456/i })).toHaveAttribute(
+      'href',
+      'https://github.com/acme/repo/commit/abc123def456',
+    );
+    expect(screen.getByText(/Cutoff time:/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        /Day closed\. Work after cutoff will not be considered\./i,
+      ),
+    ).toBeInTheDocument();
+    expect(getStatusMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('loads cutoff fields from workspace status when read-only closed panels receive no cutoff props', async () => {
+    getStatusMock.mockResolvedValue({
+      repoUrl: 'https://github.com/acme/repo',
+      repoName: 'acme/repo',
+      codespaceUrl: 'https://codespaces.new/acme/repo',
+      cutoffCommitSha: 'abc123def456',
+      cutoffAt: '2026-03-08T17:45:00.000Z',
+    });
+
+    render(
+      <WorkspacePanel
+        taskId={1}
+        candidateSessionId={2}
+        dayIndex={2}
+        readOnly
+        readOnlyReason="Day closed. Work after cutoff will not be considered."
+        isClosed
+      />,
+    );
+
+    expect(await screen.findByText(/^Day closed$/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Evaluation is based on the commit shown below/i),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /abc123def456/i })).toHaveAttribute(
+      'href',
+      'https://github.com/acme/repo/commit/abc123def456',
+    );
+    expect(screen.getByText(/Cutoff time:/i)).toBeInTheDocument();
+    expect(getStatusMock).toHaveBeenCalledTimes(1);
   });
 
   it('keeps shared workspace identity when moving from Day 2 to Day 3', async () => {
