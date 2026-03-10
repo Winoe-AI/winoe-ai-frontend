@@ -201,7 +201,7 @@ describe('WorkspacePanel', () => {
     expect(screen.getByText(/Day closed for this task/i)).toBeInTheDocument();
     expect(
       screen.getByText(
-        /Only commits pushed before the cutoff time are evaluated/i,
+        /You may work offline\/locally, but only commits pushed to the official repo before cutoff are evaluated\./i,
       ),
     ).toBeInTheDocument();
     expect(
@@ -245,7 +245,7 @@ describe('WorkspacePanel', () => {
     expect(await screen.findByText(/^Day closed$/i)).toBeInTheDocument();
     expect(
       screen.getByText(
-        /Only commits pushed before the cutoff time are evaluated/i,
+        /You may work offline\/locally, but only commits pushed to the official repo before cutoff are evaluated\./i,
       ),
     ).toBeInTheDocument();
     expect(

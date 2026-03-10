@@ -15,7 +15,7 @@ describe('IntegrityCallout', () => {
 
     expect(
       screen.getByText(
-        /Only commits pushed before the cutoff time are evaluated/i,
+        /You may work offline\/locally, but only commits pushed to the official repo before cutoff are evaluated\./i,
       ),
     ).toBeInTheDocument();
     expect(

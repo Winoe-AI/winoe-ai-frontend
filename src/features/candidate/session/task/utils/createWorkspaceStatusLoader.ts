@@ -2,7 +2,7 @@ import { loadWorkspaceStatus } from './loadWorkspaceStatus';
 import type { WorkspaceLoadResult } from './workspaceResponses';
 
 type LoaderRefs = {
-  modeRef: { current: 'init' | 'refresh' };
+  modeRef: { current: 'init' | 'refresh' | 'poll' };
   initAttemptedRef: { current: boolean };
 };
 

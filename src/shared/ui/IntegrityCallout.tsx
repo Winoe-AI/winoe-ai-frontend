@@ -1,4 +1,5 @@
 import { formatDateTime } from '@/shared/formatters';
+import { OFFICIAL_REPO_CUTOFF_COPY } from '@/lib/copy/integrity';
 import { cn } from './classnames';
 
 function toTrimmedString(value: unknown): string | null {
@@ -92,7 +93,7 @@ export function IntegrityCallout({
       ) : null}
 
       <div className={showClosedState ? 'mt-2 space-y-1' : 'space-y-1'}>
-        <p>Only commits pushed before the cutoff time are evaluated.</p>
+        <p>{OFFICIAL_REPO_CUTOFF_COPY}</p>
         <p>Work after cutoff will not be considered.</p>
         {hasCutoffDetails ? (
           <p>Evaluation is based on the commit shown below.</p>
