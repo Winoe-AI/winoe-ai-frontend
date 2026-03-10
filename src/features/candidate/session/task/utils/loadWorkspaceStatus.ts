@@ -19,7 +19,7 @@ import {
 } from './workspaceResponses';
 
 type Params = {
-  mode: 'init' | 'refresh';
+  mode: 'init' | 'refresh' | 'poll';
   taskId: number;
   candidateSessionId: number;
   initAttempted: boolean;
@@ -45,7 +45,7 @@ function getWorkspaceErrorCode(err: unknown): string | null {
 }
 
 async function fetchOrInitWorkspace(
-  mode: 'init' | 'refresh',
+  mode: 'init' | 'refresh' | 'poll',
   initAttempted: boolean,
   taskId: number,
   candidateSessionId: number,
@@ -70,6 +70,27 @@ async function fetchOrInitWorkspace(
     }
     throw err;
   }
+}
+
+function getWorkspaceCodespaceState(err: unknown): string | null {
+  if (!err || typeof err !== 'object') return null;
+  const record = err as Record<string, unknown>;
+  if (typeof record.codespaceState === 'string' && record.codespaceState.trim())
+    return record.codespaceState.trim();
+  const details = record.details;
+  if (!details || typeof details !== 'object') return null;
+  const detailRecord = details as Record<string, unknown>;
+  if (
+    typeof detailRecord.codespaceState === 'string' &&
+    detailRecord.codespaceState.trim()
+  )
+    return detailRecord.codespaceState.trim();
+  if (
+    typeof detailRecord.codespace_status === 'string' &&
+    detailRecord.codespace_status.trim()
+  )
+    return detailRecord.codespace_status.trim();
+  return null;
 }
 
 export async function loadWorkspaceStatus({
@@ -101,12 +122,16 @@ export async function loadWorkspaceStatus({
       'Unable to load your workspace right now.',
     );
     const errorCode = getWorkspaceErrorCode(err) ?? normalized.code;
+    const codespaceState = getWorkspaceCodespaceState(err);
     const status = toStatus(err);
     const isSignin =
       status === 401 || status === 403 || normalized.action === 'signin';
     if (isSignin) return sessionExpired();
     if (errorCode === 'WORKSPACE_NOT_INITIALIZED') return provisioning();
     if (status === 409) return provisioning();
-    return workspaceError(mode, normalized.message);
+    return workspaceError(mode, normalized.message, {
+      errorCode,
+      codespaceState,
+    });
   }
 }

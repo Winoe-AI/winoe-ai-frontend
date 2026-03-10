@@ -494,6 +494,7 @@ describe('candidate api helpers', () => {
       repoName: 'acme/repo',
       repoFullName: null,
       codespaceUrl: 'https://codespaces.new/acme/repo',
+      codespaceState: null,
       cutoffCommitSha: null,
       cutoffAt: null,
     });
@@ -524,6 +525,7 @@ describe('candidate api helpers', () => {
       repoName: 'acme/repo2',
       repoFullName: null,
       codespaceUrl: null,
+      codespaceState: null,
       cutoffCommitSha: null,
       cutoffAt: null,
     });
@@ -544,6 +546,7 @@ describe('candidate api helpers', () => {
       repoName: null,
       repoFullName: null,
       codespaceUrl: null,
+      codespaceState: null,
       cutoffCommitSha: null,
       cutoffAt: null,
     });
@@ -569,6 +572,7 @@ describe('candidate api helpers', () => {
       repoName: 'acme/repo3',
       repoFullName: 'acme/repo3',
       codespaceUrl: 'https://codespaces.new/acme/repo3',
+      codespaceState: null,
       cutoffCommitSha: null,
       cutoffAt: null,
     });

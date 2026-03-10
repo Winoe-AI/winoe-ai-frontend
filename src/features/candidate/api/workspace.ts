@@ -21,6 +21,7 @@ function normalizeWorkspaceStatus(data: unknown): CandidateWorkspaceStatus {
       repoName: null,
       repoFullName: null,
       codespaceUrl: null,
+      codespaceState: null,
       cutoffCommitSha: null,
       cutoffAt: null,
     };
@@ -33,6 +34,16 @@ function normalizeWorkspaceStatus(data: unknown): CandidateWorkspaceStatus {
     toStringOrNull(rec.repoName ?? rec.repo_name) ?? repoFullName ?? null;
   const codespaceUrl =
     toStringOrNull(rec.codespaceUrl ?? rec.codespace_url) ?? null;
+  const codespaceState =
+    toStringOrNull(
+      rec.codespaceState ??
+        rec.codespace_state ??
+        rec.codespaceStatus ??
+        rec.codespace_status ??
+        rec.workspaceState ??
+        rec.workspace_state ??
+        rec.status,
+    ) ?? null;
   const cutoffCommitSha =
     toStringOrNull(rec.cutoffCommitSha ?? rec.cutoff_commit_sha) ?? null;
   const cutoffAt =
@@ -45,6 +56,7 @@ function normalizeWorkspaceStatus(data: unknown): CandidateWorkspaceStatus {
     repoName,
     repoFullName,
     codespaceUrl,
+    codespaceState,
     cutoffCommitSha,
     cutoffAt,
   };

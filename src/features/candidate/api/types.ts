@@ -76,6 +76,7 @@ export type CandidateWorkspaceStatus = {
   repoName: string | null;
   repoFullName: string | null;
   codespaceUrl: string | null;
+  codespaceState?: string | null;
   cutoffCommitSha?: string | null;
   cutoffAt?: string | null;
 };

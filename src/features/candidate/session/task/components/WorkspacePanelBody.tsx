@@ -12,6 +12,7 @@ type Props = {
   onRefresh: () => void;
   message: string;
   integrityCallout?: ReactNode;
+  fallbackPanel?: ReactNode;
   readOnly: boolean;
   readOnlyReason: string | null;
 };
@@ -25,6 +26,7 @@ export function WorkspacePanelBody({
   onRefresh,
   message,
   integrityCallout,
+  fallbackPanel,
   readOnly,
   readOnlyReason,
 }: Props) {
@@ -47,18 +49,22 @@ export function WorkspacePanelBody({
 
   if (error) {
     return (
-      <div className="mt-3 rounded border border-red-200 bg-red-50 p-3 text-sm text-red-800">
-        <div>{error}</div>
-        <div className="mt-2 flex gap-2">
-          <Button
-            size="sm"
-            variant="secondary"
-            onClick={onRefresh}
-            disabled={readOnly || refreshing}
-          >
-            {refreshing ? 'Refreshing…' : 'Retry'}
-          </Button>
+      <div className="mt-3 space-y-2">
+        <div className="rounded border border-red-200 bg-red-50 p-3 text-sm text-red-800">
+          <div>{error}</div>
+          <div className="mt-2 flex gap-2">
+            <Button
+              size="sm"
+              variant="secondary"
+              onClick={onRefresh}
+              disabled={readOnly || refreshing}
+            >
+              {refreshing ? 'Refreshing…' : 'Retry'}
+            </Button>
+          </div>
         </div>
+        {fallbackPanel ? <div>{fallbackPanel}</div> : null}
+        {integrityCallout ? <div>{integrityCallout}</div> : null}
       </div>
     );
   }
@@ -71,6 +77,7 @@ export function WorkspacePanelBody({
         </div>
       ) : null}
       {integrityCallout ? <div>{integrityCallout}</div> : null}
+      {fallbackPanel ? <div>{fallbackPanel}</div> : null}
       <div>{message}</div>
       {readOnly ? (
         <div className="rounded border border-gray-300 bg-gray-200 p-2 text-xs text-gray-700">

@@ -2,13 +2,16 @@
 import { useEffect, useRef } from 'react';
 import type { ReactNode } from 'react';
 import type { CandidateWorkspaceStatus } from '@/features/candidate/api';
+import Button from '@/shared/ui/Button';
 import { IntegrityCallout } from '@/shared/ui/IntegrityCallout';
 import { useWorkspaceStatus } from '../hooks/useWorkspaceStatus';
+import { logCodespaceFallbackShown } from '../utils/workspaceEvents';
 import { buildWorkspaceMessage } from '../utils/workspaceMessages';
 import type {
   CodingWorkspace,
   CodingWorkspaceSnapshot,
 } from '../utils/codingWorkspace';
+import { CodespaceFallbackPanel } from './CodespaceFallbackPanel';
 import { WorkspacePanelHeader } from './WorkspacePanelHeader';
 import { WorkspacePanelBody } from './WorkspacePanelBody';
 
@@ -46,14 +49,26 @@ export function WorkspacePanel(props: WorkspacePanelProps) {
   const isWorkspaceIntegrityDay = dayIndex === 2 || dayIndex === 3;
   const shouldLoadWorkspace =
     !readOnly || isClosed || hasCutoffProps || isWorkspaceIntegrityDay;
-  const { workspace, loading, refreshing, error, notice, refresh } =
-    useWorkspaceStatus({
-      taskId,
-      candidateSessionId,
-      enabled: shouldLoadWorkspace,
-      onTaskWindowClosed,
-    });
+  const {
+    workspace,
+    loading,
+    refreshing,
+    error,
+    notice,
+    codespaceAvailability,
+    showCodespaceFallback,
+    codespaceFallbackReason,
+    refresh,
+    retryCodespace,
+  } = useWorkspaceStatus({
+    taskId,
+    candidateSessionId,
+    enabled: shouldLoadWorkspace,
+    enableCodespaceFallback: isWorkspaceIntegrityDay && !readOnly,
+    onTaskWindowClosed,
+  });
   const lastSnapshotKeyRef = useRef<string | null>(null);
+  const fallbackLoggedRef = useRef(false);
 
   useEffect(() => {
     if (!onCodingWorkspaceSnapshot) return;
@@ -90,6 +105,14 @@ export function WorkspacePanel(props: WorkspacePanelProps) {
     cutoffCommitSha ?? workspace?.cutoffCommitSha ?? null;
   const effectiveCutoffAt = cutoffAt ?? workspace?.cutoffAt ?? null;
   const effectiveError = codingWorkspace?.error ?? error;
+  const hasRepoUrl = Boolean(
+    effectiveWorkspace?.repoUrl && effectiveWorkspace.repoUrl.trim(),
+  );
+  const shouldShowFallback = Boolean(
+    showCodespaceFallback && isWorkspaceIntegrityDay && !readOnly,
+  );
+  const shouldShowActionableFallback = shouldShowFallback && hasRepoUrl;
+  const shouldShowUnavailableFallbackState = shouldShowFallback && !hasRepoUrl;
   const workspaceMessage = codingWorkspace?.error
     ? 'Unable to confirm a shared Day 2/Day 3 workspace identity.'
     : buildWorkspaceMessage(effectiveWorkspace);
@@ -102,6 +125,65 @@ export function WorkspacePanel(props: WorkspacePanelProps) {
       isClosed={isClosed || Boolean(effectiveCutoffCommitSha)}
     />
   );
+  const fallbackPanelNode = shouldShowActionableFallback ? (
+    <CodespaceFallbackPanel
+      repoUrl={effectiveWorkspace?.repoUrl ?? null}
+      repoFullName={
+        effectiveWorkspace?.repoFullName ?? effectiveWorkspace?.repoName ?? null
+      }
+      errorState={codespaceFallbackReason ?? codespaceAvailability ?? null}
+      cutoffAt={effectiveCutoffAt}
+      onRetry={retryCodespace}
+    />
+  ) : shouldShowUnavailableFallbackState ? (
+    <section
+      aria-labelledby="codespace-fallback-unavailable-heading"
+      className="rounded border border-amber-300 bg-amber-50 p-3 text-sm text-amber-950"
+    >
+      <div className="flex flex-wrap items-start justify-between gap-2">
+        <h3
+          id="codespace-fallback-unavailable-heading"
+          className="text-sm font-semibold"
+        >
+          Codespaces unavailable, repo details still loading
+        </h3>
+        <Button
+          size="sm"
+          variant="secondary"
+          onClick={retryCodespace}
+          disabled={loading || refreshing}
+        >
+          {loading || refreshing ? 'Trying…' : 'Try again'}
+        </Button>
+      </div>
+      <p className="mt-2 text-xs text-amber-900">
+        Retry to fetch repository details before showing local clone steps.
+      </p>
+    </section>
+  ) : null;
+
+  useEffect(() => {
+    if (!shouldShowFallback) {
+      fallbackLoggedRef.current = false;
+      return;
+    }
+    if (fallbackLoggedRef.current) return;
+    fallbackLoggedRef.current = true;
+    logCodespaceFallbackShown({
+      dayIndex,
+      taskId,
+      availability: codespaceAvailability,
+      reason: codespaceFallbackReason,
+      hasRepoUrl,
+    });
+  }, [
+    codespaceAvailability,
+    codespaceFallbackReason,
+    dayIndex,
+    hasRepoUrl,
+    shouldShowFallback,
+    taskId,
+  ]);
 
   return (
     <div className="rounded-md border border-gray-200 bg-white p-4 shadow-sm">
@@ -120,6 +202,7 @@ export function WorkspacePanel(props: WorkspacePanelProps) {
         onRefresh={refresh}
         message={workspaceMessage}
         integrityCallout={calloutNode}
+        fallbackPanel={fallbackPanelNode}
         readOnly={readOnly}
         readOnlyReason={readOnlyReason}
       />
