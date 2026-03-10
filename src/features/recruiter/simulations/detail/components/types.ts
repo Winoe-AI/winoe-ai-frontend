@@ -1,5 +1,8 @@
+import type { ScenarioPatchPayload } from '@/features/recruiter/api/simulationLifecycle';
 import type { CandidateSession } from '@/features/recruiter/types';
 import type { RowState } from '../hooks/types';
+import type { ScenarioEditorDraft } from '../scenario';
+import type { ScenarioVersionItem } from '../scenario/types';
 import type { SimulationPlan } from '../utils/plan';
 
 export type SearchState = {
@@ -15,19 +18,43 @@ export type SearchState = {
 export type SimulationDetailViewProps = {
   simulationId: string;
   simulationStatus: string | null;
+  selectedScenarioStatusForDisplay: string | null;
   scenarioVersionLabel: string;
   scenarioIdLabel: string | null;
   scenarioLocked: boolean;
   scenarioLockedAt: string | null;
+  scenarioVersions: ScenarioVersionItem[];
+  selectedScenarioVersionId: string | null;
+  onSelectScenarioVersion: (versionId: string) => void;
+  selectedScenarioVersion: ScenarioVersionItem | null;
+  previousScenarioVersion: ScenarioVersionItem | null;
+  scenarioLockBannerMessage: string | null;
+  scenarioContentUnavailableMessage: string | null;
+  scenarioGeneratingLabel: string | null;
+  scenarioEditorDisabled: boolean;
+  scenarioEditorDisabledReason: string | null;
+  scenarioEditorSaving: boolean;
+  scenarioEditorSaveError: string | null;
+  scenarioEditorFieldErrors: Partial<
+    Record<'storylineMd' | 'taskPrompts' | 'rubric', string>
+  >;
+  scenarioEditorDraft: ScenarioEditorDraft | null;
+  onScenarioEditorDraftChange: (
+    versionId: string,
+    draft: ScenarioEditorDraft,
+  ) => void;
+  onSaveScenarioEdits: (payload: ScenarioPatchPayload) => Promise<void> | void;
   inviteEnabled: boolean;
   inviteDisabledReason: string | null;
   inviteResendEnabled: boolean;
   inviteResendDisabledReason: string | null;
   actionError: string | null;
   canApprove: boolean;
+  approveButtonLabel: string;
   approveLoading: boolean;
   onApprove: () => void;
   regenerateLoading: boolean;
+  regenerateDisabled: boolean;
   onRegenerate: () => void;
   terminatePending: boolean;
   terminateModalOpen: boolean;
@@ -45,6 +72,7 @@ export type SimulationDetailViewProps = {
   companyContextLabel: string;
   scenarioLabel: string | null;
   rubricSummary: string | null;
+  scenarioContentUnavailableMessageForPlan: string | null;
   planDays: { dayIndex: number; task: SimulationPlan['days'][number] | null }[];
   planLoading: boolean;
   planStatusCode: number | null;

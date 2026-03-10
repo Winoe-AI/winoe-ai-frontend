@@ -1,4 +1,4 @@
-import { act, render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import RecruiterSimulationDetailPage from '@/features/recruiter/simulations/detail/RecruiterSimulationDetailPage';
 import { NotificationsProvider } from '@/shared/notifications';
@@ -208,16 +208,18 @@ describe('RecruiterSimulationDetailPage', () => {
         });
       },
       '/api/simulations/sim-1/candidates': jsonResponse([]),
-      '/api/backend/simulations/sim-1/activate': jsonResponse({
+      '/api/backend/simulations/sim-1/scenario/10/approve': jsonResponse({
         simulationId: 'sim-1',
         status: 'active_inviting',
+        activeScenarioVersionId: 10,
+        pendingScenarioVersionId: null,
       }),
     });
 
     renderPage();
 
     const approveBtn = await screen.findByRole('button', {
-      name: /Approve \/ Activate inviting/i,
+      name: /Approve v1 \/ Start inviting/i,
     });
     const inviteBtn = await screen.findByRole('button', {
       name: /Invite candidate/i,
@@ -233,16 +235,18 @@ describe('RecruiterSimulationDetailPage', () => {
     await user.click(approveBtn);
 
     await waitFor(() => {
-      const activateCalls = fetchMock.mock.calls.filter(
-        (call) => getUrl(call[0]) === '/api/backend/simulations/sim-1/activate',
+      const approveCalls = fetchMock.mock.calls.filter(
+        (call) =>
+          getUrl(call[0]) ===
+          '/api/backend/simulations/sim-1/scenario/10/approve',
       );
-      expect(activateCalls.length).toBe(1);
+      expect(approveCalls.length).toBe(1);
     });
 
     await waitFor(() => {
       expect(
         screen.queryByRole('button', {
-          name: /Approve \/ Activate inviting/i,
+          name: /Approve .* \/ Start inviting/i,
         }),
       ).not.toBeInTheDocument();
     });
@@ -257,7 +261,6 @@ describe('RecruiterSimulationDetailPage', () => {
 
   it('shows regenerate confirmation for locked scenarios', async () => {
     const user = userEvent.setup();
-    const confirmSpy = jest.spyOn(window, 'confirm').mockReturnValue(false);
 
     mockFetchHandlers({
       '/api/simulations': jsonResponse([
@@ -288,6 +291,8 @@ describe('RecruiterSimulationDetailPage', () => {
       }),
       '/api/simulations/sim-1/candidates': jsonResponse([]),
       '/api/backend/simulations/sim-1/scenario/regenerate': jsonResponse({
+        scenarioVersionId: 102,
+        jobId: 'job-1',
         status: 'generating',
       }),
     });
@@ -299,7 +304,10 @@ describe('RecruiterSimulationDetailPage', () => {
     });
 
     await user.click(regenerateBtn);
-    expect(confirmSpy).toHaveBeenCalledTimes(1);
+    const dialog = await screen.findByRole('dialog', {
+      name: /Confirm scenario regenerate/i,
+    });
+    expect(dialog).toBeInTheDocument();
     expect(
       fetchMock.mock.calls.filter(
         (call) =>
@@ -308,8 +316,15 @@ describe('RecruiterSimulationDetailPage', () => {
       ).length,
     ).toBe(0);
 
-    confirmSpy.mockReturnValue(true);
+    await user.click(within(dialog).getByRole('button', { name: /Cancel/i }));
+
     await user.click(regenerateBtn);
+    const confirmDialog = await screen.findByRole('dialog', {
+      name: /Confirm scenario regenerate/i,
+    });
+    await user.click(
+      within(confirmDialog).getByRole('button', { name: /^Regenerate$/i }),
+    );
 
     await waitFor(() => {
       const calls = fetchMock.mock.calls.filter(
@@ -319,8 +334,6 @@ describe('RecruiterSimulationDetailPage', () => {
       );
       expect(calls.length).toBe(1);
     });
-
-    confirmSpy.mockRestore();
   });
 
   it('shows action error when approve request fails', async () => {
@@ -353,7 +366,7 @@ describe('RecruiterSimulationDetailPage', () => {
         ],
       }),
       '/api/simulations/sim-1/candidates': jsonResponse([]),
-      '/api/backend/simulations/sim-1/activate': () => {
+      '/api/backend/simulations/sim-1/scenario/10/approve': () => {
         return Promise.reject('approve failed');
       },
     });
@@ -361,7 +374,7 @@ describe('RecruiterSimulationDetailPage', () => {
     renderPage();
 
     const approveBtn = await screen.findByRole('button', {
-      name: /Approve \/ Activate inviting/i,
+      name: /Approve v1 \/ Start inviting/i,
     });
     await user.click(approveBtn);
 
@@ -392,7 +405,7 @@ describe('RecruiterSimulationDetailPage', () => {
       screen.queryByRole('button', { name: /Invite your first candidate/i }),
     ).not.toBeInTheDocument();
     expect(
-      screen.queryByRole('button', { name: /Approve \/ Activate inviting/i }),
+      screen.queryByRole('button', { name: /Approve .* \/ Start inviting/i }),
     ).not.toBeInTheDocument();
 
     const calledUrls = fetchMock.mock.calls.map((call) => getUrl(call[0]));
@@ -423,7 +436,7 @@ describe('RecruiterSimulationDetailPage', () => {
       screen.queryByRole('button', { name: /Invite your first candidate/i }),
     ).not.toBeInTheDocument();
     expect(
-      screen.queryByRole('button', { name: /Approve \/ Activate inviting/i }),
+      screen.queryByRole('button', { name: /Approve .* \/ Start inviting/i }),
     ).not.toBeInTheDocument();
 
     const calledUrls = fetchMock.mock.calls.map((call) => getUrl(call[0]));
@@ -595,7 +608,7 @@ describe('RecruiterSimulationDetailPage', () => {
 
     expect(
       await screen.findByRole('button', {
-        name: /Approve \/ Activate inviting/i,
+        name: /Approve v1 \/ Start inviting/i,
       }),
     ).toBeInTheDocument();
 

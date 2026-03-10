@@ -7,6 +7,7 @@ type Props = Pick<
   SimulationDetailViewProps,
   | 'simulationId'
   | 'simulationStatus'
+  | 'selectedScenarioStatusForDisplay'
   | 'scenarioVersionLabel'
   | 'scenarioIdLabel'
   | 'scenarioLocked'
@@ -16,9 +17,11 @@ type Props = Pick<
   | 'inviteEnabled'
   | 'inviteDisabledReason'
   | 'canApprove'
+  | 'approveButtonLabel'
   | 'approveLoading'
   | 'onApprove'
   | 'regenerateLoading'
+  | 'regenerateDisabled'
   | 'onRegenerate'
   | 'terminatePending'
 > & { onInvite: () => void; onOpenTerminateModal: () => void };
@@ -26,6 +29,7 @@ type Props = Pick<
 export function SimulationDetailHeader({
   simulationId,
   simulationStatus,
+  selectedScenarioStatusForDisplay,
   scenarioVersionLabel,
   scenarioIdLabel,
   scenarioLocked,
@@ -35,9 +39,11 @@ export function SimulationDetailHeader({
   inviteEnabled,
   inviteDisabledReason,
   canApprove,
+  approveButtonLabel,
   approveLoading,
   onApprove,
   regenerateLoading,
+  regenerateDisabled,
   onRegenerate,
   terminatePending,
   onOpenTerminateModal,
@@ -47,6 +53,7 @@ export function SimulationDetailHeader({
     <SimulationDetailHeaderCore
       simulationId={simulationId}
       simulationStatus={simulationStatus}
+      selectedScenarioStatusForDisplay={selectedScenarioStatusForDisplay}
       scenarioVersionLabel={scenarioVersionLabel}
       scenarioIdLabel={scenarioIdLabel}
       scenarioLocked={scenarioLocked}
@@ -56,9 +63,11 @@ export function SimulationDetailHeader({
       inviteEnabled={inviteEnabled}
       inviteDisabledReason={inviteDisabledReason}
       canApprove={canApprove}
+      approveButtonLabel={approveButtonLabel}
       approveLoading={approveLoading}
       onApprove={onApprove}
       regenerateLoading={regenerateLoading}
+      regenerateDisabled={regenerateDisabled}
       onRegenerate={onRegenerate}
       terminatePending={terminatePending}
       onOpenTerminateModal={onOpenTerminateModal}

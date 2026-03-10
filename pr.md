@@ -1,153 +1,123 @@
 # Title
 
-Issue #147: Codespaces unavailability fallback + integrity messaging alignment (Day 2/Day 3)
+Issue #134: Recruiter scenario version controls (regenerate + edit + versioned approval)
 
 ## TL;DR
 
-- Day 2/Day 3 workspace flow now degrades gracefully when Codespaces init/status cannot reach ready state.
-- Added a reusable `CodespaceFallbackPanel` with copyable repo URL + local clone/test/push checklist.
-- Retry behavior is explicit (`init` retry vs status retry), and fallback guidance is preserved when retries fail again.
-- Integrity messaging now uses one shared sentence across surfaces to avoid overclaiming enforcement.
-- Manual QA for Issue #147 is complete and PASS with artifact-backed Playwright verification across scenarios A-G.
+Issue #134 is PR-ready. Recruiter simulation detail now supports version-aware regenerate, edit, and approve flows with selected-version as the source of truth, honest handling of non-canonical historical versions, and final live QA evidence passing all required runtime checks.
 
 ## Problem
 
-Candidates could get blocked when Codespaces policies or runtime availability prevented initialization, with no clear local path shown in the UI.
-
-Prior copy also risked implying stronger enforcement than what we actually enforce. The product model is commit-time based, so copy must explicitly state that only pushed commits before cutoff are evaluated.
+Recruiters need to iterate on scenarios before inviting candidates: regenerate new versions, make targeted edits, compare versions, and approve exactly the intended version. The UI also needed to enforce lock rules and avoid implying historical content availability that backend does not currently provide for non-active versions.
 
 ## What changed
 
-- Added reusable `CodespaceFallbackPanel` for compact local fallback guidance.
-- Added deterministic codespace availability handling (`ready` / `not_ready` / `unavailable` / `error`) derived from status payloads, codespace state signals, and error codes/messages.
-- Implemented explicit retry semantics:
-  - init-path fallback retries call `init` again.
-  - status-path fallback retries call status refresh.
-- Preserved fallback state after retry failures (retry no longer hides guidance permanently if the next attempt fails).
-- Gated actionable fallback instructions on `repoUrl` availability.
-- Updated shared integrity copy constant and reused it in candidate and recruiter integrity callouts.
+- Added versioned scenario controls in `/dashboard/simulations/[id]`.
+- Added `ScenarioVersionSelector` with per-version status and lock/availability cues.
+- Added regenerate UX with confirmation modal and generating lifecycle display.
+- Added scenario editor for `storylineMd`, `taskPrompts`, and `rubric` PATCH updates.
+- Wired version-specific approval to selected version ID.
+- Enforced lock semantics in UI and non-blocking `409 SCENARIO_LOCKED` handling.
+- Updated scenario status presentation to stay truthful for local-only/unavailable selected versions.
+- Kept observability metadata-only; no scenario body content is logged.
 
-## Behavior details
+## Acceptance criteria coverage
 
-- Immediate fallback on init failure:
-  - If init returns terminal/unavailable/error during initial load, fallback is shown immediately.
-- Persistent `not_ready` threshold:
-  - Fallback appears after `3` consecutive `not_ready` checks with `4000ms` poll interval.
-- Non-actionable retry state when repo identity is incomplete:
-  - If fallback is triggered before `repoUrl` is available, UI shows a compact retry-only state (`Codespaces unavailable, repo details still loading`) rather than clone commands.
-  - Once `repoUrl` is available, actionable clone instructions are shown.
-- Exact integrity message now used:
-  - "You may work offline/locally, but only commits pushed to the official repo before cutoff are evaluated."
+- AC1 Regenerate creates new version and shows generating
+  - Covered via regenerate confirm flow, local optimistic version seed, and visible `Generating vN...` state.
+- AC2 Generated version reconciles correctly after completion
+  - Covered via job polling and reconcile refresh; generating clears without reload after terminal job completion.
+- AC3 Editable version updates preview
+  - Covered via editor save (`PATCH`) and local/remote refresh showing updated scenario content.
+- AC4 Locked version is read-only and 409 handled non-blockingly
+  - Covered via UI disable rules plus non-blocking lock banner on `409 SCENARIO_LOCKED`.
+- AC5 Approval uses selected version only
+  - Covered via selected-version approve endpoint path; no legacy activate flow used for approval.
+
+## Key implementation details
+
+- Selected version as source of truth
+  - `selectedScenarioVersionId` drives preview, editor state, and approval target.
+- Regenerate flow + polling/reconciliation
+  - `POST regenerate` seeds local generating version, then polls job status and reconciles to backend state.
+- Truthful non-canonical historical/local-only handling
+  - `contentAvailability` distinguishes `canonical`, `local_only`, and `unavailable`; non-canonical versions are treated honestly.
+- Editor dirty draft preservation
+  - Drafts are preserved per version in-session across version switches.
+- Lock semantics / `SCENARIO_LOCKED`
+  - Locked versions cannot be edited or approved; `409` shows a non-blocking warning banner.
+- Selected-version approval endpoint
+  - Approval posts to selected version path, not a simulation-level fallback.
+- Page-level status/CTA consistency fix for local-only/unavailable selected versions
+  - Page badges and CTAs now reflect selected-version truthfully, avoiding contradictory "ready" signals when selected content is local-only/unavailable.
+
+## Backend contract alignment
+
+Confirmed endpoints:
+
+- `POST /api/simulations/{id}/scenario/regenerate`
+- `PATCH /api/simulations/{id}/scenario/{scenarioVersionId}`
+- `POST /api/simulations/{id}/scenario/{scenarioVersionId}/approve`
+
+Confirmed backend limitation:
+
+- Backend does not currently provide canonical non-active historical scenario content payload/endpoint.
+- Frontend now degrades honestly for non-canonical historical versions rather than implying canonical preview/edit availability.
 
 ## Testing
 
-Targeted tests added/updated:
+Documentation pass note: no tests were re-run in this pass; this section reflects the latest approved evidence.
 
-- `tests/unit/features/candidate/session/task/WorkspacePanel.codespaceFallback.test.tsx`
-- `tests/unit/features/candidate/session/task/CodespaceFallbackPanel.test.tsx`
-- `tests/unit/features/candidate/session/task/WorkspacePanel.test.tsx`
-- `tests/unit/shared/ui/IntegrityCallout.test.tsx`
-- `tests/unit/features/recruiter/candidate-submissions/ArtifactCard.test.tsx`
-- `tests/unit/lib/api/candidate.test.ts`
+- Lint: PASS (`npm run lint`)
+- Typecheck: PASS (`npm run typecheck`)
+- Targeted tests: PASS
+  - Command:
+    - `npm test -- --runInBand tests/integration/recruiter/SimulationDetailScenarioVersions.test.tsx tests/integration/recruiter/SimulationDetailPageClient.test.tsx tests/unit/features/recruiter/api/simulationLifecycle.test.ts tests/unit/features/recruiter/simulation-detail/RecruiterSimulationDetailPage.helpers.test.ts`
+  - Result summary:
+    - `4` suites passed, `50` tests passed, `0` failed.
 
-Automated checks run:
+## Manual QA
 
-- `npm run lint` -> PASS
-- `npm run typecheck` -> PASS
-- `npm test` -> PASS (`238` suites, `1479` tests)
-- `npm run build` -> PASS
+Final approved live QA pass completed and accepted.
 
-Precommit note:
+- QA bundle path: `.qa/issue134/manual_qa_20260310_1252/`
+- Final verdict: `PASS` (see `.qa/issue134/manual_qa_20260310_1252/artifacts/final_verdict.json`)
+- Runtime method: live frontend + backend + worker in `TENON_ENV=test` against isolated SQLite DB.
+- Runtime verifications proven:
+  - generating state clears without reload after terminal job completion
+  - selected local-only state remains truthful
+  - no page-level badge contradiction
+  - CTA state remains truthful for selected local-only version
+  - selected-version approval smoke passes
+  - lock `409 SCENARIO_LOCKED` smoke passes non-blockingly
 
-- `precommit.sh` includes lint/test/typecheck/build; build parity was verified directly with `npm run build`.
+## QA results
 
-Manual QA:
+- Final QA verdict: `PASS`
+- Final approved evidence bundle: `.qa/issue134/manual_qa_20260310_1252/`
+- Core evidence:
+  - `.qa/issue134/manual_qa_20260310_1252/QA_REPORT.md`
+  - `.qa/issue134/manual_qa_20260310_1252/artifacts/qa_result.json`
+  - `.qa/issue134/manual_qa_20260310_1252/artifacts/critical_evidence.json`
+  - `.qa/issue134/manual_qa_20260310_1252/artifacts/final_verdict.json`
+  - `.qa/issue134/manual_qa_20260310_1252/artifacts/targeted_tests.log`
 
-- PASS (see `Manual QA / Verification` section below for runtime method, scenario matrix, and artifacts).
+## Screenshots / evidence
 
-## Manual QA / Verification
+- `.qa/issue134/manual_qa_20260310_1252/screenshots/03_A_generating_state_visible.png`
+- `.qa/issue134/manual_qa_20260310_1252/screenshots/04_A_post_terminal_generating_cleared.png`
+- `.qa/issue134/manual_qa_20260310_1252/screenshots/05_B_badge_consistency_state.png`
+- `.qa/issue134/manual_qa_20260310_1252/screenshots/06_B_cta_truthful_state.png`
+- `.qa/issue134/manual_qa_20260310_1252/screenshots/08_C_approval_selected_version_only.png`
+- `.qa/issue134/manual_qa_20260310_1252/screenshots/09_C_lock_409_nonblocking_banner.png`
 
-Verdict: PASS
+## Risks / follow-ups
 
-Runtime method:
+- Non-blocking backend follow-up: expose canonical non-active historical scenario content to support full historical parity.
+- Non-blocking wording nuance: selector chip copy for local-only/unavailable states can be further tuned for recruiter readability.
 
-- Real localhost frontend + backend runtime.
-- Playwright Chromium verification.
-- Targeted route interception for deterministic Codespaces failure/edge states:
-  - `POST /api/backend/tasks/{task_id}/codespace/init`
-  - `GET /api/backend/tasks/{task_id}/codespace/status`
+## Reviewer notes
 
-Environment:
-
-- Frontend branch/commit:
-  - `feature/codespaces-policy-constraints-messaging-fallback-instructions-when-unavailable-147`
-  - `d4b90a8dcc9d0cb738662e6e41e7b203b910bb13`
-- Backend branch/commit:
-  - `main`
-  - `24cec485e921fbef88d5220be9d211c037905395`
-- Ports:
-  - frontend `127.0.0.1:3000`
-  - backend `127.0.0.1:8000`
-  - JWKS `127.0.0.1:8787`
-- Browser/runtime:
-  - Playwright Chromium `1.57.0`
-
-Scenario matrix:
-
-- Scenario A (baseline ready path): PASS
-- Scenario B (init failure with no repo identity): PASS
-- Scenario C (persistent `not_ready` with repo URL): PASS
-- Scenario D (ready before threshold): PASS
-- Scenario E (retry after init failure recovers): PASS
-- Scenario F (retry failure preserves fallback guidance): PASS
-- Scenario G (Day 2/Day 3 integrity copy consistency): PASS
-
-Key verified behaviors:
-
-- Candidate is not blocked when Codespaces is unavailable.
-- Actionable fallback appears only when `repoUrl` exists.
-- Non-actionable retry-only state appears when repo details are unavailable.
-- Retry semantics are correct for both init retry and status retry paths.
-- Day 2 and Day 3 both show the exact required sentence:
-  - "You may work offline/locally, but only commits pushed to the official repo before cutoff are evaluated."
-
-## Files of interest
-
-- `src/features/candidate/session/task/components/CodespaceFallbackPanel.tsx`
-- `src/features/candidate/session/task/components/WorkspacePanel.tsx`
-- `src/features/candidate/session/task/hooks/useWorkspaceStatus.ts`
-- `src/features/candidate/session/task/utils/codespaceAvailability.ts`
-- `src/features/candidate/session/task/utils/loadWorkspaceStatus.ts`
-- `src/lib/copy/integrity.ts`
-- `src/shared/ui/IntegrityCallout.tsx`
-- `tests/unit/features/candidate/session/task/WorkspacePanel.codespaceFallback.test.tsx`
-- `tests/unit/features/candidate/session/task/CodespaceFallbackPanel.test.tsx`
-
-## Risks / rollout notes
-
-- Telemetry is currently non-PII `console.info` via `[candidate:codespace_fallback_shown]`.
-- Fallback threshold is currently `3` polls at `4000ms`; this is intentionally conservative for MVP and may need tuning with real usage.
-- Recruiter-facing copy alignment is intentional because integrity copy is shared (`OFFICIAL_REPO_CUTOFF_COPY`).
-
-## Screenshots / Evidence
-
-- Evidence bundle folder (local QA artifacts):
-  - `.qa/issue147/manual_qa_20260309_192344/`
-- Main report:
-  - `.qa/issue147/manual_qa_20260309_192344/QA_REPORT.md`
-- Structured result artifact:
-  - `.qa/issue147/manual_qa_20260309_192344/artifacts/issue147_playwright_result.json`
-- Representative screenshots:
-  - `01_A_happy_path_day2_ready.png`
-  - `02_B_init_failure_no_repo_identity.png`
-  - `03_C_before_threshold_no_fallback.png`
-  - `04_C_after_threshold_actionable_fallback.png`
-  - `05_D_ready_before_threshold.png`
-  - `07_E_retry_recovered_ready.png`
-  - `09_F_retry_failed_fallback_persists.png`
-  - `10_G_day2_integrity_copy.png`
-  - `11_G_day3_integrity_copy.png`
-
-Note:
-
-- Artifacts above are local repository evidence; no external sanitized/shareable bundle is claimed in this PR note.
+- This is a documentation-only finalization pass; no product code changed.
+- Frontend behavior intentionally does not overclaim backend historical content capabilities.
+- Issue #134 is PR-ready based on the final approved live QA pass.

@@ -282,6 +282,8 @@ describe('RecruiterSimulationDetailPage helpers', () => {
     const detail = __testables.normalizeSimulationDetailPreview({
       id: 7,
       status: 'generating',
+      activeScenarioVersionId: 10,
+      pendingScenarioVersionId: 11,
       seniority: 'mid',
       companyContext: { domain: 'Fintech', productArea: 'Payments' },
       scenario: {
@@ -289,7 +291,16 @@ describe('RecruiterSimulationDetailPage helpers', () => {
         versionIndex: 2,
         status: 'generating',
         lockedAt: '2026-03-01T00:00:00.000Z',
-        storyline: 'Generated storyline',
+        storylineMd: 'Generated storyline',
+        taskPromptsJson: [
+          {
+            dayIndex: 1,
+            title: 'Day 1',
+            description: 'Prompt',
+          },
+        ],
+        rubricJson: { dimensions: [] },
+        notes: 'Scenario note',
       },
       scenarioJob: {
         jobId: 'job-123',
@@ -302,13 +313,49 @@ describe('RecruiterSimulationDetailPage helpers', () => {
     expect(detail.status).toBe('generating');
     expect(detail.level).toBe('mid');
     expect(detail.companyContext).toContain('Fintech');
+    expect(detail.activeScenarioVersionId).toBe('10');
+    expect(detail.pendingScenarioVersionId).toBe('11');
     expect(detail.scenarioVersion.id).toBe('10');
     expect(detail.scenarioVersion.versionIndex).toBe(2);
     expect(detail.scenarioVersion.isLocked).toBe(true);
+    expect(detail.scenarioVersion.contentAvailability).toBe('canonical');
+    expect(detail.storyline).toBe('Generated storyline');
+    expect(detail.taskPromptsJson).toEqual([
+      {
+        dayIndex: 1,
+        title: 'Day 1',
+        description: 'Prompt',
+      },
+    ]);
+    expect(detail.rubricJson).toEqual({ dimensions: [] });
+    expect(detail.notes).toBe('Scenario note');
     expect(detail.generationJob?.jobId).toBe('job-123');
     expect(__testables.scenarioVersionLabel(2)).toBe('v2');
     expect(__testables.scenarioVersionLabel(null)).toBe('v—');
     expect(__testables.isPreviewGenerating(detail)).toBe(true);
     expect(__testables.isPreviewEmpty(detail)).toBe(false);
+  });
+
+  it('marks historical metadata-only versions as unavailable content', () => {
+    const detail = __testables.normalizeSimulationDetailPreview({
+      id: 77,
+      status: 'ready_for_review',
+      activeScenarioVersionId: 10,
+      scenarioVersions: [
+        { id: 10, versionIndex: 1, status: 'ready', lockedAt: null },
+        { id: 11, versionIndex: 2, status: 'ready', lockedAt: null },
+      ],
+      scenario: {
+        id: 10,
+        versionIndex: 1,
+        status: 'ready',
+      },
+      tasks: [{ dayIndex: 1, title: 'Day 1' }],
+    });
+
+    const v1 = detail.scenarioVersions.find((version) => version.id === '10');
+    const v2 = detail.scenarioVersions.find((version) => version.id === '11');
+    expect(v1?.contentAvailability).toBe('canonical');
+    expect(v2?.contentAvailability).toBe('unavailable');
   });
 });
