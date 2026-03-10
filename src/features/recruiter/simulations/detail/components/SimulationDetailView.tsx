@@ -1,6 +1,7 @@
 'use client';
 import dynamic from 'next/dynamic';
 import { CandidatesSection } from './sections/CandidatesSection';
+import { ScenarioControlsSection } from './ScenarioControlsSection';
 import { SimulationPlanSection } from './SimulationPlanSection';
 import { SimulationDetailHeader } from './SimulationDetailHeader';
 import { useInviteModalActions } from './InviteModalActions';
@@ -35,6 +36,9 @@ export function SimulationDetailView(props: SimulationDetailViewProps) {
       <SimulationDetailHeader
         simulationId={props.simulationId}
         simulationStatus={props.simulationStatus}
+        selectedScenarioStatusForDisplay={
+          props.selectedScenarioStatusForDisplay
+        }
         scenarioVersionLabel={props.scenarioVersionLabel}
         scenarioIdLabel={props.scenarioIdLabel}
         scenarioLocked={props.scenarioLocked}
@@ -44,17 +48,37 @@ export function SimulationDetailView(props: SimulationDetailViewProps) {
         inviteEnabled={props.inviteEnabled}
         inviteDisabledReason={props.inviteDisabledReason}
         canApprove={props.canApprove}
+        approveButtonLabel={props.approveButtonLabel}
         approveLoading={props.approveLoading}
         onApprove={props.onApprove}
         regenerateLoading={props.regenerateLoading}
+        regenerateDisabled={props.regenerateDisabled}
         onRegenerate={props.onRegenerate}
         terminatePending={props.terminatePending}
         onOpenTerminateModal={() => props.setTerminateModalOpen(true)}
         onInvite={openInviteModal}
       />
       <CleanupInProgressPanel cleanupJobIds={props.cleanupJobIds} />
+      <ScenarioControlsSection
+        versions={props.scenarioVersions}
+        selectedVersionId={props.selectedScenarioVersionId}
+        onSelectVersion={props.onSelectScenarioVersion}
+        selectedVersion={props.selectedScenarioVersion}
+        previousVersion={props.previousScenarioVersion}
+        lockBannerMessage={props.scenarioLockBannerMessage}
+        contentUnavailableMessage={props.scenarioContentUnavailableMessage}
+        generatingLabel={props.scenarioGeneratingLabel}
+        editorDisabled={props.scenarioEditorDisabled}
+        editorDisabledReason={props.scenarioEditorDisabledReason}
+        editorSaving={props.scenarioEditorSaving}
+        editorSaveError={props.scenarioEditorSaveError}
+        editorFieldErrors={props.scenarioEditorFieldErrors}
+        editorDraft={props.scenarioEditorDraft}
+        onEditorDraftChange={props.onScenarioEditorDraftChange}
+        onSave={props.onSaveScenarioEdits}
+      />
       <SimulationPlanSection
-        status={props.simulationStatus}
+        status={props.selectedScenarioStatusForDisplay}
         scenarioVersionLabel={props.scenarioVersionLabel}
         scenarioIdLabel={props.scenarioIdLabel}
         scenarioLocked={props.scenarioLocked}
@@ -66,6 +90,9 @@ export function SimulationDetailView(props: SimulationDetailViewProps) {
         companyContextLabel={props.companyContextLabel}
         scenarioLabel={props.scenarioLabel}
         rubricSummary={props.rubricSummary}
+        contentUnavailableMessage={
+          props.scenarioContentUnavailableMessageForPlan
+        }
         planDays={props.planDays}
         loading={props.planLoading}
         statusCode={props.planStatusCode}

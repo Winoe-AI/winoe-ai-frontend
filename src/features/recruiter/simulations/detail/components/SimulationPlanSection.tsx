@@ -19,6 +19,7 @@ type Props = {
   companyContextLabel: string;
   scenarioLabel: string | null;
   rubricSummary: string | null;
+  contentUnavailableMessage: string | null;
   planDays: { dayIndex: number; task: SimulationPlan['days'][number] | null }[];
   loading: boolean;
   statusCode: number | null;
@@ -45,6 +46,7 @@ export function SimulationPlanSection({
   companyContextLabel,
   scenarioLabel,
   rubricSummary,
+  contentUnavailableMessage,
   planDays,
   loading,
   statusCode,
@@ -94,7 +96,9 @@ export function SimulationPlanSection({
               onRetryGenerate={onRetryGenerate}
             />
           ) : null}
-          {isEmptyScenario ? (
+          {contentUnavailableMessage ? (
+            <ContentUnavailable message={contentUnavailableMessage} />
+          ) : isEmptyScenario ? (
             <EmptyScenario
               loading={retryGenerateLoading}
               onRetryGenerate={onRetryGenerate}
@@ -240,6 +244,13 @@ const EmptyScenario = ({
         Retry generate
       </Button>
     </div>
+  </div>
+);
+
+const ContentUnavailable = ({ message }: { message: string }) => (
+  <div className="rounded border border-gray-200 bg-gray-50 p-3 text-sm text-gray-700">
+    <p className="font-medium text-gray-900">Scenario content unavailable.</p>
+    <p className="mt-1 text-gray-600">{message}</p>
   </div>
 );
 

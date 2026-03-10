@@ -5,10 +5,12 @@ import { InlineBadge } from '@/shared/ui/InlineBadge';
 import PageHeader from '@/shared/ui/PageHeader';
 import { StatusPill } from '@/shared/ui/StatusPill';
 import { statusMeta } from '@/shared/status/statusMeta';
+import { RegenerateScenarioButton } from '../scenario';
 
 type Props = {
   simulationId: string;
   simulationStatus: string | null;
+  selectedScenarioStatusForDisplay: string | null;
   scenarioVersionLabel: string;
   scenarioIdLabel: string | null;
   scenarioLocked: boolean;
@@ -18,9 +20,11 @@ type Props = {
   inviteEnabled: boolean;
   inviteDisabledReason: string | null;
   canApprove: boolean;
+  approveButtonLabel: string;
   approveLoading: boolean;
   onApprove: () => void;
   regenerateLoading: boolean;
+  regenerateDisabled: boolean;
   onRegenerate: () => void;
   terminatePending: boolean;
   onOpenTerminateModal: () => void;
@@ -38,6 +42,7 @@ function lockLabel(locked: boolean, lockedAt: string | null): string {
 export function SimulationDetailHeaderCore({
   simulationId,
   simulationStatus,
+  selectedScenarioStatusForDisplay,
   scenarioVersionLabel,
   scenarioIdLabel,
   scenarioLocked,
@@ -47,15 +52,20 @@ export function SimulationDetailHeaderCore({
   inviteEnabled,
   inviteDisabledReason,
   canApprove,
+  approveButtonLabel,
   approveLoading,
   onApprove,
   regenerateLoading,
+  regenerateDisabled,
   onRegenerate,
   terminatePending,
   onOpenTerminateModal,
   onInvite,
 }: Props) {
-  const status = statusMeta(simulationStatus ?? 'draft', 'Unknown');
+  const status = statusMeta(
+    selectedScenarioStatusForDisplay ?? simulationStatus ?? 'draft',
+    'Unknown',
+  );
 
   return (
     <div className="flex flex-col gap-3">
@@ -72,17 +82,15 @@ export function SimulationDetailHeaderCore({
               loading={approveLoading}
               disabled={!canApprove}
             >
-              Approve / Activate inviting
+              {approveButtonLabel}
             </Button>
           ) : null}
-          <Button
-            onClick={onRegenerate}
-            size="sm"
-            variant="secondary"
+          <RegenerateScenarioButton
             loading={regenerateLoading}
-          >
-            Regenerate scenario
-          </Button>
+            disabled={regenerateDisabled}
+            currentVersionLabel={scenarioVersionLabel}
+            onConfirm={onRegenerate}
+          />
           <Button
             onClick={onInvite}
             size="sm"
