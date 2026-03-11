@@ -15,5 +15,8 @@ describe('next.config headers', () => {
     expect(csp?.value).toContain("object-src 'none'");
     expect(csp?.value).toContain("frame-src 'none'");
     expect(csp?.value).toContain("frame-ancestors 'none'");
+    expect(csp?.value).toContain('media-src');
+    expect(csp?.value).toContain('blob:');
+    expect(csp?.value).toContain('http://127.0.0.1:9000');
   });
 });

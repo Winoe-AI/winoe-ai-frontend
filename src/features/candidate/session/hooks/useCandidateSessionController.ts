@@ -128,7 +128,8 @@ export function useCandidateSessionController(token: string) {
   });
   const unlockRefreshRef = useRef<string | null>(null);
   const candidateSessionId = state.candidateSessionId ?? null;
-  const currentTaskId = state.taskState.currentTask?.id ?? null;
+  const currentTask = state.taskState.currentTask;
+  const currentTaskId = currentTask?.id ?? null;
 
   const clearScheduleErrors = useCallback(() => {
     setScheduleDateError(null);
@@ -480,12 +481,14 @@ export function useCandidateSessionController(token: string) {
 
   const handleStart = useCallback(() => {
     session.setStarted(true);
-    if (!state.taskState.currentTask) {
+    if (!currentTask) {
       void actions.fetchCurrentTask().catch(() => setView('error'));
     }
-  }, [actions, session, state.taskState.currentTask]);
+  }, [actions, currentTask, session]);
 
-  const derived = useCandidateDerivedInfo(state, errorStatus, errorMessage);
+  const derived = useCandidateDerivedInfo(state, errorStatus, errorMessage, {
+    currentTask,
+  });
 
   const windowState = useWindowState({
     dayWindows: state.bootstrap?.dayWindows,
@@ -504,8 +507,7 @@ export function useCandidateSessionController(token: string) {
     currentTaskId !== null && lastSubmissionTaskId === currentTaskId
       ? { submittedAt: lastSubmissionAt, submissionId: lastSubmissionId }
       : null;
-  const canonicalSubmission =
-    state.taskState.currentTask?.recordedSubmission ?? null;
+  const canonicalSubmission = currentTask?.recordedSubmission ?? null;
   const canonicalSubmissionId = canonicalSubmission?.submissionId ?? null;
   const canonicalSubmittedAt = canonicalSubmission?.submittedAt ?? null;
   const storedSubmission =
@@ -531,7 +533,7 @@ export function useCandidateSessionController(token: string) {
 
   const resolvedView: ViewState =
     (view === 'loading' || view === 'starting') &&
-    (state.taskState.isComplete || state.taskState.currentTask)
+    (state.taskState.isComplete || currentTask)
       ? 'running'
       : view;
 

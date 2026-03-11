@@ -11,8 +11,14 @@ export function useCandidateDerivedInfo(
   state: CandidateSessionState,
   errorStatus: number | null,
   errorMessage: string | null,
+  options?: {
+    currentTask?: CandidateSessionState['taskState']['currentTask'];
+  },
 ) {
-  const currentTask = state.taskState.currentTask;
+  const currentTask =
+    options && options.currentTask !== undefined
+      ? options.currentTask
+      : state.taskState.currentTask;
   const completedCount = state.taskState.completedTaskIds.length;
   const isComplete = state.taskState.isComplete;
   const currentDayIndex = useMemo(
@@ -24,7 +30,7 @@ export function useCandidateDerivedInfo(
     currentTask && (currentTask.dayIndex === 2 || currentTask.dayIndex === 3),
   );
   const showRecordingPanel =
-    currentTask?.dayIndex === 4 || currentTask?.type === 'handoff';
+    currentTask?.dayIndex === 4 && currentTask?.type !== 'handoff';
   const showDocsPanel =
     currentTask?.dayIndex === 5 || currentTask?.type === 'documentation';
   const resourceLink = useMemo(

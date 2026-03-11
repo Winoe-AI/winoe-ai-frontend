@@ -10,6 +10,7 @@ import { TaskPanelErrorBanner } from './components/TaskPanelErrorBanner';
 import { TaskActions } from './components/TaskActions';
 import { DraftSaveStatus } from './components/DraftSaveStatus';
 import { Day5ReflectionPanel } from './components/Day5ReflectionPanel';
+import { HandoffUploadPanel } from './handoff/HandoffUploadPanel';
 import { useTaskSubmitController } from './hooks/useTaskSubmitController';
 import { isDay5ReflectionTask } from './utils/day5Reflection';
 import type { WindowActionGate } from '../lib/windowState';
@@ -30,6 +31,17 @@ export default function CandidateTaskView(props: {
     disabledReason: null,
     comeBackAt: null,
   };
+  if (props.task.type === 'handoff') {
+    return (
+      <HandoffUploadPanel
+        key={props.task.id}
+        candidateSessionId={props.candidateSessionId}
+        task={props.task}
+        actionGate={actionGate}
+        onTaskWindowClosed={props.onTaskWindowClosed}
+      />
+    );
+  }
   if (isDay5ReflectionTask(props.task)) {
     return (
       <Day5ReflectionPanel

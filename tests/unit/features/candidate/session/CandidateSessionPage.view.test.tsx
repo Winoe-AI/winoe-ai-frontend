@@ -148,6 +148,7 @@ describe('CandidateSessionPage view rendering', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     window.localStorage.clear();
+    window.sessionStorage.clear();
     routerMock.push.mockReset();
     routerMock.replace.mockReset();
     resolveInviteMock.mockResolvedValue({
@@ -301,7 +302,7 @@ describe('CandidateSessionPage view rendering', () => {
     );
   });
 
-  it('shows recording panel for day 4 handoff and docs for day 5', async () => {
+  it('hides day 4 recording resource panel for handoff and still shows day 5 docs', async () => {
     useCandidateSessionMock.mockReturnValue(
       buildState({
         state: {
@@ -323,10 +324,9 @@ describe('CandidateSessionPage view rendering', () => {
     await act(async () => {
       render(<CandidateSessionPage token="inv" />);
     });
+    expect(screen.getByTestId('task-view')).toHaveTextContent('Handoff');
     await waitFor(() =>
-      expect(
-        screen.getByTestId('resource-day-4-recording'),
-      ).toBeInTheDocument(),
+      expect(screen.queryByTestId('resource-day-4-recording')).toBeNull(),
     );
 
     useCandidateSessionMock.mockReturnValue(
