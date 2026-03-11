@@ -22,6 +22,15 @@ jest.mock('@/features/candidate/api', () => {
   };
 });
 
+jest.mock(
+  '@/features/candidate/session/task/handoff/HandoffUploadPanel',
+  () => ({
+    HandoffUploadPanel: ({ task }: { task: { title: string } }) => (
+      <div data-testid="handoff-upload-panel">{task.title}</div>
+    ),
+  }),
+);
+
 describe('CandidateTaskView draft autosave integration', () => {
   const baseTask: Task = {
     id: 1,
@@ -220,6 +229,29 @@ describe('CandidateTaskView draft autosave integration', () => {
 
     expect(screen.getByRole('textbox')).toBeInTheDocument();
     expect(screen.queryByLabelText(/challenges/i)).toBeNull();
+  });
+
+  it('routes handoff tasks to dedicated upload panel', () => {
+    render(
+      <CandidateTaskView
+        candidateSessionId={22}
+        task={{
+          ...baseTask,
+          id: 44,
+          dayIndex: 4,
+          type: 'handoff',
+          title: 'Handoff upload',
+        }}
+        submitting={false}
+        submitError={null}
+        onSubmit={jest.fn()}
+      />,
+    );
+
+    expect(screen.getByTestId('handoff-upload-panel')).toHaveTextContent(
+      'Handoff upload',
+    );
+    expect(screen.queryByRole('textbox')).toBeNull();
   });
 
   it('keeps non-day5 reflection-like documentation tasks on the generic text panel', async () => {

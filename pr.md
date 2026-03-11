@@ -1,123 +1,74 @@
 # Title
 
-Issue #134: Recruiter scenario version controls (regenerate + edit + versioned approval)
+Issue #140: Day 4 handoff video upload + persisted preview + transcript UI
 
 ## TL;DR
 
-Issue #134 is PR-ready. Recruiter simulation detail now supports version-aware regenerate, edit, and approve flows with selected-version as the source of truth, honest handling of non-canonical historical versions, and final live QA evidence passing all required runtime checks.
+- Added and wired `HandoffUploadPanel` for Day 4 handoff tasks, replacing the prior link-only Day 4 behavior.
+- Implemented signed URL upload flow (`init` -> direct-to-storage upload -> `complete`) with immediate local preview.
+- Added persisted preview hydration from backend `recording.downloadUrl` plus transcript processing/ready rendering (`progress`, `text`, `segments`).
+- Preserved cutoff/window-closed behavior and retry safety (stale-attempt guard and object URL cleanup).
 
 ## Problem
 
-Recruiters need to iterate on scenarios before inviting candidates: regenerate new versions, make targeted edits, compare versions, and approve exactly the intended version. The UI also needed to enforce lock rules and avoid implying historical content availability that backend does not currently provide for non-active versions.
+Day 4 previously relied on prompt-linked resource URLs and did not provide an end-to-end upload flow, preview/resubmit UX, or transcript processing/ready UI.
 
 ## What changed
 
-- Added versioned scenario controls in `/dashboard/simulations/[id]`.
-- Added `ScenarioVersionSelector` with per-version status and lock/availability cues.
-- Added regenerate UX with confirmation modal and generating lifecycle display.
-- Added scenario editor for `storylineMd`, `taskPrompts`, and `rubric` PATCH updates.
-- Wired version-specific approval to selected version ID.
-- Enforced lock semantics in UI and non-blocking `409 SCENARIO_LOCKED` handling.
-- Updated scenario status presentation to stay truthful for local-only/unavailable selected versions.
-- Kept observability metadata-only; no scenario body content is logged.
+- Added `HandoffUploadPanel` in `src/features/candidate/session/task/handoff/*` and routed `task.type === "handoff"` through it in `CandidateTaskView`.
+- Wired signed URL upload flow:
+  - `POST /api/tasks/{task_id}/handoff/upload/init`
+  - Direct file upload to object storage signed URL with progress
+  - `POST /api/tasks/{task_id}/handoff/upload/complete`
+- Hydrated persisted preview from backend status `recording.downloadUrl`, while keeping immediate local blob preview post-upload.
+- Rendered transcript states end-to-end:
+  - Processing state with progress badge
+  - Ready state with full transcript text
+  - Timestamped segment list in a scrollable container
+  - Truthful fallback when status is ready but text/segments are empty
+- Updated handoff state machine to track preview source (`local` vs `persisted`), transcript payload fields, and safe hydration transitions.
+- Preserved robustness behavior:
+  - Retry and refresh flows
+  - Stale upload-attempt protection
+  - Object URL revoke/cleanup on replace and unmount
+  - Cutoff enforcement and `TASK_WINDOW_CLOSED` handling
+  - Non-failing degradation when persisted preview URL is temporarily unavailable
 
-## Acceptance criteria coverage
+## API / contract notes
 
-- AC1 Regenerate creates new version and shows generating
-  - Covered via regenerate confirm flow, local optimistic version seed, and visible `Generating vN...` state.
-- AC2 Generated version reconciles correctly after completion
-  - Covered via job polling and reconcile refresh; generating clears without reload after terminal job completion.
-- AC3 Editable version updates preview
-  - Covered via editor save (`PATCH`) and local/remote refresh showing updated scenario content.
-- AC4 Locked version is read-only and 409 handled non-blockingly
-  - Covered via UI disable rules plus non-blocking lock banner on `409 SCENARIO_LOCKED`.
-- AC5 Approval uses selected version only
-  - Covered via selected-version approve endpoint path; no legacy activate flow used for approval.
+Frontend now relies on the approved backend handoff-status patch that added:
 
-## Key implementation details
+- `recording.downloadUrl`
+- `transcript.text`
+- `transcript.segments`
 
-- Selected version as source of truth
-  - `selectedScenarioVersionId` drives preview, editor state, and approval target.
-- Regenerate flow + polling/reconciliation
-  - `POST regenerate` seeds local generating version, then polls job status and reconciles to backend state.
-- Truthful non-canonical historical/local-only handling
-  - `contentAvailability` distinguishes `canonical`, `local_only`, and `unavailable`; non-canonical versions are treated honestly.
-- Editor dirty draft preservation
-  - Drafts are preserved per version in-session across version switches.
-- Lock semantics / `SCENARIO_LOCKED`
-  - Locked versions cannot be edited or approved; `409` shows a non-blocking warning banner.
-- Selected-version approval endpoint
-  - Approval posts to selected version path, not a simulation-level fallback.
-- Page-level status/CTA consistency fix for local-only/unavailable selected versions
-  - Page badges and CTAs now reflect selected-version truthfully, avoiding contradictory "ready" signals when selected content is local-only/unavailable.
+Frontend consumes these candidate handoff status fields:
 
-## Backend contract alignment
+- `recording.downloadUrl`
+- `transcript.status`
+- `transcript.progress`
+- `transcript.text`
+- `transcript.segments`
 
-Confirmed endpoints:
+## Testing / QA
 
-- `POST /api/simulations/{id}/scenario/regenerate`
-- `PATCH /api/simulations/{id}/scenario/{scenarioVersionId}`
-- `POST /api/simulations/{id}/scenario/{scenarioVersionId}/approve`
+Final strict manual/runtime QA for Issue #140: PASS.
 
-Confirmed backend limitation:
-
-- Backend does not currently provide canonical non-active historical scenario content payload/endpoint.
-- Frontend now degrades honestly for non-canonical historical versions rather than implying canonical preview/edit availability.
-
-## Testing
-
-Documentation pass note: no tests were re-run in this pass; this section reflects the latest approved evidence.
-
-- Lint: PASS (`npm run lint`)
-- Typecheck: PASS (`npm run typecheck`)
-- Targeted tests: PASS
-  - Command:
-    - `npm test -- --runInBand tests/integration/recruiter/SimulationDetailScenarioVersions.test.tsx tests/integration/recruiter/SimulationDetailPageClient.test.tsx tests/unit/features/recruiter/api/simulationLifecycle.test.ts tests/unit/features/recruiter/simulation-detail/RecruiterSimulationDetailPage.helpers.test.ts`
-  - Result summary:
-    - `4` suites passed, `50` tests passed, `0` failed.
-
-## Manual QA
-
-Final approved live QA pass completed and accepted.
-
-- QA bundle path: `.qa/issue134/manual_qa_20260310_1252/`
-- Final verdict: `PASS` (see `.qa/issue134/manual_qa_20260310_1252/artifacts/final_verdict.json`)
-- Runtime method: live frontend + backend + worker in `TENON_ENV=test` against isolated SQLite DB.
-- Runtime verifications proven:
-  - generating state clears without reload after terminal job completion
-  - selected local-only state remains truthful
-  - no page-level badge contradiction
-  - CTA state remains truthful for selected local-only version
-  - selected-version approval smoke passes
-  - lock `409 SCENARIO_LOCKED` smoke passes non-blockingly
-
-## QA results
-
-- Final QA verdict: `PASS`
-- Final approved evidence bundle: `.qa/issue134/manual_qa_20260310_1252/`
-- Core evidence:
-  - `.qa/issue134/manual_qa_20260310_1252/QA_REPORT.md`
-  - `.qa/issue134/manual_qa_20260310_1252/artifacts/qa_result.json`
-  - `.qa/issue134/manual_qa_20260310_1252/artifacts/critical_evidence.json`
-  - `.qa/issue134/manual_qa_20260310_1252/artifacts/final_verdict.json`
-  - `.qa/issue134/manual_qa_20260310_1252/artifacts/targeted_tests.log`
-
-## Screenshots / evidence
-
-- `.qa/issue134/manual_qa_20260310_1252/screenshots/03_A_generating_state_visible.png`
-- `.qa/issue134/manual_qa_20260310_1252/screenshots/04_A_post_terminal_generating_cleared.png`
-- `.qa/issue134/manual_qa_20260310_1252/screenshots/05_B_badge_consistency_state.png`
-- `.qa/issue134/manual_qa_20260310_1252/screenshots/06_B_cta_truthful_state.png`
-- `.qa/issue134/manual_qa_20260310_1252/screenshots/08_C_approval_selected_version_only.png`
-- `.qa/issue134/manual_qa_20260310_1252/screenshots/09_C_lock_409_nonblocking_banner.png`
+- Runtime method used real localhost services and browser automation: frontend `http://127.0.0.1:3000`, backend `http://127.0.0.1:8000`, Playwright, and local MinIO (`127.0.0.1:9000`) for signed upload flow.
+- Verified in strict runtime QA:
+  - Day 4 handoff upload flow passes end-to-end with preview.
+  - Persisted preview works after revisit/reload.
+  - No-tamper progression holds: Day 4 remains current/actionable until Day 5 opens.
+  - Resubmit works until cutoff; cutoff closure is enforced with clean `TASK_WINDOW_CLOSED` handling.
+  - Signed URL console/UI leakage regression is not present in this QA evidence (leak checks PASS).
+- Evidence source: `.qa/issue140/manual_qa_20260311_1717/QA_REPORT.md` and `.qa/issue140/manual_qa_20260311_1717/artifacts/qa_result_final.json` (with Day 4 no-tamper proof in `.qa/issue140/manual_qa_20260311_1717/artifacts/day4_no_tamper_current_task_proof.json`).
+- Internal-only note: the raw QA evidence bundle is internal and should not be shared publicly as-is.
 
 ## Risks / follow-ups
 
-- Non-blocking backend follow-up: expose canonical non-active historical scenario content to support full historical parity.
-- Non-blocking wording nuance: selector chip copy for local-only/unavailable states can be further tuned for recruiter readability.
+- Persisted preview depends on short-lived signed URLs; frontend degrades gracefully and supports refresh/retry when a persisted URL is unavailable/expired.
+- No extra blocker remains for Issue #140.
 
-## Reviewer notes
+## Screenshots / demo notes
 
-- This is a documentation-only finalization pass; no product code changed.
-- Frontend behavior intentionally does not overclaim backend historical content capabilities.
-- Issue #134 is PR-ready based on the final approved live QA pass.
+No new screenshots were captured in this run. UI evidence is covered by tests; screenshots can be attached at PR raise if needed.
