@@ -75,7 +75,9 @@ export async function reloadCandidateSubmissions(params: {
     const artifactWarning =
       hadError && Object.keys(artifacts).length === 0
         ? 'Details unavailable for submissions.'
-        : null;
+        : hadError
+          ? 'Some submission details are unavailable.'
+          : null;
 
     return {
       candidate,

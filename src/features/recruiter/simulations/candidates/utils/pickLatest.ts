@@ -1,7 +1,6 @@
 import type { SubmissionListItem } from '../types';
 
-export const pickLatestByDay = (items: SubmissionListItem[], day: number) => {
-  const candidates = items.filter((it) => Number(it.dayIndex) === day);
+const pickLatest = (candidates: SubmissionListItem[]) => {
   if (!candidates.length) return null;
   return candidates.reduce<SubmissionListItem | null>((best, cand) => {
     if (!best) return cand;
@@ -16,3 +15,11 @@ export const pickLatestByDay = (items: SubmissionListItem[], day: number) => {
     return best;
   }, null);
 };
+
+export const pickLatestByDay = (items: SubmissionListItem[], day: number) =>
+  pickLatest(items.filter((it) => Number(it.dayIndex) === day));
+
+export const pickLatestWhere = (
+  items: SubmissionListItem[],
+  predicate: (item: SubmissionListItem) => boolean,
+) => pickLatest(items.filter(predicate));
