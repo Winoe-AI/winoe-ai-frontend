@@ -14,10 +14,13 @@ import { ArtifactGithubSection } from './ArtifactGithubSection';
 import { ArtifactTestResults } from './ArtifactTestResults';
 import { ArtifactTextAnswer } from './ArtifactTextAnswer';
 import { formatDiffSummary } from './artifactUtils';
+import { ArtifactDay4Handoff } from './ArtifactDay4Handoff';
+import { isHandoffArtifact } from '../../utils/handoff';
 
 type Props = { artifact: SubmissionArtifact; repoLinkLabel?: string | null };
 
 export function ArtifactCard({ artifact, repoLinkLabel }: Props) {
+  const isDay4Handoff = isHandoffArtifact(artifact);
   const { repoUrl, repoFullName } = deriveRepoInfo(artifact);
   const workflowUrl =
     artifact.workflowUrl ?? artifact.testResults?.workflowUrl ?? null;
@@ -82,6 +85,8 @@ export function ArtifactCard({ artifact, repoLinkLabel }: Props) {
         />
       ) : null}
 
+      {isDay4Handoff ? <ArtifactDay4Handoff artifact={artifact} /> : null}
+
       {artifact.task.prompt ? (
         <ArtifactTextAnswer.Prompt value={artifact.task.prompt} />
       ) : null}
@@ -93,12 +98,12 @@ export function ArtifactCard({ artifact, repoLinkLabel }: Props) {
           content={artifact.contentText as string}
           onToggle={() => setExpanded((v) => !v)}
         />
-      ) : (
+      ) : !isDay4Handoff ? (
         <ArtifactTextAnswer.Empty
           showGithub={showGithub}
           taskType={artifact.task.type}
         />
-      )}
+      ) : null}
     </div>
   );
 }

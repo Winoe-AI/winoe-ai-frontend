@@ -178,4 +178,47 @@ describe('CandidateSubmissionsPage', () => {
     expect(await screen.findByText(/No submissions yet/i)).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: /Refresh/i }));
   });
+
+  it('shows partial artifact warning while rendering available artifacts', async () => {
+    recruiterGetMock.mockImplementation((path: string) => {
+      if (path.startsWith('/submissions?')) {
+        return Promise.resolve({
+          items: [
+            {
+              submissionId: 1,
+              candidateSessionId: 123,
+              taskId: 11,
+              dayIndex: 2,
+              type: 'code',
+              submittedAt: '2024-01-01T00:00:00Z',
+            },
+            {
+              submissionId: 2,
+              candidateSessionId: 123,
+              taskId: 12,
+              dayIndex: 3,
+              type: 'code',
+              submittedAt: '2024-01-02T00:00:00Z',
+            },
+          ],
+        });
+      }
+      if (path.startsWith('/submissions/1')) {
+        return Promise.resolve(buildArtifact(1, 2));
+      }
+      if (path.startsWith('/submissions/2')) {
+        return Promise.reject(new Error('Artifact unavailable'));
+      }
+      return Promise.resolve({});
+    });
+
+    await act(async () => {
+      render(<CandidateSubmissionsPage />);
+    });
+
+    expect(
+      await screen.findByText(/Some submission details are unavailable/i),
+    ).toBeInTheDocument();
+    expect(screen.getByText(/Day 2: Task 1/i)).toBeInTheDocument();
+  });
 });

@@ -18,4 +18,5 @@ export type SubmissionState = {
   showAll: boolean;
   latestDay2: SubmissionArtifact | null;
   latestDay3: SubmissionArtifact | null;
+  latestDay4Handoff: SubmissionArtifact | null;
 };

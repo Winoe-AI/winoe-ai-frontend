@@ -40,6 +40,25 @@ export type SubmissionTestResults = {
   output?: unknown;
 };
 
+export type HandoffTranscriptSegment = {
+  id?: string | null;
+  startMs: number;
+  endMs: number;
+  text: string;
+};
+
+export type HandoffTranscript = {
+  status: string;
+  text: string | null;
+  segments: HandoffTranscriptSegment[];
+};
+
+export type HandoffSubmissionArtifact = {
+  recordingId: string | null;
+  downloadUrl: string | null;
+  transcript: HandoffTranscript | null;
+};
+
 export type SubmissionArtifact = {
   submissionId: number;
   candidateSessionId: number;
@@ -66,5 +85,6 @@ export type SubmissionArtifact = {
   diffUrl?: string | null;
   diffSummary?: Record<string, unknown> | null;
   testResults: SubmissionTestResults | null;
+  handoff?: HandoffSubmissionArtifact | null;
   submittedAt: string;
 };

@@ -3,10 +3,12 @@ import { SubmissionsHeader } from './SubmissionsHeader';
 import { SubmissionsTableSkeleton } from './SubmissionsTableSkeleton';
 import { SubmissionsEmpty } from './SubmissionsEmpty';
 import { LatestArtifacts } from './LatestArtifacts';
+import { LatestDay4Handoff } from './LatestDay4Handoff';
 import { AllSubmissionsCard } from './AllSubmissionsCard';
 import { SubmissionsErrorCard } from './SubmissionsErrorCard';
 import type { SubmissionListItem } from '../types';
 import type { SubmissionActions, SubmissionState } from './types';
+import { isHandoffSubmissionItem } from '../utils/handoff';
 
 type Props = {
   simulationId: string;
@@ -48,6 +50,10 @@ export function CandidateSubmissionsView({
       ) : (
         <>
           <LatestArtifacts day2={state.latestDay2} day3={state.latestDay3} />
+          <LatestDay4Handoff
+            artifact={state.latestDay4Handoff}
+            hasHandoffSubmission={state.items.some(isHandoffSubmissionItem)}
+          />
           {state.artifactWarning ? (
             <div className="rounded border border-amber-200 bg-amber-50 p-3 text-xs text-amber-800">
               {state.artifactWarning}
