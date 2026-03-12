@@ -1,128 +1,153 @@
-# Title
+# Issue #143: Recruiter Fit Profile page + evidence trail + print-to-PDF demo flow
 
-Issue #141: Recruiter Candidate Submissions — Day 4 playback + transcript viewer with search
+## Title
+
+Recruiter Fit Profile page with evidence trail, generation polling, and print/PDF demo flow.
 
 ## TL;DR
 
-- Added a dedicated Day 4 handoff evidence section on Candidate Submissions for recruiter playback and transcript review.
-- Added HTML5 video playback + download using backend-supplied signed `handoff.downloadUrl`, with a graceful unavailable fallback.
-- Added segmented transcript rendering with client-side case-insensitive search, safe tokenized highlighting, match counts, and timestamp click-to-seek.
-- Preserved partial artifact failure behavior so warnings surface without blocking other available artifacts.
-- Updated handoff API/type normalization for nested and fallback transcript/download fields.
-- Final manual/runtime QA verification: PASS (scenarios A–J), evidence-backed.
+- Added dedicated recruiter route `/dashboard/simulations/[id]/candidates/[candidateSessionId]/fit-profile` plus a Fit Profile entry link from Candidate Submissions.
+- Implemented Fit Profile UI blocks: `FitScoreHeader`, `DayScoreCard`, `EvidenceList`, `FitProfileStatusPanel`, and warning banner support.
+- Implemented generation + polling state machine with `not_generated`, `generating`, `ready`, `access_denied`, and `error` states.
+- Implemented evidence trail rendering with safe external links (`target="_blank"`, `rel="noreferrer noopener"`) and visible printable URL text.
+- Implemented print flow via `window.print()`, scoped print mode, shell chrome hide markers, and full-width content expansion.
+- Added explicit `not_evaluated` day handling (including `disabledDayIndexes`) so excluded days render clearly as non-scored.
 
-## Problem
+## Problem / Why
 
-Recruiters could fetch submission artifacts, but Candidate Submissions did not provide a dedicated Day 4 evidence review flow for playback, transcript reading, transcript search, and timestamp-based evidence navigation.
+Recruiters needed a decisive, scannable output for candidate evaluation with an overall fit score, per-day scoring, and evidence citations, plus a print-friendly report view for demo usage. The existing candidate submissions page had no dedicated Fit Profile experience.
 
 ## What changed
 
-- Added a dedicated Day 4 handoff evidence section in recruiter Candidate Submissions (`LatestDay4Handoff`).
-- Added HTML5 video playback via signed URL (`handoff.downloadUrl`).
-- Added explicit video download action.
-- Added transcript processing state UI when transcript segments are not ready.
-- Added segmented transcript viewer with formatted timestamps.
-- Added client-side transcript search with case-insensitive matching, safe highlighting via tokenized render (no HTML injection path), and match count.
-- Added timestamp click-to-seek behavior that seeks the video player to segment start time.
-- Preserved partial artifact warning behavior (`Some submission details are unavailable.`) while keeping other artifacts visible.
-- Extended type/API normalization for `handoff` payloads, including nested and snake_case/camelCase fallbacks for transcript/download data.
+- Dedicated route
+  - Added route page at `src/app/(recruiter)/dashboard/simulations/[id]/candidates/[candidateSessionId]/fit-profile/page.tsx`.
+  - Uses `FitProfilePage` with route metadata for recruiter fit reporting.
+- Candidate submissions entry point
+  - Added `Fit Profile` link in `SubmissionsHeader`.
+  - Wired href from candidate submissions context: `/dashboard/simulations/${simulationId}/candidates/${candidateSessionId}/fit-profile`.
+- Fit profile components
+  - Added `FitProfilePage`, `FitScoreHeader`, `DayScoreCard`, `EvidenceList`, `FitProfileStatusPanel`, `FitProfileWarningBanner`, plus formatting/types files under `src/features/recruiter/simulations/candidates/fitProfile/`.
+- Generate + polling state machine
+  - `useFitProfile` drives GET/POST flow and transitions:
+    - `not_generated`: initial or 404-not-found evaluation state.
+    - `generating`: running state + auto-poll timer.
+    - `ready`: report rendered.
+    - `access_denied`: 403.
+    - `error`: generic failure.
+  - Polling interval is controlled by `FIT_PROFILE_POLL_INTERVAL_MS` and cleaned up on unmount.
+- Evidence trail rendering
+  - Evidence cards support commit/diff/test/transcript style evidence metadata (`kind`, `ref`, `excerpt`, timestamp range).
+  - Evidence links open in new tab with safe rel attrs.
+  - Visible printable URL text is shown under each link.
+- Print / Save PDF flow
+  - `Print / Save PDF` button calls `window.print()`.
+  - `FitProfilePage` toggles body class `fit-profile-print-mode` while mounted.
+  - Print mode is scoped, not global: `@media print` rules apply under `body.fit-profile-print-mode`.
+- Not-evaluated day handling
+  - Normalizer resolves day evaluation status from explicit flags/status values, null/missing score, and `disabledDayIndexes`.
+  - Disabled days are materialized even if missing from `dayScores`.
+  - `DayScoreCard` renders explicit `Not evaluated` badge + explanatory copy and excludes score display for those days.
+- Print-shell markers / scoped print CSS
+  - Added marker attributes:
+    - `data-fit-profile-no-print="true"` on shell chrome (header/nav/skip-link and Fit Profile top action row).
+    - `data-fit-profile-main-content="true"` on `<main>` container.
+  - Print CSS hides marked chrome, expands main content (`max-width: none`, zero margins/padding), and keeps fit profile cards readable.
 
-## Important bug fix / follow-up correction
+## Acceptance criteria coverage
 
-- Removed the incorrect `dayIndex === 4` heuristic that could treat non-handoff Day 4 submissions as handoff evidence.
-- Playback/transcript UI now renders only for real handoff artifacts (`type: 'handoff'` or artifact handoff payload present).
-- Latest Day 4 evidence now resolves from the latest actual handoff submission, not the latest arbitrary Day 4 submission.
-- Manual/runtime QA verified non-handoff Day 4 submissions do not render playback/transcript UI.
+- Recruiter can generate Fit Profile
+  - `Generate Fit Profile` button triggers `POST /api/candidate_sessions/{id}/fit_profile/generate` and transitions into generating flow.
+- Polling updates status correctly
+  - Generating state auto-polls GET endpoint and transitions to ready when report becomes available.
+- Report renders overall score + per-day scores
+  - `FitScoreHeader` renders overall fit score/recommendation/calibration; `DayScoreCard` renders each day.
+- Evidence links clickable
+  - Evidence links render as anchors and open in new tab (`target="_blank"`).
+- Print-to-PDF produces readable document
+  - Print button + scoped print CSS + shell-hide markers + full-width main content + visible URL text.
+- 409 "not ready" handled gracefully
+  - GET 409 maps to generating/polling; POST 409 maps to "already running" generating state then polling.
 
-## Final QA Verification
+## API / contract handling
 
-- Final status: PR-ready, manual/runtime QA verified: PASS.
-- Verification method:
-  - Real localhost runtime
-  - Frontend: `http://127.0.0.1:3000`
-  - Backend: `http://127.0.0.1:8000`
-  - Playwright browser automation
-  - Local JWKS + session-cookie auth harness
-  - Local MinIO signed-media flow
-- Evidence bundle:
-  - `.qa/issue141/manual_qa_20260311_222235/`
-  - `.qa/issue141/manual_qa_20260311_222235.zip`
-- Final QA scenario summary: PASS across scenarios A–J, covering:
-  - Day 4 handoff evidence section renders correctly.
-  - Video playback works from signed URL.
-  - Download action works.
-  - Fallback works when video becomes unavailable.
-  - Transcript processing state is shown without blocking the page.
-  - Transcript ready state renders segmented transcript with timestamps.
-  - Search is case-insensitive and shows highlights + match count.
-  - Timestamp click seeks video correctly.
-  - Partial artifact warning preserves successful artifacts.
-  - Non-handoff Day 4 submissions do not render playback/transcript UI.
-  - No obvious signed URL leakage or persistence was observed in captured frontend QA scope.
+- GET/POST fit profile endpoints
+  - Frontend BFF proxies:
+    - `GET /api/candidate_sessions/[candidateSessionId]/fit_profile`
+    - `POST /api/candidate_sessions/[candidateSessionId]/fit_profile/generate`
+  - Upstream backend paths forwarded as:
+    - `GET /api/candidate_sessions/{candidate_session_id}/fit_profile`
+    - `POST /api/candidate_sessions/{candidate_session_id}/fit_profile/generate`
+- Support for status payloads and 409 progress semantics
+  - `fitProfile.api.ts` supports status payloads (`not_started`, `running`, `ready`, `failed`) and report-in-root/report-nested variations.
+  - `useFitProfile` also handles transport-level 409 as generation-in-progress.
+- 403 / 404 / 409 / generic errors
+  - 403 -> access denied panel.
+  - 404 -> "Evaluation not found" + not-generated flow.
+  - 409 -> generating + auto-poll.
+  - Other failures -> error panel with retry.
 
-## Files changed
+## Security / privacy notes
 
-Primary implementation files:
-
-- `src/features/recruiter/simulations/candidates/components/ArtifactCard/ArtifactCard.tsx`
-- `src/features/recruiter/simulations/candidates/components/ArtifactCard/ArtifactDay4Handoff.tsx` (new)
-- `src/features/recruiter/simulations/candidates/components/ArtifactCard/day4Transcript.ts` (new)
-- `src/features/recruiter/simulations/candidates/components/CandidateSubmissionsView.tsx`
-- `src/features/recruiter/simulations/candidates/components/LatestDay4Handoff.tsx` (new)
-- `src/features/recruiter/simulations/candidates/hooks/candidateLoader.ts`
-- `src/features/recruiter/simulations/candidates/hooks/computeLatestArtifacts.ts`
-- `src/features/recruiter/simulations/candidates/hooks/reloadCandidateSubmissions.ts`
-- `src/features/recruiter/simulations/candidates/types.ts`
-- `src/features/recruiter/simulations/candidates/utils/candidateSubmissionsApi.ts`
-- `src/features/recruiter/simulations/candidates/utils/handoff.ts` (new)
-- `src/features/recruiter/simulations/candidates/utils/pickLatest.ts`
-
-Test coverage added/updated:
-
-- `tests/unit/features/recruiter/candidate-submissions/ArtifactDay4Handoff.test.tsx` (new)
-- `tests/unit/features/recruiter/candidate-submissions/day4Transcript.test.ts` (new)
-- `tests/unit/features/recruiter/candidate-submissions/computeLatestArtifacts.test.ts` (new)
-- `tests/integration/recruiter/simulations/candidates/CandidateSubmissionsContent.test.tsx`
-- `tests/unit/features/recruiter/candidate-submissions/CandidateSubmissionsPage.test.tsx`
+- No report content logging
+  - Fit Profile code path does not log report payloads or evidence excerpts.
+- Safe evidence link behavior
+  - Evidence links use `target="_blank"` and `rel="noreferrer noopener"`.
+  - Only valid `http`/`https` URLs are rendered as clickable links.
+- Printed visible URLs are sanitized / token-free
+  - Printable URL text strips query/hash (`printableEvidenceUrl`) to avoid exposing signed token params in print output.
 
 ## Testing
 
-Implementation validation (passed):
+- Targeted tests added/updated
+  - `tests/integration/recruiter/simulations/candidates/FitProfilePage.test.tsx`
+  - `tests/unit/features/recruiter/fit-profile/FitProfileComponents.test.tsx`
+  - `tests/unit/shared/AppLayout.test.tsx`
+- Targeted test coverage includes
+  - generate flow, GET/POST 409 handling, polling transition to ready, 403/404/generic states, print button wiring, print-mode class toggling, warning banner rendering, evidence link safety, and explicit `not_evaluated` day rendering.
+- Check results (latest iteration verification logs)
+  - Targeted fit-profile/app-layout test command: PASS
+  - `npm run lint`: PASS
+  - `npm run typecheck`: PASS
+  - `npm run build`: PASS
+  - `precommit.sh`: PASS (exit code `0`, see `.ai_flow/sessions/20260312_000939/iterations/02/checks/precommit.exitcode`)
 
-- `npm run lint` -> PASS
-- `npm run typecheck` -> PASS
-- `npm run build` -> PASS
-- `npm test -- --runInBand tests/unit/features/recruiter/candidate-submissions` -> PASS
+## Manual QA / demo proof
 
-QA validation (manual/runtime):
+- Route entry point
+  - Candidate submissions header includes a direct `Fit Profile` link to `/dashboard/simulations/[id]/candidates/[candidateSessionId]/fit-profile`.
+- Generate / polling / ready flow validation
+  - Validated by integration tests for not-generated, generating, 409 progression, and ready render states.
+- Print-proof artifact validation
+  - Browser artifact path used to validate print media behavior: generated HTML proof + screenshot + computed-style metrics JSON.
+  - Metrics confirm shell hide and content expansion behavior in print media.
+- Local auth limitation
+  - Live authenticated recruiter-route print verification was blocked locally by Auth0 redirect, so artifact-backed print proof was used as fallback evidence in this environment.
 
-- Playwright-backed localhost runtime QA completed with overall verdict: PASS.
-- Final QA pass produced PASS across scenarios A–J.
-- Evidence: `.qa/issue141/manual_qa_20260311_222235/` and `.qa/issue141/manual_qa_20260311_222235.zip`.
+## Artifacts
 
-## Manual QA / screenshots
+- Print proof HTML
+  - `test-results/fit-profile-print-proof.html`
+- Print proof screenshot
+  - `test-results/fit-profile-print-proof.png`
+- Print proof metrics JSON
+  - `test-results/fit-profile-print-proof-metrics.json`
+- Iteration diffs
+  - `.ai_flow/sessions/20260312_000939/iterations/01/diff.patch`
+  - `.ai_flow/sessions/20260312_000939/iterations/02/diff.patch`
 
-- Manual browser/runtime QA was performed for this issue.
-- Screenshots and supporting artifacts exist in the issue-scoped QA bundle:
-  - `.qa/issue141/manual_qa_20260311_222235/screenshots/`
-  - `.qa/issue141/manual_qa_20260311_222235/artifacts/`
+## Risks / follow-ups
 
-## Risks / assumptions
-
-- Latest-handoff prefetch depends on submissions-list contract correctness for identifying handoff records via `type: 'handoff'`.
-- Signed playback/download URLs are ephemeral and intentionally not persisted in long-lived client storage.
+- Follow-up (non-blocking): re-run print verification on the live authenticated recruiter route in an environment with valid Auth0 recruiter session credentials.
 
 ## Rollout / demo checklist
 
-- [ ] Recruiter opens candidate submission.
-- [ ] Recruiter sees latest Day 4 handoff evidence section.
-- [ ] Recruiter plays Day 4 video.
-- [ ] Recruiter downloads Day 4 video.
-- [ ] Recruiter searches transcript and sees highlighted matches + count.
-- [ ] Recruiter clicks transcript timestamp and video seeks correctly.
-- [ ] Recruiter sees processing/fallback states when transcript or video artifacts are unavailable.
+- Open completed candidate session.
+- Click `Fit Profile` from Candidate Submissions.
+- Click `Generate Fit Profile` if needed.
+- Wait for generating state to transition to ready report.
+- Review overall fit score, recommendation calibration text, per-day cards, and evidence trail.
+- Click `Print / Save PDF` and confirm print preview readability.
 
-## Status
+## Final status
 
-- PR-ready.
-- Manual/runtime QA verified: PASS.
+Ready for PR raise.

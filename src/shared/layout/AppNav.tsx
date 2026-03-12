@@ -24,7 +24,11 @@ export function AppNav({ isAuthed, permissions = [], navScope }: AppNavProps) {
   const showCandidate = allowCandidate;
 
   return (
-    <nav className="flex items-center gap-4 pr-2 text-sm sm:pr-3">
+    <nav
+      className="flex items-center gap-4 pr-2 text-sm sm:pr-3"
+      data-fit-profile-no-print="true"
+      data-app-nav="true"
+    >
       {showRecruiter ? (
         <Link href="/dashboard" className="text-gray-700 hover:text-gray-900">
           Recruiter Dashboard

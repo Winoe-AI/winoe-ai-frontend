@@ -22,6 +22,7 @@ export default function CandidateSubmissionsPage() {
   return (
     <CandidateSubmissionsView
       simulationId={simulationId}
+      candidateSessionId={candidateSessionId}
       labels={labels}
       state={state}
       actions={actions}

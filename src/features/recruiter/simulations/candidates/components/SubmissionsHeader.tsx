@@ -9,6 +9,7 @@ type Props = {
   title: string;
   subtitle: string;
   backHref: string;
+  fitProfileHref: string;
   status?: string | null;
   inviteEmail?: string | null;
   onRefresh: () => void;
@@ -18,6 +19,7 @@ export function SubmissionsHeader({
   title,
   subtitle,
   backHref,
+  fitProfileHref,
   status,
   inviteEmail,
   onRefresh,
@@ -43,6 +45,12 @@ export function SubmissionsHeader({
         >
           Reload
         </Button>
+        <Link
+          className="rounded-md border border-blue-200 bg-blue-50 px-3 py-2 text-sm font-medium text-blue-700 hover:bg-blue-100"
+          href={fitProfileHref}
+        >
+          Fit Profile
+        </Link>
         <Link className="text-sm text-blue-600 hover:underline" href={backHref}>
           ← Back to candidates
         </Link>
