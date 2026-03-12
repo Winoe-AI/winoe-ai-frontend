@@ -12,6 +12,7 @@ import { isHandoffSubmissionItem } from '../utils/handoff';
 
 type Props = {
   simulationId: string;
+  candidateSessionId: string;
   labels: { title: string; subtitle: string };
   state: SubmissionState;
   actions: SubmissionActions;
@@ -21,6 +22,7 @@ type Props = {
 
 export function CandidateSubmissionsView({
   simulationId,
+  candidateSessionId,
   labels,
   state,
   actions,
@@ -40,6 +42,7 @@ export function CandidateSubmissionsView({
         title={labels.title}
         subtitle={labels.subtitle}
         backHref={`/dashboard/simulations/${simulationId}`}
+        fitProfileHref={`/dashboard/simulations/${simulationId}/candidates/${candidateSessionId}/fit-profile`}
         status={state.candidate?.status}
         inviteEmail={state.candidate?.inviteEmail ?? null}
         onRefresh={actions.reload}

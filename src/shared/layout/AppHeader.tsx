@@ -15,7 +15,11 @@ export function AppHeader({
   navScope,
 }: AppHeaderProps) {
   return (
-    <header className="border-b bg-white">
+    <header
+      className="border-b bg-white"
+      data-fit-profile-no-print="true"
+      data-app-header="true"
+    >
       <div
         className={`${contentContainer} flex items-center justify-between py-3`}
       >
