@@ -20,7 +20,11 @@ type Props = {
   scenarioLabel: string | null;
   rubricSummary: string | null;
   contentUnavailableMessage: string | null;
-  planDays: { dayIndex: number; task: SimulationPlan['days'][number] | null }[];
+  planDays: {
+    dayIndex: number;
+    task: SimulationPlan['days'][number] | null;
+    aiEvaluationEnabled: boolean;
+  }[];
   loading: boolean;
   statusCode: number | null;
   generating: boolean;

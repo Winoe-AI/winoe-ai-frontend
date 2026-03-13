@@ -60,6 +60,7 @@ type RegenerationPollState = {
 type PlanDaySlot = {
   dayIndex: number;
   task: SimulationPlan['days'][number] | null;
+  aiEvaluationEnabled: boolean;
 };
 
 function buildActionError(
@@ -321,19 +322,21 @@ function buildPlanDaysForVersion(
 
   return [1, 2, 3, 4, 5].map((dayIndex) => {
     const selected = selectedByDay.get(dayIndex);
-    const base =
-      basePlanDays.find((slot) => slot.dayIndex === dayIndex)?.task ?? null;
+    const baseSlot = basePlanDays.find((slot) => slot.dayIndex === dayIndex);
+    const base = baseSlot?.task ?? null;
+    const aiEvaluationEnabled = baseSlot?.aiEvaluationEnabled ?? true;
 
     if (!selected) {
-      return { dayIndex, task: base };
+      return { dayIndex, task: base, aiEvaluationEnabled };
     }
 
     if (!base) {
-      return { dayIndex, task: selected };
+      return { dayIndex, task: selected, aiEvaluationEnabled };
     }
 
     return {
       dayIndex,
+      aiEvaluationEnabled,
       task: {
         ...base,
         title: selected.title,

@@ -286,6 +286,11 @@ describe('RecruiterSimulationDetailPage helpers', () => {
       pendingScenarioVersionId: 11,
       seniority: 'mid',
       companyContext: { domain: 'Fintech', productArea: 'Payments' },
+      ai: {
+        evalEnabledByDay: {
+          '4': false,
+        },
+      },
       scenario: {
         id: 10,
         versionIndex: 2,
@@ -329,6 +334,13 @@ describe('RecruiterSimulationDetailPage helpers', () => {
     ]);
     expect(detail.rubricJson).toEqual({ dimensions: [] });
     expect(detail.notes).toBe('Scenario note');
+    expect(detail.aiEvaluationEnabledByDay).toEqual({
+      '1': true,
+      '2': true,
+      '3': true,
+      '4': false,
+      '5': true,
+    });
     expect(detail.generationJob?.jobId).toBe('job-123');
     expect(__testables.scenarioVersionLabel(2)).toBe('v2');
     expect(__testables.scenarioVersionLabel(null)).toBe('v—');
@@ -357,5 +369,28 @@ describe('RecruiterSimulationDetailPage helpers', () => {
     const v2 = detail.scenarioVersions.find((version) => version.id === '11');
     expect(v1?.contentAvailability).toBe('canonical');
     expect(v2?.contentAvailability).toBe('unavailable');
+  });
+
+  it('normalizes snake_case AI eval maps with defaults for missing days', () => {
+    const detail = __testables.normalizeSimulationDetailPreview({
+      id: 88,
+      status: 'ready_for_review',
+      ai: {
+        eval_enabled_by_day: {
+          '2': false,
+          '5': false,
+          '8': true,
+        },
+      },
+      tasks: [],
+    });
+
+    expect(detail.aiEvaluationEnabledByDay).toEqual({
+      '1': true,
+      '2': false,
+      '3': true,
+      '4': true,
+      '5': false,
+    });
   });
 });

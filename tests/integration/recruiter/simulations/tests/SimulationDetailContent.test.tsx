@@ -41,6 +41,15 @@ const simulationDetailResponse = () =>
     role: 'Backend Engineer',
     techStack: 'Python + FastAPI',
     focus: 'API design',
+    ai: {
+      evalEnabledByDay: {
+        '1': true,
+        '2': true,
+        '3': true,
+        '4': false,
+        '5': true,
+      },
+    },
     scenario: 'Build a billing service for a growing marketplace.',
     tasks: [
       {
@@ -244,6 +253,15 @@ describe('RecruiterSimulationDetailPage', () => {
     expect(
       await screen.findByText(/Repo not provisioned yet/i),
     ).toBeInTheDocument();
+    expect(
+      await screen.findByText(/AI Evaluation: Disabled/i),
+    ).toBeInTheDocument();
+    expect(
+      await screen.findByText(/Human Review Required/i),
+    ).toBeInTheDocument();
+    expect(
+      screen.getAllByText(/AI Evaluation: Enabled/i).length,
+    ).toBeGreaterThan(0);
     expect(await screen.findByText(/Day 4/i)).toBeInTheDocument();
     expect(await screen.findByText(/Day 5/i)).toBeInTheDocument();
     const placeholders = await screen.findAllByText(/Not generated yet/i);

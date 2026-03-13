@@ -28,7 +28,9 @@ export function SimulationAiConfigSection({
 }: Props) {
   return (
     <section className="rounded border border-gray-200 p-4">
-      <h2 className="text-sm font-semibold text-gray-900">AI configuration</h2>
+      <h2 className="text-sm font-semibold text-gray-900">
+        AI Evaluation Settings
+      </h2>
       <p className="mt-1 text-xs text-gray-500">
         Candidate notice version:{' '}
         <span className="font-semibold">{values.noticeVersion}</span>
@@ -40,7 +42,7 @@ export function SimulationAiConfigSection({
 
       <fieldset className="mt-3">
         <legend className="text-xs font-medium uppercase tracking-wide text-gray-500">
-          Evaluation enabled by day
+          Per-day AI evaluation
         </legend>
         <div className="mt-2 grid gap-2 sm:grid-cols-2">
           {evalDayToggles.map(({ day, key }) => (

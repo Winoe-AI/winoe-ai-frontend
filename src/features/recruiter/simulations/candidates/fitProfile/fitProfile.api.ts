@@ -78,7 +78,12 @@ function normalizeEvidence(value: unknown): FitProfileEvidence | null {
 function normalizeDayEvaluationStatus(
   record: Record<string, unknown>,
   normalizedScore: number | null,
+  aiEvaluationEnabled: boolean,
 ): FitProfileDayScore['evaluationStatus'] {
+  if (!aiEvaluationEnabled) {
+    return 'not_evaluated';
+  }
+
   const explicitStatus = normalizeStatus(
     record.status ??
       record.evaluationStatus ??
@@ -114,12 +119,22 @@ function normalizeDayEvaluationStatus(
   return normalizedScore === null ? 'not_evaluated' : 'evaluated';
 }
 
-function normalizeDayScore(value: unknown): FitProfileDayScore | null {
+function normalizeDayScore(
+  value: unknown,
+  disabledDaySet: Set<number>,
+): FitProfileDayScore | null {
   const record = asRecord(value);
   if (!record) return null;
 
   const dayIndex = toNumberOrNull(record.dayIndex ?? record.day_index);
   if (dayIndex === null) return null;
+  const normalizedDayIndex = Math.max(1, Math.round(dayIndex));
+  const status = normalizeStatus(record.status);
+  const reason = normalizeStatus(record.reason);
+  const aiEvaluationEnabled =
+    !disabledDaySet.has(normalizedDayIndex) &&
+    status !== 'human_review_required' &&
+    reason !== 'ai_eval_disabled_for_day';
 
   const rubricBreakdown = asRecord(
     record.rubricBreakdown ?? record.rubric_breakdown,
@@ -133,16 +148,21 @@ function normalizeDayScore(value: unknown): FitProfileDayScore | null {
   const evaluationStatus = normalizeDayEvaluationStatus(
     record,
     normalizedScore,
+    aiEvaluationEnabled,
   );
   const score =
-    evaluationStatus === 'not_evaluated' ? null : (normalizedScore ?? 0);
+    !aiEvaluationEnabled || evaluationStatus === 'not_evaluated'
+      ? null
+      : (normalizedScore ?? 0);
 
   return {
-    dayIndex: Math.max(1, Math.round(dayIndex)),
+    dayIndex: normalizedDayIndex,
     score,
     rubricBreakdown: rubricBreakdown ?? {},
     evidence,
     evaluationStatus,
+    reason,
+    aiEvaluationEnabled,
   };
 }
 
@@ -227,16 +247,8 @@ function normalizeReport(value: unknown): FitProfileReport | null {
   const disabledDaySet = new Set(disabledDayIndexes);
 
   const dayScores = dayScoresRaw
-    .map(normalizeDayScore)
-    .filter((item): item is FitProfileDayScore => Boolean(item))
-    .map((item) => {
-      if (!disabledDaySet.has(item.dayIndex)) return item;
-      return {
-        ...item,
-        score: null,
-        evaluationStatus: 'not_evaluated' as const,
-      };
-    });
+    .map((item) => normalizeDayScore(item, disabledDaySet))
+    .filter((item): item is FitProfileDayScore => Boolean(item));
 
   const existingDayIndexes = new Set(dayScores.map((item) => item.dayIndex));
   disabledDayIndexes.forEach((dayIndex) => {
@@ -247,6 +259,8 @@ function normalizeReport(value: unknown): FitProfileReport | null {
       rubricBreakdown: {},
       evidence: [],
       evaluationStatus: 'not_evaluated',
+      reason: 'ai_eval_disabled_for_day',
+      aiEvaluationEnabled: false,
     });
   });
 

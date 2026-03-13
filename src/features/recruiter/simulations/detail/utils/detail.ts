@@ -1,5 +1,9 @@
 import { toNumberOrNull, toStringOrCsv, toStringOrNull } from './parsing';
 import { normalizeSimulationPlan, type SimulationPlan } from './plan';
+import {
+  normalizeSimulationEvalEnabledByDay,
+  type SimulationEvalEnabledByDay,
+} from '@/features/recruiter/api/simulationAiEval';
 
 export type SimulationLifecycleStatus =
   | 'draft'
@@ -45,6 +49,7 @@ export type SimulationDetailPreview = {
   rubricSummary: string | null;
   level: string | null;
   companyContext: string | null;
+  aiEvaluationEnabledByDay: SimulationEvalEnabledByDay;
   generationJob: SimulationGenerationJob | null;
   hasJobFailure: boolean;
 };
@@ -513,6 +518,7 @@ export function normalizeSimulationDetailPreview(
   const plan = normalizeSimulationPlan(raw);
   const record = asRecord(raw) ?? {};
   const scenario = asRecord(record.scenario);
+  const ai = asRecord(record.ai);
   const statusRaw = toStringOrNull(record.status)?.toLowerCase() ?? null;
   const status = parseLifecycleStatus(statusRaw);
 
@@ -583,6 +589,12 @@ export function normalizeSimulationDetailPreview(
       null,
     companyContext: readCompanyContext(
       record.companyContext ?? record.company_context,
+    ),
+    aiEvaluationEnabledByDay: normalizeSimulationEvalEnabledByDay(
+      ai?.evalEnabledByDay ??
+        ai?.eval_enabled_by_day ??
+        record.evalEnabledByDay ??
+        record.eval_enabled_by_day,
     ),
     generationJob,
     hasJobFailure:
