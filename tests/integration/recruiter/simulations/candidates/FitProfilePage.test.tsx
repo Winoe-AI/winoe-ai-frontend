@@ -118,7 +118,7 @@ describe('FitProfilePage', () => {
     ).toHaveAttribute('target', '_blank');
   });
 
-  it('renders not-evaluated day cards from disabled indexes and missing scores', async () => {
+  it('renders AI-disabled day cards as human-review-required placeholders', async () => {
     const fetchMock = jest.fn(async (input: RequestInfo | URL) => {
       const url = getRequestUrl(input);
       if (url === '/api/candidate_sessions/2/fit_profile') {
@@ -140,7 +140,8 @@ describe('FitProfilePage', () => {
               {
                 dayIndex: 3,
                 score: null,
-                status: 'not_evaluated',
+                status: 'human_review_required',
+                reason: 'ai_eval_disabled_for_day',
                 rubricBreakdown: {},
                 evidence: [],
               },
@@ -159,12 +160,11 @@ describe('FitProfilePage', () => {
     expect(
       screen.getByText(/Disabled days excluded from scoring: 2, 3/i),
     ).toBeInTheDocument();
-    expect(screen.getAllByText('Not evaluated')).toHaveLength(2);
+    expect(screen.getAllByText('AI Evaluation: Disabled')).toHaveLength(2);
     expect(
-      screen.getAllByText(
-        /This day was not evaluated and does not affect overall fit score./i,
-      ),
+      screen.getAllByText(/AI evaluation disabled for this day./i),
     ).toHaveLength(2);
+    expect(screen.getAllByText(/Human review required./i)).toHaveLength(2);
   });
 
   it('maps 404 to not-generated panel', async () => {

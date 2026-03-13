@@ -4,8 +4,7 @@ import { normalizeCreateSimulationResponse } from './simulationsNormalize';
 import { isRecord } from './simUtils';
 import { throwMappedApiError } from '@/lib/api/errors/errorMapping';
 import { requestRecruiterBff } from './requestRecruiterBff';
-
-const AI_DAY_KEYS = ['1', '2', '3', '4', '5'] as const;
+import { extractProvidedSimulationEvalEnabledByDay } from './simulationAiEval';
 
 export async function createSimulation(
   input: CreateSimulationInput,
@@ -29,15 +28,9 @@ export async function createSimulation(
     };
   }
 
-  const evalEnabledByDay =
-    input.ai?.evalEnabledByDay && isRecord(input.ai.evalEnabledByDay)
-      ? AI_DAY_KEYS.reduce<Record<string, boolean>>((acc, day) => {
-          if (typeof input.ai?.evalEnabledByDay?.[day] === 'boolean') {
-            acc[day] = input.ai.evalEnabledByDay[day];
-          }
-          return acc;
-        }, {})
-      : undefined;
+  const evalEnabledByDay = extractProvidedSimulationEvalEnabledByDay(
+    input.ai?.evalEnabledByDay,
+  );
 
   const payload = {
     title: safeTitle,

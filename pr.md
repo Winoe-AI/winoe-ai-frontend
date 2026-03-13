@@ -1,153 +1,209 @@
-# Issue #143: Recruiter Fit Profile page + evidence trail + print-to-PDF demo flow
+# 1. Title
 
-## Title
+Issue #146: Recruiter per-day AI evaluation toggles in create flow, preview state rendering, and Fit Profile disabled-day handling.
 
-Recruiter Fit Profile page with evidence trail, generation polling, and print/PDF demo flow.
+# 2. TL;DR
 
-## TL;DR
+- Added compact per-day AI evaluation toggles to simulation create (`Day 1`..`Day 5`), default enabled.
+- Create submit now persists the nested backend contract shape under `ai.evalEnabledByDay`.
+- Simulation detail/preview now renders per-day AI state (`Enabled` / `Disabled`) with disabled-day `Human Review Required` messaging.
+- Fit Profile now suppresses AI score content for disabled days and renders explicit human-review-only messaging.
+- Edit flow was intentionally not implemented because this repo has no existing recruiter simulation edit route/screen to extend safely.
 
-- Added dedicated recruiter route `/dashboard/simulations/[id]/candidates/[candidateSessionId]/fit-profile` plus a Fit Profile entry link from Candidate Submissions.
-- Implemented Fit Profile UI blocks: `FitScoreHeader`, `DayScoreCard`, `EvidenceList`, `FitProfileStatusPanel`, and warning banner support.
-- Implemented generation + polling state machine with `not_generated`, `generating`, `ready`, `access_denied`, and `error` states.
-- Implemented evidence trail rendering with safe external links (`target="_blank"`, `rel="noreferrer noopener"`) and visible printable URL text.
-- Implemented print flow via `window.print()`, scoped print mode, shell chrome hide markers, and full-width content expansion.
-- Added explicit `not_evaluated` day handling (including `disabledDayIndexes`) so excluded days render clearly as non-scored.
+# 3. Issue / Problem
 
-## Problem / Why
+Recruiters need per-day control over whether AI evaluation is active so they can enforce clear human-vs-AI boundaries and compliance posture. Backend persistence exists; frontend needed to expose the controls and consistently reflect enabled/disabled states in simulation preview and Fit Profile rendering.
 
-Recruiters needed a decisive, scannable output for candidate evaluation with an overall fit score, per-day scoring, and evidence citations, plus a print-friendly report view for demo usage. The existing candidate submissions page had no dedicated Fit Profile experience.
+# 4. Scope delivered
 
-## What changed
+- Simulation create flow UI + payload wiring for per-day AI evaluation toggles.
+- Shared helper for day-key defaults/normalization to remove duplicated day-map logic.
+- Simulation detail/preview rendering of AI evaluation on/off state per day.
+- Fit Profile behavior for disabled days: no AI score, explicit disabled + human-review messaging.
+- Automated test coverage updates for create, detail/preview, and Fit Profile paths.
 
-- Dedicated route
-  - Added route page at `src/app/(recruiter)/dashboard/simulations/[id]/candidates/[candidateSessionId]/fit-profile/page.tsx`.
-  - Uses `FitProfilePage` with route metadata for recruiter fit reporting.
-- Candidate submissions entry point
-  - Added `Fit Profile` link in `SubmissionsHeader`.
-  - Wired href from candidate submissions context: `/dashboard/simulations/${simulationId}/candidates/${candidateSessionId}/fit-profile`.
-- Fit profile components
-  - Added `FitProfilePage`, `FitScoreHeader`, `DayScoreCard`, `EvidenceList`, `FitProfileStatusPanel`, `FitProfileWarningBanner`, plus formatting/types files under `src/features/recruiter/simulations/candidates/fitProfile/`.
-- Generate + polling state machine
-  - `useFitProfile` drives GET/POST flow and transitions:
-    - `not_generated`: initial or 404-not-found evaluation state.
-    - `generating`: running state + auto-poll timer.
-    - `ready`: report rendered.
-    - `access_denied`: 403.
-    - `error`: generic failure.
-  - Polling interval is controlled by `FIT_PROFILE_POLL_INTERVAL_MS` and cleaned up on unmount.
-- Evidence trail rendering
-  - Evidence cards support commit/diff/test/transcript style evidence metadata (`kind`, `ref`, `excerpt`, timestamp range).
-  - Evidence links open in new tab with safe rel attrs.
-  - Visible printable URL text is shown under each link.
-- Print / Save PDF flow
-  - `Print / Save PDF` button calls `window.print()`.
-  - `FitProfilePage` toggles body class `fit-profile-print-mode` while mounted.
-  - Print mode is scoped, not global: `@media print` rules apply under `body.fit-profile-print-mode`.
-- Not-evaluated day handling
-  - Normalizer resolves day evaluation status from explicit flags/status values, null/missing score, and `disabledDayIndexes`.
-  - Disabled days are materialized even if missing from `dayScores`.
-  - `DayScoreCard` renders explicit `Not evaluated` badge + explanatory copy and excludes score display for those days.
-- Print-shell markers / scoped print CSS
-  - Added marker attributes:
-    - `data-fit-profile-no-print="true"` on shell chrome (header/nav/skip-link and Fit Profile top action row).
-    - `data-fit-profile-main-content="true"` on `<main>` container.
-  - Print CSS hides marked chrome, expands main content (`max-width: none`, zero margins/padding), and keeps fit profile cards readable.
+# 5. What changed
 
-## Acceptance criteria coverage
+## Create flow
 
-- Recruiter can generate Fit Profile
-  - `Generate Fit Profile` button triggers `POST /api/candidate_sessions/{id}/fit_profile/generate` and transitions into generating flow.
-- Polling updates status correctly
-  - Generating state auto-polls GET endpoint and transitions to ready when report becomes available.
-- Report renders overall score + per-day scores
-  - `FitScoreHeader` renders overall fit score/recommendation/calibration; `DayScoreCard` renders each day.
-- Evidence links clickable
-  - Evidence links render as anchors and open in new tab (`target="_blank"`).
-- Print-to-PDF produces readable document
-  - Print button + scoped print CSS + shell-hide markers + full-width main content + visible URL text.
-- 409 "not ready" handled gracefully
-  - GET 409 maps to generating/polling; POST 409 maps to "already running" generating state then polling.
+- Added compact AI settings controls in create:
+  - `AI Evaluation Settings`
+  - Toggle checkboxes for `Day 1` through `Day 5`
+- Default state is enabled for all five days.
+- Submit payload uses the nested contract shape:
 
-## API / contract handling
+```json
+{
+  "ai": {
+    "evalEnabledByDay": {
+      "1": true,
+      "2": true,
+      "3": true,
+      "4": false,
+      "5": true
+    }
+  }
+}
+```
 
-- GET/POST fit profile endpoints
-  - Frontend BFF proxies:
-    - `GET /api/candidate_sessions/[candidateSessionId]/fit_profile`
-    - `POST /api/candidate_sessions/[candidateSessionId]/fit_profile/generate`
-  - Upstream backend paths forwarded as:
-    - `GET /api/candidate_sessions/{candidate_session_id}/fit_profile`
-    - `POST /api/candidate_sessions/{candidate_session_id}/fit_profile/generate`
-- Support for status payloads and 409 progress semantics
-  - `fitProfile.api.ts` supports status payloads (`not_started`, `running`, `ready`, `failed`) and report-in-root/report-nested variations.
-  - `useFitProfile` also handles transport-level 409 as generation-in-progress.
-- 403 / 404 / 409 / generic errors
-  - 403 -> access denied panel.
-  - 404 -> "Evaluation not found" + not-generated flow.
-  - 409 -> generating + auto-poll.
-  - Other failures -> error panel with retry.
+## Shared AI toggle normalization/helper
 
-## Security / privacy notes
+- Centralized day-key constants/defaults and normalization/extraction in shared helper logic.
+- Reduced scattered `1..5` day-key handling across create and detail normalization paths.
+- Ensures missing day keys safely default to enabled while preserving explicit backend-provided boolean values.
 
-- No report content logging
-  - Fit Profile code path does not log report payloads or evidence excerpts.
-- Safe evidence link behavior
-  - Evidence links use `target="_blank"` and `rel="noreferrer noopener"`.
-  - Only valid `http`/`https` URLs are rendered as clickable links.
-- Printed visible URLs are sanitized / token-free
-  - Printable URL text strips query/hash (`printableEvidenceUrl`) to avoid exposing signed token params in print output.
+## Simulation detail / preview rendering
 
-## Testing
+- Detail normalization reads AI toggle state from backend AI fields and normalizes to a full day map.
+- Day cards now render:
+  - `AI Evaluation: Enabled`
+  - `AI Evaluation: Disabled`
+- Disabled days show additional helper text:
+  - `Human Review Required`
+- Disabled badge uses muted/neutral styling; enabled uses success styling.
 
-- Targeted tests added/updated
-  - `tests/integration/recruiter/simulations/candidates/FitProfilePage.test.tsx`
-  - `tests/unit/features/recruiter/fit-profile/FitProfileComponents.test.tsx`
-  - `tests/unit/shared/AppLayout.test.tsx`
-- Targeted test coverage includes
-  - generate flow, GET/POST 409 handling, polling transition to ready, 403/404/generic states, print button wiring, print-mode class toggling, warning banner rendering, evidence link safety, and explicit `not_evaluated` day rendering.
-- Check results (latest iteration verification logs)
-  - Targeted fit-profile/app-layout test command: PASS
-  - `npm run lint`: PASS
-  - `npm run typecheck`: PASS
-  - `npm run build`: PASS
-  - `precommit.sh`: PASS (exit code `0`, see `.ai_flow/sessions/20260312_000939/iterations/02/checks/precommit.exitcode`)
+## Fit Profile disabled-day behavior
 
-## Manual QA / demo proof
+- Disabled AI days do not render an AI score.
+- Disabled days render explicit messaging:
+  - `AI evaluation disabled for this day.`
+  - `Human review required.`
+- Disabled placeholder semantics are handled clearly:
+  - backend-provided disabled placeholders (`human_review_required` / `ai_eval_disabled_for_day`) are normalized as AI-disabled
+  - days in `disabledDayIndexes` are materialized even when missing from `dayScores`
 
-- Route entry point
-  - Candidate submissions header includes a direct `Fit Profile` link to `/dashboard/simulations/[id]/candidates/[candidateSessionId]/fit-profile`.
-- Generate / polling / ready flow validation
-  - Validated by integration tests for not-generated, generating, 409 progression, and ready render states.
-- Print-proof artifact validation
-  - Browser artifact path used to validate print media behavior: generated HTML proof + screenshot + computed-style metrics JSON.
-  - Metrics confirm shell hide and content expansion behavior in print media.
-- Local auth limitation
-  - Live authenticated recruiter-route print verification was blocked locally by Auth0 redirect, so artifact-backed print proof was used as fallback evidence in this environment.
+## Tests added/updated
 
-## Artifacts
+- Create flow integration test now explicitly proves:
+  - five day toggles render
+  - all toggles default enabled
+  - Day 4 can be toggled off
+  - submit payload contains exact nested `ai.evalEnabledByDay`
+  - flattened/incorrect toggle fields are explicitly rejected in assertions
+- Detail/preview tests verify AI enabled/disabled labels and disabled-day human-review messaging.
+- Fit Profile tests verify disabled-day placeholder rendering and no AI-score display for disabled days.
 
-- Print proof HTML
-  - `test-results/fit-profile-print-proof.html`
-- Print proof screenshot
-  - `test-results/fit-profile-print-proof.png`
-- Print proof metrics JSON
-  - `test-results/fit-profile-print-proof-metrics.json`
-- Iteration diffs
-  - `.ai_flow/sessions/20260312_000939/iterations/01/diff.patch`
-  - `.ai_flow/sessions/20260312_000939/iterations/02/diff.patch`
+# 6. What was intentionally not included
 
-## Risks / follow-ups
+- Simulation edit flow support was intentionally skipped.
+- Reason: there is no existing recruiter simulation edit screen/route in this repo (no safe existing edit surface to extend without introducing new product scope).
 
-- Follow-up (non-blocking): re-run print verification on the live authenticated recruiter route in an environment with valid Auth0 recruiter session credentials.
+# 7. Backend contract confirmed
 
-## Rollout / demo checklist
+- `ai.evalEnabledByDay`
+  - Create submit contract is nested under `ai`.
+  - Per-day booleans are carried as string day keys (`"1"`..`"5"`).
+- Detail payload AI fields
+  - Detail normalization reads AI toggle map from backend AI payload fields (`ai.evalEnabledByDay` with snake_case fallback) and normalizes to full 5-day state.
+- Fit Profile disabled-day placeholder semantics
+  - Disabled-day state is derived from backend disabled signals (`disabledDayIndexes` and disabled placeholder status/reason semantics), then rendered as human-review-only days.
 
-- Open completed candidate session.
-- Click `Fit Profile` from Candidate Submissions.
-- Click `Generate Fit Profile` if needed.
-- Wait for generating state to transition to ready report.
-- Review overall fit score, recommendation calibration text, per-day cards, and evidence trail.
-- Click `Print / Save PDF` and confirm print preview readability.
+# 8. Acceptance criteria coverage
 
-## Final status
+- Recruiter can toggle per-day AI evaluation on create.
+  - Covered by create integration test (`SimulationCreatePage`) asserting all five toggles, default-on state, and Day 4 disable interaction.
+- Toggled values saved and visible on detail fetch.
+  - Covered by create payload assertion for nested `ai.evalEnabledByDay` and detail normalization/rendering tests consuming backend detail payload.
+- Preview page reflects toggle states.
+  - Covered by simulation detail integration tests asserting `AI Evaluation: Disabled`/`Enabled` and `Human Review Required` copy.
+- Fit Profile clearly indicates disabled days.
+  - Covered by Fit Profile integration/component tests asserting disabled badges and required disabled-day copy.
+- Disabled days do not show AI-generated score.
+  - Covered by Fit Profile normalization/component/integration tests asserting disabled-day cards render without AI score output.
 
-Ready for PR raise.
+# 9. Testing
+
+Exact commands run in validated iterations:
+
+```bash
+npm test -- --runInBand tests/unit/features/recruiter/simulations/create/createFormConfig.test.ts tests/unit/lib/recruiterApi.test.ts tests/unit/features/recruiter/simulation-detail/RecruiterSimulationDetailPage.helpers.test.ts tests/unit/features/recruiter/fit-profile/FitProfileComponents.test.tsx tests/unit/features/recruiter/fit-profile/fitProfileApi.test.ts tests/integration/recruiter/simulations/new/CreateSimulationContent.test.tsx tests/integration/recruiter/simulations/tests/SimulationDetailContent.test.tsx tests/integration/recruiter/simulations/candidates/FitProfilePage.test.tsx
+npm run lint
+npx prettier --write src/features/recruiter/api/simulationAiEval.ts src/features/recruiter/simulations/candidates/fitProfile/DayScoreCard.tsx src/features/recruiter/simulations/create/hooks/useSimulationCreateForm.ts src/features/recruiter/simulations/detail/components/PlanDayCard.tsx src/features/recruiter/simulations/detail/hooks/useSimulationLabels.ts tests/integration/recruiter/simulations/tests/SimulationDetailContent.test.tsx
+npm run lint
+npm run typecheck
+npm run build
+```
+
+Results:
+
+- Targeted tests: pass.
+- `npm run lint`: failed once due to formatting, then passed after running Prettier.
+- `npm run typecheck`: pass.
+- `npm run build`: pass.
+- Overall outcome: lint/typecheck/build/tests all passing.
+
+# 10. Manual QA / Runtime Verification
+
+Manual QA was completed against real localhost frontend + backend runtime using Playwright runtime automation, the playbook-approved local auth harness (`__session` cookie + local JWKS), and direct UI verification with evidence capture under `.qa/issue146/...`.
+
+Manual QA verdict: **PASS**  
+Ready for PR raise: **Yes**
+
+Evidence bundle:
+
+- `.qa/issue146/manual_qa_20260313_115354`
+- Pointer file: `.qa/issue146/LATEST_EVIDENCE_PATH.txt`
+
+Verified scenarios:
+
+- [x] Create page shows `AI Evaluation Settings` with `Day 1`..`Day 5` toggles
+- [x] All five toggles default enabled
+- [x] Day 4 can be disabled in the create UI
+- [x] Create request payload uses exact nested `ai.evalEnabledByDay` shape
+- [x] Simulation detail/preview shows `AI Evaluation: Disabled`, `Human Review Required`, and enabled state on other days
+- [x] Fit Profile Day 4 shows `AI Evaluation: Disabled`, `AI evaluation disabled for this day.`, and `Human review required.`
+- [x] Disabled Fit Profile day does not show AI score
+- [x] Final happy-path QA run had no console errors and no failing API responses
+
+Payload proof captured during manual QA (verbatim):
+
+```json
+"ai": {
+  "noticeVersion": "mvp1",
+  "evalEnabledByDay": {
+    "1": true,
+    "2": true,
+    "3": true,
+    "4": false,
+    "5": true
+  }
+}
+```
+
+Key QA artifacts:
+
+- `screenshots/01_create_form_default_state.png`
+- `screenshots/02_create_form_day4_disabled.png`
+- `screenshots/03_detail_preview_ai_states.png`
+- `screenshots/04_fit_profile_disabled_day.png`
+- `artifacts/create_request_payload.json`
+- `artifacts/create_response.json`
+- `artifacts/issue146_qa_result.json`
+- `QA_REPORT.md`
+- `commands.log`
+
+Manual QA scope notes:
+
+- Manual QA used real localhost runtime.
+- Validation included UI screenshots, network payload capture, and Fit Profile runtime verification.
+- Edit flow remained intentionally out of scope.
+- Candidate-facing messaging was backend-exposed but not a separate frontend edit surface in this issue.
+
+# 11. Risks / follow-ups
+
+- Backend disabled-day semantics assumption:
+  - UI behavior currently assumes disabled-day markers continue to use current backend disabled signals (`disabledDayIndexes` and disabled placeholder status/reason semantics).
+  - If backend introduces new disabled reason/status variants, frontend normalization may need an extension.
+- Manual QA environment note:
+  - Initial localhost QA attempts hit pre-existing local DB schema drift, causing backend `500` responses during create.
+  - QA was resolved using a fresh migrated local Postgres DB: `tenon_issue146_qa`.
+  - This was an environment/setup issue, not a product-code defect.
+  - No product source code was modified during QA; only `.qa/issue146/...` artifacts/harness files were created.
+
+# 12. Rollout / demo notes
+
+1. Create a simulation and disable `Day 4` in AI Evaluation Settings.
+2. Open simulation preview/detail and verify Day 4 shows `AI Evaluation: Disabled` with `Human Review Required`.
+3. Generate/open Fit Profile and verify Day 4 renders human-review-only messaging with no AI score shown.
+
+**Final status: Ready for PR raise.**

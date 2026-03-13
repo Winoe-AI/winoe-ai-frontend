@@ -57,6 +57,18 @@ describe('SimulationCreatePage', () => {
 
     render(<SimulationCreatePage />);
 
+    const day1Toggle = screen.getByLabelText(/^Day 1$/i);
+    const day2Toggle = screen.getByLabelText(/^Day 2$/i);
+    const day3Toggle = screen.getByLabelText(/^Day 3$/i);
+    const day4Toggle = screen.getByLabelText(/^Day 4$/i);
+    const day5Toggle = screen.getByLabelText(/^Day 5$/i);
+
+    expect(day1Toggle).toBeChecked();
+    expect(day2Toggle).toBeChecked();
+    expect(day3Toggle).toBeChecked();
+    expect(day4Toggle).toBeChecked();
+    expect(day5Toggle).toBeChecked();
+
     await user.type(screen.getByLabelText(/Title/i), ' Backend Payments ');
     await user.clear(screen.getByLabelText(/^Role$/i));
     await user.type(screen.getByLabelText(/^Role$/i), ' Backend Engineer ');
@@ -70,7 +82,8 @@ describe('SimulationCreatePage', () => {
     await user.type(screen.getByLabelText(/Company domain/i), ' fintech ');
     await user.type(screen.getByLabelText(/Product area/i), ' payments ');
     await user.type(screen.getByLabelText(/Focus /i), 'Messaging focus');
-    await user.click(screen.getByLabelText(/Day 4/i));
+    await user.click(day4Toggle);
+    expect(day4Toggle).not.toBeChecked();
 
     await user.click(
       screen.getByRole('button', { name: /Create simulation/i }),
@@ -100,6 +113,23 @@ describe('SimulationCreatePage', () => {
         },
       });
     });
+    const submittedPayload = createSimulationMock.mock.calls[0]?.[0];
+    expect(submittedPayload).toBeTruthy();
+    expect(submittedPayload).toMatchObject({
+      ai: {
+        evalEnabledByDay: {
+          '1': true,
+          '2': true,
+          '3': true,
+          '4': false,
+          '5': true,
+        },
+      },
+    });
+    expect(submittedPayload).not.toHaveProperty('evalEnabledByDay');
+    expect(submittedPayload).not.toHaveProperty('evalDay4');
+    expect(submittedPayload).not.toHaveProperty('ai.evalDay4');
+    expect(submittedPayload).not.toHaveProperty('aiEvalEnabledByDay');
 
     expect(routerMock.push).toHaveBeenCalledWith(
       '/dashboard/simulations/sim_123',

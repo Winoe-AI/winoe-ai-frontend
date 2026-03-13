@@ -12,7 +12,11 @@ type Props = {
   companyContextLabel: string;
   scenarioLabel: string | null;
   rubricSummary: string | null;
-  planDays: { dayIndex: number; task: SimulationPlan['days'][number] | null }[];
+  planDays: {
+    dayIndex: number;
+    task: SimulationPlan['days'][number] | null;
+    aiEvaluationEnabled: boolean;
+  }[];
 };
 
 export function SimulationPlanContent({

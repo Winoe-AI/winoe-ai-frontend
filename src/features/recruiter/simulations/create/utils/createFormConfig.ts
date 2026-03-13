@@ -3,13 +3,18 @@ import type {
   SimulationEvalDayKey,
   SimulationRoleLevel,
 } from '@/features/recruiter/api';
+import {
+  DEFAULT_SIMULATION_EVAL_ENABLED_BY_DAY,
+  SIMULATION_EVAL_DAY_KEYS,
+} from '@/features/recruiter/api/simulationAiEval';
 import { DEFAULT_TEMPLATE_KEY } from '@/lib/templateCatalog';
 
 export const MAX_FOCUS_NOTES_CHARS = 1000;
 export const MAX_COMPANY_CONTEXT_VALUE_CHARS = 120;
 export const MAX_AI_NOTICE_VERSION_CHARS = 100;
 
-export const AI_DAY_KEYS: SimulationEvalDayKey[] = ['1', '2', '3', '4', '5'];
+export const AI_DAY_KEYS: readonly SimulationEvalDayKey[] =
+  SIMULATION_EVAL_DAY_KEYS;
 
 export type AiEvalDayFieldKey =
   | 'evalDay1'
@@ -80,11 +85,11 @@ export const initialValues: FormValues = {
   companyDomain: '',
   companyProductArea: '',
   noticeVersion: 'mvp1',
-  evalDay1: true,
-  evalDay2: true,
-  evalDay3: true,
-  evalDay4: true,
-  evalDay5: true,
+  evalDay1: DEFAULT_SIMULATION_EVAL_ENABLED_BY_DAY['1'],
+  evalDay2: DEFAULT_SIMULATION_EVAL_ENABLED_BY_DAY['2'],
+  evalDay3: DEFAULT_SIMULATION_EVAL_ENABLED_BY_DAY['3'],
+  evalDay4: DEFAULT_SIMULATION_EVAL_ENABLED_BY_DAY['4'],
+  evalDay5: DEFAULT_SIMULATION_EVAL_ENABLED_BY_DAY['5'],
 };
 
 const trimOrUndefined = (value: string | undefined) => {

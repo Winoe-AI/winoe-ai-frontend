@@ -10,6 +10,7 @@ import {
 } from '@/lib/auth/routing';
 import { toUserMessage } from '@/lib/errors/errors';
 import {
+  AI_DAY_KEYS,
   AI_DAY_FIELD_MAP,
   SENIORITY_OPTIONS,
   initialValues,
@@ -36,6 +37,15 @@ export function useSimulationCreateForm(onSuccess: (id: string) => void) {
     const trimmedDomain = values.companyDomain.trim();
     const trimmedProductArea = values.companyProductArea.trim();
     const trimmedFocus = values.focus.trim();
+    const evalEnabledByDay = AI_DAY_KEYS.reduce<
+      NonNullable<CreateSimulationInput['ai']>['evalEnabledByDay']
+    >(
+      (acc, day) => {
+        acc[day] = values[AI_DAY_FIELD_MAP[day]];
+        return acc;
+      },
+      {} as NonNullable<CreateSimulationInput['ai']>['evalEnabledByDay'],
+    );
     const payload: CreateSimulationInput = {
       title: values.title.trim(),
       role: values.role.trim(),
@@ -54,13 +64,7 @@ export function useSimulationCreateForm(onSuccess: (id: string) => void) {
           : undefined,
       ai: {
         noticeVersion: values.noticeVersion.trim(),
-        evalEnabledByDay: {
-          '1': values[AI_DAY_FIELD_MAP['1']],
-          '2': values[AI_DAY_FIELD_MAP['2']],
-          '3': values[AI_DAY_FIELD_MAP['3']],
-          '4': values[AI_DAY_FIELD_MAP['4']],
-          '5': values[AI_DAY_FIELD_MAP['5']],
-        },
+        evalEnabledByDay,
       },
     };
 

@@ -73,7 +73,11 @@ export type SimulationDetailViewProps = {
   scenarioLabel: string | null;
   rubricSummary: string | null;
   scenarioContentUnavailableMessageForPlan: string | null;
-  planDays: { dayIndex: number; task: SimulationPlan['days'][number] | null }[];
+  planDays: {
+    dayIndex: number;
+    task: SimulationPlan['days'][number] | null;
+    aiEvaluationEnabled: boolean;
+  }[];
   planLoading: boolean;
   planStatusCode: number | null;
   generating: boolean;

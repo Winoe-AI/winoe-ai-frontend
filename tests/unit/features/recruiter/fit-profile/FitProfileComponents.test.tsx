@@ -36,6 +36,8 @@ describe('Fit Profile components', () => {
           dayIndex: 2,
           score: 0.61,
           evaluationStatus: 'evaluated',
+          reason: null,
+          aiEvaluationEnabled: true,
           rubricBreakdown: {
             problemSolving: 0.7,
             communication: 'clear and direct',
@@ -59,6 +61,8 @@ describe('Fit Profile components', () => {
           dayIndex: 4,
           score: null,
           evaluationStatus: 'not_evaluated',
+          reason: 'ai_eval_disabled_for_day',
+          aiEvaluationEnabled: false,
           rubricBreakdown: {},
           evidence: [],
         }}
@@ -66,12 +70,14 @@ describe('Fit Profile components', () => {
     );
 
     expect(screen.getByText('Day 4')).toBeInTheDocument();
-    expect(screen.getByText('Not evaluated')).toBeInTheDocument();
+    expect(screen.getByText('AI Evaluation: Disabled')).toBeInTheDocument();
     expect(
-      screen.getByText(
-        /This day was not evaluated and does not affect overall fit score./i,
-      ),
+      screen.getByText(/AI evaluation disabled for this day./i),
     ).toBeInTheDocument();
+    expect(screen.getByText(/Human review required./i)).toBeInTheDocument();
+    expect(
+      screen.queryByText(/This day was not evaluated and does not affect/i),
+    ).not.toBeInTheDocument();
   });
 
   it('renders evidence links with safe external link attributes', () => {

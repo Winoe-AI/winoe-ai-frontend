@@ -24,6 +24,8 @@ export type FitProfileDayScore = {
   rubricBreakdown: Record<string, unknown>;
   evidence: FitProfileEvidence[];
   evaluationStatus: FitProfileDayEvaluationStatus;
+  reason: string | null;
+  aiEvaluationEnabled: boolean;
 };
 
 export type FitProfileVersion = {

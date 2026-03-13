@@ -1,10 +1,33 @@
 'use client';
 import { MarkdownPreview } from '@/shared/ui/Markdown';
+import { InlineBadge } from '@/shared/ui/InlineBadge';
 import { SimulationPlanDay } from '../utils/plan';
 import { PlanDayRubric } from './PlanDayRubric';
 import { PlanDayWorkspace } from './PlanDayWorkspace';
 
-type Props = { slot: { dayIndex: number; task: SimulationPlanDay | null } };
+type Props = {
+  slot: {
+    dayIndex: number;
+    task: SimulationPlanDay | null;
+    aiEvaluationEnabled: boolean;
+  };
+};
+
+function AiEvaluationState({ enabled }: { enabled: boolean }) {
+  return (
+    <div className="flex flex-col items-start gap-1">
+      <InlineBadge
+        label={`AI Evaluation: ${enabled ? 'Enabled' : 'Disabled'}`}
+        tone={enabled ? 'success' : 'muted'}
+      />
+      {!enabled ? (
+        <p className="text-xs font-medium text-gray-600">
+          Human Review Required
+        </p>
+      ) : null}
+    </div>
+  );
+}
 
 export function PlanDayCard({ slot }: Props) {
   const day = slot.task;
@@ -14,6 +37,9 @@ export function PlanDayCard({ slot }: Props) {
       <div className="rounded border border-gray-200 bg-gray-50 p-4">
         <div className="text-xs font-medium uppercase tracking-wide text-gray-500">
           {dayLabel}
+        </div>
+        <div className="mt-2">
+          <AiEvaluationState enabled={slot.aiEvaluationEnabled} />
         </div>
         <div className="mt-1 text-base font-semibold text-gray-900">
           Not generated yet
@@ -32,6 +58,9 @@ export function PlanDayCard({ slot }: Props) {
           </div>
           <div className="mt-1 text-base font-semibold text-gray-900">
             {day.title}
+          </div>
+          <div className="mt-2">
+            <AiEvaluationState enabled={slot.aiEvaluationEnabled} />
           </div>
         </div>
         {day.type ? (
