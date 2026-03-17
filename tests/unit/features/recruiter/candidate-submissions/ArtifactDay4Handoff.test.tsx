@@ -139,6 +139,20 @@ describe('ArtifactDay4Handoff', () => {
     ).not.toThrow();
   });
 
+  it('shows unavailable fallback when playback fails to load', () => {
+    const { container } = render(
+      <ArtifactCard artifact={buildDay4Artifact()} />,
+    );
+    const video = container.querySelector('video');
+    expect(video).toBeTruthy();
+
+    fireEvent.error(video as HTMLVideoElement);
+
+    expect(
+      screen.getByText(/Video unavailable right now/i),
+    ).toBeInTheDocument();
+  });
+
   it('does not render handoff playback UI for non-handoff Day 4 artifacts', () => {
     render(<ArtifactCard artifact={buildNonHandoffDay4Artifact()} />);
 
