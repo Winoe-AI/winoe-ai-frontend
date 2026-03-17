@@ -56,11 +56,15 @@ jest.mock('@/features/recruiter/api', () => ({
   normalizeCandidateSession: (data: unknown) => data,
 }));
 
-jest.mock('@/lib/api/client', () => ({
-  recruiterBffClient: {
-    get: (...args: unknown[]) => recruiterGetMock(...args),
-  },
-}));
+jest.mock('@/lib/api/client', () => {
+  const actual = jest.requireActual('@/lib/api/client');
+  return {
+    ...actual,
+    recruiterBffClient: {
+      get: (...args: unknown[]) => recruiterGetMock(...args),
+    },
+  };
+});
 
 jest.mock('@/features/recruiter/utils/formatters', () => {
   const actual = jest.requireActual('@/features/recruiter/utils/formatters');

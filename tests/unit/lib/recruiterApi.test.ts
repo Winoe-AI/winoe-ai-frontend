@@ -10,13 +10,17 @@ const mockRecruiterRequest = jest.fn();
 const mockSafeRequest = jest.fn();
 const mockRecruiterBffGet = jest.fn();
 
-jest.mock('@/lib/api/client', () => ({
-  bffClient: { get: jest.fn(), post: jest.fn() },
-  recruiterBffClient: {
-    get: (...args: unknown[]) => mockRecruiterBffGet(...args),
-  },
-  safeRequest: (...args: unknown[]) => mockSafeRequest(...args),
-}));
+jest.mock('@/lib/api/client', () => {
+  const actual = jest.requireActual('@/lib/api/client');
+  return {
+    ...actual,
+    bffClient: { get: jest.fn(), post: jest.fn() },
+    recruiterBffClient: {
+      get: (...args: unknown[]) => mockRecruiterBffGet(...args),
+    },
+    safeRequest: (...args: unknown[]) => mockSafeRequest(...args),
+  };
+});
 
 jest.mock('@/features/recruiter/api/requestRecruiterBff', () => ({
   requestRecruiterBff: (...args: unknown[]) => mockRecruiterRequest(...args),

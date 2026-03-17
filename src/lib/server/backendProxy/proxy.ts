@@ -10,6 +10,10 @@ import { forwardHeaders, copyUpstreamHeaders } from './headers';
 import { readBodyTextWithLimit } from './body';
 import { buildProxyResponse } from './response';
 import { resolveTarget, type BackendRouteContext } from './target';
+import {
+  enforceMutationSameOrigin,
+  enforceProxyMethodPolicy,
+} from './requestSecurity';
 
 type ProxyAuthResult =
   | { ok: true; accessToken: string; cookies: NextResponse | null }
@@ -46,17 +50,21 @@ export async function proxyToBackend(
 ) {
   const start = process.env.TENON_DEBUG_PERF ? Date.now() : null;
   const requestId = resolveRequestId(req.headers);
+
+  const { backendPath, pathSegments, targetUrl, method, timeoutMs } =
+    await resolveTarget(req, context);
+  const methodError = enforceProxyMethodPolicy(method, pathSegments, requestId);
+  if (methodError) return methodError;
+
+  const originError = enforceMutationSameOrigin(req, method, requestId);
+  if (originError) return originError;
+
   const auth = await requireProxyAuth(req);
   if (!auth.ok) {
     mergeAuthCookies(auth.cookies, auth.response);
     auth.response.headers.set(REQUEST_ID_HEADER, requestId);
     return auth.response;
   }
-
-  const { backendPath, targetUrl, method, timeoutMs } = await resolveTarget(
-    req,
-    context,
-  );
   const headers = forwardHeaders(req);
   headers.Authorization = `Bearer ${auth.accessToken}`;
 

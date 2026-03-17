@@ -25,6 +25,3 @@ export function PATCH(req: NextRequest, context: BackendRouteContext) {
 export function DELETE(req: NextRequest, context: BackendRouteContext) {
   return proxyToBackend(req, context);
 }
-export function OPTIONS(req: NextRequest, context: BackendRouteContext) {
-  return proxyToBackend(req, context);
-}

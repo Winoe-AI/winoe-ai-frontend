@@ -141,7 +141,8 @@ describe('httpClient edge cases', () => {
     await expect(
       apiClient.get('/fail-no-detail', { skipCache: true }),
     ).rejects.toMatchObject({
-      message: 'Request failed with status 403',
+      message:
+        'Request blocked by security policy. Please refresh and try again.',
     });
   });
 

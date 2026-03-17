@@ -55,29 +55,22 @@ describe('httpClient', () => {
     expect(global.fetch).toHaveBeenCalledWith(
       '/api/simulations',
       expect.objectContaining({
-        credentials: 'include',
+        credentials: 'same-origin',
         cache: 'no-store',
       }),
     );
   });
 
-  it('omits credentials for absolute backend origins', async () => {
-    process.env.NEXT_PUBLIC_TENON_API_BASE_URL =
-      'https://backend.example.com/api';
-    (global.fetch as jest.Mock).mockResolvedValueOnce(
-      responseHelpers.jsonResponse({ ok: true }) as unknown as Response,
-    );
-
-    await apiClient.get('/candidate/invites', undefined, {
-      basePath: 'https://backend.example.com/api',
-    });
-
-    expect(global.fetch).toHaveBeenCalledWith(
-      'https://backend.example.com/api/candidate/invites',
-      expect.objectContaining({
-        credentials: 'omit',
+  it('rejects absolute BFF origins to enforce same-origin requests', async () => {
+    await expect(
+      apiClient.get('/candidate/invites', undefined, {
+        basePath: 'https://backend.example.com/api',
       }),
-    );
+    ).rejects.toMatchObject({
+      status: 400,
+      code: 'BFF_UNSAFE_REQUEST',
+    });
+    expect(global.fetch).not.toHaveBeenCalled();
   });
 
   it('dedupes concurrent GETs and only fetches once', async () => {

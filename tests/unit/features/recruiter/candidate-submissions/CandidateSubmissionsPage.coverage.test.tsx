@@ -8,14 +8,18 @@ jest.mock('next/navigation', () => ({
   useRouter: () => ({ push: jest.fn() }),
 }));
 
-jest.mock('@/lib/api/client', () => ({
-  recruiterBffClient: {
-    get: jest.fn().mockResolvedValue({
-      simulation: { id: 1, title: 'Test' },
-      submissions: [],
-    }),
-  },
-}));
+jest.mock('@/lib/api/client', () => {
+  const actual = jest.requireActual('@/lib/api/client');
+  return {
+    ...actual,
+    recruiterBffClient: {
+      get: jest.fn().mockResolvedValue({
+        simulation: { id: 1, title: 'Test' },
+        submissions: [],
+      }),
+    },
+  };
+});
 
 jest.mock('@/lib/auth/routing', () => ({
   buildLoginUrl: jest.fn(() => '/auth/login'),

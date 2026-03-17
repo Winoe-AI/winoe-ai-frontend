@@ -2,12 +2,16 @@ const mockPost = jest.fn();
 const mockGet = jest.fn();
 const mockRequestWithMeta = jest.fn();
 
-jest.mock('@/lib/api/client', () => ({
-  apiClient: {
-    post: mockPost,
-    get: mockGet,
-  },
-}));
+jest.mock('@/lib/api/client', () => {
+  const actual = jest.requireActual('@/lib/api/client');
+  return {
+    ...actual,
+    apiClient: {
+      post: mockPost,
+      get: mockGet,
+    },
+  };
+});
 
 jest.mock('@/lib/api/client/request', () => ({
   requestWithMeta: (...args: unknown[]) => mockRequestWithMeta(...args),

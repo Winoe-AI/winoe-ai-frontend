@@ -1,88 +1,119 @@
-# Title
+## 1. Title
 
-Issue #145: P2 compliance UX for candidate AI notice, consent-gated Day 4 finalize, and upload deletion handling
+P2 Security: CSRF posture for Next BFF routes (same-origin enforcement) + safe defaults (#130)
 
-# TL;DR
+## 2. TL;DR
 
-Issue #145 is complete. Frontend compliance UX is delivered end-to-end, backend compatibility fallbacks are implemented, backend recruiter-submissions blocker is resolved, and final manual QA is PASS.
+Frontend hardening for `/api/backend/*` is complete and PR-ready. Request execution is centralized through `requestCore -> bffFetch`, proxy mutation guardrails enforce method and same-origin policy, and caller usage is aligned to safe same-origin defaults without introducing browser bearer-token workarounds.
 
-# Final Implementation State
+## 3. Problem / Why
 
-## Frontend behavior delivered
+MVP1 uses cookie-based sessions via Next.js BFF/proxy routes. With backend CSRF/CORS hardening in `tenon-backend#221`, frontend behavior had to align so cookie-authenticated mutations remain same-origin safe, unsafe request patterns are rejected consistently, and token hygiene is preserved.
 
-- AI notice in scheduling flow.
-- AI notice/reminder in Day 4 flow.
-- Consent-gated finalize (`Complete upload` disabled until consent is checked).
-- Delete upload CTA with irreversible confirmation modal.
-- Transcript/deleted/unavailable state rendering in candidate Day 4 panel.
-- Recruiter-side graceful handling for deleted/unavailable Day 4 media.
+## 4. What changed
 
-## Frontend contract fallback behavior
+- Added shared `bffFetch()` helper in `src/lib/api/client/bffFetch.ts`.
+- Centralized request execution through `requestCore -> bffFetch` in `src/lib/api/client/requestCore.ts`.
+- Migrated recruiter fallback path to helper-based execution in `src/features/recruiter/api/recruiterRequestFallback.ts`.
+- Added path normalization and URL safety behavior in `src/lib/api/client/url.ts` and `src/lib/api/client/requestContext.ts`.
+- Added proxy method-policy and same-origin mutation guardrails in `src/lib/server/backendProxy/requestSecurity.ts`, wired through `src/lib/server/backendProxy/proxy.ts`.
+- Tightened `/api/backend/[...path]` route contract in `src/app/api/backend/[...path]/route.ts`.
 
-### Consent fallback chain
+## 5. Security posture changes
 
-- `POST /tasks/{id}/handoff/consent`
-- `POST /tasks/{id}/handoff/upload/consent`
-- `POST /candidate/session/{candidateSessionId}/privacy/consent`
-- Consent fields embedded in `upload/complete` payload when needed.
+- `bffFetch()` rejects cross-origin absolute BFF URLs.
+- `bffFetch()` rejects `mode: "no-cors"`.
+- Browser usage defaults to same-origin-safe credentials behavior for BFF calls.
+- `401/403` are normalized to safe generic user-facing messages.
+- Proxy guardrails enforce method policy and same-origin behavior for cookie-authenticated unsafe methods.
+- No browser bearer-token workaround was introduced.
 
-### Delete fallback chain
+## 6. API / route contract changes
 
-- `DELETE /tasks/{id}/handoff`
-- `POST /tasks/{id}/handoff/delete`
-- `POST /recordings/{recordingId}/delete`
+- Mutation routes enforce explicit method policy.
+- `GET` on mutation routes returns `405 Method Not Allowed`.
+- Bad-origin cookie-authenticated mutation requests return `403`.
+- Open-proxy behavior was not introduced; upstream targeting remains internal and constrained.
 
-## Frontend correctness improvements
+## 7. Helper / caller migration
 
-- Fixed stale `refreshStatus` race by ignoring out-of-order responses via request-id tracking.
-- Added deleted-state inference from `recording.status` (`deleted`/`purged`) when explicit deleted flags are absent.
-- Day 4 panel delete action now explicitly includes `recordingId` for canonical delete endpoint compatibility.
+- Primary BFF request execution now flows through `requestCore -> bffFetch`.
+- Recruiter fallback path now uses helper-based execution.
+- No direct browser `fetch("/api/backend/...")` bypass callers remain.
 
-## Backend blocker resolution
+## 8. Path normalization / URL safety
 
-- `tenon-backend` recruiter submissions projection now includes:
-  - `workflow_run_status`
-  - `workflow_run_conclusion`
-- Regression coverage was added to prevent recurrence of `/api/submissions` `MissingGreenlet` failure.
+- Path joining and normalization logic is centralized and reused.
+- Already-prefixed API paths are handled safely (no double-prefixing).
+- Unsafe URL patterns are blocked before dispatch.
 
-# Testing / QA
+## 9. Token hygiene audit result
 
-## Frontend checks
+- No client-side bearer-token persistence or transport workaround was added.
+- Browser auth remains session-cookie based.
+- This frontend branch does not redesign auth.
+- This frontend branch does not implement a CSRF-token framework.
 
-- PASS: targeted frontend tests
-  - `npm test -- --runInBand tests/unit/features/candidate/session/task/handoff/HandoffUploadPanel.test.tsx tests/unit/features/candidate/session/task/handoff/handoffUploadMachine.test.ts tests/unit/features/candidate/session/task/handoff/handoffApi.test.ts tests/unit/features/recruiter/candidate-submissions/ArtifactDay4Handoff.test.tsx`
-- PASS: `npm run lint`
-- PASS: `npm run typecheck`
-- PASS: `npm run build`
+## 10. Automated tests / validation
 
-## Backend checks
+- targeted regression suites: **PASS**
+- broader recruiter/candidate suites: **PASS**
+- full suite: **PASS**
+- `250 passed`, `250 total`
+- `1580 passed`, `1580 total`
+- lint: **PASS**
+- typecheck: **PASS**
+- build: **PASS**
+- precommit: **PASS**
 
-- PASS: targeted backend integration tests
-  - `poetry run pytest --no-cov tests/integration/api/test_submissions_api.py tests/integration/api/test_media_privacy_api.py`
-- PASS: touched-file lint
-  - `poetry run ruff check app/services/submissions/service_recruiter/list_submissions.py tests/integration/api/test_submissions_api.py`
-- PASS: recruiter submissions regression coverage verified in integration suite (`test_submissions_api.py`) for `/api/submissions` stability.
+## 11. Manual QA evidence
 
-## Final manual QA evidence
+### Manual QA verdict
 
-- Evidence bundle: `.qa/issue145/manual_qa_20260316_184739/QA_REPORT.md`
-- Final QA verdict: PASS
-- Scheduling AI notice verified.
-- Day 4 AI notice verified.
-- Consent gating verified.
-- Finalize after consent verified.
-- Transcript/media states verified.
-- Delete flow verified.
-- Recruiter submissions surface verified.
-- Recruiter Day 4 unavailable/deleted behavior verified.
-- `/api/submissions?...` verified at `200`.
-- Canonical consent/delete endpoints verified at `200`.
-- Legacy task-scoped consent/delete endpoints verified at `404`.
+**PASS**
 
-# Environment note
+### Verified scenarios
 
-- Local workstation Postgres runtime was schema-drifted.
-- Final live verification used playbook-approved sqlite fallback (`USE_SQLITE=1`).
-- This did not block validation of issue #145 behavior on the real frontend + backend code.
+- Recruiter create simulation -> PASS
+- Recruiter view simulation detail -> PASS
+- Recruiter send invite -> PASS
+- Candidate claim invite -> PASS
+- Candidate schedule start date -> PASS
+- Negative cross-site mutation with `Origin: https://evil.example` -> PASS (`403`)
+- Negative `GET` on representative mutation route -> PASS (`405`)
 
-Ready for PR raise: Yes
+### Runtime/browser security observations
+
+- Browser API traffic stayed on `localhost:3000` only.
+- No direct browser requests were made to backend host `:8000`.
+- No browser `Authorization` header was observed.
+- Browser auth remained session-cookie based (`__session`).
+- Candidate browser storage contained app/session state only, not bearer-token persistence.
+
+### Evidence references
+
+- `.qa/130/manual_qa_20260316_2327/QA_REPORT.md`
+- Recruiter/candidate flow screenshots: `.qa/130/manual_qa_20260316_2327/screenshots/`
+- Raw HTTP artifact (bad-origin POST): `.qa/130/manual_qa_20260316_2327/http/negative_bad_origin_post.txt`
+- Raw HTTP artifact (GET-on-mutation): `.qa/130/manual_qa_20260316_2327/http/negative_get_on_mutation_route.txt`
+- Playwright result/network artifacts: `.qa/130/manual_qa_20260316_2327/artifacts/issue130_playwright_result.json`, `.qa/130/manual_qa_20260316_2327/artifacts/issue130_playwright_network_events.json`, `.qa/130/manual_qa_20260316_2327/artifacts/issue130_playwright_console_events.json`
+
+## 12. Manual QA runtime caveats
+
+- Manual QA was performed in local runtime, not staging or production.
+- Candidate claim/schedule initially failed under shorthand test bearer tokens because backend ownership checks required `email_verified=true`.
+- QA switched to QA-only signed JWT + local JWKS to satisfy backend ownership checks.
+- This was a QA runtime setup only, not a product-code change.
+- Invite verification used an existing active simulation for the invite action because a newly created simulation remained in `generating` state locally without scenario-worker activation.
+- Backend `#221` remains the source of truth for full Origin/Referer enforcement semantics.
+- Backend `#129` remains related dependency context for broader token-endpoint cleanup.
+
+## 13. Risks / dependencies
+
+- Backend `#221` and `#129` remain dependency context outside this frontend branch.
+- Method allow-policy and mutation-route classification must remain synchronized as backend route surfaces evolve.
+- Local-runtime manual QA cannot substitute for staging/production verification.
+
+## 14. PR readiness judgment
+
+Frontend scope for issue #130 is complete and approved for PR raise, with local-runtime QA caveats and backend dependency context documented above.
