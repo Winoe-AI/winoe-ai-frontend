@@ -36,6 +36,21 @@ function toNullableNumber(value: unknown): number | null {
   return null;
 }
 
+function toNullableBoolean(value: unknown): boolean | null {
+  if (typeof value === 'boolean') return value;
+  if (typeof value === 'number') {
+    if (value === 1) return true;
+    if (value === 0) return false;
+    return null;
+  }
+  if (typeof value !== 'string') return null;
+  const normalized = value.trim().toLowerCase();
+  if (!normalized) return null;
+  if (['true', '1', 'yes'].includes(normalized)) return true;
+  if (['false', '0', 'no'].includes(normalized)) return false;
+  return null;
+}
+
 function asRecord(value: unknown): Record<string, unknown> | null {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return null;
   return value as Record<string, unknown>;
@@ -115,12 +130,35 @@ function normalizeHandoff(
   const downloadUrl =
     toNullableString(handoffRecord.downloadUrl ?? handoffRecord.download_url) ??
     null;
+  const recordingStatus =
+    toNullableString(
+      handoffRecord.recordingStatus ?? handoffRecord.recording_status,
+    ) ?? null;
+  const isDeleted =
+    toNullableBoolean(
+      handoffRecord.isDeleted ??
+        handoffRecord.is_deleted ??
+        handoffRecord.deleted,
+    ) ?? null;
+  const deletedAt =
+    toIsoOrNull(handoffRecord.deletedAt ?? handoffRecord.deleted_at) ?? null;
   const transcript = normalizeTranscript(handoffRecord);
 
-  if (!recordingId && !downloadUrl && !transcript) return null;
+  if (
+    !recordingId &&
+    !downloadUrl &&
+    !transcript &&
+    !recordingStatus &&
+    !isDeleted &&
+    !deletedAt
+  )
+    return null;
   return {
     recordingId,
     downloadUrl,
+    recordingStatus,
+    isDeleted,
+    deletedAt,
     transcript,
   };
 }

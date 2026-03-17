@@ -56,6 +56,9 @@ export type HandoffTranscript = {
 export type HandoffSubmissionArtifact = {
   recordingId: string | null;
   downloadUrl: string | null;
+  recordingStatus?: string | null;
+  isDeleted?: boolean | null;
+  deletedAt?: string | null;
   transcript: HandoffTranscript | null;
 };
 

@@ -3,8 +3,11 @@ import { expect, test } from '@playwright/test';
 test('candidate Day 4 handoff upload flow hydrates and reaches transcript ready', async ({
   page,
 }) => {
-  let statusCallCount = 0;
+  let completeBody: Record<string, unknown> | null = null;
   let initBody: Record<string, unknown> | null = null;
+  let statusAfterCompleteCalls = 0;
+  let completed = false;
+  let deleted = false;
 
   await page.route('**/api/backend/**', async (route) => {
     const request = route.request();
@@ -60,6 +63,8 @@ test('candidate Day 4 handoff upload flow hydrates and reaches transcript ready'
     }
 
     if (pathname.endsWith('/tasks/4/handoff/upload/complete')) {
+      completeBody = request.postDataJSON() as Record<string, unknown>;
+      completed = true;
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
@@ -72,15 +77,25 @@ test('candidate Day 4 handoff upload flow hydrates and reaches transcript ready'
     }
 
     if (pathname.endsWith('/tasks/4/handoff/status')) {
-      statusCallCount += 1;
-
-      const body =
-        statusCallCount === 1
-          ? {
-              recording: null,
-              transcript: null,
-            }
-          : statusCallCount === 2
+      let body: Record<string, unknown>;
+      if (deleted) {
+        body = {
+          recording: null,
+          transcript: null,
+          isDeleted: true,
+          deletedAt: '2026-03-16T10:10:00.000Z',
+          recordingStatus: 'deleted',
+          transcriptStatus: 'deleted',
+        };
+      } else if (!completed) {
+        body = {
+          recording: null,
+          transcript: null,
+        };
+      } else {
+        statusAfterCompleteCalls += 1;
+        body =
+          statusAfterCompleteCalls === 1
             ? {
                 recording: {
                   recordingId: 'rec_123',
@@ -114,11 +129,29 @@ test('candidate Day 4 handoff upload flow hydrates and reaches transcript ready'
                   ],
                 },
               };
+      }
 
       await route.fulfill({
         status: 200,
         contentType: 'application/json',
         body: JSON.stringify(body),
+      });
+      return;
+    }
+
+    if (
+      pathname.endsWith('/tasks/4/handoff') &&
+      request.method().toUpperCase() === 'DELETE'
+    ) {
+      deleted = true;
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          deleted: true,
+          deletedAt: '2026-03-16T10:10:00.000Z',
+          status: 'deleted',
+        }),
       });
       return;
     }
@@ -152,6 +185,16 @@ test('candidate Day 4 handoff upload flow hydrates and reaches transcript ready'
   });
 
   await expect(
+    page.getByRole('button', { name: /complete upload/i }),
+  ).toBeDisabled();
+  await page
+    .getByLabel(
+      /I understand and consent to submission and processing of my video and transcript for evaluation/i,
+    )
+    .check();
+  await page.getByRole('button', { name: /complete upload/i }).click();
+
+  await expect(
     page.getByRole('button', { name: /replace upload/i }),
   ).toBeVisible();
   await expect(page.getByText(/transcript processing\.\.\./i)).toBeVisible();
@@ -163,9 +206,29 @@ test('candidate Day 4 handoff upload flow hydrates and reaches transcript ready'
   await expect(page.getByText(/00:00 - 00:01/i)).toBeVisible();
   await expect(page.getByText(/hello/i)).toBeVisible();
 
+  await page
+    .getByRole('button', { name: /^delete upload$/i })
+    .first()
+    .click();
+  await expect(page.getByText(/Delete this upload\?/i)).toBeVisible();
+  await page
+    .getByRole('button', { name: /^delete upload$/i })
+    .nth(1)
+    .click();
+  await expect(page.getByText(/Upload deleted\./i)).toBeVisible();
+  await expect(
+    page.getByRole('button', { name: /upload video/i }),
+  ).toBeVisible();
+
   expect(initBody).toEqual({
     contentType: 'video/mp4',
     sizeBytes: 11,
     filename: 'handoff.mp4',
+  });
+  expect(completeBody).toEqual({
+    recordingId: 'rec_123',
+    consentAccepted: true,
+    aiNoticeVersion: 'mvp1',
+    noticeVersion: 'mvp1',
   });
 });

@@ -1,6 +1,7 @@
 import Button from '@/shared/ui/Button';
 import Input from '@/shared/ui/Input';
 import type { CandidateDayWindow } from '@/features/candidate/api';
+import { AiNoticeCard } from '../components/AiNoticeCard';
 
 type Props = {
   title: string;
@@ -84,6 +85,8 @@ export function SchedulingView({
           {role ? ` (${role})` : ''}.
         </p>
       </div>
+
+      <AiNoticeCard compact />
 
       {scheduleSubmitError ? (
         <div className="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-800">

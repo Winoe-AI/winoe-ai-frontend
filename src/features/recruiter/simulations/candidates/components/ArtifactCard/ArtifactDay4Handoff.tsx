@@ -35,12 +35,24 @@ export function ArtifactDay4Handoff({ artifact }: Props) {
   const handoff = artifact.handoff ?? null;
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const segmentRefs = useRef<Record<string, HTMLDivElement | null>>({});
+  const [failedVideoUrl, setFailedVideoUrl] = useState<string | null>(null);
   const [query, setQuery] = useState('');
+  const downloadUrl = handoff?.downloadUrl ?? null;
   const transcript = handoff?.transcript ?? null;
   const transcriptStatus = transcript?.status ?? 'processing';
   const transcriptSegments = transcript?.segments ?? EMPTY_TRANSCRIPT_SEGMENTS;
   const transcriptIsReady =
     isTranscriptReady(transcriptStatus) && transcriptSegments.length > 0;
+  const deleted =
+    handoff?.isDeleted === true || Boolean(handoff?.deletedAt ?? null);
+  const unavailableByStatus = ['forbidden', 'unavailable', 'deleted'].includes(
+    normalizeStatus(handoff?.recordingStatus),
+  );
+  const videoUnavailable = Boolean(
+    downloadUrl && failedVideoUrl === downloadUrl,
+  );
+  const shouldHidePlayer =
+    deleted || unavailableByStatus || videoUnavailable || !downloadUrl;
 
   const { segments, totalMatches } = useMemo(
     () => buildTranscriptSearchResults(transcriptSegments, query),
@@ -72,18 +84,19 @@ export function ArtifactDay4Handoff({ artifact }: Props) {
     <div className="mt-3 rounded border border-slate-200 bg-slate-50 p-3">
       <div className="text-sm font-semibold text-gray-900">Day 4 playback</div>
       <div className="mt-2">
-        {handoff?.downloadUrl ? (
+        {!shouldHidePlayer && downloadUrl ? (
           <>
             <video
               ref={videoRef}
               controls
               preload="metadata"
               className="w-full rounded border border-gray-200 bg-black"
-              src={handoff.downloadUrl}
+              src={downloadUrl}
+              onError={() => setFailedVideoUrl(downloadUrl)}
             />
             <a
               className="mt-2 inline-block text-sm text-blue-600 underline"
-              href={handoff.downloadUrl}
+              href={downloadUrl}
               download
             >
               Download video
@@ -91,7 +104,9 @@ export function ArtifactDay4Handoff({ artifact }: Props) {
           </>
         ) : (
           <div className="rounded border border-dashed border-gray-200 bg-white p-3 text-sm text-gray-700">
-            Video unavailable right now.
+            {deleted
+              ? 'Video deleted or unavailable.'
+              : 'Video unavailable right now.'}
           </div>
         )}
       </div>

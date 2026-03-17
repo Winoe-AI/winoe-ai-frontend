@@ -21,6 +21,15 @@ function makeStatus(
     transcriptProgressPct: null,
     transcriptText: null,
     transcriptSegments: null,
+    consentStatus: null,
+    consentedAt: null,
+    isDeleted: false,
+    deletedAt: null,
+    canDelete: null,
+    deleteDisabledReason: null,
+    aiNoticeVersion: null,
+    aiNoticeEnabled: null,
+    aiNoticeSummaryUrl: null,
     ...overrides,
   };
 }
@@ -46,7 +55,7 @@ describe('handoffUploadMachine', () => {
     expect(uploaded.phase).toBe('uploaded');
     expect(uploaded.recordingId).toBe('rec_123');
     expect(uploaded.previewUrl).toBe('blob://preview');
-    expect(uploaded.transcriptStatus).toBe('pending');
+    expect(uploaded.transcriptStatus).toBe('not_started');
   });
 
   it('hydrates from mounted uploaded status without preview URL', () => {
@@ -210,6 +219,26 @@ describe('handoffUploadMachine', () => {
     });
     expect(reopened.phase).toBe('idle');
     expect(reopened.windowClosedMessage).toBeNull();
+  });
+
+  it('moves to deleted state and clears media/transcript details', () => {
+    const uploaded = handoffUploadReducer(initialHandoffUploadState, {
+      type: 'UPLOAD_SUCCEEDED',
+      recordingId: 'rec_123',
+      previewUrl: 'blob://preview',
+    });
+
+    const deleted = handoffUploadReducer(uploaded, {
+      type: 'DELETE_SUCCEEDED',
+      deletedAt: '2026-03-16T10:00:00.000Z',
+    });
+
+    expect(deleted.phase).toBe('deleted');
+    expect(deleted.isDeleted).toBe(true);
+    expect(deleted.recordingId).toBeNull();
+    expect(deleted.previewUrl).toBeNull();
+    expect(deleted.transcriptText).toBeNull();
+    expect(shouldPollHandoffStatus(deleted)).toBe(false);
   });
 
   it('computes helpers and polling decisions', () => {

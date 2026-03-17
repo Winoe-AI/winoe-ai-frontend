@@ -119,6 +119,40 @@ exports[`CandidateSessionView scheduling states renders scheduling confirm state
       </p>
     </div>
     <div
+      class="rounded-md border border-slate-200 bg-slate-50 p-4"
+    >
+      <div
+        class="flex flex-wrap items-center gap-2"
+      >
+        <h3
+          class="text-sm font-semibold text-slate-900"
+        >
+          AI-assisted evaluation notice
+        </h3>
+        <span
+          class="inline-flex items-center rounded-full border border-slate-300 bg-white px-2 py-0.5 text-xs text-slate-700"
+        >
+          Notice mvp1
+        </span>
+      </div>
+      <ul
+        class="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-700"
+      >
+        <li>
+          Your Day 4 video and transcript may be used for evaluation by our team and AI-assisted review tools.
+        </li>
+        <li>
+          Reviewers use this material to assess communication clarity and technical reasoning.
+        </li>
+      </ul>
+      <a
+        class="mt-2 inline-block text-sm text-blue-700 underline"
+        href="/candidate/what-we-evaluate"
+      >
+        What we evaluate
+      </a>
+    </div>
+    <div
       class="space-y-4 rounded-md border border-gray-200 p-4"
     >
       <div
@@ -224,6 +258,40 @@ exports[`CandidateSessionView scheduling states renders scheduling form state 1`
       >
         Confirm your local schedule before starting Infra Simulation (Backend Engineer).
       </p>
+    </div>
+    <div
+      class="rounded-md border border-slate-200 bg-slate-50 p-4"
+    >
+      <div
+        class="flex flex-wrap items-center gap-2"
+      >
+        <h3
+          class="text-sm font-semibold text-slate-900"
+        >
+          AI-assisted evaluation notice
+        </h3>
+        <span
+          class="inline-flex items-center rounded-full border border-slate-300 bg-white px-2 py-0.5 text-xs text-slate-700"
+        >
+          Notice mvp1
+        </span>
+      </div>
+      <ul
+        class="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-700"
+      >
+        <li>
+          Your Day 4 video and transcript may be used for evaluation by our team and AI-assisted review tools.
+        </li>
+        <li>
+          Reviewers use this material to assess communication clarity and technical reasoning.
+        </li>
+      </ul>
+      <a
+        class="mt-2 inline-block text-sm text-blue-700 underline"
+        href="/candidate/what-we-evaluate"
+      >
+        What we evaluate
+      </a>
     </div>
     <div
       class="space-y-4 rounded-md border border-gray-200 p-4"
