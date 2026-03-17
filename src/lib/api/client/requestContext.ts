@@ -1,4 +1,5 @@
 import { buildCacheKey, DEFAULT_CACHE_TTL_MS } from './cache';
+import { isAbsoluteHttpUrl, joinBaseAndPath } from './url';
 import type {
   ApiClientOptions,
   HttpMethod,
@@ -36,9 +37,9 @@ export function buildRequestContext(
     15000,
   );
   const basePath = clientOptions?.basePath;
-  const targetUrl = path.startsWith('http')
+  const targetUrl = isAbsoluteHttpUrl(path)
     ? path
-    : `${basePath ?? ''}${path.startsWith('/') ? path : `/${path}`}`;
+    : joinBaseAndPath(basePath ?? '', path);
 
   const method = (options.method ?? 'GET') as HttpMethod;
   const dedupeKey =

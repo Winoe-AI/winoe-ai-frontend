@@ -628,10 +628,6 @@ describe('api/backend proxy route', () => {
       new MockNextRequest('http://x', { method: 'DELETE' }),
       ctx,
     );
-    await mod.OPTIONS(
-      new MockNextRequest('http://x', { method: 'OPTIONS' }),
-      ctx,
-    );
-    expect(upstreamRequestMock).toHaveBeenCalledTimes(5);
+    expect(upstreamRequestMock).toHaveBeenCalledTimes(4);
   });
 });

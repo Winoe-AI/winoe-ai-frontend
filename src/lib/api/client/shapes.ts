@@ -15,6 +15,7 @@ export type RequestOptions = {
   headers?: Record<string, string>;
   cache?: RequestCache;
   credentials?: RequestCredentials;
+  mode?: RequestMode;
   signal?: AbortSignal;
   skipCache?: boolean;
   cacheTtlMs?: number;

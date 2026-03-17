@@ -508,7 +508,7 @@ describe('httpClient branch coverage', () => {
   });
 
   describe('credentials handling', () => {
-    it('uses include for same-origin requests', async () => {
+    it('uses same-origin for same-origin requests', async () => {
       (global.fetch as jest.Mock).mockResolvedValueOnce(
         responseHelpers.jsonResponse({ ok: true }) as unknown as Response,
       );
@@ -516,7 +516,7 @@ describe('httpClient branch coverage', () => {
       await apiClient.get('/same-origin', { skipCache: true });
 
       expect((global.fetch as jest.Mock).mock.calls[0][1].credentials).toBe(
-        'include',
+        'same-origin',
       );
     });
 

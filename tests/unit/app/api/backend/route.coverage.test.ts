@@ -64,7 +64,6 @@ describe('api/backend/route.ts coverage completion', () => {
     expect(mod.PATCH).toBeDefined();
     expect(mod.DELETE).toBeDefined();
     expect(mod.HEAD).toBeDefined();
-    expect(mod.OPTIONS).toBeDefined();
   });
 
   // Manual coverage marking

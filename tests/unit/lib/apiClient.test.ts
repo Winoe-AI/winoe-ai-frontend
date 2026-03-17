@@ -22,8 +22,44 @@ describe('apiClient request helpers', () => {
         method: 'GET',
         headers: {},
         body: undefined,
-        credentials: 'include',
+        credentials: 'same-origin',
         cache: 'no-store',
+      }),
+    );
+  });
+
+  it('normalizes /backend paths when basePath is /api', async () => {
+    fetchMock.mockResolvedValue(responseHelpers.jsonResponse({ ok: true }));
+
+    await apiClient.get(
+      '/backend/jobs',
+      { skipCache: true },
+      { basePath: '/api' },
+    );
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/backend/jobs',
+      expect.objectContaining({
+        method: 'GET',
+        credentials: 'same-origin',
+      }),
+    );
+  });
+
+  it('avoids double prefix when path already includes /api', async () => {
+    fetchMock.mockResolvedValue(responseHelpers.jsonResponse({ ok: true }));
+
+    await apiClient.get(
+      '/api/backend/jobs',
+      { skipCache: true },
+      { basePath: '/api' },
+    );
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      '/api/backend/jobs',
+      expect.objectContaining({
+        method: 'GET',
+        credentials: 'same-origin',
       }),
     );
   });
@@ -88,6 +124,49 @@ describe('apiClient request helpers', () => {
     await expect(apiClient.get('/oops')).rejects.toMatchObject({
       message: 'Request failed with status 500',
       status: 500,
+    });
+  });
+
+  it('rejects absolute cross-origin BFF URLs', async () => {
+    await expect(
+      apiClient.get('https://evil.example/api/backend/jobs'),
+    ).rejects.toMatchObject({
+      status: 400,
+      code: 'BFF_UNSAFE_REQUEST',
+    });
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it('rejects BFF requests configured with no-cors mode', async () => {
+    await expect(
+      apiClient.get('/jobs', { mode: 'no-cors' as RequestMode }),
+    ).rejects.toMatchObject({
+      status: 400,
+      code: 'BFF_UNSAFE_REQUEST',
+    });
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it('normalizes BFF 401 and 403 messages to safe defaults', async () => {
+    fetchMock
+      .mockResolvedValueOnce(
+        responseHelpers.jsonResponse({ detail: 'raw auth detail' }, 401),
+      )
+      .mockResolvedValueOnce(
+        responseHelpers.jsonResponse({ detail: 'raw forbidden detail' }, 403),
+      );
+
+    await expect(apiClient.get('/auth-required')).rejects.toMatchObject({
+      status: 401,
+      code: 'BFF_AUTH_REQUIRED',
+      message: 'Authentication required. Please sign in again.',
+    });
+
+    await expect(apiClient.post('/forbidden', {})).rejects.toMatchObject({
+      status: 403,
+      code: 'BFF_FORBIDDEN',
+      message:
+        'Request blocked by security policy. Please refresh and try again.',
     });
   });
 
@@ -194,7 +273,7 @@ describe('apiClient request helpers', () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ ok: true }),
-        credentials: 'include',
+        credentials: 'same-origin',
         cache: 'no-store',
       }),
     );
@@ -211,7 +290,7 @@ describe('apiClient request helpers', () => {
         method: 'GET',
         headers: {},
         body: undefined,
-        credentials: 'include',
+        credentials: 'same-origin',
         cache: 'no-store',
       }),
     );

@@ -16,3 +16,4 @@ export type {
   RequestOptions,
 } from './shapes';
 export { requestWithMeta } from './request';
+export { bffFetch } from './bffFetch';
