@@ -264,6 +264,32 @@ describe('API Routes Coverage - simulations/[id]/candidates', () => {
   });
 });
 
+describe('API Routes Coverage - simulations/[id]/candidates/compare', () => {
+  beforeEach(() => jest.clearAllMocks());
+
+  it('covers route metadata and success', async () => {
+    const mod =
+      await import('@/app/api/simulations/[id]/candidates/compare/route');
+    markMetadataCovered('@/app/api/simulations/[id]/candidates/compare/route');
+
+    expect(mod.dynamic).toBe('force-dynamic');
+    expect(mod.runtime).toBe('nodejs');
+
+    mockRequireBffAuth.mockResolvedValue({
+      ok: true,
+      accessToken: 'tok',
+      cookies: NextResponse.next(),
+    });
+    mockForwardJson.mockResolvedValue(NextResponse.json([]));
+
+    const res = await mod.GET(
+      new NextRequest('http://localhost/api/simulations/s1/candidates/compare'),
+      { params: Promise.resolve({ id: 's1' }) },
+    );
+    expect(res.status).toBe(200);
+  });
+});
+
 describe('API Routes Coverage - simulations/[id]/invite', () => {
   beforeEach(() => jest.clearAllMocks());
 

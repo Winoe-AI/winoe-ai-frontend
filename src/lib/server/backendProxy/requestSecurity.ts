@@ -71,6 +71,10 @@ const METHOD_RULES: MethodRule[] = [
     pattern: /^simulations\/[^/]+\/candidates$/,
     methods: ['GET', 'HEAD'],
   },
+  {
+    pattern: /^simulations\/[^/]+\/candidates\/compare$/,
+    methods: ['GET', 'HEAD'],
+  },
   { pattern: /^simulations\/[^/]+\/invite$/, methods: ['POST'] },
   { pattern: /^simulations\/[^/]+\/terminate$/, methods: ['POST'] },
   {

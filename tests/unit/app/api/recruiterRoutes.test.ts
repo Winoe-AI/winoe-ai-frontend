@@ -240,6 +240,20 @@ describe('recruiter API routes', () => {
       );
     });
 
+    it('GET /api/simulations/[id]/candidates/compare forwards correctly', async () => {
+      forwardJsonMock.mockResolvedValue(new MockNextResponse({ ok: true }));
+      const { GET } =
+        await import('@/app/api/simulations/[id]/candidates/compare/route');
+      await GET(new MockNextRequest('http://x'), {
+        params: Promise.resolve({ id: 'sim-9' }),
+      });
+      expect(forwardJsonMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          path: '/api/simulations/sim-9/candidates/compare',
+        }),
+      );
+    });
+
     it('POST invite uses payload even when json fails', async () => {
       forwardJsonMock.mockResolvedValue(new MockNextResponse({ ok: true }));
       const { POST } = await import('@/app/api/simulations/[id]/invite/route');

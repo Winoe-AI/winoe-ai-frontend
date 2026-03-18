@@ -109,6 +109,7 @@ describe('API routes extra coverage', () => {
       '@/app/api/simulations/route',
       '@/app/api/simulations/[id]/route',
       '@/app/api/simulations/[id]/candidates/route',
+      '@/app/api/simulations/[id]/candidates/compare/route',
       '@/app/api/simulations/[id]/candidates/[candidateSessionId]/invite/resend/route',
       '@/app/api/simulations/[id]/invite/route',
       '@/app/api/submissions/route',
