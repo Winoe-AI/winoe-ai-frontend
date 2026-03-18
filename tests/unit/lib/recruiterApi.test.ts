@@ -4,6 +4,7 @@ import {
   createSimulation,
   normalizeCandidateSession,
   listSimulationCandidates,
+  listSimulationCandidateCompare,
 } from '@/features/recruiter/api';
 
 const mockRecruiterRequest = jest.fn();
@@ -290,6 +291,42 @@ describe('recruiterApi', () => {
       mockedRecruiterGet.mockResolvedValueOnce([]);
       await listSimulationCandidates('sim_3');
       expect(mockedRecruiterGet).toHaveBeenCalledTimes(2);
+    });
+  });
+
+  describe('listSimulationCandidateCompare', () => {
+    it('calls compare endpoint and normalizes rows', async () => {
+      mockedRecruiterGet.mockResolvedValueOnce([
+        {
+          candidate_session_id: 12,
+          candidate: { name: 'Alex', email: 'alex@example.com' },
+          status: 'completed',
+          fit_profile_status: 'ready',
+          overall_fit_score: 76,
+          recommendation: 'lean_hire',
+        },
+      ]);
+
+      const rows = await listSimulationCandidateCompare('sim_22');
+
+      expect(mockedRecruiterGet).toHaveBeenCalledWith(
+        '/simulations/sim_22/candidates/compare',
+        expect.objectContaining({ cache: 'no-store' }),
+      );
+      expect(rows).toEqual([
+        expect.objectContaining({
+          candidateSessionId: '12',
+          candidateLabel: 'Alex',
+          fitProfileStatus: 'ready',
+          overallFitScore: 0.76,
+        }),
+      ]);
+    });
+
+    it('returns empty list for blank simulation id', async () => {
+      const rows = await listSimulationCandidateCompare('   ');
+      expect(rows).toEqual([]);
+      expect(mockedRecruiterGet).not.toHaveBeenCalled();
     });
   });
 
