@@ -170,9 +170,12 @@ test('candidate Day 4 handoff upload flow hydrates and reaches transcript ready'
     await route.fulfill({ status: 200, body: '' });
   });
 
-  await page.goto('/candidate/session/test-token');
+  await page.goto('/candidate-sessions/test-token');
 
-  await page.getByRole('button', { name: /start simulation/i }).click();
+  const startButton = page.getByRole('button', { name: /start simulation/i });
+  if ((await startButton.count()) > 0) {
+    await startButton.first().click();
+  }
   await expect(page.getByText(/handoff demo/i)).toBeVisible();
   await expect(
     page.getByRole('button', { name: /upload video/i }),

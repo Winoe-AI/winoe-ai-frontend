@@ -49,3 +49,6 @@ issue.md
 AI_FLOW.md
 .qa/
 ai_flow_boot_script.sh
+
+# QA Verification generated artifacts
+qa_verifications/
