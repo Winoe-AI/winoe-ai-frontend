@@ -6,7 +6,13 @@ import React from 'react';
 const shouldSilence = (message: unknown) =>
   typeof message === 'string' &&
   (message.includes('baseline-browser-mapping') ||
-    message.includes('not wrapped in act('));
+    message.includes('not wrapped in act(') ||
+    message.startsWith(
+      '[security] /api/auth/access-token is disabled outside local',
+    ) ||
+    message.startsWith(
+      '[security] /api/dev/access-token is disabled outside local',
+    ));
 
 const originalWarn = console.warn;
 console.warn = (...args: unknown[]) => {
