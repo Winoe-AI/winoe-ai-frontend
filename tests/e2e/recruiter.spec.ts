@@ -1,13 +1,22 @@
-import { test } from '@playwright/test';
-import { RecruiterPage } from './pages';
+import { expect, test } from '@playwright/test';
+import { installRecruiterApiMocks } from './flow-qa/fixtures/recruiterMocks';
+import { storageStates } from './flow-qa/fixtures/storageStates';
+import { RecruiterDashboardQaPage } from './flow-qa/pages';
 
-test.describe.skip('brittle - re-enable after selector stabilization', () => {
-  test('recruiter logs in and sees simulations', async ({ page }) => {
-    // Skipping until selectors/copy stabilized; smoke test is the e2e gate.
-    const recruiter = new RecruiterPage(page);
+test.use({ storageState: storageStates.recruiterOnly });
 
-    await recruiter.gotoLogin();
-    await recruiter.login();
-    await recruiter.expectDashboard();
-  });
+test('recruiter logs in and sees simulations', async ({ page }) => {
+  await installRecruiterApiMocks(page);
+
+  const recruiter = new RecruiterDashboardQaPage(page);
+
+  await recruiter.gotoDashboard();
+
+  await expect(page).toHaveURL(/\/dashboard$/);
+  await recruiter.expectDashboardLoaded();
+
+  await expect(
+    page.getByRole('link', { name: /frontend platform modernization/i }),
+  ).toBeVisible();
+  await expect(page.getByRole('button', { name: /invite candidate/i }).first()).toBeVisible();
 });

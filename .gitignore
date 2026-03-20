@@ -50,5 +50,8 @@ AI_FLOW.md
 .qa/
 ai_flow_boot_script.sh
 
-# QA Verification generated artifacts
-qa_verifications/
+# Component, Performance, Accessibility QA generated artifacts
+/qa_verifications/Component-Perf-A11y-QA/comp_perf_a11y_qa_latest
+
+# E2E Flow QA generated artifacts
+/qa_verifications/E2E-Flow-QA/e2e_flow_qa_latest

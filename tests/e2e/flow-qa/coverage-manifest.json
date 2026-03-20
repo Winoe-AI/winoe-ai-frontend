@@ -1,0 +1,271 @@
+{
+  "contractVersion": 1,
+  "pageRoutes": [
+    {
+      "route": "/",
+      "specs": [
+        "marketing.spec.ts",
+        "navigation.spec.ts",
+        "responsive.spec.ts"
+      ],
+      "states": [
+        "signed_out",
+        "signed_in_redirect",
+        "keyboard_navigation"
+      ]
+    },
+    {
+      "route": "/auth/error",
+      "specs": [
+        "auth.spec.ts"
+      ],
+      "states": [
+        "render",
+        "diagnostics"
+      ]
+    },
+    {
+      "route": "/auth/login",
+      "specs": [
+        "auth.spec.ts",
+        "navigation.spec.ts"
+      ],
+      "states": [
+        "auth0_redirect",
+        "marketing_nav"
+      ]
+    },
+    {
+      "route": "/auth/logout",
+      "specs": [
+        "auth.spec.ts"
+      ],
+      "states": [
+        "logout_redirect"
+      ]
+    },
+    {
+      "route": "/candidate-sessions/[token]",
+      "specs": [
+        "candidate-session.spec.ts",
+        "candidate-day4.spec.ts"
+      ],
+      "states": [
+        "legacy_redirect"
+      ]
+    },
+    {
+      "route": "/candidate/dashboard",
+      "specs": [
+        "auth.spec.ts",
+        "error-states.spec.ts",
+        "navigation.spec.ts"
+      ],
+      "states": [
+        "forbidden_redirect",
+        "empty",
+        "navigation"
+      ]
+    },
+    {
+      "route": "/candidate/session/[token]",
+      "specs": [
+        "candidate-session.spec.ts",
+        "candidate-day1.spec.ts",
+        "candidate-day2.spec.ts",
+        "candidate-day3.spec.ts",
+        "candidate-day4.spec.ts",
+        "candidate-day5.spec.ts",
+        "candidate-completion.spec.ts",
+        "error-states.spec.ts",
+        "responsive.spec.ts"
+      ],
+      "states": [
+        "bootstrap",
+        "expired",
+        "day1",
+        "day2",
+        "day3",
+        "day4",
+        "day5",
+        "complete",
+        "error"
+      ]
+    },
+    {
+      "route": "/candidate/what-we-evaluate",
+      "specs": [
+        "navigation.spec.ts"
+      ],
+      "states": [
+        "render"
+      ]
+    },
+    {
+      "route": "/dashboard",
+      "specs": [
+        "auth.spec.ts",
+        "recruiter-dashboard.spec.ts",
+        "error-states.spec.ts",
+        "navigation.spec.ts",
+        "responsive.spec.ts"
+      ],
+      "states": [
+        "forbidden_redirect",
+        "loading",
+        "loaded",
+        "empty",
+        "error"
+      ]
+    },
+    {
+      "route": "/dashboard/simulations/[id]",
+      "specs": [
+        "recruiter-sim-detail.spec.ts",
+        "recruiter-create-sim.spec.ts"
+      ],
+      "states": [
+        "loaded",
+        "search",
+        "resend_cooldown",
+        "terminate_modal"
+      ]
+    },
+    {
+      "route": "/dashboard/simulations/[id]/candidates/[candidateSessionId]",
+      "specs": [
+        "recruiter-submissions.spec.ts"
+      ],
+      "states": [
+        "loaded",
+        "artifact_expand"
+      ]
+    },
+    {
+      "route": "/dashboard/simulations/[id]/candidates/[candidateSessionId]/fit-profile",
+      "specs": [
+        "recruiter-submissions.spec.ts"
+      ],
+      "states": [
+        "ready",
+        "back_navigation"
+      ]
+    },
+    {
+      "route": "/dashboard/simulations/new",
+      "specs": [
+        "recruiter-create-sim.spec.ts",
+        "navigation.spec.ts"
+      ],
+      "states": [
+        "validation",
+        "submit_success"
+      ]
+    },
+    {
+      "route": "/not-authorized",
+      "specs": [
+        "auth.spec.ts"
+      ],
+      "states": [
+        "candidate_block",
+        "recruiter_block"
+      ]
+    }
+  ],
+  "nonPageRoutes": [
+    {
+      "route": "/auth/clear",
+      "specs": [
+        "auth.spec.ts"
+      ],
+      "states": [
+        "clear_and_redirect"
+      ]
+    },
+    {
+      "route": "/route-that-does-not-exist",
+      "specs": [
+        "error-states.spec.ts"
+      ],
+      "states": [
+        "not_found"
+      ]
+    }
+  ],
+  "criticalMutations": [
+    {
+      "name": "Create Simulation",
+      "endpoint": "/api/simulations",
+      "specs": [
+        "recruiter-create-sim.spec.ts"
+      ],
+      "assertions": [
+        "success",
+        "validation_error"
+      ]
+    },
+    {
+      "name": "Invite Candidate",
+      "endpoint": "/api/simulations/[id]/invite",
+      "specs": [
+        "recruiter-dashboard.spec.ts",
+        "recruiter-sim-detail.spec.ts"
+      ],
+      "assertions": [
+        "success",
+        "validation_error"
+      ]
+    },
+    {
+      "name": "Resend Invite",
+      "endpoint": "/api/simulations/[id]/candidates/[candidateSessionId]/invite/resend",
+      "specs": [
+        "recruiter-sim-detail.spec.ts"
+      ],
+      "assertions": [
+        "success",
+        "cooldown_error"
+      ]
+    },
+    {
+      "name": "Terminate Simulation",
+      "endpoint": "/api/simulations/[id]/terminate",
+      "specs": [
+        "recruiter-sim-detail.spec.ts"
+      ],
+      "assertions": [
+        "success",
+        "cancel_flow",
+        "validation_error"
+      ]
+    },
+    {
+      "name": "Save Candidate Draft",
+      "endpoint": "/api/backend/tasks/[taskId]/draft",
+      "specs": [
+        "candidate-day1.spec.ts"
+      ],
+      "assertions": [
+        "success",
+        "network_error"
+      ]
+    },
+    {
+      "name": "Submit Candidate Task",
+      "endpoint": "/api/backend/tasks/[taskId]/submit",
+      "specs": [
+        "candidate-day1.spec.ts",
+        "candidate-day2.spec.ts",
+        "candidate-day3.spec.ts",
+        "candidate-day4.spec.ts",
+        "candidate-day5.spec.ts"
+      ],
+      "assertions": [
+        "success",
+        "validation_error",
+        "timeout_error"
+      ]
+    }
+  ]
+}

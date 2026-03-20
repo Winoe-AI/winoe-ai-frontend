@@ -43,8 +43,9 @@ export async function requireBffAuth(
 
   const permissions = extractPermissions(
     session.user,
-    normalizeAccessToken((session as { accessToken?: unknown }).accessToken),
+    normalizeAccessToken(session as unknown),
   );
+  const sessionAccessToken = normalizeAccessToken(session as unknown);
   if (
     options?.requirePermission &&
     !hasPermission(permissions, options.requirePermission)
@@ -63,6 +64,20 @@ export async function requireBffAuth(
     });
     const accessToken = normalizeAccessToken(tokenResult);
     if (!accessToken) {
+      const allowLocalFallback =
+        process.env.NODE_ENV === 'development' ||
+        process.env.VERCEL_ENV?.toLowerCase() === 'development';
+      if (allowLocalFallback && sessionAccessToken) {
+        const result: AuthResult = {
+          ok: true,
+          accessToken: sessionAccessToken,
+          permissions,
+          session,
+          cookies: cookieCarrier,
+        };
+        logPerf('fallback-token');
+        return result;
+      }
       logPerf('missing-token');
       return {
         ok: false,
@@ -84,6 +99,20 @@ export async function requireBffAuth(
     logPerf('ok');
     return result;
   } catch (e: unknown) {
+    const allowLocalFallback =
+      process.env.NODE_ENV === 'development' ||
+      process.env.VERCEL_ENV?.toLowerCase() === 'development';
+    if (allowLocalFallback && sessionAccessToken) {
+      const result: AuthResult = {
+        ok: true,
+        accessToken: sessionAccessToken,
+        permissions,
+        session,
+        cookies: cookieCarrier,
+      };
+      logPerf('fallback-token');
+      return result;
+    }
     const message =
       e instanceof Error ? e.message : 'Unable to obtain access token';
     logPerf('token-error');
