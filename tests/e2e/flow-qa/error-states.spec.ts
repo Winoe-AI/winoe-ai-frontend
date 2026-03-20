@@ -10,7 +10,9 @@ import {
 test.describe('Error and Edge State Flows', () => {
   test.use({ storageState: storageStates.recruiterOnly });
 
-  test('unknown route renders not-found state for authenticated user', async ({ page }) => {
+  test('unknown route renders not-found state for authenticated user', async ({
+    page,
+  }) => {
     const response = await page.goto('/route-that-does-not-exist');
 
     expect(response).not.toBeNull();
@@ -36,7 +38,9 @@ test.describe('Error and Edge State Flows', () => {
 
       await page.goto('/dashboard');
 
-      await expect(page.getByRole('heading', { name: /dashboard/i })).toBeVisible();
+      await expect(
+        page.getByRole('heading', { name: /dashboard/i }),
+      ).toBeVisible();
       await expect(page.getByText(/couldn.?t load simulations/i)).toBeVisible();
 
       await page.getByRole('button', { name: /^retry$/i }).click();
@@ -62,7 +66,9 @@ test.describe('Error and Edge State Flows', () => {
       await expect(page.getByText(/no invites yet/i)).toBeVisible();
     });
 
-    test('candidate session renders load error on backend failure', async ({ page }) => {
+    test('candidate session renders load error on backend failure', async ({
+      page,
+    }) => {
       await page.route(
         `**/api/backend/candidate/session/${QA_INVITE_TOKEN}`,
         async (route) => {
@@ -77,10 +83,14 @@ test.describe('Error and Edge State Flows', () => {
       await page.goto(`/candidate/session/${QA_INVITE_TOKEN}`);
 
       await expect(page.getByText(/unable to load simulation/i)).toBeVisible();
-      await expect(page.getByRole('button', { name: /^retry$/i })).toBeVisible();
+      await expect(
+        page.getByRole('button', { name: /^retry$/i }),
+      ).toBeVisible();
     });
 
-    test('day 2 run-tests timeout state is surfaced to user', async ({ page }) => {
+    test('day 2 run-tests timeout state is surfaced to user', async ({
+      page,
+    }) => {
       await installCandidateSessionMocks(page, {
         token: QA_INVITE_TOKEN,
         initialTask: makeCandidateTask({
@@ -114,9 +124,14 @@ test.describe('Error and Edge State Flows', () => {
       ).toBeVisible();
       const mainContent = page.locator('#main-content');
       await expect(
-        mainContent.getByRole('status').filter({ hasText: /tests timed out/i }).first(),
+        mainContent
+          .getByRole('status')
+          .filter({ hasText: /tests timed out/i })
+          .first(),
       ).toBeVisible({ timeout: 8000 });
-      await expect(page.getByRole('button', { name: /retry tests/i })).toBeVisible();
+      await expect(
+        page.getByRole('button', { name: /retry tests/i }),
+      ).toBeVisible();
     });
   });
 });

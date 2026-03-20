@@ -18,5 +18,7 @@ test('recruiter logs in and sees simulations', async ({ page }) => {
   await expect(
     page.getByRole('link', { name: /frontend platform modernization/i }),
   ).toBeVisible();
-  await expect(page.getByRole('button', { name: /invite candidate/i }).first()).toBeVisible();
+  await expect(
+    page.getByRole('button', { name: /invite candidate/i }).first(),
+  ).toBeVisible();
 });

@@ -7,14 +7,21 @@ import { fileURLToPath } from 'node:url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const repoRoot = path.resolve(__dirname, '..', '..', '..', '..');
-const manifestPath = path.join(repoRoot, 'tests', 'e2e', 'flow-qa', 'coverage-manifest.json');
+const manifestPath = path.join(
+  repoRoot,
+  'tests',
+  'e2e',
+  'flow-qa',
+  'coverage-manifest.json',
+);
 const appDir = path.join(repoRoot, 'src', 'app');
 const specDir = path.join(repoRoot, 'tests', 'e2e', 'flow-qa');
 const summaryPath = process.env.FLOW_QA_CONTRACT_SUMMARY_PATH?.trim()
   ? path.resolve(process.env.FLOW_QA_CONTRACT_SUMMARY_PATH)
   : null;
 
-const failRegex = /(fail|error|forbidden|unauthorized|validation|timeout|empty|rejected|cooldown)/i;
+const failRegex =
+  /(fail|error|forbidden|unauthorized|validation|timeout|empty|rejected|cooldown)/i;
 
 function walkFiles(startDir) {
   const stack = [startDir];
@@ -39,7 +46,9 @@ function normalizeRouteFromAppPage(absPath) {
   const rel = path.relative(path.join(repoRoot, 'src', 'app'), absPath);
   const routeish = rel.replace(/\\/g, '/').replace(/\/page\.tsx$/, '');
   const segments = routeish.split('/').filter(Boolean);
-  const clean = segments.filter((segment) => !(segment.startsWith('(') && segment.endsWith(')')));
+  const clean = segments.filter(
+    (segment) => !(segment.startsWith('(') && segment.endsWith(')')),
+  );
   return clean.length === 0 ? '/' : `/${clean.join('/')}`;
 }
 
@@ -64,7 +73,9 @@ function validateManifestShape(manifest, failures) {
     failures.push('coverage-manifest.json: nonPageRoutes must be an array.');
   }
   if (!Array.isArray(manifest.criticalMutations)) {
-    failures.push('coverage-manifest.json: criticalMutations must be an array.');
+    failures.push(
+      'coverage-manifest.json: criticalMutations must be an array.',
+    );
   }
 }
 
@@ -72,7 +83,9 @@ function validateRouteEntries(entries, label, failures) {
   for (const entry of entries) {
     const route = entry?.route;
     if (typeof route !== 'string' || !route.startsWith('/')) {
-      failures.push(`${label}: every entry.route must be an absolute route (starts with /).`);
+      failures.push(
+        `${label}: every entry.route must be an absolute route (starts with /).`,
+      );
       continue;
     }
     if (!Array.isArray(entry.specs) || entry.specs.length === 0) {
@@ -80,11 +93,15 @@ function validateRouteEntries(entries, label, failures) {
     } else {
       for (const spec of entry.specs) {
         if (typeof spec !== 'string' || !spec.endsWith('.spec.ts')) {
-          failures.push(`${label} ${route}: invalid spec name '${String(spec)}'.`);
+          failures.push(
+            `${label} ${route}: invalid spec name '${String(spec)}'.`,
+          );
           continue;
         }
         if (!fileExistsUnderSpecDir(spec)) {
-          failures.push(`${label} ${route}: missing spec file tests/e2e/flow-qa/${spec}.`);
+          failures.push(
+            `${label} ${route}: missing spec file tests/e2e/flow-qa/${spec}.`,
+          );
         }
       }
     }
@@ -107,7 +124,9 @@ function validateCriticalMutations(entries, failures) {
       );
     }
     if (!Array.isArray(entry.specs) || entry.specs.length === 0) {
-      failures.push(`criticalMutations ${String(name)}: specs must be non-empty.`);
+      failures.push(
+        `criticalMutations ${String(name)}: specs must be non-empty.`,
+      );
     } else {
       for (const spec of entry.specs) {
         if (!fileExistsUnderSpecDir(spec)) {
@@ -118,13 +137,21 @@ function validateCriticalMutations(entries, failures) {
       }
     }
     if (!Array.isArray(entry.assertions) || entry.assertions.length === 0) {
-      failures.push(`criticalMutations ${String(name)}: assertions must be non-empty.`);
+      failures.push(
+        `criticalMutations ${String(name)}: assertions must be non-empty.`,
+      );
       continue;
     }
-    const hasSuccess = entry.assertions.some((item) => /^success$/i.test(String(item)));
-    const hasFailure = entry.assertions.some((item) => failRegex.test(String(item)));
+    const hasSuccess = entry.assertions.some((item) =>
+      /^success$/i.test(String(item)),
+    );
+    const hasFailure = entry.assertions.some((item) =>
+      failRegex.test(String(item)),
+    );
     if (!hasSuccess) {
-      failures.push(`criticalMutations ${String(name)}: assertions must include 'success'.`);
+      failures.push(
+        `criticalMutations ${String(name)}: assertions must include 'success'.`,
+      );
     }
     if (!hasFailure) {
       failures.push(
@@ -145,8 +172,12 @@ function main() {
   const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
   validateManifestShape(manifest, failures);
 
-  const pageRoutes = Array.isArray(manifest.pageRoutes) ? manifest.pageRoutes : [];
-  const nonPageRoutes = Array.isArray(manifest.nonPageRoutes) ? manifest.nonPageRoutes : [];
+  const pageRoutes = Array.isArray(manifest.pageRoutes)
+    ? manifest.pageRoutes
+    : [];
+  const nonPageRoutes = Array.isArray(manifest.nonPageRoutes)
+    ? manifest.nonPageRoutes
+    : [];
   const criticalMutations = Array.isArray(manifest.criticalMutations)
     ? manifest.criticalMutations
     : [];
@@ -162,11 +193,17 @@ function main() {
   );
 
   const manifestPageRoutes = dedupeSort(
-    pageRoutes.map((entry) => entry?.route).filter((route) => typeof route === 'string'),
+    pageRoutes
+      .map((entry) => entry?.route)
+      .filter((route) => typeof route === 'string'),
   );
 
-  const missingFromManifest = appPageRoutes.filter((route) => !manifestPageRoutes.includes(route));
-  const staleInManifest = manifestPageRoutes.filter((route) => !appPageRoutes.includes(route));
+  const missingFromManifest = appPageRoutes.filter(
+    (route) => !manifestPageRoutes.includes(route),
+  );
+  const staleInManifest = manifestPageRoutes.filter(
+    (route) => !appPageRoutes.includes(route),
+  );
 
   if (missingFromManifest.length > 0) {
     failures.push(
@@ -194,7 +231,11 @@ function main() {
 
   if (summaryPath) {
     fs.mkdirSync(path.dirname(summaryPath), { recursive: true });
-    fs.writeFileSync(summaryPath, `${JSON.stringify(summary, null, 2)}\n`, 'utf8');
+    fs.writeFileSync(
+      summaryPath,
+      `${JSON.stringify(summary, null, 2)}\n`,
+      'utf8',
+    );
   }
 
   if (failures.length > 0) {

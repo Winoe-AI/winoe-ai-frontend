@@ -311,7 +311,9 @@ function buildDefaultArtifacts(candidateSessionId: number) {
         transcript: {
           status: 'ready',
           text: 'Candidate walkthrough transcript.',
-          segments: [{ id: 'seg1', startMs: 0, endMs: 1800, text: 'Walkthrough intro' }],
+          segments: [
+            { id: 'seg1', startMs: 0, endMs: 1800, text: 'Walkthrough intro' },
+          ],
         },
       },
       testResults: null,
@@ -431,7 +433,8 @@ export async function installRecruiterApiMocks(
   options: RecruiterMockOptions = {},
 ): Promise<RecruiterMockState> {
   const simulationId = options.simulationId ?? defaultSimulationId;
-  const candidateSessionId = options.candidateSessionId ?? defaultCandidateSessionId;
+  const candidateSessionId =
+    options.candidateSessionId ?? defaultCandidateSessionId;
 
   const state: RecruiterMockState = {
     simulationId,
@@ -440,14 +443,21 @@ export async function installRecruiterApiMocks(
     resendInviteCount: 0,
   };
 
-  let simulations = options.simulations ?? buildDefaultSimulations(simulationId);
-  const candidates = options.candidates ?? buildDefaultCandidates(candidateSessionId);
-  const compareRows = options.compareRows ?? buildDefaultCompareRows(candidateSessionId);
-  const submissions = options.submissions ?? buildDefaultSubmissions(candidateSessionId);
-  const artifacts = options.artifactsBySubmissionId ?? buildDefaultArtifacts(candidateSessionId);
+  let simulations =
+    options.simulations ?? buildDefaultSimulations(simulationId);
+  const candidates =
+    options.candidates ?? buildDefaultCandidates(candidateSessionId);
+  const compareRows =
+    options.compareRows ?? buildDefaultCompareRows(candidateSessionId);
+  const submissions =
+    options.submissions ?? buildDefaultSubmissions(candidateSessionId);
+  const artifacts =
+    options.artifactsBySubmissionId ??
+    buildDefaultArtifacts(candidateSessionId);
   const createSimulationId = options.createSimulationId ?? 'sim-created-900';
   const fitProfilePayload =
-    options.fitProfilePayload ?? buildDefaultFitProfilePayload(candidateSessionId);
+    options.fitProfilePayload ??
+    buildDefaultFitProfilePayload(candidateSessionId);
 
   await page.route('**/api/**', async (route) => {
     const request = route.request();
@@ -457,7 +467,9 @@ export async function installRecruiterApiMocks(
 
     if (pathname === '/api/dashboard' && method === 'GET') {
       if (options.dashboardDelayMs && options.dashboardDelayMs > 0) {
-        await new Promise((resolve) => setTimeout(resolve, options.dashboardDelayMs));
+        await new Promise((resolve) =>
+          setTimeout(resolve, options.dashboardDelayMs),
+        );
       }
       await fulfillJson(route, {
         profile: {
@@ -478,7 +490,9 @@ export async function installRecruiterApiMocks(
     }
 
     if (pathname === '/api/simulations' && method === 'POST') {
-      const payload = request.postDataJSON() as Record<string, unknown> | undefined;
+      const payload = request.postDataJSON() as
+        | Record<string, unknown>
+        | undefined;
       const newId = createSimulationId;
       simulations = [
         {
@@ -495,7 +509,9 @@ export async function installRecruiterApiMocks(
       return;
     }
 
-    const simulationDetailMatch = pathname.match(/^\/api\/simulations\/([^/]+)$/);
+    const simulationDetailMatch = pathname.match(
+      /^\/api\/simulations\/([^/]+)$/,
+    );
     if (simulationDetailMatch && method === 'GET') {
       const requestedId = decodePathSegment(simulationDetailMatch[1]);
       await fulfillJson(route, buildDefaultDetail(requestedId));
@@ -521,7 +537,9 @@ export async function installRecruiterApiMocks(
     const inviteMatch = pathname.match(/^\/api\/simulations\/([^/]+)\/invite$/);
     if (inviteMatch && method === 'POST') {
       state.inviteRequestCount += 1;
-      const payload = request.postDataJSON() as Record<string, unknown> | undefined;
+      const payload = request.postDataJSON() as
+        | Record<string, unknown>
+        | undefined;
       await fulfillJson(
         route,
         {
@@ -549,7 +567,9 @@ export async function installRecruiterApiMocks(
       return;
     }
 
-    const terminateMatch = pathname.match(/^\/api\/simulations\/([^/]+)\/terminate$/);
+    const terminateMatch = pathname.match(
+      /^\/api\/simulations\/([^/]+)\/terminate$/,
+    );
     if (terminateMatch && method === 'POST') {
       await fulfillJson(route, {
         status: 'queued',

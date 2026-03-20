@@ -89,7 +89,10 @@ function withDefaults(result: PollStatusMock): Record<string, unknown> {
 }
 
 export function makeCandidateTask(
-  params: Pick<CandidateTaskMock, 'id' | 'dayIndex' | 'type' | 'title' | 'description'> & {
+  params: Pick<
+    CandidateTaskMock,
+    'id' | 'dayIndex' | 'type' | 'title' | 'description'
+  > & {
     recordedSubmission?: CandidateTaskMock['recordedSubmission'];
   },
 ): CandidateTaskMock {
@@ -165,19 +168,17 @@ export async function installCandidateSessionMocks(
 
   let submitted = false;
   let runPollCount = 0;
-  const runStatusSequence =
-    options.runStatusSequence ??
-    [
-      {
-        status: 'passed',
-        passed: 12,
-        failed: 0,
-        total: 12,
-        stdout: 'All tests passed.',
-        workflowUrl: 'https://github.com/tenon-ai/candidate-repo/actions/runs/1',
-        commitSha: 'abc1234def5678',
-      },
-    ];
+  const runStatusSequence = options.runStatusSequence ?? [
+    {
+      status: 'passed',
+      passed: 12,
+      failed: 0,
+      total: 12,
+      stdout: 'All tests passed.',
+      workflowUrl: 'https://github.com/tenon-ai/candidate-repo/actions/runs/1',
+      commitSha: 'abc1234def5678',
+    },
+  ];
 
   const state: CandidateSessionMockState = {
     token,
@@ -192,7 +193,10 @@ export async function installCandidateSessionMocks(
     const url = new URL(request.url());
     const pathname = url.pathname;
 
-    if (pathname === `/api/backend/candidate/session/${token}` && method === 'GET') {
+    if (
+      pathname === `/api/backend/candidate/session/${token}` &&
+      method === 'GET'
+    ) {
       await fulfillJson(route, {
         candidateSessionId,
         status: 'in_progress',
@@ -210,7 +214,8 @@ export async function installCandidateSessionMocks(
     }
 
     if (
-      pathname === `/api/backend/candidate/session/${candidateSessionId}/current_task` &&
+      pathname ===
+        `/api/backend/candidate/session/${candidateSessionId}/current_task` &&
       method === 'GET'
     ) {
       const isComplete = submitted
@@ -220,7 +225,9 @@ export async function installCandidateSessionMocks(
         ? (options.nextTaskAfterSubmit ?? options.initialTask)
         : options.initialTask;
       const completedTaskIds = submitted
-        ? (options.completedTaskIdsAfterSubmit ?? options.completedTaskIds ?? [])
+        ? (options.completedTaskIdsAfterSubmit ??
+          options.completedTaskIds ??
+          [])
         : (options.completedTaskIds ?? []);
 
       await fulfillJson(route, {
@@ -241,7 +248,11 @@ export async function installCandidateSessionMocks(
         candidateSessionId,
         submittedAt: nowIso(),
         progress: {
-          completed: (options.completedTaskIdsAfterSubmit ?? options.completedTaskIds ?? []).length,
+          completed: (
+            options.completedTaskIdsAfterSubmit ??
+            options.completedTaskIds ??
+            []
+          ).length,
           total: 5,
         },
         isComplete: options.isCompleteAfterSubmit ?? false,
@@ -279,15 +290,22 @@ export async function installCandidateSessionMocks(
       return;
     }
 
-    if (/\/api\/backend\/tasks\/\d+\/run\/.+/.test(pathname) && method === 'GET') {
-      const next = runStatusSequence[Math.min(runPollCount, runStatusSequence.length - 1)];
+    if (
+      /\/api\/backend\/tasks\/\d+\/run\/.+/.test(pathname) &&
+      method === 'GET'
+    ) {
+      const next =
+        runStatusSequence[Math.min(runPollCount, runStatusSequence.length - 1)];
       runPollCount += 1;
       state.runPollCount = runPollCount;
       await fulfillJson(route, withDefaults(next));
       return;
     }
 
-    if (/\/api\/backend\/candidate\/session\/[^/]+\/schedule$/.test(pathname) && method === 'POST') {
+    if (
+      /\/api\/backend\/candidate\/session\/[^/]+\/schedule$/.test(pathname) &&
+      method === 'POST'
+    ) {
       await fulfillJson(route, {
         candidateSessionId,
         scheduledStartAt: nowIso(),
@@ -345,7 +363,9 @@ export async function installCandidateDay4HandoffMocks(
       return;
     }
 
-    if (pathname.endsWith(`/candidate/session/${candidateSessionId}/current_task`)) {
+    if (
+      pathname.endsWith(`/candidate/session/${candidateSessionId}/current_task`)
+    ) {
       await fulfillJson(route, {
         isComplete: false,
         completedTaskIds: [1, 2, 3],
@@ -452,7 +472,11 @@ export async function installCandidateDay4HandoffMocks(
       return;
     }
 
-    await fulfillJson(route, { message: `Unhandled handoff route ${pathname}` }, 404);
+    await fulfillJson(
+      route,
+      { message: `Unhandled handoff route ${pathname}` },
+      404,
+    );
   });
 
   await page.route('https://storage.example.com/**', async (route) => {

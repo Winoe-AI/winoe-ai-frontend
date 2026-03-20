@@ -1,9 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { storageStates } from './fixtures/storageStates';
-import {
-  QA_INVITE_TOKEN,
-  QA_PAGE_BUDGETS,
-} from './fixtures/constants';
+import { QA_INVITE_TOKEN, QA_PAGE_BUDGETS } from './fixtures/constants';
 import { annotatePerf, assertPerfBudget } from './fixtures/perf';
 import {
   installCandidateSessionMocks,
@@ -40,7 +37,9 @@ test.describe('Candidate Session Bootstrap Flows', () => {
     const startMs = Date.now();
     const bootstrapResponsePromise = page.waitForResponse(
       (resp) =>
-        resp.url().includes(`/api/backend/candidate/session/${QA_INVITE_TOKEN}`) &&
+        resp
+          .url()
+          .includes(`/api/backend/candidate/session/${QA_INVITE_TOKEN}`) &&
         resp.status() === 200,
     );
 
@@ -62,7 +61,9 @@ test.describe('Candidate Session Bootstrap Flows', () => {
     await expect(page.getByText(/5-day timeline/i)).toBeVisible();
   });
 
-  test('legacy candidate session route redirects to canonical route', async ({ page }) => {
+  test('legacy candidate session route redirects to canonical route', async ({
+    page,
+  }) => {
     await installCandidateSessionMocks(page, {
       token: QA_INVITE_TOKEN,
       initialTask: makeCandidateTask({
@@ -97,6 +98,8 @@ test.describe('Candidate Session Bootstrap Flows', () => {
 
     await page.goto(`/candidate/session/${QA_INVITE_TOKEN}`);
 
-    await expect(page.getByText(/invite link unavailable|invite expired/i)).toBeVisible();
+    await expect(
+      page.getByText(/invite link unavailable|invite expired/i),
+    ).toBeVisible();
   });
 });

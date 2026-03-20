@@ -20,8 +20,12 @@ test.describe('Responsive Mobile Flows', () => {
 
     await page.goto('/');
 
-    await expect(page.getByRole('heading', { name: /welcome to/i })).toBeVisible();
-    await expect(page.getByRole('link', { name: /recruiter login/i })).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: /welcome to/i }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole('link', { name: /recruiter login/i }),
+    ).toBeVisible();
 
     const viewport = page.viewportSize();
     expect(viewport).not.toBeNull();
@@ -31,22 +35,33 @@ test.describe('Responsive Mobile Flows', () => {
   test.describe('Recruiter mobile', () => {
     test.use({ storageState: storageStates.recruiterOnly });
 
-    test('dashboard content and invite modal work on mobile', async ({ page }) => {
+    test('dashboard content and invite modal work on mobile', async ({
+      page,
+    }) => {
       ensureMobileProject();
       await installRecruiterApiMocks(page);
 
       await page.goto('/dashboard');
 
-      await expect(page.getByRole('heading', { name: /dashboard/i })).toBeVisible();
+      await expect(
+        page.getByRole('heading', { name: /dashboard/i }),
+      ).toBeVisible();
       await expect(
         page.getByRole('link', { name: /frontend platform modernization/i }),
       ).toBeVisible();
 
-      await page.getByRole('button', { name: /invite candidate/i }).first().click();
-      await expect(page.getByRole('heading', { name: /invite candidate/i })).toBeVisible();
+      await page
+        .getByRole('button', { name: /invite candidate/i })
+        .first()
+        .click();
+      await expect(
+        page.getByRole('heading', { name: /invite candidate/i }),
+      ).toBeVisible();
 
       await page.getByRole('button', { name: /^close$/i }).click();
-      await expect(page.getByRole('heading', { name: /invite candidate/i })).toHaveCount(0);
+      await expect(
+        page.getByRole('heading', { name: /invite candidate/i }),
+      ).toHaveCount(0);
     });
   });
 
@@ -87,7 +102,9 @@ test.describe('Responsive Mobile Flows', () => {
       );
 
       await page.getByRole('button', { name: /save draft/i }).click();
-      await expect(page.getByRole('button', { name: /submit & continue/i })).toBeVisible();
+      await expect(
+        page.getByRole('button', { name: /submit & continue/i }),
+      ).toBeVisible();
     });
   });
 });

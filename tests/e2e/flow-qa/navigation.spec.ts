@@ -18,7 +18,9 @@ test.describe('Navigation Flows', () => {
     await page.keyboard.press('Tab');
     await expect(skipLink).toBeFocused();
 
-    const recruiterLoginLink = page.getByRole('link', { name: /recruiter login/i });
+    const recruiterLoginLink = page.getByRole('link', {
+      name: /recruiter login/i,
+    });
     await recruiterLoginLink.click();
 
     await expect(page).toHaveURL(/auth0\.com\/u\/login/i);
@@ -32,11 +34,15 @@ test.describe('Navigation Flows', () => {
 
       await page.goto('/dashboard');
       await expect(page).toHaveURL('/dashboard');
-      await expect(page.getByRole('heading', { name: /dashboard/i })).toBeVisible();
+      await expect(
+        page.getByRole('heading', { name: /dashboard/i }),
+      ).toBeVisible();
 
       await page.getByRole('link', { name: /new simulation/i }).click();
       await expect(page).toHaveURL('/dashboard/simulations/new');
-      await expect(page.getByRole('heading', { name: /new simulation/i })).toBeVisible();
+      await expect(
+        page.getByRole('heading', { name: /new simulation/i }),
+      ).toBeVisible();
 
       await page.getByRole('button', { name: /^back$/i }).click();
       await expect(page).toHaveURL('/dashboard');

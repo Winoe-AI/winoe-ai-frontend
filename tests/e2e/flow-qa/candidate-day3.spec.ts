@@ -66,10 +66,17 @@ test.describe('Candidate Day 3 Flow', () => {
     ).toBeVisible();
     const mainContent = page.locator('#main-content');
     await expect(
-      mainContent.getByRole('status').filter({ hasText: /tests failed/i }).first(),
+      mainContent
+        .getByRole('status')
+        .filter({ hasText: /tests failed/i })
+        .first(),
     ).toBeVisible({ timeout: 8000 });
-    await expect(page.getByRole('button', { name: /retry tests/i })).toBeVisible();
-    await expect(page.getByText(/expected true, received false/i)).toBeVisible();
+    await expect(
+      page.getByRole('button', { name: /retry tests/i }),
+    ).toBeVisible();
+    await expect(
+      page.getByText(/expected true, received false/i),
+    ).toBeVisible();
 
     const submitResponsePromise = page.waitForResponse(
       (resp) =>
@@ -83,6 +90,8 @@ test.describe('Candidate Day 3 Flow', () => {
 
     expect(submitResponse.status()).toBe(200);
     await sessionPage.expectDay(4);
-    await expect(page.getByRole('button', { name: /upload video/i })).toBeVisible();
+    await expect(
+      page.getByRole('button', { name: /upload video/i }),
+    ).toBeVisible();
   });
 });

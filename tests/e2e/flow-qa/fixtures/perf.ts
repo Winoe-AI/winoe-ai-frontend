@@ -1,4 +1,10 @@
-import { expect, test, type Locator, type Page, type Response } from '@playwright/test';
+import {
+  expect,
+  test,
+  type Locator,
+  type Page,
+  type Response,
+} from '@playwright/test';
 
 type MeasureOptions = {
   page: Page;

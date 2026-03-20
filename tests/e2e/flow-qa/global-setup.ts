@@ -60,10 +60,7 @@ function resolveClaimNamespace(map: EnvMap): string {
   return base.endsWith('/') ? base : `${base}/`;
 }
 
-function toStorageStateCookie(options: {
-  value: string;
-  baseURL: string;
-}): {
+function toStorageStateCookie(options: { value: string; baseURL: string }): {
   name: string;
   value: string;
   domain: string;
@@ -86,7 +83,10 @@ function toStorageStateCookie(options: {
   };
 }
 
-async function writeStorageState(filePath: string, cookie: ReturnType<typeof toStorageStateCookie>) {
+async function writeStorageState(
+  filePath: string,
+  cookie: ReturnType<typeof toStorageStateCookie>,
+) {
   const payload = {
     cookies: [cookie],
     origins: [],
@@ -161,8 +161,9 @@ function resolveDevIdentity(roles: string[]) {
 }
 
 function resolveBaseURL(config: FullConfig): string {
-  const fromProject = config.projects.find((project) => project.name === 'chromium')?.use
-    .baseURL;
+  const fromProject = config.projects.find(
+    (project) => project.name === 'chromium',
+  )?.use.baseURL;
   if (typeof fromProject === 'string' && fromProject.trim()) return fromProject;
 
   const fromUse = config.use?.baseURL;

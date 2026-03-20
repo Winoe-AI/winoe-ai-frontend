@@ -18,7 +18,9 @@ test.describe('Auth Flows', () => {
       await page.goto('/dashboard');
 
       await expect(page).toHaveURL(/\/not-authorized\?mode=recruiter/);
-      await expect(page.getByRole('heading', { name: /not authorized/i })).toBeVisible();
+      await expect(
+        page.getByRole('heading', { name: /not authorized/i }),
+      ).toBeVisible();
       await expect(page.getByText(/need recruiter access/i)).toBeVisible();
     });
   });
@@ -30,7 +32,9 @@ test.describe('Auth Flows', () => {
       await page.goto('/candidate/dashboard');
 
       await expect(page).toHaveURL(/\/not-authorized\?mode=candidate/);
-      await expect(page.getByRole('heading', { name: /not authorized/i })).toBeVisible();
+      await expect(
+        page.getByRole('heading', { name: /not authorized/i }),
+      ).toBeVisible();
       await expect(page.getByText(/need candidate access/i)).toBeVisible();
     });
 
@@ -40,7 +44,9 @@ test.describe('Auth Flows', () => {
       await page.goto('/auth/clear?returnTo=%2Fdashboard&mode=recruiter');
 
       await expect(page).toHaveURL(/\/auth\/error\?.*cleared=1/);
-      await expect(page.getByText(/auth state cleared\. please retry sign-in\./i)).toBeVisible();
+      await expect(
+        page.getByText(/auth state cleared\. please retry sign-in\./i),
+      ).toBeVisible();
     });
   });
 
@@ -55,8 +61,12 @@ test.describe('Auth Flows', () => {
     await auth.expectAuthErrorHeading();
     await expect(page.getByText(/code: state_invalid/i)).toBeVisible();
     await expect(page.getByText(/trace id: trace-123/i)).toBeVisible();
-    await expect(page.getByRole('button', { name: /retry sign-in/i })).toBeVisible();
-    await expect(page.getByRole('button', { name: /clear auth state/i })).toBeVisible();
+    await expect(
+      page.getByRole('button', { name: /retry sign-in/i }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole('button', { name: /clear auth state/i }),
+    ).toBeVisible();
   });
 
   test('logout route renders confirmation page', async ({ page }) => {

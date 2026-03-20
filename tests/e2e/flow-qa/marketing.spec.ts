@@ -5,7 +5,9 @@ import { annotatePerf, assertPerfBudget } from './fixtures/perf';
 import { MarketingPage } from './pages';
 
 test.describe('Marketing Flows', () => {
-  test('landing page renders signed-out state within budget @perf', async ({ page }) => {
+  test('landing page renders signed-out state within budget @perf', async ({
+    page,
+  }) => {
     const marketing = new MarketingPage(page);
     const startMs = Date.now();
 
@@ -24,11 +26,15 @@ test.describe('Marketing Flows', () => {
   test.describe('Signed-in marketing shell', () => {
     test.use({ storageState: storageStates.recruiterOnly });
 
-    test('landing page redirects signed-in users to dashboard', async ({ page }) => {
+    test('landing page redirects signed-in users to dashboard', async ({
+      page,
+    }) => {
       await page.goto('/');
 
       await expect(page).toHaveURL('/dashboard');
-      await expect(page.getByRole('heading', { name: /dashboard/i })).toBeVisible();
+      await expect(
+        page.getByRole('heading', { name: /dashboard/i }),
+      ).toBeVisible();
     });
   });
 });

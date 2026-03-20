@@ -35,19 +35,25 @@ test.describe('Candidate Day 5 Flow', () => {
 
     await sessionPage.expectDay(5);
     await expect(page.getByText(/^day 5 • documentation$/i)).toBeVisible();
-    const submitButton = page.getByRole('button', { name: /submit & continue/i });
+    const submitButton = page.getByRole('button', {
+      name: /submit & continue/i,
+    });
     await expect(submitButton).toBeDisabled();
     await expect(
-      page.getByText(/complete all sections with at least 20 characters to submit\./i),
+      page.getByText(
+        /complete all sections with at least 20 characters to submit\./i,
+      ),
     ).toBeVisible();
 
     const challengesField = page.getByLabel(/^challenges$/i);
     await challengesField.focus();
     await page.keyboard.press('Tab');
-    await expect(page.getByText(/this section is required\./i).first()).toBeVisible();
+    await expect(
+      page.getByText(/this section is required\./i).first(),
+    ).toBeVisible();
 
     await challengesField.fill(
-        'The hardest challenge was sequencing Day 2 and Day 3 work while preserving test stability.',
+      'The hardest challenge was sequencing Day 2 and Day 3 work while preserving test stability.',
     );
     await page
       .getByLabel(/^decisions$/i)

@@ -6,10 +6,27 @@ export const normalizeAccessToken = (raw: unknown): string | null => {
     const tokenSet = (raw as { tokenSet?: unknown }).tokenSet;
     const nestedTokenSet =
       tokenSet && typeof tokenSet === 'object'
-        ? ((tokenSet as { accessToken?: unknown; token?: unknown; access_token?: unknown })
-            .accessToken ??
-          (tokenSet as { accessToken?: unknown; token?: unknown; access_token?: unknown }).token ??
-          (tokenSet as { accessToken?: unknown; token?: unknown; access_token?: unknown }).access_token)
+        ? ((
+            tokenSet as {
+              accessToken?: unknown;
+              token?: unknown;
+              access_token?: unknown;
+            }
+          ).accessToken ??
+          (
+            tokenSet as {
+              accessToken?: unknown;
+              token?: unknown;
+              access_token?: unknown;
+            }
+          ).token ??
+          (
+            tokenSet as {
+              accessToken?: unknown;
+              token?: unknown;
+              access_token?: unknown;
+            }
+          ).access_token)
         : null;
     const token =
       (raw as { accessToken?: unknown }).accessToken ??

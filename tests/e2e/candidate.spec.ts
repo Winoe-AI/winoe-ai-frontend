@@ -38,7 +38,9 @@ test('candidate completes Day 1', async ({ page }) => {
 
   const textInput = page.locator('textarea').first();
   await expect(textInput).toBeVisible();
-  await textInput.fill('Baseline Day 1 response for deterministic regression coverage.');
+  await textInput.fill(
+    'Baseline Day 1 response for deterministic regression coverage.',
+  );
 
   await page.getByRole('button', { name: /save draft/i }).click();
   await page.getByRole('button', { name: /submit & continue/i }).click();

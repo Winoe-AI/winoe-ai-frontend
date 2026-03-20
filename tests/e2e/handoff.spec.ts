@@ -18,7 +18,9 @@ test('candidate Day 4 handoff upload flow hydrates and reaches transcript ready'
 
   const bootstrapResponsePromise = page.waitForResponse(
     (resp) =>
-      resp.url().includes(`/api/backend/candidate/session/${QA_INVITE_TOKEN}`) &&
+      resp
+        .url()
+        .includes(`/api/backend/candidate/session/${QA_INVITE_TOKEN}`) &&
       resp.status() === 200,
   );
 
@@ -76,11 +78,17 @@ test('candidate Day 4 handoff upload flow hydrates and reaches transcript ready'
   await expect(page.getByText(/00:00 - 00:01/i)).toBeVisible();
   await expect(page.getByText(/hello/i)).toBeVisible();
 
-  await page.getByRole('button', { name: /^delete upload$/i }).first().click();
+  await page
+    .getByRole('button', { name: /^delete upload$/i })
+    .first()
+    .click();
   await expect(
     page.getByRole('dialog', { name: /delete upload confirmation/i }),
   ).toBeVisible();
-  await page.getByRole('button', { name: /^delete upload$/i }).last().click();
+  await page
+    .getByRole('button', { name: /^delete upload$/i })
+    .last()
+    .click();
 
   await expect(page.getByText(/upload deleted/i)).toBeVisible();
   await expect(

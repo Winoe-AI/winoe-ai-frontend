@@ -31,8 +31,12 @@ test.describe('Live Integration Lane: Recruiter', () => {
 
     expect(dashboardResponse.status()).toBe(200);
     await expect(page).toHaveURL('/dashboard');
-    await expect(page.getByRole('heading', { name: /^dashboard$/i })).toBeVisible();
-    await expect(page.getByRole('button', { name: /new simulation/i })).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: /^dashboard$/i }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole('button', { name: /new simulation/i }),
+    ).toBeVisible();
 
     const dashboardLoadMs = Date.now() - dashboardStartMs;
     annotatePerf('perf:integration-dashboard-load-ms', dashboardLoadMs);
@@ -41,7 +45,9 @@ test.describe('Live Integration Lane: Recruiter', () => {
     await page.goto('/dashboard/simulations/new');
 
     await expect(page).toHaveURL('/dashboard/simulations/new');
-    await expect(page.getByRole('heading', { name: /new simulation/i })).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: /new simulation/i }),
+    ).toBeVisible();
 
     const uniqueTitle = `E2E Integration ${Date.now()}`;
     await page.getByLabel(/^title$/i).fill(uniqueTitle);
@@ -51,7 +57,9 @@ test.describe('Live Integration Lane: Recruiter', () => {
       .fill('TypeScript, Next.js, Playwright');
     await page
       .getByLabel(/focus/i)
-      .fill('Integration lane validation for recruiter and candidate workflows.');
+      .fill(
+        'Integration lane validation for recruiter and candidate workflows.',
+      );
 
     const createStartMs = Date.now();
     const createResponsePromise = page.waitForResponse(
@@ -124,14 +132,18 @@ test.describe('Live Integration Lane: Candidate', () => {
     await expect(
       page.getByRole('heading', { name: /candidate dashboard/i }),
     ).toBeVisible();
-    await expect(page.getByRole('heading', { name: /your invitations/i })).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: /your invitations/i }),
+    ).toBeVisible();
 
     const candidateDashboardLoadMs = Date.now() - candidateDashboardStartMs;
     annotatePerf(
       'perf:integration-candidate-dashboard-load-ms',
       candidateDashboardLoadMs,
     );
-    expect(candidateDashboardLoadMs).toBeLessThan(CANDIDATE_DASHBOARD_BUDGET_MS);
+    expect(candidateDashboardLoadMs).toBeLessThan(
+      CANDIDATE_DASHBOARD_BUDGET_MS,
+    );
 
     await page.goto('/dashboard');
 

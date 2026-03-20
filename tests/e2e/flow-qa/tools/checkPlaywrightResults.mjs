@@ -91,7 +91,9 @@ function main() {
     );
   }
   if (summary.flaky > args.maxFlaky) {
-    failures.push(`${args.label}: flaky tests ${summary.flaky} exceeds max ${args.maxFlaky}`);
+    failures.push(
+      `${args.label}: flaky tests ${summary.flaky} exceeds max ${args.maxFlaky}`,
+    );
   }
   if (summary.skipped > args.maxSkipped) {
     failures.push(
@@ -115,7 +117,11 @@ function main() {
   if (args.output) {
     const absOutput = path.resolve(args.output);
     fs.mkdirSync(path.dirname(absOutput), { recursive: true });
-    fs.writeFileSync(absOutput, `${JSON.stringify(payload, null, 2)}\n`, 'utf8');
+    fs.writeFileSync(
+      absOutput,
+      `${JSON.stringify(payload, null, 2)}\n`,
+      'utf8',
+    );
   }
 
   if (payload.ok) {

@@ -20,14 +20,18 @@ test.describe('Recruiter Dashboard Flows', () => {
     );
     const navPromise = dashboard.gotoDashboard();
 
-    await expect(page.locator('.animate-pulse').first()).toBeVisible({ timeout: 2500 });
+    await expect(page.locator('.animate-pulse').first()).toBeVisible({
+      timeout: 2500,
+    });
     const dashboardResponse = await dashboardResponsePromise;
     await navPromise;
 
     expect(dashboardResponse.status()).toBe(200);
     await expect(page).toHaveURL('/dashboard');
     await dashboard.expectDashboardLoaded();
-    await expect(page.getByRole('link', { name: /frontend platform modernization/i })).toBeVisible();
+    await expect(
+      page.getByRole('link', { name: /frontend platform modernization/i }),
+    ).toBeVisible();
 
     const loadMs = Date.now() - startMs;
     annotatePerf('perf:dashboard-load-ms', loadMs);
@@ -42,18 +46,28 @@ test.describe('Recruiter Dashboard Flows', () => {
     await dashboard.expectDashboardLoaded();
 
     await dashboard.openInviteModal();
-    await expect(page.getByRole('heading', { name: /invite candidate/i })).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: /invite candidate/i }),
+    ).toBeVisible();
 
     await expect(page.getByText(/candidate email is required/i)).toBeVisible();
-    await expect(page.getByRole('button', { name: /^send invite$/i })).toBeDisabled();
+    await expect(
+      page.getByRole('button', { name: /^send invite$/i }),
+    ).toBeDisabled();
 
     await page.getByLabel(/candidate name/i).fill('Jane Candidate');
     await page.getByLabel(/candidate email/i).fill('not-an-email');
     await expect(page.getByText(/enter a valid email address/i)).toBeVisible();
-    await expect(page.getByRole('button', { name: /^send invite$/i })).toBeDisabled();
+    await expect(
+      page.getByRole('button', { name: /^send invite$/i }),
+    ).toBeDisabled();
 
-    await page.getByLabel(/candidate email/i).fill('jane.candidate@example.com');
-    await expect(page.getByRole('button', { name: /^send invite$/i })).toBeEnabled();
+    await page
+      .getByLabel(/candidate email/i)
+      .fill('jane.candidate@example.com');
+    await expect(
+      page.getByRole('button', { name: /^send invite$/i }),
+    ).toBeEnabled();
 
     const inviteResponsePromise = page.waitForResponse(
       (resp) =>
@@ -68,7 +82,9 @@ test.describe('Recruiter Dashboard Flows', () => {
 
     expect(inviteResponse.status()).toBe(201);
     expect(mockState.inviteRequestCount).toBe(1);
-    await expect(page.getByRole('heading', { name: /invite candidate/i })).toHaveCount(0);
+    await expect(
+      page.getByRole('heading', { name: /invite candidate/i }),
+    ).toHaveCount(0);
     await expect(page).toHaveURL('/dashboard');
   });
 });

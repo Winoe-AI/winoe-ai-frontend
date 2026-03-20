@@ -10,7 +10,9 @@ import { CandidateSessionQaPage } from './pages';
 test.describe('Candidate Day 2 Flow', () => {
   test.use({ storageState: storageStates.candidateOnly });
 
-  test('day 2 workspace + tests + submit transitions to Day 3', async ({ page }) => {
+  test('day 2 workspace + tests + submit transitions to Day 3', async ({
+    page,
+  }) => {
     await installCandidateSessionMocks(page, {
       token: QA_INVITE_TOKEN,
       initialTask: makeCandidateTask({
@@ -38,7 +40,8 @@ test.describe('Candidate Day 2 Flow', () => {
           total: null,
           stdout: null,
           stderr: null,
-          workflowUrl: 'https://github.com/tenon-ai/candidate-repo/actions/runs/1',
+          workflowUrl:
+            'https://github.com/tenon-ai/candidate-repo/actions/runs/1',
           commitSha: 'abc1234def5678',
         },
         {
@@ -49,7 +52,8 @@ test.describe('Candidate Day 2 Flow', () => {
           total: 12,
           stdout: 'All tests passed.',
           stderr: null,
-          workflowUrl: 'https://github.com/tenon-ai/candidate-repo/actions/runs/1',
+          workflowUrl:
+            'https://github.com/tenon-ai/candidate-repo/actions/runs/1',
           commitSha: 'abc1234def5678',
         },
       ],
@@ -62,7 +66,9 @@ test.describe('Candidate Day 2 Flow', () => {
 
     await sessionPage.expectDay(2);
     await expect(page.getByText(/coding workspace/i)).toBeVisible();
-    await expect(page.getByRole('link', { name: /open codespace|open repo/i })).toBeVisible();
+    await expect(
+      page.getByRole('link', { name: /open codespace|open repo/i }),
+    ).toBeVisible();
 
     const runInitResponsePromise = page.waitForResponse(
       (resp) =>
@@ -80,9 +86,14 @@ test.describe('Candidate Day 2 Flow', () => {
     ).toBeVisible();
     const mainContent = page.locator('#main-content');
     await expect(
-      mainContent.getByRole('status').filter({ hasText: /all checks passed/i }).first(),
+      mainContent
+        .getByRole('status')
+        .filter({ hasText: /all checks passed/i })
+        .first(),
     ).toBeVisible({ timeout: 8000 });
-    await expect(page.getByRole('button', { name: /re-run tests/i })).toBeVisible();
+    await expect(
+      page.getByRole('button', { name: /re-run tests/i }),
+    ).toBeVisible();
 
     const submitResponsePromise = page.waitForResponse(
       (resp) =>

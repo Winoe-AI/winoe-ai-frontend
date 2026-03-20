@@ -41,7 +41,9 @@ test.describe('Recruiter Candidate Submissions Flows', () => {
     ).toBeVisible();
     await expect(page.getByText(/latest github artifacts/i)).toBeVisible();
     await expect(page.getByText(/day 4 handoff evidence/i)).toBeVisible();
-    await expect(page.getByRole('link', { name: /workflow run/i }).first()).toBeVisible();
+    await expect(
+      page.getByRole('link', { name: /workflow run/i }).first(),
+    ).toBeVisible();
 
     await page.getByRole('button', { name: /show all/i }).click();
     await expect(page.getByText(/all submissions/i).first()).toBeVisible();
@@ -62,13 +64,15 @@ test.describe('Recruiter Candidate Submissions Flows', () => {
     );
 
     const fitProfilePath = `/dashboard/simulations/${QA_BASE_SIMULATION_ID}/candidates/${QA_CANDIDATE_SESSION_ID}/fit-profile`;
-    await expect(page.locator(`a[href="${fitProfilePath}"]`).first()).toBeVisible();
+    await expect(
+      page.locator(`a[href="${fitProfilePath}"]`).first(),
+    ).toBeVisible();
     await page.goto(fitProfilePath);
 
-    await expect(page).toHaveURL(
-      fitProfilePath,
-    );
-    await expect(page.getByRole('heading', { name: /^fit profile$/i })).toBeVisible();
+    await expect(page).toHaveURL(fitProfilePath);
+    await expect(
+      page.getByRole('heading', { name: /^fit profile$/i }),
+    ).toBeVisible();
     await expect(page.getByText(/overall fit score/i)).toBeVisible();
 
     await page.getByRole('link', { name: /back to submissions/i }).click();

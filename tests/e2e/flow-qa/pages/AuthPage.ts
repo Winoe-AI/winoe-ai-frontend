@@ -19,7 +19,9 @@ export class AuthPage extends BasePage {
   }
 
   async expectLoginHeading() {
-    await this.expectHeading(/sign in to continue your simulation|recruiter login/i);
+    await this.expectHeading(
+      /sign in to continue your simulation|recruiter login/i,
+    );
   }
 
   async expectAuthErrorHeading() {

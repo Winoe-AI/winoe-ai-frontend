@@ -18,7 +18,9 @@ test.describe('Recruiter Create Simulation Flows', () => {
     await createPage.gotoCreate();
 
     await expect(page).toHaveURL('/dashboard/simulations/new');
-    await expect(page.getByRole('heading', { name: /new simulation/i })).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: /new simulation/i }),
+    ).toBeVisible();
 
     await createPage.submitCreate();
 
