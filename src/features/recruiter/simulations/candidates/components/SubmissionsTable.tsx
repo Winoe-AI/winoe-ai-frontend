@@ -1,6 +1,6 @@
 'use client';
 import Button from '@/shared/ui/Button';
-import { ArtifactCard } from './ArtifactCard';
+import { LazyArtifactCard } from './ArtifactCard/LazyArtifactCard';
 import type { SubmissionArtifact, SubmissionListItem } from '../types';
 
 type Props = {
@@ -71,7 +71,7 @@ export function SubmissionsTable({
               </div>
             );
           }
-          return <ArtifactCard key={it.submissionId} artifact={artifact} />;
+          return <LazyArtifactCard key={it.submissionId} artifact={artifact} />;
         })}
       </div>
     </div>

@@ -180,7 +180,37 @@ describe('CandidateSubmissionsPage', () => {
       render(<CandidateSubmissionsPage />);
     });
     expect(await screen.findByText(/No submissions yet/i)).toBeInTheDocument();
-    fireEvent.click(screen.getByRole('button', { name: /Refresh/i }));
+    fireEvent.click(
+      screen.getByRole('button', { name: /reload-submissions/i }),
+    );
+  });
+
+  it('uses cache-aware candidate verification on mount and bypasses cache on refresh', async () => {
+    await act(async () => {
+      render(<CandidateSubmissionsPage />);
+    });
+
+    await waitFor(() =>
+      expect(screen.getByText(/Latest GitHub artifacts/i)).toBeInTheDocument(),
+    );
+
+    expect(listSimulationCandidatesMock).toHaveBeenCalled();
+    const firstOpts = listSimulationCandidatesMock.mock.calls[0]?.[1] as
+      | { skipCache?: boolean }
+      | undefined;
+    expect(firstOpts?.skipCache).toBe(false);
+
+    fireEvent.click(
+      screen.getByRole('button', { name: /reload-submissions/i }),
+    );
+
+    await waitFor(() =>
+      expect(listSimulationCandidatesMock.mock.calls.length).toBeGreaterThan(1),
+    );
+    const refreshOpts = listSimulationCandidatesMock.mock.calls.at(-1)?.[1] as
+      | { skipCache?: boolean }
+      | undefined;
+    expect(refreshOpts?.skipCache).toBe(true);
   });
 
   it('shows partial artifact warning while rendering available artifacts', async () => {

@@ -186,7 +186,7 @@ describe('CandidateSessionPage view rendering', () => {
     expect(screen.getByTestId('workspace-panel')).toBeInTheDocument();
     expect(screen.getByTestId('task-view')).toHaveTextContent('Code Day');
     expect(resolveInviteMock).toHaveBeenCalled();
-    expect(getCurrentTaskMock).toHaveBeenCalled();
+    expect(getCurrentTaskMock).not.toHaveBeenCalled();
   });
 
   it('hydrates closed-day recorded submission reference from persisted storage', async () => {

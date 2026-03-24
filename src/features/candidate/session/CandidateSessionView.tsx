@@ -1,9 +1,10 @@
+import type { ComponentType } from 'react';
+import dynamic from 'next/dynamic';
 import { AuthView } from './views/AuthView';
 import { CompleteView } from './views/CompleteView';
 import { ErrorView } from './views/ErrorView';
 import { LockedView } from './views/LockedView';
 import { LoadingView } from './views/LoadingView';
-import { RunningView } from './views/RunningView';
 import { SchedulingView } from './views/SchedulingView';
 import { StartView } from './views/StartView';
 import { StateMessage } from './components/StateMessage';
@@ -12,6 +13,24 @@ import type {
   CandidateSessionViewProps as Props,
   ViewState,
 } from './views/types';
+import type { RunningViewProps } from './views/RunningView';
+
+const LazyRunningView = dynamic<RunningViewProps>(
+  () => import('./views/RunningView').then((mod) => mod.RunningView),
+  {
+    ssr: false,
+    loading: () => <LoadingView message="Loading your simulation workspace." />,
+  },
+);
+
+let RunningViewComponent: ComponentType<RunningViewProps> = LazyRunningView;
+
+if (process.env.NODE_ENV === 'test') {
+  RunningViewComponent =
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    (require('./views/RunningView') as typeof import('./views/RunningView'))
+      .RunningView;
+}
 
 export type { ViewState };
 
@@ -137,7 +156,7 @@ export function CandidateSessionView(props: Props) {
     );
 
   return (
-    <RunningView
+    <RunningViewComponent
       title={props.title}
       role={props.role}
       completedCount={props.completedCount}

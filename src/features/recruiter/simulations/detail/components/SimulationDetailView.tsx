@@ -1,13 +1,53 @@
 'use client';
+import { useEffect, useState, type ComponentType } from 'react';
 import dynamic from 'next/dynamic';
+import type { ScenarioControlsSectionProps } from './ScenarioControlsSection';
 import { CandidatesSection } from './sections/CandidatesSection';
-import { ScenarioControlsSection } from './ScenarioControlsSection';
 import { SimulationPlanSection } from './SimulationPlanSection';
 import { SimulationDetailHeader } from './SimulationDetailHeader';
 import { useInviteModalActions } from './InviteModalActions';
 import { TerminateSimulationModal } from './TerminateSimulationModal';
 import { CleanupInProgressPanel } from './CleanupInProgressPanel';
 import type { SimulationDetailViewProps } from './types';
+
+const LazyScenarioControlsSection = dynamic<ScenarioControlsSectionProps>(
+  () =>
+    import('./ScenarioControlsSection').then(
+      (mod) => mod.ScenarioControlsSection,
+    ),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
+        <div className="text-sm text-gray-600">
+          Loading scenario controls...
+        </div>
+      </div>
+    ),
+  },
+);
+
+let ScenarioControlsSectionComponent: ComponentType<ScenarioControlsSectionProps> =
+  LazyScenarioControlsSection;
+
+if (process.env.NODE_ENV === 'test') {
+  const scenarioControlsModule =
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    require('./ScenarioControlsSection') as typeof import('./ScenarioControlsSection');
+  ScenarioControlsSectionComponent =
+    scenarioControlsModule.ScenarioControlsSection;
+}
+
+const DEFERRED_SCENARIO_CONTROLS_DELAY_MS =
+  process.env.NODE_ENV === 'test' ? 0 : 450;
+
+type WindowWithIdleCallbacks = Window & {
+  requestIdleCallback?: (
+    callback: IdleRequestCallback,
+    options?: IdleRequestOptions,
+  ) => number;
+  cancelIdleCallback?: (handle: number) => void;
+};
 
 const SimulationInviteModal = dynamic(
   () =>
@@ -30,6 +70,35 @@ export function SimulationDetailView(props: SimulationDetailViewProps) {
     resetInviteFlow: props.resetInviteFlow,
     setInviteModalOpen: props.setInviteModalOpen,
   });
+  const [showScenarioControls, setShowScenarioControls] = useState(
+    DEFERRED_SCENARIO_CONTROLS_DELAY_MS === 0,
+  );
+
+  useEffect(() => {
+    if (DEFERRED_SCENARIO_CONTROLS_DELAY_MS === 0 || showScenarioControls) {
+      return;
+    }
+    let idleId: number | null = null;
+
+    const timer = window.setTimeout(() => {
+      const hostWindow = window as WindowWithIdleCallbacks;
+      if (typeof hostWindow.requestIdleCallback === 'function') {
+        idleId = hostWindow.requestIdleCallback(
+          () => setShowScenarioControls(true),
+          { timeout: 900 },
+        );
+        return;
+      }
+      setShowScenarioControls(true);
+    }, DEFERRED_SCENARIO_CONTROLS_DELAY_MS);
+
+    return () => {
+      window.clearTimeout(timer);
+      if (idleId !== null) {
+        (window as WindowWithIdleCallbacks).cancelIdleCallback?.(idleId);
+      }
+    };
+  }, [showScenarioControls]);
 
   return (
     <div className="flex flex-col gap-4 py-8">
@@ -59,24 +128,32 @@ export function SimulationDetailView(props: SimulationDetailViewProps) {
         onInvite={openInviteModal}
       />
       <CleanupInProgressPanel cleanupJobIds={props.cleanupJobIds} />
-      <ScenarioControlsSection
-        versions={props.scenarioVersions}
-        selectedVersionId={props.selectedScenarioVersionId}
-        onSelectVersion={props.onSelectScenarioVersion}
-        selectedVersion={props.selectedScenarioVersion}
-        previousVersion={props.previousScenarioVersion}
-        lockBannerMessage={props.scenarioLockBannerMessage}
-        contentUnavailableMessage={props.scenarioContentUnavailableMessage}
-        generatingLabel={props.scenarioGeneratingLabel}
-        editorDisabled={props.scenarioEditorDisabled}
-        editorDisabledReason={props.scenarioEditorDisabledReason}
-        editorSaving={props.scenarioEditorSaving}
-        editorSaveError={props.scenarioEditorSaveError}
-        editorFieldErrors={props.scenarioEditorFieldErrors}
-        editorDraft={props.scenarioEditorDraft}
-        onEditorDraftChange={props.onScenarioEditorDraftChange}
-        onSave={props.onSaveScenarioEdits}
-      />
+      {showScenarioControls ? (
+        <ScenarioControlsSectionComponent
+          versions={props.scenarioVersions}
+          selectedVersionId={props.selectedScenarioVersionId}
+          onSelectVersion={props.onSelectScenarioVersion}
+          selectedVersion={props.selectedScenarioVersion}
+          previousVersion={props.previousScenarioVersion}
+          lockBannerMessage={props.scenarioLockBannerMessage}
+          contentUnavailableMessage={props.scenarioContentUnavailableMessage}
+          generatingLabel={props.scenarioGeneratingLabel}
+          editorDisabled={props.scenarioEditorDisabled}
+          editorDisabledReason={props.scenarioEditorDisabledReason}
+          editorSaving={props.scenarioEditorSaving}
+          editorSaveError={props.scenarioEditorSaveError}
+          editorFieldErrors={props.scenarioEditorFieldErrors}
+          editorDraft={props.scenarioEditorDraft}
+          onEditorDraftChange={props.onScenarioEditorDraftChange}
+          onSave={props.onSaveScenarioEdits}
+        />
+      ) : (
+        <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
+          <div className="text-sm text-gray-600">
+            Preparing scenario controls...
+          </div>
+        </div>
+      )}
       <SimulationPlanSection
         status={props.selectedScenarioStatusForDisplay}
         scenarioVersionLabel={props.scenarioVersionLabel}

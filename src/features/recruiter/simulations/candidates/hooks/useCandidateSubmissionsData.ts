@@ -21,6 +21,7 @@ export function useCandidateSubmissionsData(
       reload: () => loader.reload({ skipCache: true }),
       toggleShowAll: loader.toggleShowAll,
       setArtifacts: setters.setArtifacts,
+      setArtifactWarning: setters.setArtifactWarning,
     },
     setShowAll: setters.setShowAll,
   };

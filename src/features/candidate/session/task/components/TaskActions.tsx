@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import Button from '@/shared/ui/Button';
 
 type TaskActionsProps = {
@@ -9,7 +10,7 @@ type TaskActionsProps = {
   onSubmit: () => void;
 };
 
-export function TaskActions({
+export const TaskActions = memo(function TaskActions({
   isTextTask,
   displayStatus,
   disabled,
@@ -49,4 +50,4 @@ export function TaskActions({
       ) : null}
     </div>
   );
-}
+});

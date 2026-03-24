@@ -1,6 +1,13 @@
 'use client';
 
-import { useCallback, useMemo, useState } from 'react';
+import {
+  memo,
+  useCallback,
+  useDeferredValue,
+  useMemo,
+  useState,
+  useTransition,
+} from 'react';
 import dynamic from 'next/dynamic';
 import Button from '@/shared/ui/Button';
 import type { MarkdownPreviewProps } from '@/shared/ui/Markdown';
@@ -75,6 +82,56 @@ type Props = {
   ) => Promise<SubmitResponse | void> | SubmitResponse | void;
 };
 
+type ReflectionSectionFieldProps = {
+  section: Day5ReflectionSectionKey;
+  value: string;
+  fieldError: string | null;
+  disabled: boolean;
+  onChange: (section: Day5ReflectionSectionKey, value: string) => void;
+  onBlur: (section: Day5ReflectionSectionKey) => void;
+};
+
+const ReflectionSectionField = memo(function ReflectionSectionField({
+  section,
+  value,
+  fieldError,
+  disabled,
+  onChange,
+  onBlur,
+}: ReflectionSectionFieldProps) {
+  const fieldId = `reflection-${section}`;
+  const length = value.trim().length;
+
+  return (
+    <section className="space-y-2">
+      <label
+        htmlFor={fieldId}
+        className="block text-sm font-semibold text-gray-900"
+      >
+        {day5SectionLabel(section)}
+      </label>
+      <textarea
+        id={fieldId}
+        value={value}
+        onChange={(event) => onChange(section, event.target.value)}
+        onBlur={() => onBlur(section)}
+        className="min-h-[120px] w-full resize-y rounded-md border p-3 text-sm leading-6"
+        placeholder={`Write your ${day5SectionLabel(section).toLowerCase()} reflection…`}
+        disabled={disabled}
+      />
+      <div className="flex items-center justify-between text-xs text-gray-500">
+        <span>{length.toLocaleString()} characters</span>
+        <span>Min {String(DAY5_REFLECTION_MIN_SECTION_CHARS)} characters</span>
+      </div>
+      {fieldError ? (
+        <p className="text-xs text-red-700" role="alert">
+          {fieldError}
+        </p>
+      ) : null}
+    </section>
+  );
+});
+
 export function Day5ReflectionPanel({
   candidateSessionId,
   task,
@@ -115,6 +172,7 @@ export function Day5ReflectionPanel({
   const [submittedTerminal, setSubmittedTerminal] = useState(
     hasRecordedSubmission,
   );
+  const [previewPending, startPreviewTransition] = useTransition();
 
   const { submitStatus, lastProgress, getLastError, handleSubmit } =
     useSubmitHandler(onSubmit);
@@ -176,9 +234,15 @@ export function Day5ReflectionPanel({
     ),
   });
 
+  const deferredSections = useDeferredValue(sections);
   const markdownPreview = useMemo(
-    () => buildDay5ReflectionContentText(buildDay5ReflectionPayload(sections)),
-    [sections],
+    () =>
+      mode === 'preview'
+        ? buildDay5ReflectionContentText(
+            buildDay5ReflectionPayload(deferredSections),
+          )
+        : '',
+    [deferredSections, mode],
   );
   const replayReadOnly = actionGate.isReadOnly || hasRecordedSubmission;
   const readOnlySections =
@@ -189,25 +253,32 @@ export function Day5ReflectionPanel({
       : !replayReadOnly && hasDay5SectionContent(sections)
         ? sections
         : null;
-  const readOnlyFallbackMarkdown = replayReadOnly
-    ? recordedContentText
-    : markdownPreview;
+  const readOnlyFallbackMarkdown = replayReadOnly ? recordedContentText : '';
 
-  const handleSectionChange = (
-    key: Day5ReflectionSectionKey,
-    value: string,
-  ) => {
-    setSections((prev) => ({ ...prev, [key]: value }));
-    setTouched((prev) => ({ ...prev, [key]: true }));
-    if (backendFieldErrors[key]) {
+  const handleSectionChange = useCallback(
+    (key: Day5ReflectionSectionKey, value: string) => {
+      setSections((prev) => ({ ...prev, [key]: value }));
+      setTouched((prev) => ({ ...prev, [key]: true }));
       setBackendFieldErrors((prev) => {
+        if (!prev[key]) return prev;
         const next = { ...prev };
         delete next[key];
         return next;
       });
-    }
-    if (localFormError) setLocalFormError(null);
-  };
+      setLocalFormError((prev) => (prev ? null : prev));
+    },
+    [],
+  );
+
+  const handleSectionBlur = useCallback((key: Day5ReflectionSectionKey) => {
+    setTouched((prev) => ({ ...prev, [key]: true }));
+  }, []);
+
+  const handleModeChange = useCallback((next: 'write' | 'preview') => {
+    startPreviewTransition(() => {
+      setMode(next);
+    });
+  }, []);
 
   const submitDisabled =
     readOnly ||
@@ -300,7 +371,7 @@ export function Day5ReflectionPanel({
                     ? 'bg-blue-50 px-3 py-1 text-blue-700 transition-colors'
                     : 'px-3 py-1 text-gray-700 transition-colors hover:bg-gray-50'
                 }
-                onClick={() => setMode('write')}
+                onClick={() => handleModeChange('write')}
               >
                 Write
               </button>
@@ -312,7 +383,7 @@ export function Day5ReflectionPanel({
                     ? 'border-l border-gray-200 bg-blue-50 px-3 py-1 text-blue-700 transition-colors'
                     : 'border-l border-gray-200 px-3 py-1 text-gray-700 transition-colors hover:bg-gray-50'
                 }
-                onClick={() => setMode('preview')}
+                onClick={() => handleModeChange('preview')}
               >
                 Preview
               </button>
@@ -321,6 +392,11 @@ export function Day5ReflectionPanel({
 
           {mode === 'preview' ? (
             <div className="min-h-[360px] rounded-md border bg-white p-3">
+              {previewPending ? (
+                <div className="mb-2 text-xs text-gray-500">
+                  Refreshing preview…
+                </div>
+              ) : null}
               <PreviewComponent
                 content={markdownPreview}
                 emptyPlaceholder="Complete each reflection section to preview markdown."
@@ -328,45 +404,21 @@ export function Day5ReflectionPanel({
             </div>
           ) : (
             DAY5_REFLECTION_SECTIONS.map((section) => {
-              const fieldId = `reflection-${section}`;
               const shouldShowClientError = submitAttempted || touched[section];
               const fieldError =
                 backendFieldErrors[section] ??
-                (shouldShowClientError ? clientFieldMessages[section] : null);
-              const length = sections[section].trim().length;
+                (shouldShowClientError ? clientFieldMessages[section] : null) ??
+                null;
               return (
-                <section key={section} className="space-y-2">
-                  <label
-                    htmlFor={fieldId}
-                    className="block text-sm font-semibold text-gray-900"
-                  >
-                    {day5SectionLabel(section)}
-                  </label>
-                  <textarea
-                    id={fieldId}
-                    value={sections[section]}
-                    onChange={(event) =>
-                      handleSectionChange(section, event.target.value)
-                    }
-                    onBlur={() =>
-                      setTouched((prev) => ({ ...prev, [section]: true }))
-                    }
-                    className="min-h-[120px] w-full resize-y rounded-md border p-3 text-sm leading-6"
-                    placeholder={`Write your ${day5SectionLabel(section).toLowerCase()} reflection…`}
-                    disabled={displayStatus !== 'idle' || submitting}
-                  />
-                  <div className="flex items-center justify-between text-xs text-gray-500">
-                    <span>{length.toLocaleString()} characters</span>
-                    <span>
-                      Min {String(DAY5_REFLECTION_MIN_SECTION_CHARS)} characters
-                    </span>
-                  </div>
-                  {fieldError ? (
-                    <p className="text-xs text-red-700" role="alert">
-                      {fieldError}
-                    </p>
-                  ) : null}
-                </section>
+                <ReflectionSectionField
+                  key={section}
+                  section={section}
+                  value={sections[section]}
+                  fieldError={fieldError}
+                  disabled={displayStatus !== 'idle' || submitting}
+                  onChange={handleSectionChange}
+                  onBlur={handleSectionBlur}
+                />
               );
             })
           )}

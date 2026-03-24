@@ -19,4 +19,6 @@ export type SubmissionState = {
   latestDay2: SubmissionArtifact | null;
   latestDay3: SubmissionArtifact | null;
   latestDay4Handoff: SubmissionArtifact | null;
+  latestGithubLoading: boolean;
+  latestDay4Loading: boolean;
 };

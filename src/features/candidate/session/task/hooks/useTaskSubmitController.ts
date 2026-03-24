@@ -1,5 +1,5 @@
 'use client';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { markTextDraftSavedAt } from '../utils/draftStorage';
 import { useSubmitHandler } from './taskHooks';
 import { useTaskDraftAutosave } from './useTaskDraftAutosave';
@@ -118,6 +118,11 @@ export function useTaskSubmitController({
     useState<DurableCodingSubmission | null>(null);
   const [text, setText] = useState('');
   const [localError, setLocalError] = useState<string | null>(null);
+  const textRef = useRef(text);
+
+  useEffect(() => {
+    textRef.current = text;
+  }, [text]);
 
   const githubNative = useMemo(
     () => isGithubNativeDay(task.dayIndex) || isCodeTask(task.type),
@@ -200,7 +205,7 @@ export function useTaskSubmitController({
   const saveDraftNow = () => {
     void draftAutosave.flushNow();
   };
-  const clearDrafts = () => {};
+  const clearDrafts = useCallback(() => {}, []);
 
   const textForRender = textTask && readOnly ? finalized.text : text;
   const readOnlyReason =
@@ -211,7 +216,7 @@ export function useTaskSubmitController({
           : 'This day is closed and read-only. Finalized submission content is not available for this task.'))
       : disabledReason;
 
-  const saveAndSubmit = async () => {
+  const saveAndSubmit = useCallback(async () => {
     if (disabled || actionStatus !== 'idle') return;
 
     if (githubNative) {
@@ -229,7 +234,7 @@ export function useTaskSubmitController({
     }
 
     if (textTask) {
-      const trimmed = text.trim();
+      const trimmed = textRef.current.trim();
       if (!trimmed) {
         setLocalError('Please enter an answer before submitting.');
         return;
@@ -243,7 +248,16 @@ export function useTaskSubmitController({
     setLocalError(null);
     const resp = await handleSubmit({});
     if (resp !== 'submit-failed') clearDrafts();
-  };
+  }, [
+    actionStatus,
+    clearDrafts,
+    disabled,
+    githubNative,
+    handleSubmit,
+    task.id,
+    textRef,
+    textTask,
+  ]);
 
   const errorToShow = localError ?? submitError ?? null;
   const codingSubmissionStatus = resolveCodingSubmissionStatus(

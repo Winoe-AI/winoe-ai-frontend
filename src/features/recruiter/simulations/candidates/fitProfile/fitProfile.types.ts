@@ -1,4 +1,4 @@
-export const FIT_PROFILE_POLL_INTERVAL_MS = 2500;
+export const FIT_PROFILE_POLL_INTERVAL_MS = 10_000;
 
 export type FitProfileViewStatus =
   | 'not_generated'

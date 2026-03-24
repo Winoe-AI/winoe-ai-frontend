@@ -23,6 +23,7 @@ export async function reloadCandidateSubmissions(params: {
   candidateSessionId: string;
   pageSize: number;
   showAll: boolean;
+  preloadArtifacts?: boolean;
   skipCache?: boolean;
   signal: AbortSignal;
 }): Promise<ReloadResult> {
@@ -32,6 +33,7 @@ export async function reloadCandidateSubmissions(params: {
     candidateSessionId,
     pageSize,
     showAll,
+    preloadArtifacts = true,
     skipCache,
     signal,
   } = params;
@@ -65,6 +67,16 @@ export async function reloadCandidateSubmissions(params: {
         artifacts: {},
         artifactWarning: null,
         error: message,
+      };
+    }
+
+    if (!preloadArtifacts) {
+      return {
+        candidate,
+        items: ordered,
+        artifacts: {},
+        artifactWarning: null,
+        error: null,
       };
     }
 

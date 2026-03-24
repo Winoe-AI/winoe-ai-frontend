@@ -1,4 +1,4 @@
-import { HttpError } from '@/features/candidate/api';
+import { HttpError } from '@/lib/api/errors/errors';
 import {
   INVITE_EXPIRED_MESSAGE,
   INVITE_UNAVAILABLE_MESSAGE,

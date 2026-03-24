@@ -2,8 +2,7 @@ import {
   fetchCandidateSubmissions,
   verifyCandidate,
 } from '../utils/candidateSubmissionsApi';
-import { isHandoffSubmissionItem } from '../utils/handoff';
-import { pickLatestByDay, pickLatestWhere } from '../utils/pickLatest';
+import { pickLatestByDay } from '../utils/pickLatest';
 import type { SubmissionListItem } from '../types';
 import type { CandidateSession } from '@/features/recruiter/types';
 
@@ -38,7 +37,7 @@ export async function loadCandidateAndSubmissions({
   includePageItems,
 }: LoadParams): Promise<CandidateLoadResult> {
   try {
-    const resolvedSkipCache = skipCache ?? true;
+    const resolvedSkipCache = skipCache ?? false;
     const candidate = await verifyCandidate(
       simulationId,
       candidateSessionId,
@@ -56,11 +55,9 @@ export async function loadCandidateAndSubmissions({
     );
     const latest2 = pickLatestByDay(ordered, 2);
     const latest3 = pickLatestByDay(ordered, 3);
-    const latestDay4Handoff = pickLatestWhere(ordered, isHandoffSubmissionItem);
     const ids = [
       ...(latest2 ? [latest2.submissionId] : []),
       ...(latest3 ? [latest3.submissionId] : []),
-      ...(latestDay4Handoff ? [latestDay4Handoff.submissionId] : []),
     ];
     if (includePageItems && pageSize) {
       ids.push(...ordered.slice(0, pageSize).map((it) => it.submissionId));

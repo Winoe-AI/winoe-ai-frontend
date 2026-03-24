@@ -2,8 +2,14 @@
 
 import { useCallback, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
+import { useQueryClient } from '@tanstack/react-query';
 import { buildLoginHref } from '@/features/auth/authPaths';
-import type { CandidateInvite } from '@/features/candidate/api';
+import {
+  getCandidateCurrentTask,
+  resolveCandidateInviteToken,
+  type CandidateInvite,
+} from '@/features/candidate/api';
+import { queryKeys } from '@/shared/query';
 import { useCandidateSession } from '../session/CandidateSessionProvider';
 import { DashboardHeader } from './components/DashboardHeader';
 import { InviteList } from './components/InviteList';
@@ -18,6 +24,7 @@ export default function CandidateDashboardPage({
   signedInEmail?: string | null;
 }) {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const { state } = useCandidateSession();
   const handleAuthRequired = useCallback(() => {
     router.replace(buildLoginHref('/candidate/dashboard', 'candidate'));
@@ -58,6 +65,46 @@ export default function CandidateDashboardPage({
     [state.candidateSessionId, state.inviteToken],
   );
 
+  const prefetchContinue = useCallback(
+    (invite: CandidateInvite) => {
+      if (invite.isExpired) return;
+      const token =
+        invite.token ??
+        (invite.candidateSessionId === state.candidateSessionId
+          ? state.inviteToken
+          : null);
+      if (!token) return;
+
+      void router.prefetch(`/candidate/session/${encodeURIComponent(token)}`);
+      void queryClient
+        .fetchQuery({
+          queryKey: queryKeys.candidate.sessionBootstrap(token),
+          queryFn: ({ signal }) =>
+            resolveCandidateInviteToken(token, { signal, skipCache: false }),
+          staleTime: 10_000,
+        })
+        .then((bootstrap) => {
+          const sessionId = bootstrap?.candidateSessionId;
+          if (typeof sessionId !== 'number' || !Number.isFinite(sessionId)) {
+            return;
+          }
+          return queryClient.prefetchQuery({
+            queryKey: queryKeys.candidate.currentTask(sessionId),
+            queryFn: ({ signal }) =>
+              getCandidateCurrentTask(sessionId, {
+                signal,
+                skipCache: false,
+                cacheTtlMs: 10_000,
+                dedupeKey: `candidate-current-task-${sessionId}`,
+              }),
+            staleTime: 10_000,
+          });
+        })
+        .catch(() => {});
+    },
+    [queryClient, router, state.candidateSessionId, state.inviteToken],
+  );
+
   return (
     <div className="mx-auto flex max-w-5xl flex-col gap-6 p-6">
       <DashboardHeader email={displayEmail} />
@@ -67,6 +114,7 @@ export default function CandidateDashboardPage({
         error={error}
         onRefresh={refresh}
         onContinue={handleContinue}
+        onContinueIntent={prefetchContinue}
         resolveFallbackToken={resolveFallbackToken}
       />
     </div>

@@ -1,5 +1,5 @@
 import { useCallback, useRef } from 'react';
-import { getCandidateCurrentTask } from '@/features/candidate/api';
+import { getCandidateCurrentTask } from '@/features/candidate/api/tasks';
 import { normalizeCompletedTaskIds, toTask } from '../utils/taskTransforms';
 import type { CandidateTask } from '../CandidateSessionProvider';
 

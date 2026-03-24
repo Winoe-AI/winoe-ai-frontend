@@ -28,7 +28,12 @@ function normalizeSubmitResponse(
 
 export async function getCandidateCurrentTask(
   candidateSessionId: number,
-  options?: { skipCache?: boolean; cacheTtlMs?: number; dedupeKey?: string },
+  options?: {
+    signal?: AbortSignal;
+    skipCache?: boolean;
+    cacheTtlMs?: number;
+    dedupeKey?: string;
+  },
 ) {
   const path = `/candidate/session/${candidateSessionId}/current_task`;
   try {
@@ -37,6 +42,7 @@ export async function getCandidateCurrentTask(
       {
         headers: { 'x-candidate-session-id': String(candidateSessionId) },
         cache: 'no-store',
+        signal: options?.signal,
         skipCache: options?.skipCache,
         cacheTtlMs: options?.cacheTtlMs,
         dedupeKey: options?.dedupeKey,

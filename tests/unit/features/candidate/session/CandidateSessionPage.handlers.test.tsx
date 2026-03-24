@@ -399,16 +399,10 @@ describe('CandidateSessionPage test run handlers', () => {
   });
 
   it('shows error when start fetch fails after clicking start', async () => {
-    getCurrentTaskMock
-      .mockResolvedValueOnce({
-        isComplete: false,
-        completedTaskIds: [],
-        currentTask: null,
-      })
-      .mockRejectedValueOnce({
-        status: 500,
-        message: 'task boom',
-      });
+    getCurrentTaskMock.mockRejectedValueOnce({
+      status: 500,
+      message: 'task boom',
+    });
     useCandidateSessionMock.mockReturnValue({
       ...baseState(),
       state: {
@@ -476,7 +470,7 @@ describe('CandidateSessionPage test run handlers', () => {
         started: true,
         taskState: {
           ...baseState().state.taskState,
-          loading: true,
+          loading: false,
           currentTask: null,
         },
       },

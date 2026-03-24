@@ -1,5 +1,7 @@
 'use client';
 
+import { useMemo, type ComponentType, type ReactNode } from 'react';
+import dynamic from 'next/dynamic';
 import { Task, SubmitPayload, SubmitResponse } from './types';
 import { TaskContainer } from './components/TaskContainer';
 import { TaskHeader } from './components/TaskHeader';
@@ -9,11 +11,74 @@ import { TaskStatus } from './components/TaskStatus';
 import { TaskPanelErrorBanner } from './components/TaskPanelErrorBanner';
 import { TaskActions } from './components/TaskActions';
 import { DraftSaveStatus } from './components/DraftSaveStatus';
-import { Day5ReflectionPanel } from './components/Day5ReflectionPanel';
-import { HandoffUploadPanel } from './handoff/HandoffUploadPanel';
 import { useTaskSubmitController } from './hooks/useTaskSubmitController';
 import { isDay5ReflectionTask } from './utils/day5Reflection';
 import type { WindowActionGate } from '../lib/windowState';
+
+const LazyDay5ReflectionPanel = dynamic(
+  () =>
+    import('./components/Day5ReflectionPanel').then(
+      (mod) => mod.Day5ReflectionPanel,
+    ),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="rounded-md border border-gray-200 bg-white p-4 text-sm text-gray-600">
+        Loading reflection panel...
+      </div>
+    ),
+  },
+);
+
+const LazyHandoffUploadPanel = dynamic(
+  () =>
+    import('./handoff/HandoffUploadPanel').then(
+      (mod) => mod.HandoffUploadPanel,
+    ),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="rounded-md border border-gray-200 bg-white p-4 text-sm text-gray-600">
+        Loading upload panel...
+      </div>
+    ),
+  },
+);
+
+type Day5ReflectionPanelProps = {
+  candidateSessionId: number | null;
+  task: Task;
+  submitting: boolean;
+  submitError?: string | null;
+  actionGate: WindowActionGate;
+  onTaskWindowClosed?: (err: unknown) => void;
+  onSubmit: (
+    payload: SubmitPayload,
+  ) => Promise<SubmitResponse | void> | SubmitResponse | void;
+};
+
+type HandoffUploadPanelProps = {
+  candidateSessionId: number | null;
+  task: Task;
+  actionGate: WindowActionGate;
+  onTaskWindowClosed?: (err: unknown) => void;
+};
+
+let Day5ReflectionPanelComponent: ComponentType<Day5ReflectionPanelProps> =
+  LazyDay5ReflectionPanel;
+let HandoffUploadPanelComponent: ComponentType<HandoffUploadPanelProps> =
+  LazyHandoffUploadPanel;
+
+if (process.env.NODE_ENV === 'test') {
+  const day5Module =
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    require('./components/Day5ReflectionPanel') as typeof import('./components/Day5ReflectionPanel');
+  Day5ReflectionPanelComponent = day5Module.Day5ReflectionPanel;
+  const handoffModule =
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    require('./handoff/HandoffUploadPanel') as typeof import('./handoff/HandoffUploadPanel');
+  HandoffUploadPanelComponent = handoffModule.HandoffUploadPanel;
+}
 
 export default function CandidateTaskView(props: {
   candidateSessionId: number | null;
@@ -33,7 +98,7 @@ export default function CandidateTaskView(props: {
   };
   if (props.task.type === 'handoff') {
     return (
-      <HandoffUploadPanel
+      <HandoffUploadPanelComponent
         key={props.task.id}
         candidateSessionId={props.candidateSessionId}
         task={props.task}
@@ -44,7 +109,7 @@ export default function CandidateTaskView(props: {
   }
   if (isDay5ReflectionTask(props.task)) {
     return (
-      <Day5ReflectionPanel
+      <Day5ReflectionPanelComponent
         key={props.task.id}
         candidateSessionId={props.candidateSessionId}
         task={props.task}
@@ -115,22 +180,28 @@ function CandidateTaskViewInner({
 
   const showDay1DraftStatus = textTask && task.dayIndex === 1;
   const showDay5DraftStatus = textTask && task.dayIndex === 5;
+  const draftStatusSlot = useMemo<ReactNode>(
+    () =>
+      showDay1DraftStatus ? (
+        <DraftSaveStatus
+          status={draftAutosaveStatus}
+          lastSavedAt={savedAt}
+          restoreApplied={draftRestoreApplied}
+          error={draftError}
+        />
+      ) : null,
+    [
+      draftAutosaveStatus,
+      draftError,
+      draftRestoreApplied,
+      savedAt,
+      showDay1DraftStatus,
+    ],
+  );
 
   return (
     <TaskContainer>
-      <TaskHeader
-        task={task}
-        statusSlot={
-          showDay1DraftStatus ? (
-            <DraftSaveStatus
-              status={draftAutosaveStatus}
-              lastSavedAt={savedAt}
-              restoreApplied={draftRestoreApplied}
-              error={draftError}
-            />
-          ) : null
-        }
-      />
+      <TaskHeader task={task} statusSlot={draftStatusSlot} />
       <TaskDescription description={task.description} />
 
       <div className="mt-6">

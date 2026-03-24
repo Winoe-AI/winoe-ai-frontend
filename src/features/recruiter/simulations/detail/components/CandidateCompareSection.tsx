@@ -14,7 +14,7 @@ import {
 import type {
   CandidateCompareFitProfileStatus,
   CandidateCompareRow,
-} from '@/features/recruiter/api';
+} from '@/features/recruiter/api/candidatesCompare';
 
 type SortColumn = 'candidate' | 'status' | 'fit_profile' | 'fit_score';
 type SortDirection = 'asc' | 'desc';
@@ -39,6 +39,8 @@ const FIT_PROFILE_META: Record<
   ready: { label: 'Ready', tone: 'success' },
   failed: { label: 'Failed', tone: 'warning' },
 };
+
+const LINK_PREFETCH = process.env.NODE_ENV === 'test' ? undefined : false;
 
 function toTimestamp(value: string | null): number {
   if (!value) return 0;
@@ -375,12 +377,14 @@ export function CandidateCompareSection({
                           <Link
                             className="text-blue-600 hover:underline"
                             href={submissionsHref}
+                            prefetch={LINK_PREFETCH}
                           >
                             View Submissions
                           </Link>
                           <Link
                             className="text-blue-600 hover:underline"
                             href={fitProfileHref}
+                            prefetch={LINK_PREFETCH}
                           >
                             View Fit Profile
                           </Link>

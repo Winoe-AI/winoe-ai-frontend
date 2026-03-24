@@ -168,8 +168,12 @@ describe('CandidateSubmissionsPage', () => {
     expect(
       await screen.findByText(/Latest GitHub artifacts/i),
     ).toBeInTheDocument();
-    expect(screen.getAllByText(/Day 2: Debug API/i).length).toBeGreaterThan(0);
-    expect(screen.getAllByText(/Day 3: Fix Day3/i).length).toBeGreaterThan(0);
+    expect(
+      (await screen.findAllByText(/Day 2: Debug API/i)).length,
+    ).toBeGreaterThan(0);
+    expect(
+      (await screen.findAllByText(/Day 3: Fix Day3/i)).length,
+    ).toBeGreaterThan(0);
     expect(
       screen.getAllByRole('link', { name: /acme\/day2/i }).length,
     ).toBeGreaterThan(0);

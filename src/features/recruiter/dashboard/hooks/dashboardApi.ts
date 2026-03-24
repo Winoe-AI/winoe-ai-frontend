@@ -14,7 +14,12 @@ export async function fetchDashboard(signal?: AbortSignal) {
   try {
     const result = await httpResult<DashboardPayload>(
       '/dashboard',
-      { cache: 'no-store', signal, cacheTtlMs: 9000 },
+      {
+        cache: 'no-store',
+        signal,
+        cacheTtlMs: 30_000,
+        dedupeKey: 'recruiter-dashboard',
+      },
       { basePath: '/api', skipAuth: true },
     );
 

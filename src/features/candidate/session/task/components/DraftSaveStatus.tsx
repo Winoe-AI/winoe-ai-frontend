@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import type { TaskDraftAutosaveStatus } from '../hooks/useTaskDraftAutosave';
 
 type Props = {
@@ -8,14 +9,16 @@ type Props = {
   className?: string;
 };
 
+const savedAtFormatter = new Intl.DateTimeFormat(undefined, {
+  hour: 'numeric',
+  minute: '2-digit',
+});
+
 function formatSavedAt(value: number): string {
-  return new Intl.DateTimeFormat(undefined, {
-    hour: 'numeric',
-    minute: '2-digit',
-  }).format(new Date(value));
+  return savedAtFormatter.format(new Date(value));
 }
 
-export function DraftSaveStatus({
+export const DraftSaveStatus = memo(function DraftSaveStatus({
   status,
   lastSavedAt,
   restoreApplied,
@@ -48,4 +51,4 @@ export function DraftSaveStatus({
       {parts.join(' • ')}
     </p>
   );
-}
+});

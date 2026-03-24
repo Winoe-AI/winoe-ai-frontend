@@ -15,11 +15,20 @@ import type {
   CandidateSessionBootstrapResponse,
 } from './types';
 
-export async function listCandidateInvites(): Promise<CandidateInvite[]> {
+export async function listCandidateInvites(options?: {
+  signal?: AbortSignal;
+  skipCache?: boolean;
+}): Promise<CandidateInvite[]> {
   try {
     const data = await apiClient.get<unknown[]>(
       '/candidate/invites',
-      { cache: 'no-store' },
+      {
+        cache: 'no-store',
+        signal: options?.signal,
+        skipCache: options?.skipCache,
+        cacheTtlMs: 60_000,
+        dedupeKey: 'candidate-invites',
+      },
       candidateClientOptions,
     );
     return Array.isArray(data) ? data.map(normalizeCandidateInvite) : [];
@@ -30,13 +39,19 @@ export async function listCandidateInvites(): Promise<CandidateInvite[]> {
 
 export async function resolveCandidateInviteToken(
   token: string,
-  options?: { skipCache?: boolean },
+  options?: { skipCache?: boolean; signal?: AbortSignal },
 ) {
   const path = `/candidate/session/${encodeURIComponent(token)}`;
   try {
     return await apiClient.get<CandidateSessionBootstrapResponse>(
       path,
-      { cache: 'no-store', skipCache: options?.skipCache },
+      {
+        cache: 'no-store',
+        signal: options?.signal,
+        skipCache: options?.skipCache,
+        cacheTtlMs: 10_000,
+        dedupeKey: `candidate-session-bootstrap-${token}`,
+      },
       candidateClientOptions,
     );
   } catch (err) {

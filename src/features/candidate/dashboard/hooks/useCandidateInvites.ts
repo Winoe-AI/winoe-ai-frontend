@@ -1,10 +1,11 @@
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import {
   listCandidateInvites,
   type CandidateInvite,
 } from '@/features/candidate/api';
 import { toUserMessage } from '@/lib/errors/errors';
-import { useAsyncLoader } from '@/shared/hooks';
+import { queryKeys } from '@/shared/query';
 
 type UseCandidateInvitesResult = {
   invites: CandidateInvite[];
@@ -18,27 +19,27 @@ type UseCandidateInvitesResult = {
 export function useCandidateInvites(
   onAuthRequired?: () => void,
 ): UseCandidateInvitesResult {
-  const fetchInvites = useCallback(async () => {
-    try {
-      return await listCandidateInvites();
-    } catch (err) {
-      const status = (err as { status?: number })?.status;
-      if (status === 401 || status === 403) {
-        onAuthRequired?.();
-        return [];
-      }
-      throw err;
-    }
-  }, [onAuthRequired]);
+  const queryClient = useQueryClient();
+  const [localError, setLocalError] = useState<string | null>(null);
 
-  const { data, loading, error, load, setError } = useAsyncLoader<
-    CandidateInvite[]
-  >(fetchInvites, {
-    onError: (err) =>
-      toUserMessage(err, 'Unable to load your invites right now.'),
+  const invitesQuery = useQuery({
+    queryKey: queryKeys.candidate.invites(),
+    queryFn: async ({ signal }) => {
+      try {
+        return await listCandidateInvites({ signal });
+      } catch (err) {
+        const status = (err as { status?: number })?.status;
+        if (status === 401 || status === 403) {
+          onAuthRequired?.();
+          return [];
+        }
+        throw err;
+      }
+    },
+    staleTime: 60_000,
   });
 
-  const invites = useMemo(() => data ?? [], [data]);
+  const invites = useMemo(() => invitesQuery.data ?? [], [invitesQuery.data]);
 
   const sortedInvites = useMemo(() => {
     return [...invites].sort((a, b) => {
@@ -49,9 +50,27 @@ export function useCandidateInvites(
   }, [invites]);
 
   const refresh = useCallback(() => {
-    void load(true);
-    return () => undefined;
-  }, [load]);
+    setLocalError(null);
+    void queryClient.invalidateQueries({
+      queryKey: queryKeys.candidate.invites(),
+    });
+    void invitesQuery.refetch();
+  }, [invitesQuery, queryClient]);
 
-  return { invites, sortedInvites, loading, error, refresh, setError };
+  const queryError = useMemo(() => {
+    if (!invitesQuery.error) return null;
+    return toUserMessage(
+      invitesQuery.error,
+      'Unable to load your invites right now.',
+    );
+  }, [invitesQuery.error]);
+
+  return {
+    invites,
+    sortedInvites,
+    loading: invitesQuery.isLoading || invitesQuery.isFetching,
+    error: localError ?? queryError,
+    refresh,
+    setError: setLocalError,
+  };
 }

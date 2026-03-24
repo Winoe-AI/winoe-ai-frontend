@@ -9,6 +9,7 @@ export type CandidateCompareListOptions = {
   cache?: RequestCache;
   skipCache?: boolean;
   cacheTtlMs?: number;
+  dedupeKey?: string;
   disableDedupe?: boolean;
 };
 
@@ -26,6 +27,7 @@ export async function listSimulationCandidateCompare(
       signal: options?.signal,
       skipCache: options?.skipCache,
       cacheTtlMs: options?.cacheTtlMs ?? 6000,
+      dedupeKey: options?.dedupeKey,
       disableDedupe: options?.disableDedupe,
     },
   );

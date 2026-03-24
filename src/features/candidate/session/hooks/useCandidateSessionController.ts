@@ -1,13 +1,12 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { buildLoginHref } from '@/features/auth/authPaths';
-import { scheduleCandidateSession } from '@/features/candidate/api';
+import { scheduleCandidateSession } from '@/features/candidate/api/schedule';
 import { useCandidateSession } from '../CandidateSessionProvider';
 import { usePerfMarks } from './usePerfMarks';
 import { useCandidateDerivedInfo } from './useCandidateDerivedInfo';
 import { useTokenSync } from './useTokenSync';
 import { useCandidateSessionActions } from './useCandidateSessionActions';
-import { friendlyTaskError } from '../utils/errorMessages';
 import { loadTextDraftSavedAt } from '../task/utils/draftStorage';
 import {
   loadRecordedSubmissionReference,
@@ -395,15 +394,8 @@ export function useCandidateSessionController(token: string) {
         markEnd('candidate:schedule:submit', { status: 'locked' });
         return;
       }
-      setView('starting');
+      setView('running');
       markEnd('candidate:schedule:submit', { status: 'success' });
-      await actions
-        .fetchCurrentTask(undefined, { skipCache: true })
-        .then(() => setView('running'))
-        .catch((err) => {
-          setErrorMessage(friendlyTaskError(err));
-          setView('error');
-        });
     } catch (err) {
       const status =
         err &&

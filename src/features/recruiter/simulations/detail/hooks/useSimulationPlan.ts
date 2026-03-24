@@ -1,33 +1,26 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { recruiterBffClient } from '@/lib/api/client';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { toStatus, toUserMessage } from '@/lib/errors/errors';
-import { getSimulationJobStatus } from '@/features/recruiter/api';
+import { queryKeys } from '@/shared/query';
+import { getSimulationJobStatus } from '@/features/recruiter/api/simulationLifecycle';
 import {
   isPreviewGenerating,
-  normalizeSimulationDetailPreview,
   type SimulationGenerationJob,
-  type SimulationDetailPreview,
 } from '../utils/detail';
+import {
+  fetchSimulationDetailQuery,
+  SIMULATION_DETAIL_STALE_TIME_MS,
+} from '../queries';
 import type { SimulationPlan } from '../utils/plan';
 
 type Params = { simulationId: string };
 
 const POLL_BACKOFF_MS = [2000, 3000, 5000, 8000, 10000] as const;
 
-type LoadOptions = {
-  skipCache?: boolean;
-  silent?: boolean;
-};
-
 export function useSimulationPlan({ simulationId }: Params) {
-  const [detail, setDetail] = useState<SimulationDetailPreview | null>(null);
+  const queryClient = useQueryClient();
   const [jobStatusHint, setJobStatusHint] =
     useState<SimulationGenerationJob | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [statusCode, setStatusCode] = useState<number | null>(null);
-
-  const mountedRef = useRef(true);
   const pollTimerRef = useRef<number | null>(null);
   const pollAttemptRef = useRef(0);
 
@@ -38,82 +31,40 @@ export function useSimulationPlan({ simulationId }: Params) {
     }
   }, []);
 
-  useEffect(() => {
-    mountedRef.current = true;
-    return () => {
-      mountedRef.current = false;
-      clearPollTimer();
-    };
-  }, [clearPollTimer]);
+  const detailQuery = useQuery({
+    queryKey: queryKeys.recruiter.simulationDetail(simulationId),
+    queryFn: ({ signal }) =>
+      fetchSimulationDetailQuery(simulationId, signal, false),
+    enabled: Boolean(simulationId),
+    staleTime: SIMULATION_DETAIL_STALE_TIME_MS,
+  });
 
-  const loadPlan = useCallback(
-    async (opts?: LoadOptions) => {
-      const silent = opts?.silent === true;
-      if (!silent) {
-        setLoading(true);
-        setError(null);
-      }
+  const statusCode = useMemo(() => {
+    if (!detailQuery.error) return null;
+    return toStatus(detailQuery.error);
+  }, [detailQuery.error]);
 
-      try {
-        const data = await recruiterBffClient.get<unknown>(
-          `/simulations/${simulationId}`,
-          {
-            cache: 'no-store',
-            skipCache: opts?.skipCache,
-            cacheTtlMs: 12000,
-          },
-        );
-
-        if (!mountedRef.current) return;
-        const normalized = normalizeSimulationDetailPreview(data);
-        setDetail(normalized);
-        if (!normalized.generationJob?.jobId) {
-          setJobStatusHint(null);
-        }
-        setStatusCode(null);
-        if (!silent) setError(null);
-      } catch (caught: unknown) {
-        if (!mountedRef.current) return;
-
-        const status = toStatus(caught);
-        setDetail(null);
-        setJobStatusHint(null);
-        setStatusCode(status);
-
-        if (status === 404) {
-          setError('Simulation not found.');
-        } else if (status === 403) {
-          setError("You don't have access to this simulation.");
-        } else {
-          setError(
-            toUserMessage(caught, 'Failed to load simulation details.', {
-              includeDetail: false,
-            }),
-          );
-        }
-      } finally {
-        if (!silent && mountedRef.current) {
-          setLoading(false);
-        }
-      }
-    },
-    [simulationId],
-  );
+  const error = useMemo(() => {
+    if (!detailQuery.error) return null;
+    if (statusCode === 404) return 'Simulation not found.';
+    if (statusCode === 403) return "You don't have access to this simulation.";
+    return toUserMessage(
+      detailQuery.error,
+      'Failed to load simulation details.',
+      {
+        includeDetail: false,
+      },
+    );
+  }, [detailQuery.error, statusCode]);
 
   useEffect(() => {
     pollAttemptRef.current = 0;
     clearPollTimer();
-    setDetail(null);
-    setJobStatusHint(null);
-    setStatusCode(null);
-    void loadPlan();
-    return clearPollTimer;
-  }, [clearPollTimer, loadPlan]);
+  }, [clearPollTimer, simulationId]);
 
-  const isGenerating = useMemo(() => isPreviewGenerating(detail), [detail]);
   const effectiveJob = useMemo(() => {
-    if (!detail) return jobStatusHint;
-    if (!detail.generationJob) return jobStatusHint;
+    const detail = detailQuery.data;
+    if (!detail?.generationJob) return null;
     if (detail.generationJob.pollAfterMs != null) return detail.generationJob;
     if (!jobStatusHint) return detail.generationJob;
     if (jobStatusHint.jobId !== detail.generationJob.jobId) {
@@ -128,12 +79,19 @@ export function useSimulationPlan({ simulationId }: Params) {
         jobStatusHint.errorMessage ?? detail.generationJob.errorMessage,
       errorCode: jobStatusHint.errorCode ?? detail.generationJob.errorCode,
     };
-  }, [detail, jobStatusHint]);
+  }, [detailQuery.data, jobStatusHint]);
 
   const detailWithJobHint = useMemo(() => {
-    if (!detail || !effectiveJob || !detail.generationJob) return detail;
+    const detail = detailQuery.data;
+    if (!detail || !effectiveJob || !detail.generationJob)
+      return detail ?? null;
     return { ...detail, generationJob: effectiveJob };
-  }, [detail, effectiveJob]);
+  }, [detailQuery.data, effectiveJob]);
+
+  const isGenerating = useMemo(
+    () => isPreviewGenerating(detailWithJobHint),
+    [detailWithJobHint],
+  );
 
   useEffect(() => {
     clearPollTimer();
@@ -141,8 +99,8 @@ export function useSimulationPlan({ simulationId }: Params) {
     if (
       statusCode === 403 ||
       statusCode === 404 ||
-      !detail ||
-      detail.hasJobFailure ||
+      !detailWithJobHint ||
+      detailWithJobHint.hasJobFailure ||
       !isGenerating
     ) {
       pollAttemptRef.current = 0;
@@ -162,11 +120,12 @@ export function useSimulationPlan({ simulationId }: Params) {
     pollTimerRef.current = window.setTimeout(() => {
       pollAttemptRef.current += 1;
       void (async () => {
-        const jobId = effectiveJob?.jobId ?? detail.generationJob?.jobId;
+        const jobId =
+          effectiveJob?.jobId ?? detailWithJobHint.generationJob?.jobId;
         if (jobId) {
           try {
             const job = await getSimulationJobStatus(jobId);
-            if (job && mountedRef.current) {
+            if (job) {
               setJobStatusHint({
                 jobId: job.jobId,
                 status: job.status,
@@ -177,21 +136,41 @@ export function useSimulationPlan({ simulationId }: Params) {
             }
           } catch {}
         }
-        try {
-          await loadPlan({ skipCache: true, silent: true });
-        } catch {}
+        await queryClient.fetchQuery({
+          queryKey: queryKeys.recruiter.simulationDetail(simulationId),
+          queryFn: ({ signal }) =>
+            fetchSimulationDetailQuery(simulationId, signal, true),
+          staleTime: 0,
+        });
       })();
     }, delayMs);
 
     return clearPollTimer;
   }, [
     clearPollTimer,
-    detail,
+    detailWithJobHint,
     effectiveJob,
     isGenerating,
-    loadPlan,
+    queryClient,
+    simulationId,
     statusCode,
   ]);
+
+  const reload = useCallback(async () => {
+    const queryKey = queryKeys.recruiter.simulationDetail(simulationId);
+    await queryClient.invalidateQueries({ queryKey, refetchType: 'none' });
+    await queryClient.fetchQuery({
+      queryKey,
+      queryFn: ({ signal }) =>
+        fetchSimulationDetailQuery(simulationId, signal, true),
+      staleTime: 0,
+    });
+  }, [queryClient, simulationId]);
+
+  useEffect(() => clearPollTimer, [clearPollTimer]);
+
+  const loading =
+    detailQuery.isLoading || (detailQuery.isFetching && !detailQuery.data);
 
   return {
     detail: detailWithJobHint,
@@ -200,6 +179,6 @@ export function useSimulationPlan({ simulationId }: Params) {
     error,
     statusCode,
     isGenerating,
-    reload: () => loadPlan({ skipCache: true }),
+    reload,
   };
 }

@@ -1,13 +1,18 @@
 'use client';
-import { ArtifactCard } from './ArtifactCard';
+import { LazyArtifactCard } from './ArtifactCard/LazyArtifactCard';
 import type { SubmissionArtifact } from '../types';
 
 type Props = {
   artifact: SubmissionArtifact | null;
   hasHandoffSubmission: boolean;
+  loading: boolean;
 };
 
-export function LatestDay4Handoff({ artifact, hasHandoffSubmission }: Props) {
+export function LatestDay4Handoff({
+  artifact,
+  hasHandoffSubmission,
+  loading,
+}: Props) {
   return (
     <div className="rounded border border-gray-200 bg-white p-4">
       <div className="text-sm font-semibold text-gray-900">
@@ -18,7 +23,11 @@ export function LatestDay4Handoff({ artifact, hasHandoffSubmission }: Props) {
       </div>
       <div className="mt-3">
         {artifact ? (
-          <ArtifactCard artifact={artifact} />
+          <LazyArtifactCard artifact={artifact} />
+        ) : loading ? (
+          <div className="rounded border border-dashed border-gray-200 bg-gray-50 p-3 text-sm text-gray-700">
+            Loading Day 4 handoff details...
+          </div>
         ) : hasHandoffSubmission ? (
           <div className="rounded border border-dashed border-gray-200 bg-gray-50 p-3 text-sm text-gray-700">
             Day 4 handoff found, but artifact details are unavailable.

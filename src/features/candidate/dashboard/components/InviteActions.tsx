@@ -5,9 +5,15 @@ type Props = {
   invite: CandidateInvite;
   fallbackToken: string | null;
   onContinue: (invite: CandidateInvite) => void;
+  onIntent?: (invite: CandidateInvite) => void;
 };
 
-export function InviteActions({ invite, fallbackToken, onContinue }: Props) {
+export function InviteActions({
+  invite,
+  fallbackToken,
+  onContinue,
+  onIntent,
+}: Props) {
   const tokenAvailable = invite.token || fallbackToken;
   const disabled = !tokenAvailable || invite.isExpired;
   const label =
@@ -18,6 +24,8 @@ export function InviteActions({ invite, fallbackToken, onContinue }: Props) {
       onClick={() => onContinue(invite)}
       disabled={disabled}
       className="w-full sm:w-auto"
+      onMouseEnter={() => onIntent?.(invite)}
+      onFocus={() => onIntent?.(invite)}
     >
       {label}
     </Button>

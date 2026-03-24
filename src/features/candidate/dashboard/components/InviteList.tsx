@@ -8,6 +8,7 @@ type Props = {
   error: string | null;
   onRefresh: () => void;
   onContinue: (invite: CandidateInvite) => void;
+  onContinueIntent?: (invite: CandidateInvite) => void;
   resolveFallbackToken: (invite: CandidateInvite) => string | null;
 };
 
@@ -17,6 +18,7 @@ export function InviteList({
   error,
   onRefresh,
   onContinue,
+  onContinueIntent,
   resolveFallbackToken,
 }: Props) {
   return (
@@ -71,6 +73,7 @@ export function InviteList({
               key={`${invite.candidateSessionId}-${invite.token ?? 'no-token'}`}
               invite={invite}
               onContinue={onContinue}
+              onContinueIntent={onContinueIntent}
               fallbackToken={resolveFallbackToken(invite)}
             />
           ))}

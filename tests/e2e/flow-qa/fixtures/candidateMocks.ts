@@ -197,9 +197,12 @@ export async function installCandidateSessionMocks(
       pathname === `/api/backend/candidate/session/${token}` &&
       method === 'GET'
     ) {
+      const bootstrapStatus = options.isCompleteInitially
+        ? 'completed'
+        : 'in_progress';
       await fulfillJson(route, {
         candidateSessionId,
-        status: 'in_progress',
+        status: bootstrapStatus,
         simulation: {
           title: simulationTitle,
           role: simulationRole,

@@ -1,6 +1,6 @@
 'use client';
-import { MarkdownPreview } from '@/shared/ui/Markdown';
 import type { SimulationPlanDay } from '../utils/plan';
+import { MarkdownPreviewComponent } from './MarkdownPreviewComponent';
 
 export function PlanDayRubric({ day }: { day: SimulationPlanDay }) {
   if (!day.rubricItems.length && !day.rubricText) return null;
@@ -17,7 +17,7 @@ export function PlanDayRubric({ day }: { day: SimulationPlanDay }) {
         </ul>
       ) : (
         day.rubricText && (
-          <MarkdownPreview content={day.rubricText} className="mt-1" />
+          <MarkdownPreviewComponent content={day.rubricText} className="mt-1" />
         )
       )}
     </div>

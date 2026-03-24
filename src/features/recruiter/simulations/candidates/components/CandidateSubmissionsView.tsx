@@ -52,16 +52,23 @@ export function CandidateSubmissionsView({
         <SubmissionsEmpty onRefresh={actions.reload} />
       ) : (
         <>
-          <LatestArtifacts day2={state.latestDay2} day3={state.latestDay3} />
+          <LatestArtifacts
+            day2={state.latestDay2}
+            day3={state.latestDay3}
+            loading={state.latestGithubLoading}
+          />
           <LatestDay4Handoff
             artifact={state.latestDay4Handoff}
             hasHandoffSubmission={state.items.some(isHandoffSubmissionItem)}
+            loading={state.latestDay4Loading}
           />
-          {state.artifactWarning ? (
-            <div className="rounded border border-amber-200 bg-amber-50 p-3 text-xs text-amber-800">
-              {state.artifactWarning}
-            </div>
-          ) : null}
+          <div className="min-h-[48px]">
+            {state.artifactWarning ? (
+              <div className="rounded border border-amber-200 bg-amber-50 p-3 text-xs text-amber-800">
+                {state.artifactWarning}
+              </div>
+            ) : null}
+          </div>
           <AllSubmissionsCard
             state={state}
             actions={actions}

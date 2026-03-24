@@ -12,6 +12,8 @@ export type DataState = {
   latestDay2: SubmissionArtifact | null;
   latestDay3: SubmissionArtifact | null;
   latestDay4Handoff: SubmissionArtifact | null;
+  latestGithubLoading: boolean;
+  latestDay4Loading: boolean;
 };
 
 export type DataActions = {
@@ -20,4 +22,5 @@ export type DataActions = {
   setArtifacts: React.Dispatch<
     React.SetStateAction<Record<number, SubmissionArtifact>>
   >;
+  setArtifactWarning: React.Dispatch<React.SetStateAction<string | null>>;
 };

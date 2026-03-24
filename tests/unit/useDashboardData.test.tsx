@@ -152,6 +152,9 @@ describe('useDashboardData', () => {
     render(<TestDashboard />);
 
     await waitFor(() => expect(assignMock).toHaveBeenCalled());
+    await waitFor(() =>
+      expect(screen.getByTestId('profile-loading').textContent).toBe('false'),
+    );
     expect(assignMock.mock.calls[0]?.[0]).toContain('/auth/login?');
   });
 
@@ -172,6 +175,9 @@ describe('useDashboardData', () => {
     render(<TestDashboard />);
 
     await waitFor(() => expect(assignMock).toHaveBeenCalled());
+    await waitFor(() =>
+      expect(screen.getByTestId('profile-loading').textContent).toBe('false'),
+    );
     expect(assignMock.mock.calls[0]?.[0]).toContain('/not-authorized?');
   });
 

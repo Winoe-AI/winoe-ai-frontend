@@ -83,10 +83,7 @@ export function useAsyncLoader<T>(
 
   useEffect(() => {
     if (options.immediate === false) return;
-    const id = window.setTimeout(() => {
-      void load(true);
-    }, 0);
-    return () => window.clearTimeout(id);
+    void load(true);
   }, [load, options.immediate]);
 
   return { data, loading, error, load, abort, setData, setError };

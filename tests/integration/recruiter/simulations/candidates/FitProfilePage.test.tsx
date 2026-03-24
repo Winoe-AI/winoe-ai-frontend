@@ -243,7 +243,7 @@ describe('FitProfilePage', () => {
     ).toBeInTheDocument();
 
     await act(async () => {
-      jest.advanceTimersByTime(2600);
+      jest.advanceTimersByTime(10200);
     });
 
     await waitFor(() => {
@@ -300,8 +300,12 @@ describe('FitProfilePage', () => {
       }),
     ).toBe(true);
 
+    await waitFor(() => {
+      expect(getCalls).toBeGreaterThanOrEqual(2);
+    });
+
     await act(async () => {
-      jest.advanceTimersByTime(2600);
+      jest.advanceTimersByTime(10200);
     });
 
     await waitFor(() => {
@@ -352,7 +356,7 @@ describe('FitProfilePage', () => {
     ).toBeInTheDocument();
 
     await act(async () => {
-      jest.advanceTimersByTime(2600);
+      jest.advanceTimersByTime(10200);
     });
 
     await waitFor(() => {

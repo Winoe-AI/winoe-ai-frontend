@@ -451,9 +451,11 @@ export async function installRecruiterApiMocks(
     options.compareRows ?? buildDefaultCompareRows(candidateSessionId);
   const submissions =
     options.submissions ?? buildDefaultSubmissions(candidateSessionId);
-  const artifacts =
-    options.artifactsBySubmissionId ??
-    buildDefaultArtifacts(candidateSessionId);
+  const artifacts: Record<
+    number,
+    Record<string, unknown>
+  > = options.artifactsBySubmissionId ??
+  buildDefaultArtifacts(candidateSessionId);
   const createSimulationId = options.createSimulationId ?? 'sim-created-900';
   const fitProfilePayload =
     options.fitProfilePayload ??

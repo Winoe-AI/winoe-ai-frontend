@@ -31,6 +31,8 @@ type Props = {
   onEditorDraftChange: (versionId: string, draft: ScenarioEditorDraft) => void;
 };
 
+export type ScenarioControlsSectionProps = Props;
+
 export function ScenarioControlsSection({
   versions,
   selectedVersionId,

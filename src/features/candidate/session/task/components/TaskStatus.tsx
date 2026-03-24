@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { StatusPill } from '@/shared/ui/StatusPill';
 import { statusMeta } from '@/shared/status/statusMeta';
 
@@ -9,7 +10,7 @@ type TaskStatusProps = {
   submittedSha?: string | null;
 };
 
-export function TaskStatus({
+export const TaskStatus = memo(function TaskStatus({
   displayStatus,
   progress,
   submittedLabel = null,
@@ -45,4 +46,4 @@ export function TaskStatus({
       ) : null}
     </div>
   );
-}
+});

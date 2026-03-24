@@ -5,7 +5,7 @@ import {
   putCandidateTaskDraft,
   type CandidateTaskDraft,
   type CandidateTaskDraftPayload,
-} from '@/features/candidate/api';
+} from '@/features/candidate/api/taskDrafts';
 import { normalizeApiError } from '@/lib/errors/errors';
 import {
   extractTaskWindowClosedOverride,
@@ -249,18 +249,6 @@ export function useTaskDraftAutosave<TValue>({
   useEffect(() => {
     if (candidateSessionId === null || !taskId || isDisabled) return;
 
-    let payload: CandidateTaskDraftPayload;
-    try {
-      payload = normalizePayload(serializeRef.current(valueRef.current));
-    } catch {
-      setInternalStatus('error');
-      setError('Unable to prepare your draft for autosave.');
-      return;
-    }
-
-    const fingerprint = payloadFingerprint(payload);
-    if (fingerprint === lastSavedFingerprintRef.current) return;
-
     const timer = window.setTimeout(() => {
       void persistNow('debounce');
     }, debounceMs);
@@ -290,11 +278,13 @@ export function useTaskDraftAutosave<TValue>({
     };
   }, [candidateSessionId, isDisabled, persistNow, taskId]);
 
+  const flushNow = useCallback(() => persistNow('manual'), [persistNow]);
+
   return {
     status,
     lastSavedAt,
     restoreApplied,
     error,
-    flushNow: () => persistNow('manual'),
+    flushNow,
   };
 }

@@ -6,7 +6,7 @@ import { statusMeta } from '@/shared/status/statusMeta';
 import { SimulationPlan } from '../utils/plan';
 import { SimulationPlanContent } from './SimulationPlanContent';
 
-type Props = {
+export type SimulationPlanSectionProps = {
   status: string | null;
   scenarioVersionLabel: string;
   scenarioIdLabel: string | null;
@@ -62,7 +62,7 @@ export function SimulationPlanSection({
   jobFailureCode,
   error,
   onRetry,
-}: Props) {
+}: SimulationPlanSectionProps) {
   const hasTasks = planDays.some((slot) => Boolean(slot.task));
   const hasScenario = Boolean(scenarioLabel?.trim());
   const hasRubricSummary = Boolean(rubricSummary?.trim());

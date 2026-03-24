@@ -1,15 +1,10 @@
-import {
-  resolveCandidateInviteToken,
-  type CandidateSessionBootstrapResponse,
-} from '@/features/candidate/api';
+import { resolveCandidateInviteToken } from '@/features/candidate/api';
+import type { CandidateSessionBootstrapResponse } from '@/features/candidate/api/types';
 import {
   INVITE_EXPIRED_MESSAGE,
   INVITE_UNAVAILABLE_MESSAGE,
 } from '@/lib/copy/invite';
-import {
-  friendlyBootstrapError,
-  friendlyTaskError,
-} from '../utils/errorMessages';
+import { friendlyBootstrapError } from '../utils/errorMessages';
 import { hasScheduleConfigured, isScheduleLocked } from '../utils/schedule';
 import type { ViewState } from '../CandidateSessionView';
 
@@ -83,15 +78,8 @@ export function createInviteInit(params: InviteInitParams) {
         params.markEnd('candidate:init', { status: 'locked' });
         return;
       }
-      params.setView('starting');
+      params.setView('running');
       params.markEnd('candidate:init', { status: 'success' });
-      await params
-        .fetchTask({ sessionId: resp.candidateSessionId })
-        .then(() => params.setView('running'))
-        .catch((err) => {
-          params.setErrorMessage(friendlyTaskError(err));
-          params.setView('error');
-        });
     } catch (err) {
       const status = (err as { status?: number }).status;
       if (status === 401) {

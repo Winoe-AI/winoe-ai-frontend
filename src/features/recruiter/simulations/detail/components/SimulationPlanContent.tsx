@@ -1,5 +1,5 @@
 'use client';
-import { MarkdownPreview } from '@/shared/ui/Markdown';
+import { MarkdownPreviewComponent } from './MarkdownPreviewComponent';
 import { PlanDayCard } from './PlanDayCard';
 import type { SimulationPlan } from '../utils/plan';
 
@@ -45,7 +45,7 @@ export function SimulationPlanContent({
           <div className="text-xs font-medium uppercase tracking-wide text-gray-500">
             Storyline / prestart
           </div>
-          <MarkdownPreview content={scenarioLabel} className="mt-1" />
+          <MarkdownPreviewComponent content={scenarioLabel} className="mt-1" />
         </div>
       ) : null}
       {rubricSummary ? (
@@ -53,7 +53,7 @@ export function SimulationPlanContent({
           <div className="text-xs font-medium uppercase tracking-wide text-gray-500">
             Rubric summary
           </div>
-          <MarkdownPreview content={rubricSummary} className="mt-1" />
+          <MarkdownPreviewComponent content={rubricSummary} className="mt-1" />
         </div>
       ) : null}
       <div className="grid gap-4">

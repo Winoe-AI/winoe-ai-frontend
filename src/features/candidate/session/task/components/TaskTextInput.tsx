@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useDeferredValue, useState, useTransition } from 'react';
 import dynamic from 'next/dynamic';
 import type { MarkdownPreviewProps } from '@/shared/ui/Markdown';
 import { TaskTextToolbar } from './TaskTextToolbar';
@@ -42,6 +42,8 @@ export function TaskTextInput({
   savedAt,
 }: TaskTextInputProps) {
   const [mode, setMode] = useState<'write' | 'preview'>('write');
+  const [previewPending, startPreviewTransition] = useTransition();
+  const deferredPreviewValue = useDeferredValue(value);
 
   if (readOnly) {
     return (
@@ -61,9 +63,15 @@ export function TaskTextInput({
     );
   }
 
+  const handleModeChange = (next: 'write' | 'preview') => {
+    startPreviewTransition(() => {
+      setMode(next);
+    });
+  };
+
   return (
     <>
-      <TaskTextToolbar mode={mode} onChange={setMode} />
+      <TaskTextToolbar mode={mode} onChange={handleModeChange} />
 
       {mode === 'write' ? (
         <textarea
@@ -75,8 +83,13 @@ export function TaskTextInput({
         />
       ) : (
         <div className="w-full min-h-[360px] md:min-h-[420px] rounded-md border bg-white p-3">
+          {previewPending ? (
+            <div className="mb-2 text-xs text-gray-500">
+              Refreshing preview…
+            </div>
+          ) : null}
           <PreviewComponent
-            content={value}
+            content={deferredPreviewValue}
             emptyPlaceholder="Add content to preview your Markdown formatting."
           />
         </div>

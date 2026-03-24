@@ -35,6 +35,7 @@ export function useTaskAutoload({
     )
       return;
     if (!state.candidateSessionId) return;
+    if (!state.started) return;
     if (
       state.taskState.loading ||
       state.taskState.isComplete ||

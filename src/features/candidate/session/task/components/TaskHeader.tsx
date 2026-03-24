@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { memo, type ReactNode } from 'react';
 import { Task } from '../types';
 
 type TaskHeaderProps = {
@@ -6,7 +6,10 @@ type TaskHeaderProps = {
   statusSlot?: ReactNode;
 };
 
-export function TaskHeader({ task, statusSlot }: TaskHeaderProps) {
+export const TaskHeader = memo(function TaskHeader({
+  task,
+  statusSlot,
+}: TaskHeaderProps) {
   return (
     <div className="flex items-start justify-between gap-4">
       <div>
@@ -18,4 +21,4 @@ export function TaskHeader({ task, statusSlot }: TaskHeaderProps) {
       {statusSlot ? <div className="pt-1">{statusSlot}</div> : null}
     </div>
   );
-}
+});

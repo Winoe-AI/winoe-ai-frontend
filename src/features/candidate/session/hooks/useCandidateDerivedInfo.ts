@@ -20,7 +20,8 @@ export function useCandidateDerivedInfo(
       ? options.currentTask
       : state.taskState.currentTask;
   const completedCount = state.taskState.completedTaskIds.length;
-  const isComplete = state.taskState.isComplete;
+  const isComplete =
+    state.taskState.isComplete || state.bootstrap?.status === 'completed';
   const currentDayIndex = useMemo(
     () => deriveCurrentDayIndex(completedCount, currentTask, isComplete),
     [completedCount, currentTask, isComplete],

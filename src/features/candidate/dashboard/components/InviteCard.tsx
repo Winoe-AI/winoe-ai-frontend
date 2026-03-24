@@ -8,12 +8,14 @@ import { InviteWarnings } from './InviteWarnings';
 type InviteCardProps = {
   invite: CandidateInvite;
   onContinue: (invite: CandidateInvite) => void;
+  onContinueIntent?: (invite: CandidateInvite) => void;
   fallbackToken: string | null;
 };
 
 export function InviteCard({
   invite,
   onContinue,
+  onContinueIntent,
   fallbackToken,
 }: InviteCardProps) {
   const tokenAvailable = invite.token || fallbackToken;
@@ -29,6 +31,7 @@ export function InviteCard({
           invite={invite}
           fallbackToken={fallbackToken}
           onContinue={onContinue}
+          onIntent={onContinueIntent}
         />
       </div>
 

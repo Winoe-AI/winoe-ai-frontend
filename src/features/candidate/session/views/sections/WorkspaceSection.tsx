@@ -1,4 +1,5 @@
-import { WorkspaceAndTests } from '../WorkspaceAndTests';
+import type { ComponentType } from 'react';
+import dynamic from 'next/dynamic';
 import type { CandidateTask } from '../../CandidateSessionProvider';
 import type { PollResult } from '../../task/hooks/runTestsTypes';
 import type { WindowActionGate } from '../../lib/windowState';
@@ -6,6 +7,29 @@ import type {
   CodingWorkspace,
   CodingWorkspaceSnapshot,
 } from '../../task/utils/codingWorkspace';
+import type { WorkspaceAndTestsProps } from '../WorkspaceAndTests';
+
+const LazyWorkspaceAndTests = dynamic<WorkspaceAndTestsProps>(
+  () => import('../WorkspaceAndTests').then((mod) => mod.WorkspaceAndTests),
+  {
+    ssr: false,
+    loading: () => (
+      <div className="rounded-md border border-gray-200 bg-white p-4 text-sm text-gray-600">
+        Loading workspace tools...
+      </div>
+    ),
+  },
+);
+
+let WorkspaceAndTestsComponent: ComponentType<WorkspaceAndTestsProps> =
+  LazyWorkspaceAndTests;
+
+if (process.env.NODE_ENV === 'test') {
+  WorkspaceAndTestsComponent =
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    (require('../WorkspaceAndTests') as typeof import('../WorkspaceAndTests'))
+      .WorkspaceAndTests;
+}
 
 type Props = {
   task: CandidateTask | null;
@@ -32,7 +56,7 @@ export function WorkspaceSection({
 }: Props) {
   if (!showWorkspacePanel || candidateSessionId === null || !task) return null;
   return (
-    <WorkspaceAndTests
+    <WorkspaceAndTestsComponent
       task={task}
       candidateSessionId={candidateSessionId}
       actionGate={actionGate}

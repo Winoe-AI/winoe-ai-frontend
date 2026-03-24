@@ -1,6 +1,18 @@
 'use client';
-import { MarkdownPreview } from '@/shared/ui/Markdown';
+import type { ComponentType } from 'react';
+import { LazyMarkdownPreview } from '@/shared/ui/LazyMarkdownPreview';
+import type { MarkdownPreviewProps } from '@/shared/ui/Markdown';
 import { Pre } from './Pre';
+
+let MarkdownPreviewComponent: ComponentType<MarkdownPreviewProps> =
+  LazyMarkdownPreview;
+
+if (process.env.NODE_ENV === 'test') {
+  MarkdownPreviewComponent =
+    // eslint-disable-next-line @typescript-eslint/no-require-imports
+    (require('@/shared/ui/Markdown') as typeof import('@/shared/ui/Markdown'))
+      .MarkdownPreview;
+}
 
 function Prompt({ value }: { value: string }) {
   return <Pre label="Prompt" value={value} />;
@@ -32,7 +44,7 @@ function Text({
       </div>
       {expanded ? (
         <div className="mt-2" data-testid="md-preview">
-          <MarkdownPreview content={content} />
+          <MarkdownPreviewComponent content={content} />
         </div>
       ) : (
         <pre className="mt-2 whitespace-pre-wrap text-sm text-gray-800">

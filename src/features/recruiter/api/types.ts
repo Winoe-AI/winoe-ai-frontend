@@ -84,6 +84,7 @@ export type CandidateListOptions = {
   cache?: RequestCache;
   skipCache?: boolean;
   cacheTtlMs?: number;
+  dedupeKey?: string;
   disableDedupe?: boolean;
 };
 

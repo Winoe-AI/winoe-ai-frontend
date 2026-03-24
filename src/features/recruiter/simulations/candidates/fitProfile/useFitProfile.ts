@@ -1,10 +1,15 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { toStatus, toUserMessage } from '@/lib/errors/errors';
+import { queryKeys } from '@/shared/query';
 import {
   fetchCandidateFitProfile,
   generateCandidateFitProfile,
 } from './fitProfile.api';
-import type { FitProfileState } from './fitProfile.types';
+import type {
+  FitProfileFetchOutcome,
+  FitProfileState,
+} from './fitProfile.types';
 import { FIT_PROFILE_POLL_INTERVAL_MS } from './fitProfile.types';
 
 const INITIAL_STATE: FitProfileState = {
@@ -16,70 +21,79 @@ const INITIAL_STATE: FitProfileState = {
   errorCode: null,
 };
 
-export function useFitProfile(candidateSessionId: string) {
-  const [state, setState] = useState<FitProfileState>(INITIAL_STATE);
-  const [loading, setLoading] = useState(true);
-  const [generatePending, setGeneratePending] = useState(false);
+const FIT_PROFILE_LOADING_STALE_MS = 10_000;
 
-  const mountedRef = useRef(true);
-  const pollTimerRef = useRef<number | null>(null);
-  const requestControllerRef = useRef<AbortController | null>(null);
-  const pollInFlightRef = useRef(false);
+function stateFromOutcome(outcome: FitProfileFetchOutcome): FitProfileState {
+  if (outcome.kind === 'ready') {
+    return {
+      status: 'ready',
+      report: outcome.report,
+      generatedAt: outcome.generatedAt,
+      warnings: outcome.warnings,
+      message: 'Fit Profile ready.',
+      errorCode: null,
+    };
+  }
 
-  const clearPollTimer = useCallback(() => {
-    if (pollTimerRef.current != null) {
-      window.clearTimeout(pollTimerRef.current);
-      pollTimerRef.current = null;
-    }
-  }, []);
+  if (outcome.kind === 'running') {
+    return {
+      status: 'generating',
+      report: null,
+      generatedAt: null,
+      warnings: outcome.warnings,
+      message:
+        'Fit Profile is generating. This page will refresh automatically.',
+      errorCode: null,
+    };
+  }
 
-  const abortRequest = useCallback(() => {
-    requestControllerRef.current?.abort();
-    requestControllerRef.current = null;
-  }, []);
-
-  const applyNotGenerated = useCallback((message: string) => {
-    setState({
+  if (outcome.kind === 'not_started') {
+    return {
       status: 'not_generated',
       report: null,
       generatedAt: null,
       warnings: [],
-      message,
+      message:
+        'Fit Profile has not been generated yet. Generate a report to continue.',
       errorCode: null,
-    });
-  }, []);
+    };
+  }
 
-  const applyError = useCallback(
-    (message: string, errorCode?: string | null) => {
-      setState({
-        status: 'error',
-        report: null,
-        generatedAt: null,
-        warnings: [],
-        message,
-        errorCode: errorCode ?? null,
-      });
-    },
-    [],
-  );
+  return {
+    status: 'error',
+    report: null,
+    generatedAt: null,
+    warnings: [],
+    message: outcome.message,
+    errorCode: outcome.errorCode ?? null,
+  };
+}
 
-  const applyGenerating = useCallback(
-    (message: string, warnings: string[] = []) => {
-      setState((prev) => ({
-        ...prev,
-        status: 'generating',
-        message,
-        warnings,
-        errorCode: null,
-        report: null,
-        generatedAt: null,
-      }));
-    },
-    [],
-  );
-
-  const applyAccessDenied = useCallback(() => {
-    setState({
+function stateFromLoadError(error: unknown): FitProfileState {
+  const status = toStatus(error);
+  if (status === 409) {
+    return {
+      status: 'generating',
+      report: null,
+      generatedAt: null,
+      warnings: [],
+      message:
+        'Fit Profile is generating. This page will refresh automatically.',
+      errorCode: null,
+    };
+  }
+  if (status === 404) {
+    return {
+      status: 'not_generated',
+      report: null,
+      generatedAt: null,
+      warnings: [],
+      message: 'Evaluation not found. Generate a Fit Profile to create one.',
+      errorCode: null,
+    };
+  }
+  if (status === 403) {
+    return {
       status: 'access_denied',
       report: null,
       generatedAt: null,
@@ -87,179 +101,175 @@ export function useFitProfile(candidateSessionId: string) {
       message:
         'Access denied. You do not have permission to view this Fit Profile.',
       errorCode: null,
+    };
+  }
+  return {
+    status: 'error',
+    report: null,
+    generatedAt: null,
+    warnings: [],
+    message: toUserMessage(error, 'Unable to load Fit Profile right now.', {
+      includeDetail: false,
+    }),
+    errorCode: null,
+  };
+}
+
+export function useFitProfile(candidateSessionId: string) {
+  const queryClient = useQueryClient();
+  const [generatePending, setGeneratePending] = useState(false);
+  const [stateOverride, setStateOverride] = useState<FitProfileState | null>(
+    null,
+  );
+
+  const queryKey = queryKeys.recruiter.fitProfileStatus(candidateSessionId);
+  const refreshStatusNow = useCallback(async () => {
+    await queryClient.invalidateQueries({ queryKey, refetchType: 'none' });
+    await queryClient.fetchQuery({
+      queryKey,
+      queryFn: ({ signal }) =>
+        fetchCandidateFitProfile(candidateSessionId, signal, {
+          skipCache: true,
+        }),
+      staleTime: 0,
     });
-  }, []);
+  }, [candidateSessionId, queryClient, queryKey]);
 
-  const loadFitProfile = useCallback(
-    async (opts?: { silent?: boolean }) => {
-      const silent = opts?.silent === true;
-
-      if (!candidateSessionId) {
-        applyError('Candidate session ID is missing.');
-        setLoading(false);
-        return;
-      }
-
-      if (!silent) setLoading(true);
-
-      abortRequest();
-      const controller = new AbortController();
-      requestControllerRef.current = controller;
-
+  const fitProfileQuery = useQuery({
+    queryKey,
+    queryFn: async ({ signal }) => {
       try {
-        const payload = await fetchCandidateFitProfile(
-          candidateSessionId,
-          controller.signal,
-        );
-        if (!mountedRef.current || controller.signal.aborted) return;
-
-        if (payload.kind === 'ready') {
-          setState({
-            status: 'ready',
-            report: payload.report,
-            generatedAt: payload.generatedAt,
-            warnings: payload.warnings,
-            message: 'Fit Profile ready.',
-            errorCode: null,
-          });
-          return;
-        }
-
-        if (payload.kind === 'running') {
-          applyGenerating(
-            'Fit Profile is generating. This page will refresh automatically.',
-            payload.warnings,
-          );
-          return;
-        }
-
-        if (payload.kind === 'not_started') {
-          applyNotGenerated(
-            'Fit Profile has not been generated yet. Generate a report to continue.',
-          );
-          return;
-        }
-
-        applyError(payload.message, payload.errorCode);
+        return await fetchCandidateFitProfile(candidateSessionId, signal, {
+          skipCache: true,
+        });
       } catch (error) {
-        if (controller.signal.aborted || !mountedRef.current) return;
-
-        const status = toStatus(error);
-        if (status === 409) {
-          applyGenerating(
-            'Fit Profile is generating. This page will refresh automatically.',
-          );
-        } else if (status === 404) {
-          applyNotGenerated(
-            'Evaluation not found. Generate a Fit Profile to create one.',
-          );
-        } else if (status === 403) {
-          applyAccessDenied();
-        } else {
-          applyError(
-            toUserMessage(error, 'Unable to load Fit Profile right now.', {
-              includeDetail: false,
-            }),
-          );
+        if (toStatus(error) === 409) {
+          return {
+            kind: 'running',
+            warnings: [],
+          } satisfies FitProfileFetchOutcome;
         }
-      } finally {
-        if (mountedRef.current && !silent) {
-          setLoading(false);
-        }
+        throw error;
       }
     },
-    [
-      abortRequest,
-      applyAccessDenied,
-      applyError,
-      applyGenerating,
-      applyNotGenerated,
-      candidateSessionId,
-    ],
-  );
+    enabled: Boolean(candidateSessionId),
+    staleTime: (query) => {
+      const data = query.state.data as FitProfileFetchOutcome | undefined;
+      return data?.kind === 'ready'
+        ? Number.POSITIVE_INFINITY
+        : FIT_PROFILE_LOADING_STALE_MS;
+    },
+    refetchInterval: (query) => {
+      const data = query.state.data as FitProfileFetchOutcome | undefined;
+      return data?.kind === 'running' ? FIT_PROFILE_POLL_INTERVAL_MS : false;
+    },
+  });
+
+  const derivedState = useMemo<FitProfileState>(() => {
+    if (!candidateSessionId) {
+      return {
+        status: 'error',
+        report: null,
+        generatedAt: null,
+        warnings: [],
+        message: 'Candidate session ID is missing.',
+        errorCode: null,
+      };
+    }
+    if (stateOverride) return stateOverride;
+    if (fitProfileQuery.data) return stateFromOutcome(fitProfileQuery.data);
+    if (fitProfileQuery.error) return stateFromLoadError(fitProfileQuery.error);
+    return INITIAL_STATE;
+  }, [
+    candidateSessionId,
+    fitProfileQuery.data,
+    fitProfileQuery.error,
+    stateOverride,
+  ]);
 
   const generate = useCallback(async () => {
     if (!candidateSessionId || generatePending) return;
 
-    clearPollTimer();
-    abortRequest();
     setGeneratePending(true);
-    applyGenerating('Generating Fit Profile...');
+    setStateOverride({
+      status: 'generating',
+      report: null,
+      generatedAt: null,
+      warnings: [],
+      message: 'Generating Fit Profile...',
+      errorCode: null,
+    });
 
     try {
       await generateCandidateFitProfile(candidateSessionId);
-      if (!mountedRef.current) return;
-      await loadFitProfile({ silent: true });
+      await refreshStatusNow();
+      setStateOverride(null);
     } catch (error) {
-      if (!mountedRef.current) return;
       const status = toStatus(error);
       if (status === 409) {
-        applyGenerating(
-          'Fit Profile generation is already in progress. Refreshing status...',
-        );
-        await loadFitProfile({ silent: true });
+        setStateOverride({
+          status: 'generating',
+          report: null,
+          generatedAt: null,
+          warnings: [],
+          message:
+            'Fit Profile generation is already in progress. Refreshing status...',
+          errorCode: null,
+        });
+        await refreshStatusNow();
+        setStateOverride(null);
       } else if (status === 403) {
-        applyAccessDenied();
+        setStateOverride({
+          status: 'access_denied',
+          report: null,
+          generatedAt: null,
+          warnings: [],
+          message:
+            'Access denied. You do not have permission to view this Fit Profile.',
+          errorCode: null,
+        });
       } else if (status === 404) {
-        applyNotGenerated(
-          'Evaluation not found. Generate a Fit Profile to create one.',
-        );
+        setStateOverride({
+          status: 'not_generated',
+          report: null,
+          generatedAt: null,
+          warnings: [],
+          message:
+            'Evaluation not found. Generate a Fit Profile to create one.',
+          errorCode: null,
+        });
       } else {
-        applyError(
-          toUserMessage(error, 'Unable to generate Fit Profile right now.', {
-            includeDetail: false,
-          }),
-        );
+        setStateOverride({
+          status: 'error',
+          report: null,
+          generatedAt: null,
+          warnings: [],
+          message: toUserMessage(
+            error,
+            'Unable to generate Fit Profile right now.',
+            {
+              includeDetail: false,
+            },
+          ),
+          errorCode: null,
+        });
       }
     } finally {
-      if (mountedRef.current) {
-        setGeneratePending(false);
-      }
+      setGeneratePending(false);
     }
-  }, [
-    abortRequest,
-    applyAccessDenied,
-    applyError,
-    applyGenerating,
-    applyNotGenerated,
-    candidateSessionId,
-    clearPollTimer,
-    generatePending,
-    loadFitProfile,
-  ]);
-
-  useEffect(() => {
-    mountedRef.current = true;
-    void loadFitProfile();
-    return () => {
-      mountedRef.current = false;
-      clearPollTimer();
-      abortRequest();
-    };
-  }, [abortRequest, clearPollTimer, loadFitProfile]);
-
-  useEffect(() => {
-    clearPollTimer();
-    if (state.status !== 'generating') return;
-
-    pollTimerRef.current = window.setTimeout(() => {
-      if (pollInFlightRef.current || !mountedRef.current) return;
-      pollInFlightRef.current = true;
-      void loadFitProfile({ silent: true }).finally(() => {
-        pollInFlightRef.current = false;
-      });
-    }, FIT_PROFILE_POLL_INTERVAL_MS);
-
-    return clearPollTimer;
-  }, [clearPollTimer, loadFitProfile, state.status]);
+  }, [candidateSessionId, generatePending, refreshStatusNow]);
 
   const reload = useCallback(async () => {
-    await loadFitProfile();
-  }, [loadFitProfile]);
+    setStateOverride(null);
+    await refreshStatusNow();
+  }, [refreshStatusNow]);
 
   return {
-    state,
-    loading,
+    state: derivedState,
+    loading:
+      !stateOverride &&
+      (fitProfileQuery.isLoading ||
+        (fitProfileQuery.isFetching && !fitProfileQuery.data)),
     generatePending,
     generate,
     reload,

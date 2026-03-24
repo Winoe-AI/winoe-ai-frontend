@@ -1,6 +1,7 @@
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import CandidateSessionPage from '@/features/candidate/session/CandidateSessionPage';
+import { __resetHttpClientCache } from '@/lib/api/client';
 import { renderCandidateWithProviders } from '../../setup';
 import { jsonResponse } from '../../setup/responseHelpers';
 
@@ -31,6 +32,7 @@ function setSessionPath(token: string) {
 beforeEach(() => {
   fetchMock.mockReset();
   global.fetch = fetchMock as unknown as typeof fetch;
+  __resetHttpClientCache();
   Object.values(routerMock).forEach((fn) => fn.mockReset());
   sessionStorage.clear();
   localStorage.clear();
@@ -482,24 +484,27 @@ describe('CandidateSessionPage (auth flow)', () => {
     sessionStorage.removeItem('tenon:candidate_session_v1');
     renderCandidateWithProviders(<CandidateSessionPage token="valid-token" />);
 
-    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(2));
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
     expect(fetchMock).toHaveBeenCalledWith(
       '/api/backend/candidate/session/valid-token',
       expect.objectContaining({ method: 'GET' }),
-    );
-    expect(fetchMock).toHaveBeenCalledWith(
-      '/api/backend/candidate/session/321/current_task',
-      expect.objectContaining({
-        headers: expect.objectContaining({
-          'x-candidate-session-id': '321',
-        }),
-      }),
     );
 
     const startBtn = await screen.findByRole('button', {
       name: /Start simulation/i,
     });
     await user.click(startBtn);
+
+    await waitFor(() =>
+      expect(fetchMock).toHaveBeenCalledWith(
+        '/api/backend/candidate/session/321/current_task',
+        expect.objectContaining({
+          headers: expect.objectContaining({
+            'x-candidate-session-id': '321',
+          }),
+        }),
+      ),
+    );
 
     const taskTitles = await screen.findAllByText('Task One');
     expect(taskTitles.length).toBeGreaterThan(0);

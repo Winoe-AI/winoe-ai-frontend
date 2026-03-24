@@ -1,13 +1,14 @@
 'use client';
-import { ArtifactCard } from './ArtifactCard';
+import { LazyArtifactCard } from './ArtifactCard/LazyArtifactCard';
 import type { SubmissionArtifact } from '../types';
 
 type Props = {
   day2: SubmissionArtifact | null;
   day3: SubmissionArtifact | null;
+  loading?: boolean;
 };
 
-export function LatestArtifacts({ day2, day3 }: Props) {
+export function LatestArtifacts({ day2, day3, loading = false }: Props) {
   const hasLatest = Boolean(day2 || day3);
   return (
     <div className="rounded border border-gray-200 bg-white p-4">
@@ -18,12 +19,17 @@ export function LatestArtifacts({ day2, day3 }: Props) {
         Shows the newest Day 2 and Day 3 submissions by submitted time.
       </div>
       <div className="mt-3 flex flex-col gap-3 md:grid md:grid-cols-2">
-        <Slot label="Day 2" artifact={day2} />
-        <Slot label="Day 3" artifact={day3} />
+        <Slot label="Day 2" artifact={day2} loading={loading} />
+        <Slot label="Day 3" artifact={day3} loading={loading} />
       </div>
-      {!hasLatest ? (
+      {!hasLatest && !loading ? (
         <div className="mt-2 text-xs text-gray-600">
           Day 2 / Day 3 artifacts will appear after the candidate submits code.
+        </div>
+      ) : null}
+      {!hasLatest && loading ? (
+        <div className="mt-2 text-xs text-gray-600">
+          Loading latest Day 2 / Day 3 artifacts...
         </div>
       ) : null}
     </div>
@@ -33,16 +39,25 @@ export function LatestArtifacts({ day2, day3 }: Props) {
 const Slot = ({
   label,
   artifact,
+  loading,
 }: {
   label: string;
   artifact: SubmissionArtifact | null;
+  loading: boolean;
 }) => {
+  if (loading && !artifact) return <LoadingPlaceholder label={label} />;
   if (!artifact) return <Placeholder label={label} />;
-  return <ArtifactCard artifact={artifact} />;
+  return <LazyArtifactCard artifact={artifact} />;
 };
 
 const Placeholder = ({ label }: { label: string }) => (
   <div className="rounded border border-dashed border-gray-200 bg-gray-50 p-3 text-sm text-gray-700">
     {label} submission not available.
+  </div>
+);
+
+const LoadingPlaceholder = ({ label }: { label: string }) => (
+  <div className="rounded border border-dashed border-blue-200 bg-blue-50 p-3 text-sm text-blue-900">
+    Loading {label} artifact...
   </div>
 );

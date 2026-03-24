@@ -10,7 +10,7 @@ import type {
   CodingWorkspaceSnapshot,
 } from '../task/utils/codingWorkspace';
 
-type Props = {
+export type RunningViewProps = {
   title: string;
   role: string;
   completedCount: number;
@@ -68,7 +68,7 @@ export function RunningView({
   onDashboard,
   onTaskWindowClosed,
   onCodingWorkspaceSnapshot,
-}: Props) {
+}: RunningViewProps) {
   return (
     <div className="p-6 max-w-4xl mx-auto space-y-4">
       <SessionWindowBanner

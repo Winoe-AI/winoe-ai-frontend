@@ -1,5 +1,6 @@
 import { recruiterBffClient } from '@/lib/api/client';
 import { listSimulationCandidates } from '@/features/recruiter/api';
+import { normalizeCandidateSession } from '@/features/recruiter/api/candidatesNormalize';
 import type {
   HandoffSubmissionArtifact,
   HandoffTranscript,
@@ -212,13 +213,31 @@ export async function verifyCandidate(
   skipCache?: boolean,
 ) {
   try {
-    const candidates = await listSimulationCandidates(simulationId, {
+    const list = await listSimulationCandidates(simulationId, {
       cache: 'no-store',
       signal,
       skipCache,
-      disableDedupe: true,
       cacheTtlMs: 9000,
+      dedupeKey: `simulation-candidates-${simulationId}`,
     });
+    const candidates = Array.isArray(list)
+      ? list
+      : await recruiterBffClient
+          .get<unknown>(
+            `/simulations/${encodeURIComponent(simulationId)}/candidates`,
+            {
+              cache: 'no-store',
+              signal,
+              skipCache,
+              cacheTtlMs: 9000,
+              dedupeKey: `simulation-candidates-${simulationId}`,
+            },
+          )
+          .then((payload) =>
+            Array.isArray(payload)
+              ? payload.map((entry) => normalizeCandidateSession(entry))
+              : [],
+          );
     const found =
       candidates.find(
         (c) => String(c.candidateSessionId) === candidateSessionId,
@@ -258,7 +277,7 @@ export async function fetchCandidateSubmissions(
       signal,
       skipCache,
       cacheTtlMs: 9000,
-      disableDedupe: true,
+      dedupeKey: `candidate-submissions-${simulationId ?? 'unknown'}-${candidateSessionId}`,
     },
   );
   return normalizeListResponse(data);

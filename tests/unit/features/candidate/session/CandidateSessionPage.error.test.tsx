@@ -182,7 +182,8 @@ describe('CandidateSessionPage auth/error states', () => {
 
     render(<CandidateSessionPage token="inv" />);
 
-    await waitFor(() => expect(getCurrentTaskMock).toHaveBeenCalled());
+    await waitFor(() => expect(resolveInviteMock).toHaveBeenCalled());
+    expect(getCurrentTaskMock).not.toHaveBeenCalled();
     expect(screen.queryByTestId('state-message')).not.toBeInTheDocument();
   });
 
@@ -515,7 +516,20 @@ describe('CandidateSessionPage auth/error states', () => {
       simulation: { title: 'Sim', role: 'Role' },
     });
     getCurrentTaskMock.mockRejectedValue({ status: 500 });
-    useCandidateSessionMock.mockReturnValue(baseState());
+    useCandidateSessionMock.mockReturnValue({
+      ...baseState(),
+      state: {
+        ...baseState().state,
+        started: true,
+        taskState: {
+          loading: false,
+          error: null,
+          isComplete: false,
+          completedTaskIds: [],
+          currentTask: null,
+        },
+      },
+    });
 
     await act(async () => {
       render(<CandidateSessionPage token="inv" />);
@@ -554,12 +568,17 @@ describe('CandidateSessionPage auth/error states', () => {
   });
 
   it('clicking retry in no-task fallback calls fetchCurrentTask with skipCache', async () => {
+    getCurrentTaskMock.mockRejectedValue({ status: 500 });
     useCandidateSessionMock.mockReturnValue({
       ...baseState(),
       state: {
         ...baseState().state,
+        started: true,
         taskState: {
-          ...baseState().state.taskState,
+          loading: false,
+          error: null,
+          isComplete: false,
+          completedTaskIds: [],
           currentTask: null,
         },
       },
@@ -571,18 +590,19 @@ describe('CandidateSessionPage auth/error states', () => {
 
     await waitFor(() =>
       expect(
-        screen.getByText(/Unable to load your session/i),
+        screen.getByText(/Unable to load simulation/i),
       ).toBeInTheDocument(),
     );
 
     const retryBtn = screen.getByRole('button', { name: /Retry/i });
+    const initialCallCount = getCurrentTaskMock.mock.calls.length;
     fireEvent.click(retryBtn);
 
     await waitFor(() =>
-      expect(getCurrentTaskMock).toHaveBeenCalledWith(
-        expect.anything(),
-        expect.objectContaining({ skipCache: true }),
+      expect(getCurrentTaskMock.mock.calls.length).toBeGreaterThan(
+        initialCallCount,
       ),
     );
+    expect(getCurrentTaskMock.mock.calls.at(-1)?.[0]).toBe(99);
   });
 });

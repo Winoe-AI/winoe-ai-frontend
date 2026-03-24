@@ -1,4 +1,4 @@
-import { act, renderHook } from '@testing-library/react';
+import { act, renderHook, waitFor } from '@testing-library/react';
 import { useDashboardQuery } from '@/features/recruiter/dashboard/hooks/useDashboardQuery';
 
 const fetchDashboard = jest.fn();
@@ -35,6 +35,8 @@ describe('useDashboardQuery', () => {
       await Promise.resolve();
     });
     expect(fetchDashboard).toHaveBeenCalledTimes(1);
-    expect(result.current.requestId).toBe('rid');
+    await waitFor(() => {
+      expect(result.current.requestId).toBe('rid');
+    });
   });
 });

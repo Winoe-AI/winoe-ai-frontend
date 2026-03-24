@@ -1,7 +1,17 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import {
+  useCallback,
+  useMemo,
+  type Dispatch,
+  type SetStateAction,
+} from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { toStatus, toUserMessage } from '@/lib/errors/errors';
+import { queryKeys } from '@/shared/query';
 import type { CandidateSession } from '@/features/recruiter/types';
-import { listSimulationCandidates } from '@/features/recruiter/api';
+import {
+  fetchSimulationCandidatesQuery,
+  SIMULATION_CANDIDATES_STALE_TIME_MS,
+} from '../queries';
 
 type Params = { simulationId: string };
 
@@ -9,78 +19,66 @@ export function useSimulationCandidates({
   simulationId,
   enabled = true,
 }: Params & { enabled?: boolean }) {
-  const [candidates, setCandidates] = useState<CandidateSession[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const mountedRef = useRef(true);
+  const queryClient = useQueryClient();
+  const queryKey = queryKeys.recruiter.simulationCandidates(simulationId);
 
-  useEffect(() => {
-    mountedRef.current = true;
-    return () => {
-      mountedRef.current = false;
-    };
-  }, []);
+  const candidatesQuery = useQuery({
+    queryKey,
+    queryFn: ({ signal }) =>
+      fetchSimulationCandidatesQuery(simulationId, signal),
+    enabled: enabled && Boolean(simulationId),
+    staleTime: SIMULATION_CANDIDATES_STALE_TIME_MS,
+  });
 
-  useEffect(() => {
-    setCandidates([]);
-    setError(null);
-    setLoading(true);
-  }, [enabled, simulationId]);
+  const error = useMemo(() => {
+    if (!candidatesQuery.error) return null;
+    const status = toStatus(candidatesQuery.error);
+    if (status === 401) return 'Session expired. Please sign in again.';
+    if (status === 403) return 'You are not authorized to view candidates.';
+    let message = toUserMessage(candidatesQuery.error, 'Request failed', {
+      includeDetail: false,
+    });
+    if (
+      status &&
+      status >= 500 &&
+      /request failed with status/i.test(message)
+    ) {
+      message = 'Request failed';
+    }
+    return message || 'Request failed';
+  }, [candidatesQuery.error]);
 
-  const loadCandidates = useCallback(
-    async (opts?: { skipCache?: boolean }) => {
-      if (!enabled) {
-        return;
-      }
+  const reload = useCallback(async () => {
+    await queryClient.invalidateQueries({ queryKey, refetchType: 'none' });
+    await queryClient.fetchQuery({
+      queryKey,
+      queryFn: ({ signal }) =>
+        fetchSimulationCandidatesQuery(simulationId, signal, true),
+      staleTime: 0,
+    });
+  }, [queryClient, queryKey, simulationId]);
 
-      setLoading(true);
-      setError(null);
-      try {
-        const list = await listSimulationCandidates(simulationId, {
-          cache: 'no-store',
-          skipCache: opts?.skipCache,
-          cacheTtlMs: 9000,
-        });
-        if (!mountedRef.current) return;
-        setCandidates(Array.isArray(list) ? list : []);
-      } catch (e: unknown) {
-        if (!mountedRef.current) return;
-        const status = toStatus(e);
-        if (status === 401) {
-          setError('Session expired. Please sign in again.');
-          return;
+  const setCandidates = useCallback<
+    Dispatch<SetStateAction<CandidateSession[]>>
+  >(
+    (value) => {
+      queryClient.setQueryData<CandidateSession[]>(queryKey, (prev) => {
+        const current = Array.isArray(prev) ? prev : [];
+        if (typeof value === 'function') {
+          return value(current);
         }
-        if (status === 403) {
-          setError('You are not authorized to view candidates.');
-          return;
-        }
-        let message =
-          typeof e === 'string'
-            ? 'Request failed'
-            : toUserMessage(e, 'Request failed', { includeDetail: false });
-        if (status && status >= 500) {
-          if (/request failed with status/i.test(message)) {
-            message = 'Request failed';
-          }
-        }
-        setError(message || 'Request failed');
-      } finally {
-        if (mountedRef.current) setLoading(false);
-      }
+        return value;
+      });
     },
-    [enabled, simulationId],
+    [queryClient, queryKey],
   );
 
-  useEffect(() => {
-    if (!enabled) return;
-    void loadCandidates();
-  }, [enabled, loadCandidates]);
-
   return {
-    candidates,
-    loading,
+    candidates: Array.isArray(candidatesQuery.data) ? candidatesQuery.data : [],
+    loading:
+      enabled && (candidatesQuery.isLoading || candidatesQuery.isFetching),
     error,
-    reload: () => loadCandidates({ skipCache: true }),
+    reload,
     setCandidates,
   };
 }

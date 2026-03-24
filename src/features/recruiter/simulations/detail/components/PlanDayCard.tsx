@@ -1,7 +1,7 @@
 'use client';
-import { MarkdownPreview } from '@/shared/ui/Markdown';
 import { InlineBadge } from '@/shared/ui/InlineBadge';
 import { SimulationPlanDay } from '../utils/plan';
+import { MarkdownPreviewComponent } from './MarkdownPreviewComponent';
 import { PlanDayRubric } from './PlanDayRubric';
 import { PlanDayWorkspace } from './PlanDayWorkspace';
 
@@ -75,7 +75,7 @@ export function PlanDayCard({ slot }: Props) {
           <div className="text-xs font-medium uppercase tracking-wide text-gray-500">
             Task description
           </div>
-          <MarkdownPreview content={day.prompt} className="mt-1" />
+          <MarkdownPreviewComponent content={day.prompt} className="mt-1" />
         </div>
       ) : null}
 

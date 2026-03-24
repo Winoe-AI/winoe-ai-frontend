@@ -1,8 +1,6 @@
 import { useState } from 'react';
-import {
-  createSimulation,
-  type CreateSimulationInput,
-} from '@/features/recruiter/api';
+import { createSimulation } from '@/features/recruiter/api';
+import type { CreateSimulationInput } from '@/features/recruiter/api/types';
 import {
   buildLoginUrl,
   buildNotAuthorizedUrl,

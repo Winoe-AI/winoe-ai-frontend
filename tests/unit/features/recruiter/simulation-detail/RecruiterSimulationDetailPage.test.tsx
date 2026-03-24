@@ -678,9 +678,7 @@ describe('RecruiterSimulationDetailPage component', () => {
       expect(screen.getByText(/No candidates yet/i)).toBeInTheDocument();
     });
 
-    fireEvent.click(
-      screen.getByRole('button', { name: /Invite your first candidate/i }),
-    );
+    fireEvent.click(screen.getByRole('button', { name: /Invite candidate/i }));
 
     expect(await screen.findByTestId('invite-modal')).toBeInTheDocument();
   });

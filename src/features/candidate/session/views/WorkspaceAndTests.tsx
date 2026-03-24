@@ -8,7 +8,7 @@ import type {
   CodingWorkspaceSnapshot,
 } from '../task/utils/codingWorkspace';
 
-type Props = {
+export type WorkspaceAndTestsProps = {
   task: CandidateTask;
   candidateSessionId: number;
   actionGate: WindowActionGate;
@@ -28,7 +28,7 @@ export function WorkspaceAndTests({
   onPollTests,
   onTaskWindowClosed,
   onCodingWorkspaceSnapshot,
-}: Props) {
+}: WorkspaceAndTestsProps) {
   const closedByCutoff = Boolean(task.cutoffCommitSha);
   const workspaceReadOnly = actionGate.isReadOnly || closedByCutoff;
   const cutoffDisabledReason = closedByCutoff

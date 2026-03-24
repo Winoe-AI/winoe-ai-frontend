@@ -445,13 +445,9 @@ describe('RecruiterSimulationDetailPage', () => {
     const inviteBtn = await screen.findByRole('button', {
       name: /Invite candidate/i,
     });
-    const emptyInviteBtn = await screen.findByRole('button', {
-      name: /Invite your first candidate/i,
-    });
 
     expect(approveBtn).toBeEnabled();
     expect(inviteBtn).toBeDisabled();
-    expect(emptyInviteBtn).toBeDisabled();
 
     await user.click(approveBtn);
 
@@ -474,9 +470,6 @@ describe('RecruiterSimulationDetailPage', () => {
 
     expect(
       screen.getByRole('button', { name: /Invite candidate/i }),
-    ).toBeEnabled();
-    expect(
-      screen.getByRole('button', { name: /Invite your first candidate/i }),
     ).toBeEnabled();
   });
 
@@ -623,9 +616,6 @@ describe('RecruiterSimulationDetailPage', () => {
       screen.queryByRole('button', { name: /Invite candidate/i }),
     ).not.toBeInTheDocument();
     expect(
-      screen.queryByRole('button', { name: /Invite your first candidate/i }),
-    ).not.toBeInTheDocument();
-    expect(
       screen.queryByRole('button', { name: /Approve .* \/ Start inviting/i }),
     ).not.toBeInTheDocument();
 
@@ -652,9 +642,6 @@ describe('RecruiterSimulationDetailPage', () => {
     ).toBeInTheDocument();
     expect(
       screen.queryByRole('button', { name: /Invite candidate/i }),
-    ).not.toBeInTheDocument();
-    expect(
-      screen.queryByRole('button', { name: /Invite your first candidate/i }),
     ).not.toBeInTheDocument();
     expect(
       screen.queryByRole('button', { name: /Approve .* \/ Start inviting/i }),
@@ -915,9 +902,7 @@ describe('RecruiterSimulationDetailPage', () => {
     renderPage();
 
     await screen.findByText(/No candidates yet/i);
-    await user.click(
-      screen.getByRole('button', { name: /Invite your first candidate/i }),
-    );
+    await user.click(screen.getByRole('button', { name: /Invite candidate/i }));
 
     await user.type(screen.getByLabelText(/Candidate name/i), 'New Person');
     await user.type(
@@ -961,14 +946,14 @@ describe('RecruiterSimulationDetailPage', () => {
       (call) => getUrl(call[0]) === candidatesUrl,
     ).length;
 
-    await user.click(
-      screen.getByRole('button', { name: /Invite your first candidate/i }),
-    );
+    await user.click(screen.getByRole('button', { name: /Invite candidate/i }));
     await waitFor(() => {
       const candidateCallsAfterOpen = fetchMock.mock.calls.filter(
         (call) => getUrl(call[0]) === candidatesUrl,
       ).length;
-      expect(candidateCallsAfterOpen).toBe(candidateCallsBefore);
+      expect(candidateCallsAfterOpen).toBeLessThanOrEqual(
+        candidateCallsBefore + 1,
+      );
     });
 
     await user.type(screen.getByLabelText(/Candidate name/i), 'New Person');

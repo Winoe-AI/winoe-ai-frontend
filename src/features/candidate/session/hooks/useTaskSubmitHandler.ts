@@ -1,4 +1,4 @@
-import { submitCandidateTask } from '@/features/candidate/api';
+import { submitCandidateTask } from '@/features/candidate/api/tasks';
 import { useNotifications } from '@/shared/notifications';
 import { normalizeApiError } from '@/lib/errors/errors';
 import { friendlySubmitError } from '../utils/errorMessages';

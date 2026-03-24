@@ -3,11 +3,30 @@ import type { CandidateSession, CandidateListOptions } from './types';
 import { normalizeCandidateSession } from './candidatesNormalize';
 
 const CANDIDATE_CACHE_TTL_MS = 5000;
-const candidateCache = new Map<
-  string,
-  { ts: number; data?: CandidateSession[] }
->();
-const inFlightCandidates = new Map<string, Promise<CandidateSession[]>>();
+const CANDIDATE_CACHE_STORE_KEY = '__tenonRecruiterCandidateCacheStore';
+
+type CandidateCacheStore = {
+  candidateCache: Map<string, { ts: number; data?: CandidateSession[] }>;
+  inFlightCandidates: Map<string, Promise<CandidateSession[]>>;
+};
+
+function getCandidateCacheStore(): CandidateCacheStore {
+  const root = globalThis as typeof globalThis & {
+    [CANDIDATE_CACHE_STORE_KEY]?: CandidateCacheStore;
+  };
+  if (!root[CANDIDATE_CACHE_STORE_KEY]) {
+    root[CANDIDATE_CACHE_STORE_KEY] = {
+      candidateCache: new Map<
+        string,
+        { ts: number; data?: CandidateSession[] }
+      >(),
+      inFlightCandidates: new Map<string, Promise<CandidateSession[]>>(),
+    };
+  }
+  return root[CANDIDATE_CACHE_STORE_KEY];
+}
+
+const { candidateCache, inFlightCandidates } = getCandidateCacheStore();
 
 export const __resetCandidateCache = () => {
   candidateCache.clear();
@@ -40,6 +59,7 @@ export function listSimulationCandidates(
       signal: options?.signal,
       skipCache,
       cacheTtlMs: cacheTtl,
+      dedupeKey: options?.dedupeKey,
       disableDedupe: options?.disableDedupe,
     })
     .then((data) => {

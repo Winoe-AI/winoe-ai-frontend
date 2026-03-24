@@ -10,7 +10,7 @@ import {
   retrySimulationGeneration,
   terminateSimulation,
   type ScenarioPatchPayload,
-} from '@/features/recruiter/api';
+} from '@/features/recruiter/api/simulationLifecycle';
 import { toUserMessage } from '@/lib/errors/errors';
 import { useNotifications } from '@/shared/notifications';
 import { SimulationDetailView } from './components/SimulationDetailView';
@@ -1079,6 +1079,12 @@ export default function SimulationDetailContainer() {
           ),
         );
         return;
+      }
+      if (
+        typeof result.data?.status === 'string' &&
+        result.data.status.trim()
+      ) {
+        setStatusOverride(result.data.status);
       }
       setPendingRegeneration(null);
       await refreshPlan();

@@ -355,6 +355,7 @@ export function normalizeFitProfilePayload(
 export async function fetchCandidateFitProfile(
   candidateSessionId: string,
   signal?: AbortSignal,
+  options?: { skipCache?: boolean },
 ): Promise<FitProfileFetchOutcome> {
   const encodedId = encodeURIComponent(candidateSessionId);
   const payload = await recruiterBffClient.get<unknown>(
@@ -362,9 +363,9 @@ export async function fetchCandidateFitProfile(
     {
       cache: 'no-store',
       signal,
-      skipCache: true,
-      disableDedupe: true,
-      cacheTtlMs: 0,
+      skipCache: options?.skipCache,
+      cacheTtlMs: 10_000,
+      dedupeKey: `fit-profile-status-${candidateSessionId}`,
     },
   );
   return normalizeFitProfilePayload(payload);
