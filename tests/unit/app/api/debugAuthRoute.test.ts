@@ -42,8 +42,14 @@ describe('/api/debug/auth route', () => {
       email: 'test@example.com',
       'https://tenon.ai/roles': ['recruiter'],
     };
-    mockGetSessionNormalized.mockResolvedValue({ user, accessToken: 'test-token' });
-    mockExtractPermissions.mockReturnValue(['read:simulations', 'create:invites']);
+    mockGetSessionNormalized.mockResolvedValue({
+      user,
+      accessToken: 'test-token',
+    });
+    mockExtractPermissions.mockReturnValue([
+      'read:simulations',
+      'create:invites',
+    ]);
 
     const mod = await import('@/app/api/debug/auth/route');
     const res = await mod.GET();

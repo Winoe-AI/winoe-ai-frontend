@@ -14,31 +14,55 @@ describe('CandidateSubmissionsPage - candidate guards', () => {
     setMockParams({ id: '1', candidateSessionId: '2' });
     const fetchMock = installFetchMock(async (input: RequestInfo | URL) => {
       const url = getRequestUrl(input);
-      if (url === '/api/simulations/1/candidates') return textResponse('no candidate', 500);
+      if (url === '/api/simulations/1/candidates')
+        return textResponse('no candidate', 500);
       return textResponse('Not found', 404);
     });
     render(<CandidateSubmissionsPage />);
-    expect(await screen.findByText(/Unable to verify candidate access/i)).toBeInTheDocument();
-    expect(fetchMock.mock.calls.map((call) => getRequestUrl(call[0]))).toEqual(['/api/simulations/1/candidates']);
+    expect(
+      await screen.findByText(/Unable to verify candidate access/i),
+    ).toBeInTheDocument();
+    expect(fetchMock.mock.calls.map((call) => getRequestUrl(call[0]))).toEqual([
+      '/api/simulations/1/candidates',
+    ]);
   });
 
   it('blocks submissions when candidate is not in the simulation', async () => {
     setMockParams({ id: '1', candidateSessionId: '2' });
     const fetchMock = installFetchMock(async (input: RequestInfo | URL) => {
       const url = getRequestUrl(input);
-      if (url === '/api/simulations/1/candidates') return jsonResponse([{ candidateSessionId: 9, inviteEmail: 'other@example.com', candidateName: 'Other', status: 'not_started', startedAt: null, completedAt: null, hasReport: false }]);
+      if (url === '/api/simulations/1/candidates')
+        return jsonResponse([
+          {
+            candidateSessionId: 9,
+            inviteEmail: 'other@example.com',
+            candidateName: 'Other',
+            status: 'not_started',
+            startedAt: null,
+            completedAt: null,
+            hasReport: false,
+          },
+        ]);
       return textResponse('Not found', 404);
     });
     render(<CandidateSubmissionsPage />);
-    expect(await screen.findByText(/Candidate not found for this simulation/i)).toBeInTheDocument();
-    expect(fetchMock.mock.calls.map((call) => getRequestUrl(call[0]))).toEqual(['/api/simulations/1/candidates']);
+    expect(
+      await screen.findByText(/Candidate not found for this simulation/i),
+    ).toBeInTheDocument();
+    expect(fetchMock.mock.calls.map((call) => getRequestUrl(call[0]))).toEqual([
+      '/api/simulations/1/candidates',
+    ]);
   });
 
   it('blocks submissions when candidate id is invalid', async () => {
     setMockParams({ id: '1', candidateSessionId: 'abc' });
-    const fetchMock = installFetchMock(async () => textResponse('Not found', 404));
+    const fetchMock = installFetchMock(async () =>
+      textResponse('Not found', 404),
+    );
     render(<CandidateSubmissionsPage />);
-    expect(await screen.findByText(/Invalid candidate id/i)).toBeInTheDocument();
+    expect(
+      await screen.findByText(/Invalid candidate id/i),
+    ).toBeInTheDocument();
     expect(fetchMock).not.toHaveBeenCalled();
   });
 });

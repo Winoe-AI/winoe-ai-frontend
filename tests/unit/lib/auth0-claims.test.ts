@@ -3,12 +3,12 @@ import {
   extractPermissions,
   hasPermission,
   getUserEmail,
-} from '@/lib/auth0-claims';
+} from '@/platform/auth0/claims';
 import {
   CUSTOM_CLAIM_EMAIL,
   CUSTOM_CLAIM_PERMISSIONS,
   CUSTOM_CLAIM_ROLES,
-} from '@/lib/brand';
+} from '@/platform/config/brand';
 
 const makeJwt = (claims: Record<string, unknown>) => {
   const header = Buffer.from(

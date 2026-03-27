@@ -1,7 +1,7 @@
 import type {
   CandidateCurrentDayWindow,
   CandidateDayWindow,
-} from '@/features/candidate/api';
+} from '@/features/candidate/session/api';
 import { formatDate, formatTime } from './lockedView.format';
 
 type Props = {

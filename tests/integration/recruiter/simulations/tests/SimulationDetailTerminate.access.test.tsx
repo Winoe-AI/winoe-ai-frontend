@@ -5,7 +5,7 @@ import {
   installTerminateFetchMock,
   resetTerminateIntegrationState,
 } from './SimulationDetailTerminate.testlib';
-import RecruiterSimulationDetailPage from '@/features/recruiter/simulations/detail/RecruiterSimulationDetailPage';
+import RecruiterSimulationDetailPage from '@/features/recruiter/simulation-management/detail/RecruiterSimulationDetailPage';
 
 describe('Simulation detail terminate access handling', () => {
   beforeEach(() => {
@@ -22,13 +22,21 @@ describe('Simulation detail terminate access handling', () => {
 
     render(<RecruiterSimulationDetailPage />);
     await waitFor(() =>
-      expect(screen.getByRole('button', { name: /^terminate simulation$/i })).toBeInTheDocument(),
+      expect(
+        screen.getByRole('button', { name: /^terminate simulation$/i }),
+      ).toBeInTheDocument(),
     );
 
-    await user.click(screen.getByRole('button', { name: /^terminate simulation$/i }));
+    await user.click(
+      screen.getByRole('button', { name: /^terminate simulation$/i }),
+    );
     const modal = await screen.findByTestId('terminate-simulation-modal');
-    await user.click(within(modal).getByLabelText('confirm-terminate-simulation'));
-    await user.click(within(modal).getByRole('button', { name: /^terminate simulation$/i }));
+    await user.click(
+      within(modal).getByLabelText('confirm-terminate-simulation'),
+    );
+    await user.click(
+      within(modal).getByRole('button', { name: /^terminate simulation$/i }),
+    );
 
     expect(await screen.findByText('Not authorized')).toBeInTheDocument();
   });

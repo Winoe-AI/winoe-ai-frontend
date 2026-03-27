@@ -5,7 +5,7 @@ import {
   isScheduleDateInPast,
   isScheduleLocked,
   localDateAtHourToUtcIso,
-} from '@/features/candidate/session/utils/schedule';
+} from '@/features/candidate/session/utils/scheduleUtils';
 
 describe('candidate schedule utilities', () => {
   it('converts local date at 9AM to UTC using timezone', () => {

@@ -3,7 +3,7 @@ import {
   areWorkspaceStatusesEqual,
   getCodingWorkspace,
   type CodingWorkspaceSnapshot,
-} from '../../task/utils/codingWorkspace';
+} from '@/features/candidate/tasks/utils/codingWorkspaceUtils';
 
 type WorkspaceByDay = {
   day2: CodingWorkspaceSnapshot['workspace'];

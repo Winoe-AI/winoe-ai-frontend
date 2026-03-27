@@ -20,7 +20,9 @@ describe('httpClient branches - error parsing and auth headers', () => {
         throw new Error('invalid json');
       },
     } as unknown as Response);
-    await expect(apiClient.get('/json-error-fail', { skipCache: true })).rejects.toMatchObject({
+    await expect(
+      apiClient.get('/json-error-fail', { skipCache: true }),
+    ).rejects.toMatchObject({
       message: 'Request failed with status 500',
     });
   });
@@ -34,26 +36,44 @@ describe('httpClient branches - error parsing and auth headers', () => {
         throw new Error('text read failed');
       },
     } as unknown as Response);
-    await expect(apiClient.get('/text-error-fail', { skipCache: true })).rejects.toMatchObject({
+    await expect(
+      apiClient.get('/text-error-fail', { skipCache: true }),
+    ).rejects.toMatchObject({
       message: 'Request failed with status 500',
     });
   });
 
   it('does not attach auth header with authToken option', async () => {
-    (global.fetch as jest.Mock).mockResolvedValueOnce(responseHelpers.jsonResponse({ ok: true }) as unknown as Response);
-    await apiClient.get('/auth-test', { skipCache: true }, { authToken: 'custom-token' });
-    expect((global.fetch as jest.Mock).mock.calls[0][1].headers.Authorization).toBeUndefined();
+    (global.fetch as jest.Mock).mockResolvedValueOnce(
+      responseHelpers.jsonResponse({ ok: true }) as unknown as Response,
+    );
+    await apiClient.get(
+      '/auth-test',
+      { skipCache: true },
+      { authToken: 'custom-token' },
+    );
+    expect(
+      (global.fetch as jest.Mock).mock.calls[0][1].headers.Authorization,
+    ).toBeUndefined();
   });
 
   it('respects null authToken to skip auth', async () => {
-    (global.fetch as jest.Mock).mockResolvedValueOnce(responseHelpers.jsonResponse({ ok: true }) as unknown as Response);
+    (global.fetch as jest.Mock).mockResolvedValueOnce(
+      responseHelpers.jsonResponse({ ok: true }) as unknown as Response,
+    );
     await apiClient.get('/no-auth', { skipCache: true }, { authToken: null });
-    expect((global.fetch as jest.Mock).mock.calls[0][1].headers.Authorization).toBeUndefined();
+    expect(
+      (global.fetch as jest.Mock).mock.calls[0][1].headers.Authorization,
+    ).toBeUndefined();
   });
 
   it('skips auth header when skipAuth is true', async () => {
-    (global.fetch as jest.Mock).mockResolvedValueOnce(responseHelpers.jsonResponse({ ok: true }) as unknown as Response);
+    (global.fetch as jest.Mock).mockResolvedValueOnce(
+      responseHelpers.jsonResponse({ ok: true }) as unknown as Response,
+    );
     await apiClient.get('/skip-auth', { skipCache: true }, { skipAuth: true });
-    expect((global.fetch as jest.Mock).mock.calls[0][1].headers.Authorization).toBeUndefined();
+    expect(
+      (global.fetch as jest.Mock).mock.calls[0][1].headers.Authorization,
+    ).toBeUndefined();
   });
 });

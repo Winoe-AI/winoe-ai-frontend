@@ -11,7 +11,9 @@ describe('proxy - logout normalization stable paths', () => {
   it('normalizes same-origin absolute logout returnTo to root-only', async () => {
     getSessionNormalizedMock.mockResolvedValue(null);
     const req = new NextRequest(
-      new URL('http://localhost/auth/logout?returnTo=http%3A%2F%2Flocalhost%2Fdashboard'),
+      new URL(
+        'http://localhost/auth/logout?returnTo=http%3A%2F%2Flocalhost%2Fdashboard',
+      ),
     );
     const res = await proxy(req);
     expect(res?.status).toBe(307);
@@ -23,7 +25,9 @@ describe('proxy - logout normalization stable paths', () => {
   it('does not redirect when logout returnTo is already root', async () => {
     getSessionNormalizedMock.mockResolvedValue(null);
     const req = new NextRequest(
-      new URL('http://localhost/auth/logout?returnTo=http%3A%2F%2Flocalhost%2F'),
+      new URL(
+        'http://localhost/auth/logout?returnTo=http%3A%2F%2Flocalhost%2F',
+      ),
     );
     const res = await proxy(req);
     expect(res?.headers.get('location')).toBeNull();

@@ -8,7 +8,11 @@ describe('route wrapper metadata', () => {
   });
 
   it('exposes root layout metadata and viewport', async () => {
-    const { metadata, viewport, default: RootLayout } = await import('@/app/layout');
+    const {
+      metadata,
+      viewport,
+      default: RootLayout,
+    } = await import('@/app/layout');
     expect(metadata?.title).toBeDefined();
     expect(viewport?.width).toBe('device-width');
 
@@ -18,15 +22,22 @@ describe('route wrapper metadata', () => {
   });
 
   it('loads auth route metadata and components', async () => {
-    const { metadata: loginMeta, default: LoginRoute } = await import('@/app/(auth)/auth/login/page');
+    const { metadata: loginMeta, default: LoginRoute } =
+      await import('@/app/(auth)/auth/login/page');
     expect(loginMeta.title).toBeDefined();
-    render(await LoginRoute({ searchParams: Promise.resolve({ returnTo: '/foo', mode: 'candidate' }) }));
+    render(
+      await LoginRoute({
+        searchParams: Promise.resolve({ returnTo: '/foo', mode: 'candidate' }),
+      }),
+    );
 
-    const { metadata: logoutMeta, default: LogoutRoute } = await import('@/app/(auth)/auth/logout/page');
+    const { metadata: logoutMeta, default: LogoutRoute } =
+      await import('@/app/(auth)/auth/logout/page');
     expect(logoutMeta.title).toBeDefined();
     render(await LogoutRoute());
 
-    const { metadata: authErrorMeta } = await import('@/app/(auth)/auth/error/page');
+    const { metadata: authErrorMeta } =
+      await import('@/app/(auth)/auth/error/page');
     expect(authErrorMeta.title).toContain('Sign-in error');
   });
 });

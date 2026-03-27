@@ -1,7 +1,7 @@
 import type {
   CandidateCurrentDayWindow,
   CandidateDayWindow,
-} from '@/features/candidate/api';
+} from '@/features/candidate/session/api';
 
 export type WindowStatePhase =
   | 'open'

@@ -5,7 +5,7 @@ import { SimulationSection } from '@/features/recruiter/dashboard/components/Sim
 type Simulation = { id: string; title: string; status: string };
 
 jest.mock(
-  '@/features/recruiter/simulations/list/RecruiterSimulationList',
+  '@/features/recruiter/simulation-management/list/RecruiterSimulationList',
   () => ({
     RecruiterSimulationList: ({
       simulations,

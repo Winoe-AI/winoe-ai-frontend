@@ -2,9 +2,9 @@ import { useCallback } from 'react';
 import {
   pollCandidateTestRun,
   startCandidateTestRun,
-} from '@/features/candidate/api/tests';
+} from '@/features/candidate/session/api/testsApi';
 import type { CandidateTask } from '../CandidateSessionProvider';
-import type { PollResult } from '../task/hooks/runTestsTypes';
+import type { PollResult } from '@/features/candidate/tasks/hooks/useRunTestsTypes';
 import {
   extractTaskWindowClosedOverride,
   formatComeBackMessage,

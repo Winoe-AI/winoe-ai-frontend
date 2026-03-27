@@ -1,7 +1,6 @@
 import {
   GET,
   NextRequest,
-  encoder,
   fetchMock,
   mockResponse,
   setupBackendProxyRouteTest,

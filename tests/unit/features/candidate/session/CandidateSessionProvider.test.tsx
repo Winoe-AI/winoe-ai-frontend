@@ -4,7 +4,7 @@ import {
   CandidateSessionProvider,
   useCandidateSession,
 } from '@/features/candidate/session/CandidateSessionProvider';
-import { BRAND_SLUG } from '@/lib/brand';
+import { BRAND_SLUG } from '@/platform/config/brand';
 import { buildPersistedSession } from './CandidateSessionProvider.testFixtures';
 
 const renderWithProvider = () =>

@@ -1,6 +1,6 @@
 import Button from '@/shared/ui/Button';
 import LoginLink from '@/features/auth/LoginLink';
-import { BRAND_NAME } from '@/lib/brand';
+import { BRAND_NAME } from '@/platform/config/brand';
 import { AuthPageLayout } from './AuthPageLayout';
 import { buildSignupHref, type LoginMode } from './authPaths';
 

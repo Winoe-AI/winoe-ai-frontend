@@ -14,7 +14,8 @@ describe('auth route entrypoints', () => {
   });
 
   it('auth error page defaults when search params are missing', async () => {
-    const { default: AuthErrorRoutePage } = await import('@/app/(auth)/auth/error/page');
+    const { default: AuthErrorRoutePage } =
+      await import('@/app/(auth)/auth/error/page');
     render(await AuthErrorRoutePage({ searchParams: undefined }));
     expect(authErrorMock).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -29,9 +30,13 @@ describe('auth route entrypoints', () => {
   });
 
   it('login page resolves search params and defaults unknown mode', async () => {
-    const { default: LoginRoutePage } = await import('@/app/(auth)/auth/login/page');
+    const { default: LoginRoutePage } =
+      await import('@/app/(auth)/auth/login/page');
     render(await LoginRoutePage({ searchParams: undefined }));
-    expect(loginMock).toHaveBeenCalledWith({ returnTo: undefined, mode: undefined });
+    expect(loginMock).toHaveBeenCalledWith({
+      returnTo: undefined,
+      mode: undefined,
+    });
 
     render(
       await LoginRoutePage({
@@ -39,17 +44,22 @@ describe('auth route entrypoints', () => {
       }),
     );
     expect(sanitizeReturnToMock).toHaveBeenCalledWith(' /dest ');
-    expect(loginMock).toHaveBeenCalledWith({ returnTo: '/dest', mode: undefined });
+    expect(loginMock).toHaveBeenCalledWith({
+      returnTo: '/dest',
+      mode: undefined,
+    });
   });
 
   it('logout page renders', async () => {
-    const { default: LogoutRoutePage } = await import('@/app/(auth)/auth/logout/page');
+    const { default: LogoutRoutePage } =
+      await import('@/app/(auth)/auth/logout/page');
     render(await LogoutRoutePage());
     expect(logoutMock).toHaveBeenCalled();
   });
 
   it('auth error page derives mode and cleared flag', async () => {
-    const { default: AuthErrorRoutePage } = await import('@/app/(auth)/auth/error/page');
+    const { default: AuthErrorRoutePage } =
+      await import('@/app/(auth)/auth/error/page');
     render(
       await AuthErrorRoutePage({
         searchParams: Promise.resolve({
@@ -63,12 +73,17 @@ describe('auth route entrypoints', () => {
     );
     expect(modeForPathMock).toHaveBeenCalled();
     expect(authErrorMock).toHaveBeenCalledWith(
-      expect.objectContaining({ returnTo: '/candidate/dashboard', mode: 'candidate', cleared: true }),
+      expect.objectContaining({
+        returnTo: '/candidate/dashboard',
+        mode: 'candidate',
+        cleared: true,
+      }),
     );
   });
 
   it('not-authorized page renders links for recruiter mode', async () => {
-    const { default: NotAuthorizedPage } = await import('@/app/(auth)/not-authorized/page');
+    const { default: NotAuthorizedPage } =
+      await import('@/app/(auth)/not-authorized/page');
     render(
       await NotAuthorizedPage({
         searchParams: Promise.resolve({ mode: 'recruiter', returnTo: '/dash' }),
@@ -80,7 +95,8 @@ describe('auth route entrypoints', () => {
   });
 
   it('not-authorized page uses candidate returnTo and recruiter default path', async () => {
-    const { default: NotAuthorizedPage } = await import('@/app/(auth)/not-authorized/page');
+    const { default: NotAuthorizedPage } =
+      await import('@/app/(auth)/not-authorized/page');
     render(
       await NotAuthorizedPage({
         searchParams: Promise.resolve({ mode: 'candidate', returnTo: '/cand' }),

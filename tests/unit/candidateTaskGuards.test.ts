@@ -2,7 +2,7 @@ import {
   isCodeTask,
   isSubmitResponse,
   isTextTask,
-} from '@/features/candidate/session/task/utils/taskGuards';
+} from '@/features/candidate/tasks/utils/taskGuardsUtils';
 
 describe('taskGuards', () => {
   it('detects code vs text tasks', () => {

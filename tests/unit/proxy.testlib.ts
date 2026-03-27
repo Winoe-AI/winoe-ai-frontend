@@ -10,7 +10,10 @@ jest.mock('next/server', () => {
         set: (key: string, value: string) => headerStore.set(key, value),
       },
       cookies: {
-        set: (name: string | { name: string; value: string }, value?: string) =>
+        set: (
+          name: string | { name: string; value: string },
+          value?: string,
+        ) =>
           typeof name === 'object' && name !== null
             ? cookieStore.set(name.name, { name: name.name, value: name.value })
             : cookieStore.set(name, { name, value: value ?? '' }),
@@ -23,7 +26,8 @@ jest.mock('next/server', () => {
     NextResponse: {
       redirect: (url: URL | string) => buildResponse(307, url.toString()),
       next: () => buildResponse(200),
-      json: (_body: unknown, init?: { status?: number }) => buildResponse(init?.status ?? 200),
+      json: (_body: unknown, init?: { status?: number }) =>
+        buildResponse(init?.status ?? 200),
     },
     NextRequest: class {
       url: string;
@@ -38,24 +42,32 @@ jest.mock('next/server', () => {
 
 import { NextRequest, NextResponse } from 'next/server';
 
-jest.mock('@/lib/auth0', () => ({
-  auth0: { middleware: jest.fn(() => NextResponse.next()), getSession: jest.fn(), getAccessToken: jest.fn() },
+jest.mock('@/platform/auth0', () => ({
+  auth0: {
+    middleware: jest.fn(() => NextResponse.next()),
+    getSession: jest.fn(),
+    getAccessToken: jest.fn(),
+  },
   getSessionNormalized: jest.fn(),
 }));
-jest.mock('@/lib/auth/routing', () => {
-  const actual = jest.requireActual('@/lib/auth/routing');
+jest.mock('@/platform/auth/routing', () => {
+  const actual = jest.requireActual('@/platform/auth/routing');
   return { ...actual, modeForPath: jest.fn(actual.modeForPath) };
 });
 
-export const mockAuth0 = jest.requireMock('@/lib/auth0').auth0 as {
+export const mockAuth0 = jest.requireMock('@/platform/auth0').auth0 as {
   middleware: jest.Mock;
   getSession: jest.Mock;
   getAccessToken: jest.Mock;
 };
-export const getSessionNormalizedMock = jest.requireMock('@/lib/auth0').getSessionNormalized as jest.Mock;
-export const modeForPathMock = jest.requireMock('@/lib/auth/routing').modeForPath as jest.Mock;
-export const actualRouting = jest.requireActual('@/lib/auth/routing');
-export const { proxy } = jest.requireActual('@/proxy') as { proxy: (req: InstanceType<typeof NextRequest>) => Promise<unknown> };
+export const getSessionNormalizedMock = jest.requireMock('@/platform/auth0')
+  .getSessionNormalized as jest.Mock;
+export const modeForPathMock = jest.requireMock('@/platform/auth/routing')
+  .modeForPath as jest.Mock;
+export const actualRouting = jest.requireActual('@/platform/auth/routing');
+export const { proxy } = jest.requireActual('@/platform/middleware/proxy') as {
+  proxy: (req: InstanceType<typeof NextRequest>) => Promise<unknown>;
+};
 
 export const resetProxyTestMocks = () => {
   jest.clearAllMocks();

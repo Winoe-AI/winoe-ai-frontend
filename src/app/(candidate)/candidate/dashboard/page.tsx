@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
-import CandidateDashboardPage from '@/features/candidate/dashboard/CandidateDashboardPage';
-import { BRAND_NAME } from '@/lib/brand';
-import { getCachedSessionNormalized } from '@/lib/auth0';
+import CandidateDashboardPage from '@/features/candidate/portal/CandidateDashboardPage';
+import { BRAND_NAME } from '@/platform/config/brand';
+import { getCachedSessionNormalized } from '@/platform/auth0';
 
 export const metadata: Metadata = {
   title: `Candidate dashboard | ${BRAND_NAME}`,

@@ -1,7 +1,10 @@
 import fs from 'fs/promises';
 import path from 'path';
 
-export function toStorageStateCookie(options: { value: string; baseURL: string }) {
+export function toStorageStateCookie(options: {
+  value: string;
+  baseURL: string;
+}) {
   const target = new URL(options.baseURL);
   return {
     name: '__session',

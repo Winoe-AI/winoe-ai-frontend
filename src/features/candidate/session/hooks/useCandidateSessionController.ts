@@ -3,17 +3,27 @@ import { useCandidateSession } from '../CandidateSessionProvider';
 import { usePerfMarks } from './usePerfMarks';
 import { useCandidateDerivedInfo } from './useCandidateDerivedInfo';
 import { useWindowState } from './useWindowState';
-import { detectBrowserTimezone, supportedTimezones } from '../utils/schedule';
-import { buildCandidateSessionControllerResult } from './controller/buildCandidateSessionControllerResult';
+import {
+  detectBrowserTimezone,
+  supportedTimezones,
+} from '../utils/scheduleUtils';
+import { buildCandidateSessionControllerResult } from './controller/useBuildCandidateSessionControllerResult';
 import { useCandidateSessionControllerLocalState } from './controller/useCandidateSessionControllerLocalState';
 import { useCandidateSessionControllerNavigation } from './controller/useCandidateSessionControllerNavigation';
 import { useCandidateSessionControllerRuntime } from './controller/useCandidateSessionControllerRuntime';
 import { useCandidateSessionScopedState } from './controller/useCandidateSessionScopedState';
-import { resolveCandidateSessionView } from './controller/resolveCandidateSessionView';
+import { resolveCandidateSessionView } from './controller/useResolveCandidateSessionView';
 export function useCandidateSessionController(token: string) {
   const session = useCandidateSession();
-  const { state, sessionForActions, candidateSessionId, currentTask, currentTaskId } = useCandidateSessionScopedState(session, token);
-  const { loginHref, redirectToLogin, onDashboard, onGoHome } = useCandidateSessionControllerNavigation(token);
+  const {
+    state,
+    sessionForActions,
+    candidateSessionId,
+    currentTask,
+    currentTaskId,
+  } = useCandidateSessionScopedState(session, token);
+  const { loginHref, redirectToLogin, onDashboard, onGoHome } =
+    useCandidateSessionControllerNavigation(token);
   const { markStart, markEnd } = usePerfMarks();
   const detectedTimezone = useMemo(() => detectBrowserTimezone(), []);
   const timezoneOptions = useMemo(() => supportedTimezones(), []);
@@ -50,7 +60,9 @@ export function useCandidateSessionController(token: string) {
     markStart,
     markEnd,
   });
-  const derived = useCandidateDerivedInfo(state, errorStatus, errorMessage, { currentTask });
+  const derived = useCandidateDerivedInfo(state, errorStatus, errorMessage, {
+    currentTask,
+  });
   const windowState = useWindowState({
     dayWindows: state.bootstrap?.dayWindows,
     currentDayIndex: derived.currentDayIndex,
@@ -66,7 +78,8 @@ export function useCandidateSessionController(token: string) {
     view,
     hasTaskData: state.taskState.isComplete || Boolean(currentTask),
     bootstrap: state.bootstrap,
-    scheduleResponseWindowCount: runtime.schedule.scheduleResponseWindows.length,
+    scheduleResponseWindowCount:
+      runtime.schedule.scheduleResponseWindows.length,
     clockNowMs: runtime.schedule.clockNowMs,
   });
   return buildCandidateSessionControllerResult({

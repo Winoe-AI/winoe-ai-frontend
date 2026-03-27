@@ -7,7 +7,7 @@ import {
   textResponse,
 } from '../../../../setup/responseHelpers';
 import { __resetCandidateCache } from '@/features/recruiter/api';
-import { __resetHttpClientCache } from '@/lib/api/client';
+import { __resetHttpClientCache } from '@/platform/api-client/client';
 
 jest.mock('next/link', () => ({
   __esModule: true,
@@ -62,15 +62,17 @@ export function resetTerminateIntegrationState() {
 export function installTerminateFetchMock(
   terminateResolver: (init?: RequestInit) => Response,
 ) {
-  const fetchMock = jest.fn(async (input: RequestInfo | URL, init?: RequestInit) => {
-    const url = getRequestUrl(input);
-    if (url === '/api/simulations/1') return simulationDetailResponse();
-    if (url === '/api/simulations/1/candidates') return candidatesResponse();
-    if (url === '/api/simulations/1/terminate' && init?.method === 'POST') {
-      return terminateResolver(init);
-    }
-    return textResponse('Not found', 404);
-  });
+  const fetchMock = jest.fn(
+    async (input: RequestInfo | URL, init?: RequestInit) => {
+      const url = getRequestUrl(input);
+      if (url === '/api/simulations/1') return simulationDetailResponse();
+      if (url === '/api/simulations/1/candidates') return candidatesResponse();
+      if (url === '/api/simulations/1/terminate' && init?.method === 'POST') {
+        return terminateResolver(init);
+      }
+      return textResponse('Not found', 404);
+    },
+  );
 
   global.fetch = fetchMock as unknown as typeof fetch;
   return fetchMock;

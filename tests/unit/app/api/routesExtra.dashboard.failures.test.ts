@@ -22,11 +22,18 @@ describe('API routes extra coverage - dashboard rejections', () => {
   afterEach(resetRoutesExtraMocks);
 
   it('handles rejected profile request', async () => {
-    mockRequireBffAuth.mockResolvedValue({ ok: true, accessToken: 'token-dash', cookies: [], requestId: 'req-extra' });
+    mockRequireBffAuth.mockResolvedValue({
+      ok: true,
+      accessToken: 'token-dash',
+      cookies: [],
+      requestId: 'req-extra',
+    });
     mockUpstreamRequest
       .mockRejectedValueOnce(new Error('profile down'))
       .mockResolvedValueOnce(responseWithJson(200, []));
-    mockParseUpstreamBody.mockResolvedValueOnce(undefined).mockResolvedValueOnce([{ id: 1 }]);
+    mockParseUpstreamBody
+      .mockResolvedValueOnce(undefined)
+      .mockResolvedValueOnce([{ id: 1 }]);
 
     const { GET } = await import(modulePath);
     markMetadataCovered(modulePath);
@@ -36,7 +43,12 @@ describe('API routes extra coverage - dashboard rejections', () => {
   });
 
   it('handles rejected simulations request', async () => {
-    mockRequireBffAuth.mockResolvedValue({ ok: true, accessToken: 'token-dash', cookies: [], requestId: 'req-extra' });
+    mockRequireBffAuth.mockResolvedValue({
+      ok: true,
+      accessToken: 'token-dash',
+      cookies: [],
+      requestId: 'req-extra',
+    });
     mockUpstreamRequest
       .mockResolvedValueOnce(responseWithJson(200, {}))
       .mockRejectedValueOnce(new Error('sim down'));
@@ -45,6 +57,8 @@ describe('API routes extra coverage - dashboard rejections', () => {
     const { GET } = await import(modulePath);
     const result = await GET(new NextRequest('http://localhost/api/dashboard'));
     expect(result.status).toBe(200);
-    expect(result.headers.get('x-tenon-upstream-status-simulations')).toBe('502');
+    expect(result.headers.get('x-tenon-upstream-status-simulations')).toBe(
+      '502',
+    );
   });
 });

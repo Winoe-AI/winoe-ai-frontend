@@ -13,12 +13,16 @@ describe('WorkspacePanel error states', () => {
   it('shows session expired for 401 and 403 status errors', async () => {
     statusMock.mockRejectedValueOnce({ status: 401 });
     renderWorkspacePanel(19, 20);
-    expect(await screen.findByText(/Session expired\. Please sign in again/i)).toBeInTheDocument();
+    expect(
+      await screen.findByText(/Session expired\. Please sign in again/i),
+    ).toBeInTheDocument();
 
     resetWorkspacePanelMocks();
     statusMock.mockRejectedValueOnce({ status: 403 });
     renderWorkspacePanel(21, 22);
-    expect(await screen.findByText(/Session expired\. Please sign in again/i)).toBeInTheDocument();
+    expect(
+      await screen.findByText(/Session expired\. Please sign in again/i),
+    ).toBeInTheDocument();
   });
 
   it('shows generic error and retry button for other statuses', async () => {

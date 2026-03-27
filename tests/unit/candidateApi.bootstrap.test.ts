@@ -67,7 +67,10 @@ describe('candidateApi bootstrap and invites', () => {
     fetchMock.mockResolvedValue(jsonRes({ detail: 'Invalid' }, 404));
     installFetchMock(fetchMock);
 
-    const { resolveCandidateInviteToken, HttpError } = await importCandidateApi();
-    await expect(resolveCandidateInviteToken('bad')).rejects.toBeInstanceOf(HttpError);
+    const { resolveCandidateInviteToken, HttpError } =
+      await importCandidateApi();
+    await expect(resolveCandidateInviteToken('bad')).rejects.toBeInstanceOf(
+      HttpError,
+    );
   });
 });

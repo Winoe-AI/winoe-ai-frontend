@@ -8,7 +8,7 @@ const normalizeApiErrorMock = jest.fn((err, fallback) => ({
   message: fallback ?? String(err),
 }));
 
-jest.mock('@/features/candidate/api', () => ({
+jest.mock('@/features/candidate/session/api', () => ({
   HttpError: class HttpError extends Error {
     status?: number;
     constructor(status?: number) {
@@ -23,7 +23,7 @@ jest.mock('@/shared/notifications', () => ({
   useNotifications: () => ({ notify: notifyMock }),
 }));
 
-jest.mock('@/lib/errors/errors', () => ({
+jest.mock('@/platform/errors/errors', () => ({
   __esModule: true,
   normalizeApiError: (error: unknown, fallback?: string) =>
     normalizeApiErrorMock(error, fallback),
@@ -32,14 +32,13 @@ jest.mock('@/lib/errors/errors', () => ({
 type HookParams = Parameters<typeof useTaskSubmission>[0];
 export type HookReturn = ReturnType<typeof useTaskSubmission>;
 
-const HookHarness = forwardRef<HookReturn, HookParams>(function HookHarness(
-  props,
-  ref,
-) {
-  const hook = useTaskSubmission(props);
-  useImperativeHandle(ref, () => hook, [hook]);
-  return null;
-});
+const HookHarness = forwardRef<HookReturn, HookParams>(
+  function HookHarness(props, ref) {
+    const hook = useTaskSubmission(props);
+    useImperativeHandle(ref, () => hook, [hook]);
+    return null;
+  },
+);
 
 export const buildHookProps = (): HookParams => ({
   candidateSessionId: 11,
@@ -57,7 +56,9 @@ export const buildHookProps = (): HookParams => ({
   onSubmissionRecorded: jest.fn(),
 });
 
-export const renderTaskSubmissionHarness = (props: HookParams = buildHookProps()) => {
+export const renderTaskSubmissionHarness = (
+  props: HookParams = buildHookProps(),
+) => {
   const ref = React.createRef<HookReturn>();
   const rendered = render(<HookHarness ref={ref} {...props} />);
   return { props, ref, unmount: rendered.unmount };

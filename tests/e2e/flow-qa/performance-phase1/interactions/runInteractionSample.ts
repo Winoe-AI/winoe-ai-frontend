@@ -9,7 +9,11 @@ import { runRecruiterNavigation } from './recruiterNavigation';
 import { runSimulationCreate } from './simulationCreate';
 import { runSubmissionsExpand } from './submissionsExpand';
 
-export async function runInteractionSample(params: { browser: Browser; ids: RuntimeIds; sample: number }): Promise<InteractionSampleMetric[]> {
+export async function runInteractionSample(params: {
+  browser: Browser;
+  ids: RuntimeIds;
+  sample: number;
+}): Promise<InteractionSampleMetric[]> {
   const { browser, ids, sample } = params;
   const context = createInteractionContext(browser, ids, sample);
   await runRecruiterNavigation(context);

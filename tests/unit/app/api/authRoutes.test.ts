@@ -8,12 +8,12 @@ jest.mock('next/server', () => {
     jest.requireActual('./mockNext');
   return { NextRequest: MockNextRequest, NextResponse: MockNextResponse };
 });
-jest.mock('@/lib/server/bffAuth', () => ({
+jest.mock('@/platform/server/bffAuth', () => ({
   requireBffAuth: (...args: unknown[]) => requireBffAuthMock(...args),
   mergeResponseCookies: (...args: unknown[]) =>
     mergeResponseCookiesMock(...args),
 }));
-jest.mock('@/lib/server/bff', () => ({
+jest.mock('@/platform/server/bff', () => ({
   forwardJson: (...args: unknown[]) => forwardJsonMock(...args),
   resolveRequestId: (...args: unknown[]) => resolveRequestIdMock(...args),
   REQUEST_ID_HEADER: 'x-request-id',

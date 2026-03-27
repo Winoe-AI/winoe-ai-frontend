@@ -18,7 +18,9 @@ describe('API Routes Coverage - simulations list', () => {
     mockBffAuthSuccess();
     mockForwardJson.mockResolvedValue(NextResponse.json([]));
 
-    const res = await mod.GET(new NextRequest('http://localhost/api/simulations'));
+    const res = await mod.GET(
+      new NextRequest('http://localhost/api/simulations'),
+    );
     expect(res.status).toBe(200);
   });
 

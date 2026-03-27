@@ -3,10 +3,13 @@ export function asRecord(value: unknown): Record<string, unknown> | null {
   return value as Record<string, unknown>;
 }
 
-export function readCode(record: Record<string, unknown> | null): string | null {
+export function readCode(
+  record: Record<string, unknown> | null,
+): string | null {
   if (!record) return null;
   const errorCode = record.errorCode;
-  if (typeof errorCode === 'string' && errorCode.trim()) return errorCode.trim();
+  if (typeof errorCode === 'string' && errorCode.trim())
+    return errorCode.trim();
   const code = record.code;
   if (typeof code === 'string' && code.trim()) return code.trim();
   return null;

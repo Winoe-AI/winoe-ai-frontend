@@ -4,8 +4,8 @@ import {
   firstWindowStartAt,
   formatCountdown,
   normalizeDayWindows,
-} from '../../utils/schedule';
-import type { CandidateSessionScheduleParams } from './candidateSessionSchedule.types';
+} from '../../utils/scheduleUtils';
+import type { CandidateSessionScheduleParams } from './useCandidateSessionSchedule.types';
 
 type Params = Pick<
   CandidateSessionScheduleParams,
@@ -45,7 +45,8 @@ export function useCandidateSessionScheduleViewState({
 
   const fallbackTimezone = scheduleTimezoneValue.trim();
   const scheduleDisplayTimezone =
-    bootstrap?.candidateTimezone ?? (fallbackTimezone ? fallbackTimezone : null);
+    bootstrap?.candidateTimezone ??
+    (fallbackTimezone ? fallbackTimezone : null);
   const scheduleDisplayStartAt = bootstrap?.scheduledStartAt ?? null;
 
   useEffect(() => {

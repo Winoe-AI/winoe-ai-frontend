@@ -6,7 +6,10 @@ export function toInt(value: number | null | undefined): number {
   return Math.round(value);
 }
 
-export function toFixed(value: number | null | undefined, digits: number): number {
+export function toFixed(
+  value: number | null | undefined,
+  digits: number,
+): number {
   if (value == null || !Number.isFinite(value)) return 0;
   return Number(value.toFixed(digits));
 }
@@ -28,7 +31,9 @@ export function median(values: number[]): number {
   if (!values.length) return 0;
   const sorted = [...values].sort((a, b) => a - b);
   const mid = Math.floor(sorted.length / 2);
-  return sorted.length % 2 === 1 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
+  return sorted.length % 2 === 1
+    ? sorted[mid]
+    : (sorted[mid - 1] + sorted[mid]) / 2;
 }
 
 export function modeOf<T extends string>(values: T[]): T {
@@ -37,15 +42,25 @@ export function modeOf<T extends string>(values: T[]): T {
   for (const value of values) counts.set(value, (counts.get(value) ?? 0) + 1);
   let winner = values[0];
   let winnerCount = -1;
-  for (const [value, count] of counts.entries()) if (count > winnerCount) [winner, winnerCount] = [value, count];
+  for (const [value, count] of counts.entries())
+    if (count > winnerCount) [winner, winnerCount] = [value, count];
   return winner;
 }
 
 export async function waitForAnyVisible(checks: Array<() => Promise<void>>) {
   const reasons: string[] = [];
   try {
-    await Promise.any(checks.map((check) => check().catch((error) => { reasons.push(getErrorMessage(error)); throw error; })));
+    await Promise.any(
+      checks.map((check) =>
+        check().catch((error) => {
+          reasons.push(getErrorMessage(error));
+          throw error;
+        }),
+      ),
+    );
   } catch {
-    throw new Error(`No expected ready state became visible: ${reasons.join(' | ')}`);
+    throw new Error(
+      `No expected ready state became visible: ${reasons.join(' | ')}`,
+    );
   }
 }

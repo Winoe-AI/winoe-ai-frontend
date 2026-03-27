@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { REQUEST_ID_HEADER } from '@/lib/server/bff';
+import { REQUEST_ID_HEADER } from '@/platform/server/bff';
 
 export function errorResponse(
   e: unknown,

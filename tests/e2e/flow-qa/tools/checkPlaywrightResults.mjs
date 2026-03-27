@@ -11,13 +11,19 @@ function main() {
 
   const failures = [];
   if (summary.unexpected > args.maxUnexpected) {
-    failures.push(`${args.label}: unexpected failures ${summary.unexpected} exceeds max ${args.maxUnexpected}`);
+    failures.push(
+      `${args.label}: unexpected failures ${summary.unexpected} exceeds max ${args.maxUnexpected}`,
+    );
   }
   if (summary.flaky > args.maxFlaky) {
-    failures.push(`${args.label}: flaky tests ${summary.flaky} exceeds max ${args.maxFlaky}`);
+    failures.push(
+      `${args.label}: flaky tests ${summary.flaky} exceeds max ${args.maxFlaky}`,
+    );
   }
   if (summary.skipped > args.maxSkipped) {
-    failures.push(`${args.label}: skipped tests ${summary.skipped} exceeds max ${args.maxSkipped}`);
+    failures.push(
+      `${args.label}: skipped tests ${summary.skipped} exceeds max ${args.maxSkipped}`,
+    );
   }
 
   const payload = {
@@ -36,11 +42,17 @@ function main() {
   if (args.output) {
     const absOutput = path.resolve(args.output);
     fs.mkdirSync(path.dirname(absOutput), { recursive: true });
-    fs.writeFileSync(absOutput, `${JSON.stringify(payload, null, 2)}\n`, 'utf8');
+    fs.writeFileSync(
+      absOutput,
+      `${JSON.stringify(payload, null, 2)}\n`,
+      'utf8',
+    );
   }
 
   if (payload.ok) {
-    console.log(`${args.label}: pass (expected=${summary.expected}, skipped=${summary.skipped}, flaky=${summary.flaky}, unexpected=${summary.unexpected})`);
+    console.log(
+      `${args.label}: pass (expected=${summary.expected}, skipped=${summary.skipped}, flaky=${summary.flaky}, unexpected=${summary.unexpected})`,
+    );
     return;
   }
 

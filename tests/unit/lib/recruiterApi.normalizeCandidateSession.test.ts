@@ -1,4 +1,8 @@
-import { normalizeCandidateSession, resetRecruiterApiMocks, restoreRecruiterApiEnv } from './recruiterApi.testlib';
+import {
+  normalizeCandidateSession,
+  resetRecruiterApiMocks,
+  restoreRecruiterApiEnv,
+} from './recruiterApi.testlib';
 
 describe('recruiterApi normalizeCandidateSession', () => {
   beforeEach(() => {
@@ -14,7 +18,16 @@ describe('recruiterApi normalizeCandidateSession', () => {
     const originalWindow = globalAny.window as Window | undefined;
     delete globalAny.window;
     const result = normalizeCandidateSession({
-      candidate_session_id: 12, invite_email: 'test@example.com', candidate_name: 'Test User', status: 'not_started', invite_token: 'tok_12', invite_url: '', invite_email_status: 'sent', invite_email_sent_at: '2025-01-01T00:00:00Z', report_ready: true, report_id: 'r-12',
+      candidate_session_id: 12,
+      invite_email: 'test@example.com',
+      candidate_name: 'Test User',
+      status: 'not_started',
+      invite_token: 'tok_12',
+      invite_url: '',
+      invite_email_status: 'sent',
+      invite_email_sent_at: '2025-01-01T00:00:00Z',
+      report_ready: true,
+      report_id: 'r-12',
     });
     expect(result.candidateSessionId).toBe(12);
     expect(result.inviteUrl).toBe('/candidate/session/tok_12');
@@ -29,7 +42,14 @@ describe('recruiterApi normalizeCandidateSession', () => {
     const originalWindow = globalAny.window as Window | undefined;
     globalAny.window = { location: { origin: 'https://app.test' } } as Window;
     const result = normalizeCandidateSession({
-      candidateSessionId: '7', inviteEmail: 'test@example.com', candidateName: 'Test User', sessionStatus: 'in_progress', inviteToken: 'tok_7', inviteUrl: '', email_verified: true, progress: { current: '1', total: '3' },
+      candidateSessionId: '7',
+      inviteEmail: 'test@example.com',
+      candidateName: 'Test User',
+      sessionStatus: 'in_progress',
+      inviteToken: 'tok_7',
+      inviteUrl: '',
+      email_verified: true,
+      progress: { current: '1', total: '3' },
     });
     expect(result.inviteUrl).toBe('https://app.test/candidate/session/tok_7');
     expect(result.verified).toBe(true);
@@ -42,7 +62,10 @@ describe('recruiterApi normalizeCandidateSession', () => {
     const empty = normalizeCandidateSession(null);
     expect(empty.candidateSessionId).toBe(0);
     expect(empty.status).toBe('not_started');
-    const invalid = normalizeCandidateSession({ id: 'NaN', progress: { current: 'x', total: 'y' } });
+    const invalid = normalizeCandidateSession({
+      id: 'NaN',
+      progress: { current: 'x', total: 'y' },
+    });
     expect(invalid.candidateSessionId).toBe(0);
     expect(invalid.dayProgress).toBeNull();
   });

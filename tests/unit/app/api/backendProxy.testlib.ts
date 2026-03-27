@@ -11,7 +11,7 @@ jest.mock('next/server', () => {
   return { NextRequest: MockNextRequest, NextResponse: MockNextResponse };
 });
 
-jest.mock('@/lib/server/bff', () => ({
+jest.mock('@/platform/server/bff', () => ({
   REQUEST_ID_HEADER: 'x-request-id',
   UPSTREAM_HEADER: 'x-upstream',
   upstreamRequest: (config: unknown) => upstreamRequestMock(config),

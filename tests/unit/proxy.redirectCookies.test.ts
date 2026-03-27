@@ -16,8 +16,12 @@ describe('proxy - redirect cookie merging', () => {
     mockAuth0.middleware.mockResolvedValue(authResp);
     getSessionNormalizedMock.mockResolvedValue(null);
 
-    const res = await proxy(new NextRequest(new URL('http://localhost/dashboard')));
+    const res = await proxy(
+      new NextRequest(new URL('http://localhost/dashboard')),
+    );
     expect(res?.status).toBe(307);
-    expect(res?.cookies.getAll().find((c) => c.name === 'edge')?.value).toBe('set');
+    expect(res?.cookies.getAll().find((c) => c.name === 'edge')?.value).toBe(
+      'set',
+    );
   });
 });

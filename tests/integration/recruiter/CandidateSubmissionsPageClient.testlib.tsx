@@ -1,16 +1,16 @@
-import CandidateSubmissionsPage from '@/features/recruiter/simulations/candidates/CandidateSubmissionsPage';
+import CandidateSubmissionsPage from '@/features/recruiter/submission-review/CandidateSubmissionsPage';
 import {
   recruiterBffClient,
   bffClient,
   __resetHttpClientCache,
-} from '@/lib/api/client';
+} from '@/platform/api-client/client';
 import { __resetCandidateCache } from '@/features/recruiter/api';
 
 export const params = { id: 'sim-1', candidateSessionId: '900' };
 
 jest.mock('next/navigation', () => ({ useParams: () => params }));
-jest.mock('@/lib/api/client', () => {
-  const actual = jest.requireActual('@/lib/api/client');
+jest.mock('@/platform/api-client/client', () => {
+  const actual = jest.requireActual('@/platform/api-client/client');
   return {
     ...actual,
     recruiterBffClient: { get: jest.fn() },
@@ -19,7 +19,10 @@ jest.mock('@/lib/api/client', () => {
   };
 });
 
-type GetHandler = (path: string, options?: unknown) => unknown | Promise<unknown>;
+type GetHandler = (
+  path: string,
+  options?: unknown,
+) => unknown | Promise<unknown>;
 
 export const resetCandidateSubmissionsClient = () => {
   jest.resetAllMocks();
@@ -42,7 +45,11 @@ export const setClientScenario = (getHandler: GetHandler) => {
   );
 };
 
-export const makeCandidate = (name: string, status: string, hasReport = true) => ({
+export const makeCandidate = (
+  name: string,
+  status: string,
+  hasReport = true,
+) => ({
   candidateSessionId: 900,
   candidateName: name,
   inviteEmail: `${name.toLowerCase()}@example.com`,
@@ -77,9 +84,7 @@ export const makeDetail = (
   task: { taskId: 100 + submissionId, dayIndex, type, title, prompt: null },
   contentText: null,
   code: null,
-  testResults: stdout
-    ? { passed: 1, failed: 0, total: 1, stdout }
-    : null,
+  testResults: stdout ? { passed: 1, failed: 0, total: 1, stdout } : null,
   submittedAt: '2025-01-02T00:00:00Z',
 });
 

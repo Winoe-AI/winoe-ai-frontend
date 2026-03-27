@@ -18,7 +18,9 @@ describe('useDashboardData', () => {
   it('fetches profile and simulations and surfaces results', async () => {
     fetchDashboard.mockResolvedValueOnce({
       profile: { name: 'Recruiter', email: 'r@test.com', role: 'Hiring' },
-      simulations: [{ id: '1', title: 'Sim', role: 'Eng', createdAt: '2024-01-01' }],
+      simulations: [
+        { id: '1', title: 'Sim', role: 'Eng', createdAt: '2024-01-01' },
+      ],
       profileError: null,
       simulationsError: null,
     });
@@ -70,7 +72,9 @@ describe('useDashboardData', () => {
   });
 
   it('ignores abort errors without setting error state', async () => {
-    fetchDashboard.mockRejectedValueOnce(new DOMException('Aborted', 'AbortError'));
+    fetchDashboard.mockRejectedValueOnce(
+      new DOMException('Aborted', 'AbortError'),
+    );
     const { result } = setupDashboardHook();
 
     await waitFor(() => expect(result.current.loadingProfile).toBe(false));

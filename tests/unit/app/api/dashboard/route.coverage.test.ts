@@ -11,7 +11,7 @@ jest.mock('next/server', () => ({
   },
 }));
 
-jest.mock('@/lib/server/bff', () => ({
+jest.mock('@/platform/server/bff', () => ({
   forwardJson: jest.fn().mockResolvedValue({
     status: 200,
     headers: new Map(),

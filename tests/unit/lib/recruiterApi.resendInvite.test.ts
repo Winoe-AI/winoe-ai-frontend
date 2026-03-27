@@ -1,4 +1,8 @@
-import { mockRecruiterRequest, resetRecruiterApiMocks, restoreRecruiterApiEnv } from './recruiterApi.testlib';
+import {
+  mockRecruiterRequest,
+  resetRecruiterApiMocks,
+  restoreRecruiterApiEnv,
+} from './recruiterApi.testlib';
 
 describe('recruiterApi resendInvite', () => {
   beforeEach(() => {
@@ -15,9 +19,15 @@ describe('recruiterApi resendInvite', () => {
   });
 
   it('posts resend endpoint when identifiers are valid', async () => {
-    mockRecruiterRequest.mockResolvedValueOnce({ data: { ok: true }, requestId: null });
+    mockRecruiterRequest.mockResolvedValueOnce({
+      data: { ok: true },
+      requestId: null,
+    });
     const { resendInvite } = await import('@/features/recruiter/api');
     await resendInvite('sim_9', 42);
-    expect(mockRecruiterRequest).toHaveBeenCalledWith('/simulations/sim_9/candidates/42/invite/resend', { method: 'POST' });
+    expect(mockRecruiterRequest).toHaveBeenCalledWith(
+      '/simulations/sim_9/candidates/42/invite/resend',
+      { method: 'POST' },
+    );
   });
 });

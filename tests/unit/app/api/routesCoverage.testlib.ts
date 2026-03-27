@@ -23,22 +23,34 @@ jest.mock('next/server', () => {
     nextUrl: URL;
     method: string;
     headers: { get: (key: string) => string | null };
-    constructor(url: URL | string, init?: { method?: string; headers?: Record<string, string> }) {
+    constructor(
+      url: URL | string,
+      init?: { method?: string; headers?: Record<string, string> },
+    ) {
       this.url = url.toString();
       this.nextUrl = new URL(this.url);
       this.method = init?.method ?? 'GET';
       const headerStore = new Map<string, string>();
-      Object.entries(init?.headers ?? {}).forEach(([key, value]) => headerStore.set(key.toLowerCase(), String(value)));
-      this.headers = { get: (key: string) => headerStore.get(key.toLowerCase()) ?? null };
+      Object.entries(init?.headers ?? {}).forEach(([key, value]) =>
+        headerStore.set(key.toLowerCase(), String(value)),
+      );
+      this.headers = {
+        get: (key: string) => headerStore.get(key.toLowerCase()) ?? null,
+      };
     }
-    async json() { return {}; }
-    async text() { return ''; }
+    async json() {
+      return {};
+    }
+    async text() {
+      return '';
+    }
   }
 
   return {
     NextRequest: MockNextRequest,
     NextResponse: {
-      json: (body: unknown, init?: { status?: number }) => buildResponse(init?.status ?? 200, body),
+      json: (body: unknown, init?: { status?: number }) =>
+        buildResponse(init?.status ?? 200, body),
       next: () => buildResponse(200),
       redirect: (url: URL | string) => {
         const response = buildResponse(307);
@@ -51,14 +63,15 @@ jest.mock('next/server', () => {
 
 export const mockRequireBffAuth = jest.fn();
 export const mockMergeResponseCookies = jest.fn();
-jest.mock('@/lib/server/bffAuth', () => ({
+jest.mock('@/platform/server/bffAuth', () => ({
   requireBffAuth: (...args: unknown[]) => mockRequireBffAuth(...args),
-  mergeResponseCookies: (...args: unknown[]) => mockMergeResponseCookies(...args),
+  mergeResponseCookies: (...args: unknown[]) =>
+    mockMergeResponseCookies(...args),
 }));
 
 export const mockForwardJson = jest.fn();
 export const mockResolveRequestId = jest.fn(() => 'req-cov');
-jest.mock('@/lib/server/bff', () => ({
+jest.mock('@/platform/server/bff', () => ({
   forwardJson: (...args: unknown[]) => mockForwardJson(...args),
   resolveRequestId: () => mockResolveRequestId(),
   REQUEST_ID_HEADER: 'x-tenon-request-id',

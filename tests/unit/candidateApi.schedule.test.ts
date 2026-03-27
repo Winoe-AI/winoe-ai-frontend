@@ -19,7 +19,13 @@ describe('candidateApi schedule', () => {
         candidateSessionId: 10,
         scheduledStartAt: '2026-03-10T13:00:00Z',
         candidateTimezone: 'America/New_York',
-        dayWindows: [{ dayIndex: 1, windowStartAt: '2026-03-10T13:00:00Z', windowEndAt: '2026-03-10T21:00:00Z' }],
+        dayWindows: [
+          {
+            dayIndex: 1,
+            windowStartAt: '2026-03-10T13:00:00Z',
+            windowEndAt: '2026-03-10T21:00:00Z',
+          },
+        ],
         scheduleLockedAt: '2026-03-01T00:00:00Z',
       }),
     );
@@ -39,7 +45,13 @@ describe('candidateApi schedule', () => {
   it('maps timezone validation errors with status 422', async () => {
     const fetchMock = jest.fn() as FetchMock;
     fetchMock.mockResolvedValue(
-      jsonRes({ detail: 'Timezone is invalid.', errorCode: 'SCHEDULE_INVALID_TIMEZONE' }, 422),
+      jsonRes(
+        {
+          detail: 'Timezone is invalid.',
+          errorCode: 'SCHEDULE_INVALID_TIMEZONE',
+        },
+        422,
+      ),
     );
     installFetchMock(fetchMock);
     const { scheduleCandidateSession } = await importCandidateApi();

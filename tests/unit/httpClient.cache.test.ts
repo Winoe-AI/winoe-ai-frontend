@@ -1,4 +1,7 @@
-import { apiClient, __resetHttpClientCache } from '@/lib/api/client';
+import {
+  apiClient,
+  __resetHttpClientCache,
+} from '@/platform/api-client/client';
 import { responseHelpers } from '../setup';
 
 describe('httpClient cache/dedupe behavior', () => {
@@ -23,15 +26,24 @@ describe('httpClient cache/dedupe behavior', () => {
     const p1 = apiClient.get('/dedupe-check');
     const p2 = apiClient.get('/dedupe-check');
     expect(global.fetch).toHaveBeenCalledTimes(1);
-    resolver[0](responseHelpers.jsonResponse({ ok: true }) as unknown as Response);
-    await expect(Promise.all([p1, p2])).resolves.toEqual([{ ok: true }, { ok: true }]);
+    resolver[0](
+      responseHelpers.jsonResponse({ ok: true }) as unknown as Response,
+    );
+    await expect(Promise.all([p1, p2])).resolves.toEqual([
+      { ok: true },
+      { ok: true },
+    ]);
   });
 
   it('does not cache responses unless cacheTtlMs > 0', async () => {
     __resetHttpClientCache();
     (global.fetch as jest.Mock)
-      .mockResolvedValueOnce(responseHelpers.jsonResponse({ value: 1 }) as unknown as Response)
-      .mockResolvedValueOnce(responseHelpers.jsonResponse({ value: 2 }) as unknown as Response);
+      .mockResolvedValueOnce(
+        responseHelpers.jsonResponse({ value: 1 }) as unknown as Response,
+      )
+      .mockResolvedValueOnce(
+        responseHelpers.jsonResponse({ value: 2 }) as unknown as Response,
+      );
 
     const first = await apiClient.get('/no-cache');
     const second = await apiClient.get('/no-cache');
@@ -56,8 +68,12 @@ describe('httpClient cache/dedupe behavior', () => {
   it('skips dedupe when disableDedupe is true', async () => {
     __resetHttpClientCache();
     (global.fetch as jest.Mock)
-      .mockResolvedValueOnce(responseHelpers.jsonResponse({ value: 1 }) as unknown as Response)
-      .mockResolvedValueOnce(responseHelpers.jsonResponse({ value: 2 }) as unknown as Response);
+      .mockResolvedValueOnce(
+        responseHelpers.jsonResponse({ value: 1 }) as unknown as Response,
+      )
+      .mockResolvedValueOnce(
+        responseHelpers.jsonResponse({ value: 2 }) as unknown as Response,
+      );
 
     const [a, b] = await Promise.all([
       apiClient.get('/dedupe-off', { disableDedupe: true }),

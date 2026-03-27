@@ -22,7 +22,12 @@ describe('API routes extra coverage - dashboard unauthorized', () => {
   afterEach(resetRoutesExtraMocks);
 
   it('returns forbidden when simulations unauthorized', async () => {
-    mockRequireBffAuth.mockResolvedValue({ ok: true, accessToken: 'token-dash', cookies: [], requestId: 'req-extra' });
+    mockRequireBffAuth.mockResolvedValue({
+      ok: true,
+      accessToken: 'token-dash',
+      cookies: [],
+      requestId: 'req-extra',
+    });
     mockUpstreamRequest
       .mockResolvedValueOnce(responseWithJson(200, {}))
       .mockResolvedValueOnce(responseWithJson(401, {}));
@@ -36,7 +41,12 @@ describe('API routes extra coverage - dashboard unauthorized', () => {
   });
 
   it('returns unauthorized when profile is forbidden', async () => {
-    mockRequireBffAuth.mockResolvedValue({ ok: true, accessToken: 'token-dash', cookies: [], requestId: 'req-extra' });
+    mockRequireBffAuth.mockResolvedValue({
+      ok: true,
+      accessToken: 'token-dash',
+      cookies: [],
+      requestId: 'req-extra',
+    });
     mockUpstreamRequest
       .mockResolvedValueOnce(responseWithJson(401, { message: 'forbidden' }))
       .mockResolvedValueOnce(responseWithJson(200, []));

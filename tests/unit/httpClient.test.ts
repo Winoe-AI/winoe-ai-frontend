@@ -2,7 +2,7 @@ import {
   apiClient,
   isSameOriginRequest,
   recruiterBffClient,
-} from '@/lib/api/client';
+} from '@/platform/api-client/client';
 import { responseHelpers } from '../setup';
 
 describe('httpClient', () => {

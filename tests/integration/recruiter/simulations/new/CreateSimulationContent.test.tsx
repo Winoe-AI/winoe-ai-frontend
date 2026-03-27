@@ -5,7 +5,7 @@ import {
   resetCreateSimulationMocks,
   routerMock,
 } from './CreateSimulationContent.testlib';
-import SimulationCreatePage from '@/features/recruiter/simulations/create/SimulationCreatePage';
+import SimulationCreatePage from '@/features/recruiter/simulation-management/create/SimulationCreatePage';
 
 describe('SimulationCreatePage happy path + validation', () => {
   beforeEach(() => {
@@ -19,7 +19,9 @@ describe('SimulationCreatePage happy path + validation', () => {
     await user.clear(screen.getByLabelText(/Title/i));
     await user.clear(screen.getByLabelText(/^Role$/i));
     await user.clear(screen.getByLabelText(/Tech stack/i));
-    await user.click(screen.getByRole('button', { name: /Create simulation/i }));
+    await user.click(
+      screen.getByRole('button', { name: /Create simulation/i }),
+    );
 
     expect(await screen.findByText(/Title is required/i)).toBeInTheDocument();
     expect(screen.getByText(/Role is required/i)).toBeInTheDocument();
@@ -29,7 +31,11 @@ describe('SimulationCreatePage happy path + validation', () => {
 
   it('creates simulation and redirects to detail page', async () => {
     const user = userEvent.setup();
-    createSimulationMock.mockResolvedValueOnce({ id: 'sim_123', ok: true, status: 201 });
+    createSimulationMock.mockResolvedValueOnce({
+      id: 'sim_123',
+      ok: true,
+      status: 201,
+    });
     render(<SimulationCreatePage />);
 
     const day4Toggle = screen.getByLabelText(/^Day 4$/i);
@@ -39,12 +45,17 @@ describe('SimulationCreatePage happy path + validation', () => {
     await user.clear(screen.getByLabelText(/Tech stack/i));
     await user.type(screen.getByLabelText(/Tech stack/i), ' Node + Postgres ');
     await user.selectOptions(screen.getByLabelText(/Role level/i), 'senior');
-    await user.selectOptions(screen.getByLabelText(/Template/i), 'node-express-ts');
+    await user.selectOptions(
+      screen.getByLabelText(/Template/i),
+      'node-express-ts',
+    );
     await user.type(screen.getByLabelText(/Company domain/i), ' fintech ');
     await user.type(screen.getByLabelText(/Product area/i), ' payments ');
     await user.type(screen.getByLabelText(/Focus /i), 'Messaging focus');
     await user.click(day4Toggle);
-    await user.click(screen.getByRole('button', { name: /Create simulation/i }));
+    await user.click(
+      screen.getByRole('button', { name: /Create simulation/i }),
+    );
 
     await waitFor(() => expect(createSimulationMock).toHaveBeenCalledTimes(1));
     expect(createSimulationMock).toHaveBeenCalledWith({
@@ -55,18 +66,35 @@ describe('SimulationCreatePage happy path + validation', () => {
       templateKey: 'node-express-ts',
       focus: 'Messaging focus',
       companyContext: { domain: 'fintech', productArea: 'payments' },
-      ai: { noticeVersion: 'mvp1', evalEnabledByDay: { '1': true, '2': true, '3': true, '4': false, '5': true } },
+      ai: {
+        noticeVersion: 'mvp1',
+        evalEnabledByDay: {
+          '1': true,
+          '2': true,
+          '3': true,
+          '4': false,
+          '5': true,
+        },
+      },
     });
-    expect(routerMock.push).toHaveBeenCalledWith('/dashboard/simulations/sim_123');
+    expect(routerMock.push).toHaveBeenCalledWith(
+      '/dashboard/simulations/sim_123',
+    );
   });
 
   it('shows form error when backend returns no id', async () => {
     const user = userEvent.setup();
-    createSimulationMock.mockResolvedValueOnce({ id: '', ok: true, status: 201 });
+    createSimulationMock.mockResolvedValueOnce({
+      id: '',
+      ok: true,
+      status: 201,
+    });
     render(<SimulationCreatePage />);
 
     await user.type(screen.getByLabelText(/Title/i), 'Backend Sim');
-    await user.click(screen.getByRole('button', { name: /Create simulation/i }));
+    await user.click(
+      screen.getByRole('button', { name: /Create simulation/i }),
+    );
     expect(await screen.findByText(/no id was returned/i)).toBeInTheDocument();
   });
 });

@@ -22,7 +22,9 @@ describe('API Routes Coverage - submissions', () => {
     mockBffAuthSuccess();
     mockForwardJson.mockResolvedValue(NextResponse.json([]));
 
-    let res = await mod.GET(new NextRequest('http://localhost/api/submissions'));
+    let res = await mod.GET(
+      new NextRequest('http://localhost/api/submissions'),
+    );
     expect(res.status).toBe(200);
 
     res = await mod.GET(

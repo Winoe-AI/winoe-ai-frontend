@@ -12,35 +12,59 @@ jest.mock('@/shared/notifications', () => ({
   useNotifications: () => ({ notify: notifyMock, update: updateMock }),
 }));
 jest.mock('next/navigation', () => ({
-  useRouter: () => ({ push: jest.fn(), replace: jest.fn(), prefetch: jest.fn() }),
+  useRouter: () => ({
+    push: jest.fn(),
+    replace: jest.fn(),
+    prefetch: jest.fn(),
+  }),
 }));
-jest.mock('@/features/recruiter/dashboard/hooks/useInviteCandidateFlow', () => ({
-  useInviteCandidateFlow: jest.fn(() => ({
-    state: { status: 'idle' },
-    submit: inviteFlowSubmitMock,
-    reset: inviteFlowResetMock,
-  })),
-}));
-jest.mock('@/features/recruiter/utils/formatters', () => ({
+jest.mock(
+  '@/features/recruiter/dashboard/hooks/useInviteCandidateFlow',
+  () => ({
+    useInviteCandidateFlow: jest.fn(() => ({
+      state: { status: 'idle' },
+      submit: inviteFlowSubmitMock,
+      reset: inviteFlowResetMock,
+    })),
+  }),
+);
+jest.mock('@/features/recruiter/utils/formattersUtils', () => ({
   copyInviteLink: (...args: unknown[]) => copyInviteLinkMock(...args),
 }));
-jest.mock('next/dynamic', () => (_importer: () => Promise<unknown>) => {
+jest.mock('next/dynamic', () => () => {
   return function Mock(props: Record<string, unknown>) {
     captureModalProps(props);
     return <div data-testid="invite-modal" />;
   };
 });
 jest.mock('@/features/recruiter/dashboard/components/ProfileCard', () => ({
-  ProfileCard: ({ name }: { name: string }) => <div data-testid="profile-card">{name}</div>,
-}));
-jest.mock('@/features/recruiter/dashboard/components/SimulationSection', () => ({
-  SimulationSection: ({ simulations, loading, error, onInvite }: { simulations: Array<{ id: string; title: string; status: string }>; loading: boolean; error: string | null; onInvite?: (sim: { id: string; title: string }) => void }) => (
-    <div data-testid="simulation-section">
-      <button onClick={() => onInvite?.({ id: '1', title: 'Sim 1' })}>invite</button>
-      {JSON.stringify({ simulations, loading, error })}
-    </div>
+  ProfileCard: ({ name }: { name: string }) => (
+    <div data-testid="profile-card">{name}</div>
   ),
 }));
+jest.mock(
+  '@/features/recruiter/dashboard/components/SimulationSection',
+  () => ({
+    SimulationSection: ({
+      simulations,
+      loading,
+      error,
+      onInvite,
+    }: {
+      simulations: Array<{ id: string; title: string; status: string }>;
+      loading: boolean;
+      error: string | null;
+      onInvite?: (sim: { id: string; title: string }) => void;
+    }) => (
+      <div data-testid="simulation-section">
+        <button onClick={() => onInvite?.({ id: '1', title: 'Sim 1' })}>
+          invite
+        </button>
+        {JSON.stringify({ simulations, loading, error })}
+      </div>
+    ),
+  }),
+);
 
 type Simulation = { id: string; title: string; status: string };
 export const baseProps = () => ({

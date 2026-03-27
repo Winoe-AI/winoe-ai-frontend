@@ -1,10 +1,19 @@
-import { apiClient, __resetHttpClientCache } from '@/lib/api/client';
+import {
+  apiClient,
+  __resetHttpClientCache,
+} from '@/platform/api-client/client';
 import { responseHelpers } from '../setup';
 
 const realFetch = global.fetch;
 const originalDebug = process.env.NEXT_PUBLIC_TENON_DEBUG_PERF;
 
-export { apiClient, responseHelpers, __resetHttpClientCache, realFetch, originalDebug };
+export {
+  apiClient,
+  responseHelpers,
+  __resetHttpClientCache,
+  realFetch,
+  originalDebug,
+};
 
 export function resetHttpClientExtraMocks() {
   __resetHttpClientCache();

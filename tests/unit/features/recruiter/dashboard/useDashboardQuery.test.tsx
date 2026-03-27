@@ -3,7 +3,7 @@ import { useDashboardQuery } from '@/features/recruiter/dashboard/hooks/useDashb
 
 const fetchDashboard = jest.fn();
 
-jest.mock('@/features/recruiter/dashboard/hooks/dashboardApi', () => ({
+jest.mock('@/features/recruiter/dashboard/hooks/useDashboardApi', () => ({
   fetchDashboard: (...args: unknown[]) => fetchDashboard(...args),
   isAbortError: (err: unknown) =>
     (err as { name?: string })?.name === 'AbortError',

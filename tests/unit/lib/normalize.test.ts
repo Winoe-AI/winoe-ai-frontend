@@ -3,7 +3,7 @@ import {
   getNumber,
   getId,
   isRecord,
-} from '@/lib/api/errors/utils/normalize';
+} from '@/platform/api-client/errors/utils/normalizeUtils';
 
 describe('normalize utils', () => {
   it('getString returns fallback when not string', () => {

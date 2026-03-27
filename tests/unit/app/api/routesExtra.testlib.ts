@@ -24,9 +24,14 @@ const buildResponse = (status = 200, location?: string) => {
 jest.mock('next/server', () => ({
   NextResponse: {
     redirect: (url: URL | string) => buildResponse(307, url.toString()),
-    json: (_body: unknown, init?: { status?: number; headers?: Record<string, string> }) => {
+    json: (
+      _body: unknown,
+      init?: { status?: number; headers?: Record<string, string> },
+    ) => {
       const resp = buildResponse(init?.status ?? 200);
-      Object.entries(init?.headers ?? {}).forEach(([k, v]) => resp.headers.set(k, String(v)));
+      Object.entries(init?.headers ?? {}).forEach(([k, v]) =>
+        resp.headers.set(k, String(v)),
+      );
       return resp;
     },
     next: () => buildResponse(200),
@@ -37,13 +42,20 @@ jest.mock('next/server', () => ({
     headers: { get: (key: string) => string | null };
     method: string;
     signal: AbortSignal;
-    constructor(url: URL | string, init?: { method?: string; headers?: Record<string, string> }) {
+    constructor(
+      url: URL | string,
+      init?: { method?: string; headers?: Record<string, string> },
+    ) {
       this.url = url.toString();
       this.nextUrl = new URL(this.url);
       this.method = init?.method ?? 'GET';
       const headerStore = new Map<string, string>();
-      Object.entries(init?.headers ?? {}).forEach(([k, v]) => headerStore.set(k.toLowerCase(), String(v)));
-      this.headers = { get: (key: string) => headerStore.get(key.toLowerCase()) ?? null };
+      Object.entries(init?.headers ?? {}).forEach(([k, v]) =>
+        headerStore.set(k.toLowerCase(), String(v)),
+      );
+      this.headers = {
+        get: (key: string) => headerStore.get(key.toLowerCase()) ?? null,
+      };
       // @ts-expect-error minimal AbortSignal
       this.signal = { aborted: false };
     }
@@ -52,16 +64,17 @@ jest.mock('next/server', () => ({
 
 export const mockRequireBffAuth = jest.fn();
 export const mockMergeResponseCookies = jest.fn();
-jest.mock('@/lib/server/bffAuth', () => ({
+jest.mock('@/platform/server/bffAuth', () => ({
   requireBffAuth: (...args: unknown[]) => mockRequireBffAuth(...args),
-  mergeResponseCookies: (...args: unknown[]) => mockMergeResponseCookies(...args),
+  mergeResponseCookies: (...args: unknown[]) =>
+    mockMergeResponseCookies(...args),
 }));
 
 export const mockForwardJson = jest.fn();
 export const mockResolveRequestId = jest.fn(() => 'req-extra');
 export const mockUpstreamRequest = jest.fn();
 export const mockParseUpstreamBody = jest.fn();
-jest.mock('@/lib/server/bff', () => ({
+jest.mock('@/platform/server/bff', () => ({
   forwardJson: (...args: unknown[]) => mockForwardJson(...args),
   resolveRequestId: () => mockResolveRequestId(),
   upstreamRequest: (...args: unknown[]) => mockUpstreamRequest(...args),
@@ -72,8 +85,9 @@ jest.mock('@/lib/server/bff', () => ({
 }));
 
 export const mockGetSessionNormalized = jest.fn();
-jest.mock('@/lib/auth0', () => ({
-  getSessionNormalized: (...args: unknown[]) => mockGetSessionNormalized(...args),
+jest.mock('@/platform/auth0', () => ({
+  getSessionNormalized: (...args: unknown[]) =>
+    mockGetSessionNormalized(...args),
 }));
 
 export const resetRoutesExtraMocks = () => jest.clearAllMocks();

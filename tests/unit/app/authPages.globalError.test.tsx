@@ -11,7 +11,10 @@ describe('global error route', () => {
     const reset = jest.fn();
 
     render(
-      GlobalError({ error: Object.assign(new Error('fail'), { digest: '123' }), reset }),
+      GlobalError({
+        error: Object.assign(new Error('fail'), { digest: '123' }),
+        reset,
+      }),
       { container: document.documentElement },
     );
     expect(screen.getByText(/Error id: 123/)).toBeInTheDocument();
@@ -19,7 +22,10 @@ describe('global error route', () => {
     const prevEnv = process.env.NODE_ENV;
     process.env.NODE_ENV = 'development';
     render(
-      GlobalError({ error: Object.assign(new Error('boom'), { digest: undefined }), reset }),
+      GlobalError({
+        error: Object.assign(new Error('boom'), { digest: undefined }),
+        reset,
+      }),
       { container: document.documentElement },
     );
     expect(screen.getByText(/boom/)).toBeInTheDocument();
@@ -38,7 +44,10 @@ describe('global error route', () => {
     window.location = stubLocation as unknown as Location;
 
     render(
-      GlobalError({ error: Object.assign(new Error('boom'), { digest: undefined }), reset }),
+      GlobalError({
+        error: Object.assign(new Error('boom'), { digest: undefined }),
+        reset,
+      }),
       { container: document.documentElement },
     );
     screen.getByRole('button', { name: /Go home/i }).click();

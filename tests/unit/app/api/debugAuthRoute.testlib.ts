@@ -17,15 +17,15 @@ jest.mock('next/server', () => {
 export const mockGetSessionNormalized = jest.fn();
 export const mockExtractPermissions = jest.fn();
 
-jest.mock('@/lib/auth0', () => ({
+jest.mock('@/platform/auth0', () => ({
   getSessionNormalized: () => mockGetSessionNormalized(),
 }));
 
-jest.mock('@/lib/auth0-claims', () => ({
+jest.mock('@/platform/auth0/claims', () => ({
   extractPermissions: (...args: unknown[]) => mockExtractPermissions(...args),
 }));
 
-jest.mock('@/lib/brand', () => ({
+jest.mock('@/platform/config/brand', () => ({
   CUSTOM_CLAIM_ROLES: 'https://tenon.ai/roles',
 }));
 

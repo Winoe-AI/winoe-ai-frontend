@@ -44,7 +44,13 @@ export function buildDefaultCompareRows(candidateSessionId: number) {
       recommendation: 'strong_hire',
       strengths: ['delivery', 'communication'],
       risks: ['none'],
-      dayCompletion: { '1': true, '2': true, '3': false, '4': false, '5': false },
+      dayCompletion: {
+        '1': true,
+        '2': true,
+        '3': false,
+        '4': false,
+        '5': false,
+      },
     },
   ];
 }

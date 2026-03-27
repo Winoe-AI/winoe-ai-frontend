@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import { DayScoreCard } from '@/features/recruiter/simulations/candidates/fitProfile/DayScoreCard';
-import { FitScoreHeader } from '@/features/recruiter/simulations/candidates/fitProfile/FitScoreHeader';
+import { DayScoreCard } from '@/features/recruiter/fit-profile/DayScoreCard';
+import { FitScoreHeader } from '@/features/recruiter/fit-profile/FitScoreHeader';
 
 describe('Fit Profile components', () => {
   it('renders score header recommendation and calibration', () => {
@@ -18,8 +18,12 @@ describe('Fit Profile components', () => {
     );
     expect(screen.getByText('78%')).toBeInTheDocument();
     expect(screen.getByText('Hire')).toBeInTheDocument();
-    expect(screen.getByText(/Confidence 74% based on rubric-aligned evidence/i)).toBeInTheDocument();
-    expect(screen.getByText(/Disabled days excluded from scoring: 4/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Confidence 74% based on rubric-aligned evidence/i),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/Disabled days excluded from scoring: 4/i),
+    ).toBeInTheDocument();
   });
 
   it('renders day score card with rubric breakdown', () => {
@@ -31,7 +35,10 @@ describe('Fit Profile components', () => {
           evaluationStatus: 'evaluated',
           reason: null,
           aiEvaluationEnabled: true,
-          rubricBreakdown: { problemSolving: 0.7, communication: 'clear and direct' },
+          rubricBreakdown: {
+            problemSolving: 0.7,
+            communication: 'clear and direct',
+          },
           evidence: [],
         }}
       />,

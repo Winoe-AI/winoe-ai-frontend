@@ -1,4 +1,4 @@
-import { apiClient, login, safeRequest } from '@/lib/api/client';
+import { apiClient, login, safeRequest } from '@/platform/api-client/client';
 import { responseHelpers } from '../../setup';
 
 export const fetchMock = jest.fn();

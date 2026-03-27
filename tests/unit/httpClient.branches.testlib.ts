@@ -5,7 +5,7 @@ import {
   isSameOriginRequest,
   recruiterBffClient,
   __resetHttpClientCache,
-} from '@/lib/api/client';
+} from '@/platform/api-client/client';
 import { responseHelpers } from '../setup';
 
 const realFetch = global.fetch;

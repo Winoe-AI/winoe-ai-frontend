@@ -49,7 +49,7 @@ beforeAll(async () => {
     { virtual: true },
   );
 
-  await import('@/lib/auth0');
+  await import('@/platform/auth0');
 });
 
 describe('auth0.ts coverage completion', () => {

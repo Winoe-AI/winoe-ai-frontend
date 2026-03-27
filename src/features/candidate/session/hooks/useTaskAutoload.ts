@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import type React from 'react';
-import { friendlyTaskError } from '../utils/errorMessages';
+import { friendlyTaskError } from '../utils/errorMessagesUtils';
 import type { ViewState } from '../CandidateSessionView';
 import type { CandidateSessionState } from '../CandidateSessionProvider';
 

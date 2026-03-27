@@ -17,8 +17,12 @@ describe('CandidateSessionPage unit flow', () => {
     mockUseCandidateSession.mockReturnValue(buildSession());
     render(<CandidateSessionPage token="" />);
 
-    expect(await screen.findByText(/Invite link unavailable/i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Go to Home/i })).toBeInTheDocument();
+    expect(
+      await screen.findByText(/Invite link unavailable/i),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /Go to Home/i }),
+    ).toBeInTheDocument();
     expect(screen.queryByText(/Retry/i)).not.toBeInTheDocument();
   });
 
@@ -49,8 +53,12 @@ describe('CandidateSessionPage unit flow', () => {
       mockResolveInvite.mockRejectedValueOnce({ status });
 
       render(<CandidateSessionPage token="invite-token" />);
-      expect(await screen.findByText(/Invite link unavailable/i)).toBeInTheDocument();
-      expect(screen.getByRole('button', { name: /Go to Home/i })).toBeInTheDocument();
+      expect(
+        await screen.findByText(/Invite link unavailable/i),
+      ).toBeInTheDocument();
+      expect(
+        screen.getByRole('button', { name: /Go to Home/i }),
+      ).toBeInTheDocument();
       expect(screen.queryByText(/Retry/i)).not.toBeInTheDocument();
     },
   );
@@ -68,6 +76,8 @@ describe('CandidateSessionPage unit flow', () => {
     mockResolveInvite.mockRejectedValueOnce({ status: 500 });
 
     render(<CandidateSessionPage token="invite-token" />);
-    expect(await screen.findByText('Unable to load simulation')).toBeInTheDocument();
+    expect(
+      await screen.findByText('Unable to load simulation'),
+    ).toBeInTheDocument();
   });
 });

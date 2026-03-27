@@ -5,7 +5,7 @@ describe('API Routes Coverage - debug/auth', () => {
   beforeEach(() => jest.clearAllMocks());
 
   it('covers route with no session', async () => {
-    jest.doMock('@/lib/auth0', () => ({
+    jest.doMock('@/platform/auth0', () => ({
       getSessionNormalized: jest.fn().mockResolvedValue(null),
     }));
 

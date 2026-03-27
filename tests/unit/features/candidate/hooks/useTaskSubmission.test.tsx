@@ -1,15 +1,16 @@
 import React from 'react';
 import { act, render, screen } from '@testing-library/react';
 import { useTaskSubmission } from '@/features/candidate/session/hooks/useTaskSubmission';
-import type { Task } from '@/features/candidate/session/task/types';
+import type { Task } from '@/features/candidate/tasks/types';
 
-jest.mock('@/features/candidate/api', () => ({
+jest.mock('@/features/candidate/session/api', () => ({
   __esModule: true,
-  ...jest.requireActual('@/features/candidate/api'),
+  ...jest.requireActual('@/features/candidate/session/api'),
   submitCandidateTask: jest.fn(),
 }));
 
-const submitMock = jest.requireMock('@/features/candidate/api').submitCandidateTask as jest.Mock;
+const submitMock = jest.requireMock('@/features/candidate/session/api')
+  .submitCandidateTask as jest.Mock;
 type HarnessProps = {
   candidateSessionId: number | null;
   currentTask: Task | null;
@@ -19,7 +20,14 @@ type HarnessProps = {
   payload?: { contentText?: string };
 };
 
-function Harness({ candidateSessionId, currentTask, setTaskError, clearTaskError, refreshTask, payload = { contentText: 'answer' } }: HarnessProps) {
+function Harness({
+  candidateSessionId,
+  currentTask,
+  setTaskError,
+  clearTaskError,
+  refreshTask,
+  payload = { contentText: 'answer' },
+}: HarnessProps) {
   const { submitting, handleSubmit } = useTaskSubmission({
     candidateSessionId,
     currentTask,
@@ -44,7 +52,13 @@ describe('useTaskSubmission', () => {
     render(
       <Harness
         candidateSessionId={5}
-        currentTask={{ id: 1, dayIndex: 1, type: 'documentation', title: 'Docs', description: '' }}
+        currentTask={{
+          id: 1,
+          dayIndex: 1,
+          type: 'documentation',
+          title: 'Docs',
+          description: '',
+        }}
         setTaskError={setTaskError}
         clearTaskError={jest.fn()}
         refreshTask={jest.fn()}
@@ -63,14 +77,24 @@ describe('useTaskSubmission', () => {
     render(
       <Harness
         candidateSessionId={5}
-        currentTask={{ id: 1, dayIndex: 1, type: 'design', title: 'Design', description: '' }}
+        currentTask={{
+          id: 1,
+          dayIndex: 1,
+          type: 'design',
+          title: 'Design',
+          description: '',
+        }}
         setTaskError={jest.fn()}
         clearTaskError={jest.fn()}
         refreshTask={refreshTask}
       />,
     );
     await act(async () => screen.getByText('submit').click());
-    expect(submitMock).toHaveBeenCalledWith({ taskId: 1, candidateSessionId: 5, contentText: 'answer' });
+    expect(submitMock).toHaveBeenCalledWith({
+      taskId: 1,
+      candidateSessionId: 5,
+      contentText: 'answer',
+    });
     await act(async () => jest.runAllTimers());
     expect(refreshTask).toHaveBeenCalled();
     jest.useRealTimers();
@@ -82,7 +106,13 @@ describe('useTaskSubmission', () => {
     render(
       <Harness
         candidateSessionId={12}
-        currentTask={{ id: 12, dayIndex: 2, type: 'code', title: 'Day 2', description: '' }}
+        currentTask={{
+          id: 12,
+          dayIndex: 2,
+          type: 'code',
+          title: 'Day 2',
+          description: '',
+        }}
         setTaskError={setTaskError}
         clearTaskError={jest.fn()}
         refreshTask={jest.fn()}
@@ -91,6 +121,10 @@ describe('useTaskSubmission', () => {
     );
     await act(async () => screen.getByText('submit').click());
     expect(setTaskError).not.toHaveBeenCalled();
-    expect(submitMock).toHaveBeenCalledWith({ taskId: 12, candidateSessionId: 12, contentText: undefined });
+    expect(submitMock).toHaveBeenCalledWith({
+      taskId: 12,
+      candidateSessionId: 12,
+      contentText: undefined,
+    });
   });
 });

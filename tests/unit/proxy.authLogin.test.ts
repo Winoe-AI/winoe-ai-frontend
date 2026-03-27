@@ -13,7 +13,9 @@ describe('proxy - auth login', () => {
   it('allows auth login route when logged out preserving query', async () => {
     getSessionNormalizedMock.mockResolvedValue(null);
     const req = new NextRequest(
-      new URL('http://localhost/auth/login?mode=recruiter&returnTo=%2Fdashboard'),
+      new URL(
+        'http://localhost/auth/login?mode=recruiter&returnTo=%2Fdashboard',
+      ),
     );
     const res = await proxy(req);
     expect(res?.status).toBe(200);
@@ -28,10 +30,14 @@ describe('proxy - auth login', () => {
       user: { permissions: ['recruiter:access'] },
       accessToken: 't',
     });
-    const res = await proxy(new NextRequest(new URL('http://localhost/auth/login')));
+    const res = await proxy(
+      new NextRequest(new URL('http://localhost/auth/login')),
+    );
     expect(res?.status).toBe(307);
     expect(res?.headers.get('location')).toBe('http://localhost/dashboard');
-    expect(res?.cookies.getAll().find((c) => c.name === 'edge')?.value).toBe('cookie');
+    expect(res?.cookies.getAll().find((c) => c.name === 'edge')?.value).toBe(
+      'cookie',
+    );
   });
 
   it('redirects logged-in candidate hitting auth login to candidate dashboard', async () => {
@@ -39,8 +45,12 @@ describe('proxy - auth login', () => {
       user: { permissions: ['candidate:access'] },
       accessToken: 't',
     });
-    const res = await proxy(new NextRequest(new URL('http://localhost/auth/login')));
+    const res = await proxy(
+      new NextRequest(new URL('http://localhost/auth/login')),
+    );
     expect(res?.status).toBe(307);
-    expect(res?.headers.get('location')).toBe('http://localhost/candidate/dashboard');
+    expect(res?.headers.get('location')).toBe(
+      'http://localhost/candidate/dashboard',
+    );
   });
 });

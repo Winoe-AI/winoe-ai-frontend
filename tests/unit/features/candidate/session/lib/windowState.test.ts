@@ -4,9 +4,24 @@ import {
   formatComeBackMessage,
 } from '@/features/candidate/session/lib/windowState';
 
-const dayWindows = [{ dayIndex: 2, windowStartAt: '2099-01-03T14:00:00Z', windowEndAt: '2099-01-03T22:00:00Z' }];
-const buildState = (nowMs: number, override: Parameters<typeof deriveWindowState>[0]['override'] = null) =>
-  deriveWindowState({ dayWindows, currentDayIndex: 2, currentDayWindow: null, override, nowMs });
+const dayWindows = [
+  {
+    dayIndex: 2,
+    windowStartAt: '2099-01-03T14:00:00Z',
+    windowEndAt: '2099-01-03T22:00:00Z',
+  },
+];
+const buildState = (
+  nowMs: number,
+  override: Parameters<typeof deriveWindowState>[0]['override'] = null,
+) =>
+  deriveWindowState({
+    dayWindows,
+    currentDayIndex: 2,
+    currentDayWindow: null,
+    override,
+    nowMs,
+  });
 
 const buildOverride = (nextOpenAt: string | null = '2099-01-04T14:00:00Z') => ({
   errorCode: 'TASK_WINDOW_CLOSED' as const,
@@ -42,7 +57,10 @@ describe('windowState', () => {
   });
 
   it('applies backend override precedence and uses nextOpenAt', () => {
-    const state = buildState(Date.parse('2099-01-03T16:00:00Z'), buildOverride());
+    const state = buildState(
+      Date.parse('2099-01-03T16:00:00Z'),
+      buildOverride(),
+    );
     expect(state.phase).toBe('closed_before_start');
     expect(state.correctedByBackend).toBe(true);
     expect(state.actionGate.comeBackAt).toBe('2099-01-04T14:00:00Z');
@@ -75,7 +93,10 @@ describe('windowState', () => {
       windowEndAt: '2099-01-03T22:00:00Z',
     };
 
-    const beforeStart = buildState(Date.parse('2099-01-03T13:59:59Z'), override);
+    const beforeStart = buildState(
+      Date.parse('2099-01-03T13:59:59Z'),
+      override,
+    );
     const afterStart = buildState(Date.parse('2099-01-03T14:00:01Z'), override);
     expect(beforeStart.phase).toBe('closed_before_start');
     expect(beforeStart.actionGate.isReadOnly).toBe(true);
@@ -84,9 +105,16 @@ describe('windowState', () => {
   });
 
   it('transitions from open to closed_after_end at windowEndAt', () => {
-    const override = { ...buildOverride(null), windowStartAt: '2099-01-03T14:00:00Z', windowEndAt: '2099-01-03T22:00:00Z' };
+    const override = {
+      ...buildOverride(null),
+      windowStartAt: '2099-01-03T14:00:00Z',
+      windowEndAt: '2099-01-03T22:00:00Z',
+    };
     const openState = buildState(Date.parse('2099-01-03T21:59:59Z'), override);
-    const closedState = buildState(Date.parse('2099-01-03T22:00:00Z'), override);
+    const closedState = buildState(
+      Date.parse('2099-01-03T22:00:00Z'),
+      override,
+    );
 
     expect(openState.phase).toBe('open');
     expect(openState.actionGate.isReadOnly).toBe(false);

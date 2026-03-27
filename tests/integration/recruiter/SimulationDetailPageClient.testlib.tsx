@@ -1,9 +1,9 @@
 import { act, render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import RecruiterSimulationDetailPage from '@/features/recruiter/simulations/detail/RecruiterSimulationDetailPage';
+import RecruiterSimulationDetailPage from '@/features/recruiter/simulation-management/detail/RecruiterSimulationDetailPage';
 import { NotificationsProvider } from '@/shared/notifications';
 import { __resetCandidateCache } from '@/features/recruiter/api';
-import { __resetHttpClientCache } from '@/lib/api/client';
+import { __resetHttpClientCache } from '@/platform/api-client/client';
 import { jsonResponse, type MockResponse } from '../../setup/responseHelpers';
 
 export const params = { id: 'sim-1' };
@@ -23,9 +23,28 @@ const simulationDetailResponse = () =>
     focus: 'Payments',
     scenario: 'Design a billing service for a SaaS platform.',
     tasks: [
-      { dayIndex: 1, title: 'Discovery', description: 'Define requirements.', rubric: ['Clarity'] },
-      { dayIndex: 2, title: 'Implementation', description: 'Implement API routes.', rubric: 'Correctness', repoUrl: 'https://github.com/acme/day2', preProvisioned: true },
-      { dayIndex: 3, title: 'Debugging', description: 'Fix failing tests.', rubric: ['Root cause'], repoFullName: 'acme/day3', preProvisioned: false },
+      {
+        dayIndex: 1,
+        title: 'Discovery',
+        description: 'Define requirements.',
+        rubric: ['Clarity'],
+      },
+      {
+        dayIndex: 2,
+        title: 'Implementation',
+        description: 'Implement API routes.',
+        rubric: 'Correctness',
+        repoUrl: 'https://github.com/acme/day2',
+        preProvisioned: true,
+      },
+      {
+        dayIndex: 3,
+        title: 'Debugging',
+        description: 'Fix failing tests.',
+        rubric: ['Root cause'],
+        repoFullName: 'acme/day3',
+        preProvisioned: false,
+      },
     ],
   });
 
@@ -36,10 +55,15 @@ export const getUrl = (input: RequestInfo | URL) => {
 };
 
 type HandlerResponse = Response | MockResponse;
-type Handler = HandlerResponse | (() => HandlerResponse | Promise<HandlerResponse>);
+type Handler =
+  | HandlerResponse
+  | (() => HandlerResponse | Promise<HandlerResponse>);
 
 export const mockFetchHandlers = (handlers: Record<string, Handler>) => {
-  const resolvedHandlers = { [`/api/simulations/${params.id}`]: simulationDetailResponse, ...handlers };
+  const resolvedHandlers = {
+    [`/api/simulations/${params.id}`]: simulationDetailResponse,
+    ...handlers,
+  };
   fetchMock.mockImplementation((input: RequestInfo | URL) => {
     const handler = resolvedHandlers[getUrl(input)];
     if (!handler) return jsonResponse({ message: 'Not found' }, 404);

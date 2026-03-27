@@ -1,4 +1,4 @@
-import { buildReturnTo, sanitizeReturnTo } from '@/lib/auth/routing';
+import { buildReturnTo, sanitizeReturnTo } from '@/platform/auth/routing';
 
 describe('auth/routing input handling', () => {
   it('handles nullish and empty inputs', () => {
@@ -20,7 +20,9 @@ describe('auth/routing input handling', () => {
   });
 
   it('buildReturnTo handles NextRequest-like object', () => {
-    const nextRequest = { nextUrl: { pathname: '/candidate/test', search: '?id=123' } };
+    const nextRequest = {
+      nextUrl: { pathname: '/candidate/test', search: '?id=123' },
+    };
     expect(buildReturnTo(nextRequest as never)).toBe('/candidate/test?id=123');
   });
 

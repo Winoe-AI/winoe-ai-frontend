@@ -1,7 +1,7 @@
 import type {
   CandidateCurrentDayWindow,
   CandidateDayWindow,
-} from '@/features/candidate/api';
+} from '@/features/candidate/session/api';
 import Button from '@/shared/ui/Button';
 import { LockedViewCountdownCard } from './LockedViewCountdownCard';
 import { LockedViewDayWindows } from './LockedViewDayWindows';

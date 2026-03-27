@@ -3,8 +3,8 @@ import {
   extractBackendMessage,
   fallbackStatus,
   toHttpError,
-} from '@/lib/api/errors/utils/errors';
-import { normalizeApiError } from '@/lib/errors/errors';
+} from '@/platform/api-client/errors/utils/errorsUtils';
+import { normalizeApiError } from '@/platform/errors/errors';
 describe('api errors helpers', () => {
   it('extracts backend message/ detail variants', () => {
     expect(extractBackendMessage('  plain  ')).toBe('plain');

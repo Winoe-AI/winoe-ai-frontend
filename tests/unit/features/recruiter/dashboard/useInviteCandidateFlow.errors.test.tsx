@@ -9,8 +9,9 @@ jest.mock('@/features/recruiter/api', () => ({
   inviteCandidate: (...args: unknown[]) => inviteCandidateMock(...args),
 }));
 
-jest.mock('@/features/recruiter/utils/formatters', () => ({
-  formatRecruiterError: (...args: unknown[]) => formatRecruiterErrorMock(...args),
+jest.mock('@/features/recruiter/utils/formattersUtils', () => ({
+  formatRecruiterError: (...args: unknown[]) =>
+    formatRecruiterErrorMock(...args),
 }));
 
 type HookReturn = ReturnType<typeof useInviteCandidateFlow>;
@@ -31,7 +32,12 @@ describe('useInviteCandidateFlow error mapping', () => {
 
   it('maps specific errors to friendly messages', async () => {
     const ref = React.createRef<HookReturn>();
-    render(<HookHarness ref={ref} simulation={{ simulationId: 'sim-1', simulationTitle: 'Sim' }} />);
+    render(
+      <HookHarness
+        ref={ref}
+        simulation={{ simulationId: 'sim-1', simulationTitle: 'Sim' }}
+      />,
+    );
 
     inviteCandidateMock.mockRejectedValue({
       status: 409,

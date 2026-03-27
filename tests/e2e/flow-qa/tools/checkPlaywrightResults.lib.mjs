@@ -48,7 +48,8 @@ export function parseArgs(argv) {
 }
 
 export function readStats(filePath) {
-  if (!fs.existsSync(filePath)) throw new Error(`Results file not found: ${filePath}`);
+  if (!fs.existsSync(filePath))
+    throw new Error(`Results file not found: ${filePath}`);
 
   const raw = JSON.parse(fs.readFileSync(filePath, 'utf8'));
   const stats = raw?.stats ?? {};
@@ -60,7 +61,11 @@ export function readStats(filePath) {
     durationMs: Number(stats.duration ?? 0),
   };
 
-  if ([summary.expected, summary.skipped, summary.unexpected, summary.flaky].some(Number.isNaN)) {
+  if (
+    [summary.expected, summary.skipped, summary.unexpected, summary.flaky].some(
+      Number.isNaN,
+    )
+  ) {
     throw new Error(`Invalid Playwright stats payload in ${filePath}`);
   }
   return summary;

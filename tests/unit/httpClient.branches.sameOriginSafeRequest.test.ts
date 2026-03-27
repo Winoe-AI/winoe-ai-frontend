@@ -28,7 +28,9 @@ describe('httpClient branches - isSameOriginRequest and safeRequest', () => {
   });
 
   it('returns error on safeRequest failure', async () => {
-    (global.fetch as jest.Mock).mockRejectedValueOnce(new Error('Network error'));
+    (global.fetch as jest.Mock).mockRejectedValueOnce(
+      new Error('Network error'),
+    );
     const result = await safeRequest('/test', { skipCache: true });
     expect(result.data).toBeNull();
     expect(result.error?.message).toBe('Network error');

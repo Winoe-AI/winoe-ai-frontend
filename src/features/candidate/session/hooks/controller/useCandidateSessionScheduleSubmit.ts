@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 import type {
   CandidateSessionScheduleParams,
   SetNullableString,
-} from './candidateSessionSchedule.types';
+} from './useCandidateSessionSchedule.types';
 import { useScheduleConfirmAction } from './useScheduleConfirmAction';
 
 type Params = Pick<

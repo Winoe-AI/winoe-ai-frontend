@@ -6,7 +6,7 @@ import {
   buildNotAuthorizedUrl,
   modeForPath,
   sanitizeReturnTo,
-} from '@/lib/auth/routing';
+} from '@/platform/auth/routing';
 describe('auth/routing extra coverage', () => {
   describe('modeForPath', () => {
     it('returns candidate for /candidate-sessions paths', () => {

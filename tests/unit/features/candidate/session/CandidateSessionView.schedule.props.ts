@@ -31,12 +31,28 @@ export const baseScheduleProps = (): CandidateSessionViewProps => ({
   scheduleTimezoneError: null,
   scheduleSubmitError: null,
   schedulePreviewWindows: [
-    { dayIndex: 1, windowStartAt: '2099-01-01T14:00:00Z', windowEndAt: '2099-01-01T22:00:00Z' },
-    { dayIndex: 2, windowStartAt: '2099-01-02T14:00:00Z', windowEndAt: '2099-01-02T22:00:00Z' },
+    {
+      dayIndex: 1,
+      windowStartAt: '2099-01-01T14:00:00Z',
+      windowEndAt: '2099-01-01T22:00:00Z',
+    },
+    {
+      dayIndex: 2,
+      windowStartAt: '2099-01-02T14:00:00Z',
+      windowEndAt: '2099-01-02T22:00:00Z',
+    },
   ],
   scheduleResponseWindows: [
-    { dayIndex: 1, windowStartAt: '2099-01-01T14:00:00Z', windowEndAt: '2099-01-01T22:00:00Z' },
-    { dayIndex: 2, windowStartAt: '2099-01-02T14:00:00Z', windowEndAt: '2099-01-02T22:00:00Z' },
+    {
+      dayIndex: 1,
+      windowStartAt: '2099-01-01T14:00:00Z',
+      windowEndAt: '2099-01-01T22:00:00Z',
+    },
+    {
+      dayIndex: 2,
+      windowStartAt: '2099-01-02T14:00:00Z',
+      windowEndAt: '2099-01-02T22:00:00Z',
+    },
   ],
   scheduleCurrentDayWindow: {
     dayIndex: 1,

@@ -44,7 +44,9 @@ describe('GlobalError component', () => {
       screen.getByText(/We hit an unexpected error while loading this page/i),
     ).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Retry/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Go home/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /Go home/i }),
+    ).toBeInTheDocument();
   });
 
   it('calls reset when retry button is clicked', () => {
@@ -66,7 +68,9 @@ describe('GlobalError component', () => {
   it('shows error digest in production mode when available', () => {
     setNodeEnv('production');
     const resetMock = jest.fn();
-    const error = Object.assign(new Error('Test error'), { digest: 'error-digest-123' });
+    const error = Object.assign(new Error('Test error'), {
+      digest: 'error-digest-123',
+    });
     render(<GlobalError error={error} reset={resetMock} />);
     expect(screen.getByText(/Error id: error-digest-123/i)).toBeInTheDocument();
     setNodeEnv(originalEnv);
@@ -87,7 +91,9 @@ describe('GlobalError component', () => {
     const error = new Error('Test error without digest');
     render(<GlobalError error={error} reset={resetMock} />);
     expect(screen.queryByText(/Error id:/i)).not.toBeInTheDocument();
-    expect(screen.queryByText('Test error without digest')).not.toBeInTheDocument();
+    expect(
+      screen.queryByText('Test error without digest'),
+    ).not.toBeInTheDocument();
     setNodeEnv(originalEnv);
   });
 });

@@ -20,7 +20,10 @@ describe('useCandidateBootstrap request dedupe', () => {
     );
 
     const { result } = renderHook(() =>
-      useCandidateBootstrap({ inviteToken: 'same-token', onResolved: jest.fn() }),
+      useCandidateBootstrap({
+        inviteToken: 'same-token',
+        onResolved: jest.fn(),
+      }),
     );
     void act(() => {
       void result.current.load();

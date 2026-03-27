@@ -13,8 +13,10 @@ describe('CandidateSubmissionsPage client states', () => {
 
   it('shows empty state when no submissions exist', async () => {
     setClientScenario((path: string) => {
-      if (path.includes('/simulations/sim-1/candidates')) return [makeCandidate('Empty', 'not_started', false)];
-      if (path.includes('/submissions?candidateSessionId=900')) return { items: [] };
+      if (path.includes('/simulations/sim-1/candidates'))
+        return [makeCandidate('Empty', 'not_started', false)];
+      if (path.includes('/submissions?candidateSessionId=900'))
+        return { items: [] };
       throw new Error(`Unexpected path ${path}`);
     });
 
@@ -24,8 +26,10 @@ describe('CandidateSubmissionsPage client states', () => {
 
   it('surfaces submissions list errors', async () => {
     setClientScenario((path: string) => {
-      if (path.includes('/simulations/sim-1/candidates')) return [makeCandidate('Err', 'completed', false)];
-      if (path.includes('/submissions?candidateSessionId=900')) return Promise.reject(new Error('network rejection'));
+      if (path.includes('/simulations/sim-1/candidates'))
+        return [makeCandidate('Err', 'completed', false)];
+      if (path.includes('/submissions?candidateSessionId=900'))
+        return Promise.reject(new Error('network rejection'));
       throw new Error(`Unexpected path ${path}`);
     });
 

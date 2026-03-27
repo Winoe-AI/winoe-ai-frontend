@@ -26,10 +26,16 @@ describe('candidateApi submit success paths', () => {
     );
     installFetchMock(fetchMock);
     const { submitCandidateTask } = await importCandidateApi();
-    await submitCandidateTask({ taskId: 7, candidateSessionId: 1, contentText: 'Answer' });
+    await submitCandidateTask({
+      taskId: 7,
+      candidateSessionId: 1,
+      contentText: 'Answer',
+    });
     expect(fetchMock).toHaveBeenCalledWith(
       '/api/backend/tasks/7/submit',
-      expect.objectContaining({ headers: expect.objectContaining({ 'x-candidate-session-id': '1' }) }),
+      expect.objectContaining({
+        headers: expect.objectContaining({ 'x-candidate-session-id': '1' }),
+      }),
     );
   });
 
@@ -49,8 +55,16 @@ describe('candidateApi submit success paths', () => {
     );
     installFetchMock(fetchMock);
     const { submitCandidateTask } = await importCandidateApi();
-    const result = await submitCandidateTask({ taskId: 7, candidateSessionId: 1, contentText: 'Answer' });
-    expect(result).toMatchObject({ commitSha: 'abc123', checkpointSha: 'abc123', finalSha: null });
+    const result = await submitCandidateTask({
+      taskId: 7,
+      candidateSessionId: 1,
+      contentText: 'Answer',
+    });
+    expect(result).toMatchObject({
+      commitSha: 'abc123',
+      checkpointSha: 'abc123',
+      finalSha: null,
+    });
   });
 
   it('submits day-5 reflection payload fields', async () => {
@@ -71,13 +85,25 @@ describe('candidateApi submit success paths', () => {
       taskId: 5,
       candidateSessionId: 1,
       contentText: '## Challenges\n...\n## Decisions\n...',
-      reflection: { challenges: 'a', decisions: 'b', tradeoffs: 'c', communication: 'd', next: 'e' },
+      reflection: {
+        challenges: 'a',
+        decisions: 'b',
+        tradeoffs: 'c',
+        communication: 'd',
+        next: 'e',
+      },
     });
     const requestInit = fetchMock.mock.calls[0]?.[1] as RequestInit;
-    const body = JSON.parse(String(requestInit.body ?? '{}')) as Record<string, unknown>;
+    const body = JSON.parse(String(requestInit.body ?? '{}')) as Record<
+      string,
+      unknown
+    >;
     expect(body).toMatchObject({
       contentText: expect.stringContaining('## Challenges'),
-      reflection: expect.objectContaining({ challenges: expect.any(String), decisions: expect.any(String) }),
+      reflection: expect.objectContaining({
+        challenges: expect.any(String),
+        decisions: expect.any(String),
+      }),
     });
   });
 });

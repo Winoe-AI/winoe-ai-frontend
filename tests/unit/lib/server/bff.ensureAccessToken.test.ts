@@ -1,4 +1,11 @@
-import { NextResponse, ensureAccessToken, getAccessToken, getSessionNormalized, resetBffTestState, restoreBffEnv } from './bff.testlib';
+import {
+  NextResponse,
+  ensureAccessToken,
+  getAccessToken,
+  getSessionNormalized,
+  resetBffTestState,
+  restoreBffEnv,
+} from './bff.testlib';
 
 describe('bff ensureAccessToken', () => {
   const originalDebugAuth = process.env.TENON_DEBUG_AUTH;
@@ -37,7 +44,9 @@ describe('bff ensureAccessToken', () => {
 
   it('logs debug output when no session and debug auth is enabled', async () => {
     process.env.TENON_DEBUG_AUTH = 'true';
-    const debugSpy = jest.spyOn(console, 'debug').mockImplementation(() => undefined);
+    const debugSpy = jest
+      .spyOn(console, 'debug')
+      .mockImplementation(() => undefined);
     getSessionNormalized.mockResolvedValue(null);
     const res = await ensureAccessToken();
     expect(res).toBeInstanceOf(NextResponse);
@@ -47,8 +56,12 @@ describe('bff ensureAccessToken', () => {
 
   it('returns 403 when required permission is missing', async () => {
     process.env.TENON_DEBUG_AUTH = 'true';
-    const debugSpy = jest.spyOn(console, 'debug').mockImplementation(() => undefined);
-    getSessionNormalized.mockResolvedValue({ user: { sub: 'x', permissions: [] } });
+    const debugSpy = jest
+      .spyOn(console, 'debug')
+      .mockImplementation(() => undefined);
+    getSessionNormalized.mockResolvedValue({
+      user: { sub: 'x', permissions: [] },
+    });
     const res = await ensureAccessToken('recruiter:access');
     expect(res).toBeInstanceOf(NextResponse);
     if (res instanceof NextResponse) expect(res.status).toBe(403);
@@ -59,6 +72,8 @@ describe('bff ensureAccessToken', () => {
   it('returns access token payload when session and token are present', async () => {
     getSessionNormalized.mockResolvedValue({ user: { sub: 'x' } });
     getAccessToken.mockResolvedValue('token-123');
-    await expect(ensureAccessToken()).resolves.toEqual({ accessToken: 'token-123' });
+    await expect(ensureAccessToken()).resolves.toEqual({
+      accessToken: 'token-123',
+    });
   });
 });

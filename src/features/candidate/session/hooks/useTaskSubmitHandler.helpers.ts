@@ -2,9 +2,9 @@ import {
   isCodeTask,
   isGithubNativeDay,
   isTextTask,
-} from '../task/utils/taskGuards';
-import { isDay5ReflectionTask } from '../task/utils/day5Reflection';
-import type { SubmitPayload, Task } from '../task/types';
+} from '@/features/candidate/tasks/utils/taskGuardsUtils';
+import { isDay5ReflectionTask } from '@/features/candidate/tasks/utils/day5ReflectionUtils';
+import type { SubmitPayload, Task } from '@/features/candidate/tasks/types';
 
 type SubmitArgs = {
   taskId: number;
@@ -48,7 +48,10 @@ export function toRecordedSubmission(
   response: unknown,
 ): { submissionId: number; submittedAt: string } | null {
   if (!response || typeof response !== 'object') return null;
-  const candidate = response as { submissionId?: unknown; submittedAt?: unknown };
+  const candidate = response as {
+    submissionId?: unknown;
+    submittedAt?: unknown;
+  };
   if (
     typeof candidate.submissionId === 'number' &&
     typeof candidate.submittedAt === 'string'

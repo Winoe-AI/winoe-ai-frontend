@@ -19,7 +19,9 @@ describe('proxy - token normalization and perf logging', () => {
       accessToken: { token: 'nested-token' },
     });
 
-    const res = await proxy(new NextRequest(new URL('http://localhost/candidate/notes')));
+    const res = await proxy(
+      new NextRequest(new URL('http://localhost/candidate/notes')),
+    );
     expect(res?.status).toBe(200);
     expect(consoleSpy).toHaveBeenCalled();
     consoleSpy.mockRestore();
@@ -33,7 +35,9 @@ describe('proxy - token normalization and perf logging', () => {
       user: { permissions: ['candidate:access'] },
       accessToken: { token: 123 },
     });
-    const res = await proxy(new NextRequest(new URL('http://localhost/candidate/board')));
+    const res = await proxy(
+      new NextRequest(new URL('http://localhost/candidate/board')),
+    );
     expect(res?.status).toBe(200);
   });
 
@@ -48,6 +52,8 @@ describe('proxy - token normalization and perf logging', () => {
     const res = await proxy(new NextRequest(new URL('http://localhost/')));
     expect(res?.status).toBe(307);
     expect(res?.headers.get('location')).toBe('http://localhost/dashboard');
-    expect(res?.cookies.getAll().find((c) => c.name === 'edge')?.value).toBe('cookie');
+    expect(res?.cookies.getAll().find((c) => c.name === 'edge')?.value).toBe(
+      'cookie',
+    );
   });
 });

@@ -1,4 +1,4 @@
-import { getAuthToken, setAuthToken } from '@/lib/auth';
+import { getAuthToken, setAuthToken } from '@/platform/auth';
 
 describe('auth token helpers', () => {
   const originalWindow = global.window;

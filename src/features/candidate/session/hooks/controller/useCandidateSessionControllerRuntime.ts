@@ -4,7 +4,7 @@ import { useTokenSync } from '../useTokenSync';
 import { useCandidateSessionSchedule } from './useCandidateSessionSchedule';
 import { useCodingWorkspaceSync } from './useCodingWorkspaceSync';
 import { useSubmissionTracking } from './useSubmissionTracking';
-import type { UseCandidateSessionControllerRuntimeArgs } from './candidateSessionControllerRuntime.types';
+import type { UseCandidateSessionControllerRuntimeArgs } from './useCandidateSessionControllerRuntime.types';
 
 export function useCandidateSessionControllerRuntime({
   token,
@@ -71,7 +71,13 @@ export function useCandidateSessionControllerRuntime({
     schedule.resetScheduleDraft();
     session.clearTaskError();
     if (typeof session.reset === 'function') session.reset();
-  }, [resetCodingWorkspace, resetLocalState, schedule, session, submissionTracking]);
+  }, [
+    resetCodingWorkspace,
+    resetLocalState,
+    schedule,
+    session,
+    submissionTracking,
+  ]);
 
   useTokenSync({
     token,

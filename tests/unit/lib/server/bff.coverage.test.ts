@@ -24,7 +24,7 @@ jest.mock('next/server', () => ({
   },
 }));
 
-jest.mock('@/lib/auth0', () => ({
+jest.mock('@/platform/auth0', () => ({
   getAccessToken: jest.fn(async () => 'token'),
   getSessionNormalized: jest.fn(async () => ({
     user: { sub: 'user' },
@@ -32,7 +32,7 @@ jest.mock('@/lib/auth0', () => ({
   })),
 }));
 
-import '@/lib/server/bff';
+import '@/platform/server/bff';
 
 describe('bff.ts coverage completion', () => {
   it('marks coverage', () => {

@@ -9,7 +9,7 @@ jest.mock('@/features/recruiter/api', () => ({
   inviteCandidate: (...args: unknown[]) => inviteCandidateMock(...args),
 }));
 
-jest.mock('@/features/recruiter/utils/formatters', () => ({
+jest.mock('@/features/recruiter/utils/formattersUtils', () => ({
   formatRecruiterError: (...args: unknown[]) =>
     formatRecruiterErrorMock(...args),
 }));
@@ -72,7 +72,11 @@ describe('useInviteCandidateFlow', () => {
     await act(async () => {
       const res = await ref.current?.submit('Ann', 'ann@test.com');
       expect(res).toMatchObject({
-        inviteUrl: 'http://invite', outcome: 'sent', simulationId: 'sim-1', candidateName: 'Ann', candidateEmail: 'ann@test.com',
+        inviteUrl: 'http://invite',
+        outcome: 'sent',
+        simulationId: 'sim-1',
+        candidateName: 'Ann',
+        candidateEmail: 'ann@test.com',
       });
     });
     expect(inviteCandidateMock).toHaveBeenCalledWith(

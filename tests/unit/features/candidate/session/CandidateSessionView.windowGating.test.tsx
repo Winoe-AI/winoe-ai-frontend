@@ -7,6 +7,8 @@ describe('CandidateSessionView window gating', () => {
     render(<CandidateSessionView {...buildCandidateSessionViewProps()} />);
     expect(screen.getByText(/^Day 1 is not open yet$/i)).toBeInTheDocument();
     expect(screen.getByText(/Come back at/i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /submit & continue/i })).toBeDisabled();
+    expect(
+      screen.getByRole('button', { name: /submit & continue/i }),
+    ).toBeDisabled();
   });
 });

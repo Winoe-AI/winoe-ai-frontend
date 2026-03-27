@@ -1,6 +1,9 @@
 import { render, screen } from '@testing-library/react';
 import { useEffect } from 'react';
-import { NotificationsProvider, useNotifications } from '@/shared/notifications';
+import {
+  NotificationsProvider,
+  useNotifications,
+} from '@/shared/notifications';
 
 describe('NotificationsProvider error tone rendering', () => {
   it('renders error title and description', () => {
@@ -18,7 +21,11 @@ describe('NotificationsProvider error tone rendering', () => {
       return null;
     }
 
-    render(<NotificationsProvider><ErrorTrigger /></NotificationsProvider>);
+    render(
+      <NotificationsProvider>
+        <ErrorTrigger />
+      </NotificationsProvider>,
+    );
     expect(screen.getByText('Error occurred')).toBeInTheDocument();
     expect(screen.getByText('Something went wrong')).toBeInTheDocument();
   });

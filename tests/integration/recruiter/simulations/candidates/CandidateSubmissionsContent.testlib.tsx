@@ -3,7 +3,7 @@ import { setMockParams } from '../../../setup/paramsMock';
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import CandidateSubmissionsPage from '@/features/recruiter/simulations/candidates/CandidateSubmissionsPage';
+import CandidateSubmissionsPage from '@/features/recruiter/submission-review/CandidateSubmissionsPage';
 import {
   getRequestUrl,
   jsonResponse,
@@ -11,11 +11,22 @@ import {
   type MockResponse,
 } from '../../../../setup/responseHelpers';
 import { __resetCandidateCache } from '@/features/recruiter/api';
-import { __resetHttpClientCache } from '@/lib/api/client';
+import { __resetHttpClientCache } from '@/platform/api-client/client';
 
 jest.mock('next/link', () => ({
   __esModule: true,
-  default: ({ href, children, ...rest }: { href: string; children: React.ReactNode }) => <a href={href} {...rest}>{children}</a>,
+  default: ({
+    href,
+    children,
+    ...rest
+  }: {
+    href: string;
+    children: React.ReactNode;
+  }) => (
+    <a href={href} {...rest}>
+      {children}
+    </a>
+  ),
 }));
 
 let anchorClickSpy: jest.SpyInstance | null = null;
@@ -26,11 +37,14 @@ beforeEach(() => {
   __resetHttpClientCache();
 });
 beforeAll(() => {
-  anchorClickSpy = jest.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(() => {});
+  anchorClickSpy = jest
+    .spyOn(HTMLAnchorElement.prototype, 'click')
+    .mockImplementation(() => {});
 });
 afterEach(() => {
   jest.resetAllMocks();
-  if (originalDebugErrors === undefined) delete process.env.NEXT_PUBLIC_TENON_DEBUG_ERRORS;
+  if (originalDebugErrors === undefined)
+    delete process.env.NEXT_PUBLIC_TENON_DEBUG_ERRORS;
   else process.env.NEXT_PUBLIC_TENON_DEBUG_ERRORS = originalDebugErrors;
 });
 afterAll(() => {
@@ -48,4 +62,15 @@ export const installFetchMock = (
   return fetchMock;
 };
 
-export { setMockParams, React, render, screen, waitFor, userEvent, CandidateSubmissionsPage, getRequestUrl, jsonResponse, textResponse };
+export {
+  setMockParams,
+  React,
+  render,
+  screen,
+  waitFor,
+  userEvent,
+  CandidateSubmissionsPage,
+  getRequestUrl,
+  jsonResponse,
+  textResponse,
+};

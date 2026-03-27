@@ -1,10 +1,10 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import CandidateDashboardPage, {
   extractInviteToken,
-} from '@/features/candidate/dashboard/CandidateDashboardPage';
+} from '@/features/candidate/portal/CandidateDashboardPage';
 import { CandidateSessionProvider } from '@/features/candidate/session/CandidateSessionProvider';
-import { listCandidateInvites } from '@/features/candidate/api';
-jest.mock('@/features/candidate/api', () => ({
+import { listCandidateInvites } from '@/features/candidate/session/api';
+jest.mock('@/features/candidate/session/api', () => ({
   listCandidateInvites: jest.fn(),
 }));
 const routerMock = {
@@ -20,7 +20,11 @@ jest.mock('next/navigation', () => ({
 }));
 const listInvitesMock = listCandidateInvites as jest.Mock;
 function renderPage(signedInEmail: string | null = 'candidate@example.com') {
-  return render(<CandidateSessionProvider><CandidateDashboardPage signedInEmail={signedInEmail} /></CandidateSessionProvider>);
+  return render(
+    <CandidateSessionProvider>
+      <CandidateDashboardPage signedInEmail={signedInEmail} />
+    </CandidateSessionProvider>,
+  );
 }
 describe('CandidateDashboardPage', () => {
   beforeEach(() => {
@@ -85,10 +89,14 @@ describe('CandidateDashboardPage', () => {
     expect(routerMock.replace).toHaveBeenCalled();
   });
   it('parses canonical invite links and navigates', () => {
-    expect(extractInviteToken('https://app.test/candidate/session/INV123')).toBe('INV123');
+    expect(
+      extractInviteToken('https://app.test/candidate/session/INV123'),
+    ).toBe('INV123');
   });
   it('parses legacy invite links and normalizes to canonical route', () => {
-    expect(extractInviteToken('https://app.test/candidate-sessions/INV123')).toBe('INV123');
+    expect(
+      extractInviteToken('https://app.test/candidate-sessions/INV123'),
+    ).toBe('INV123');
   });
   it('strips query/hash when parsing raw tokens', () => {
     expect(extractInviteToken(' INV123?utm=1 ')).toBe('INV123');

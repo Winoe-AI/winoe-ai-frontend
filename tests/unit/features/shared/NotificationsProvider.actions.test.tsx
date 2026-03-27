@@ -1,7 +1,10 @@
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import { useEffect } from 'react';
 import userEvent from '@testing-library/user-event';
-import { NotificationsProvider, useNotifications } from '@/shared/notifications';
+import {
+  NotificationsProvider,
+  useNotifications,
+} from '@/shared/notifications';
 
 describe('NotificationsProvider actions', () => {
   afterEach(() => {
@@ -17,21 +20,51 @@ describe('NotificationsProvider actions', () => {
       const { notify, update } = useNotifications();
       return (
         <>
-          <button type="button" onClick={() => notify({ id: 'with-action', tone: 'info', title: 'Toast with action', actions: [{ label: 'Do it', onClick: actionSpy }], durationMs: 1000 })}>launch</button>
-          <button type="button" onClick={() => update('with-action', { actions: [{ label: 'Updated', disabled: true }] })}>update</button>
+          <button
+            type="button"
+            onClick={() =>
+              notify({
+                id: 'with-action',
+                tone: 'info',
+                title: 'Toast with action',
+                actions: [{ label: 'Do it', onClick: actionSpy }],
+                durationMs: 1000,
+              })
+            }
+          >
+            launch
+          </button>
+          <button
+            type="button"
+            onClick={() =>
+              update('with-action', {
+                actions: [{ label: 'Updated', disabled: true }],
+              })
+            }
+          >
+            update
+          </button>
         </>
       );
     }
 
-    render(<NotificationsProvider><ActionTrigger /></NotificationsProvider>);
+    render(
+      <NotificationsProvider>
+        <ActionTrigger />
+      </NotificationsProvider>,
+    );
     await user.click(screen.getByText('launch'));
     fireEvent.click(await screen.findByRole('button', { name: /Do it/i }));
     expect(actionSpy).toHaveBeenCalled();
 
     await user.click(screen.getByRole('button', { name: /update/i }));
-    expect(await screen.findByRole('button', { name: /Updated/i })).toBeDisabled();
+    expect(
+      await screen.findByRole('button', { name: /Updated/i }),
+    ).toBeDisabled();
 
-    act(() => { jest.advanceTimersByTime(1100); });
+    act(() => {
+      jest.advanceTimersByTime(1100);
+    });
     expect(screen.queryByRole('status')).toBeNull();
   });
 
@@ -51,7 +84,11 @@ describe('NotificationsProvider actions', () => {
       return null;
     }
 
-    render(<NotificationsProvider><DisabledActionTrigger /></NotificationsProvider>);
+    render(
+      <NotificationsProvider>
+        <DisabledActionTrigger />
+      </NotificationsProvider>,
+    );
     fireEvent.click(screen.getByRole('button', { name: /Disabled/i }));
     expect(actionSpy).not.toHaveBeenCalled();
   });

@@ -10,7 +10,9 @@ export function validateManifestShape(manifest, failures) {
     failures.push('coverage-manifest.json: nonPageRoutes must be an array.');
   }
   if (!Array.isArray(manifest.criticalMutations)) {
-    failures.push('coverage-manifest.json: criticalMutations must be an array.');
+    failures.push(
+      'coverage-manifest.json: criticalMutations must be an array.',
+    );
   }
 }
 
@@ -18,7 +20,9 @@ export function validateRouteEntries(entries, label, failures, hasSpecFile) {
   for (const entry of entries) {
     const route = entry?.route;
     if (typeof route !== 'string' || !route.startsWith('/')) {
-      failures.push(`${label}: every entry.route must be an absolute route (starts with /).`);
+      failures.push(
+        `${label}: every entry.route must be an absolute route (starts with /).`,
+      );
       continue;
     }
     if (!Array.isArray(entry.specs) || entry.specs.length === 0) {
@@ -26,11 +30,15 @@ export function validateRouteEntries(entries, label, failures, hasSpecFile) {
     } else {
       for (const spec of entry.specs) {
         if (typeof spec !== 'string' || !spec.endsWith('.spec.ts')) {
-          failures.push(`${label} ${route}: invalid spec name '${String(spec)}'.`);
+          failures.push(
+            `${label} ${route}: invalid spec name '${String(spec)}'.`,
+          );
           continue;
         }
         if (!hasSpecFile(spec)) {
-          failures.push(`${label} ${route}: missing spec file tests/e2e/flow-qa/${spec}.`);
+          failures.push(
+            `${label} ${route}: missing spec file tests/e2e/flow-qa/${spec}.`,
+          );
         }
       }
     }

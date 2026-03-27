@@ -39,12 +39,21 @@ export async function handleSessionWorkspaceRunRoute(
     await fulfillJson(route, { runId: 'run-qa-1' });
     return { handled: true, runPollCount: params.runPollCount };
   }
-  if (/\/api\/backend\/tasks\/\d+\/run\/.+/.test(pathname) && method === 'GET') {
-    const next = params.runStatusSequence[Math.min(params.runPollCount, params.runStatusSequence.length - 1)];
+  if (
+    /\/api\/backend\/tasks\/\d+\/run\/.+/.test(pathname) &&
+    method === 'GET'
+  ) {
+    const next =
+      params.runStatusSequence[
+        Math.min(params.runPollCount, params.runStatusSequence.length - 1)
+      ];
     await fulfillJson(route, withDefaults(next));
     return { handled: true, runPollCount: params.runPollCount + 1 };
   }
-  if (/\/api\/backend\/candidate\/session\/[^/]+\/schedule$/.test(pathname) && method === 'POST') {
+  if (
+    /\/api\/backend\/candidate\/session\/[^/]+\/schedule$/.test(pathname) &&
+    method === 'POST'
+  ) {
     await fulfillJson(route, {
       candidateSessionId: params.candidateSessionId,
       scheduledStartAt: nowIso(),

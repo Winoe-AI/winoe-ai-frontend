@@ -19,18 +19,26 @@ describe('useCandidateBootstrap core states', () => {
   });
 
   it('loads invite bootstrap without an access token argument', async () => {
-    resolveCandidateInviteTokenMock.mockResolvedValue({ candidateSessionId: 99 });
+    resolveCandidateInviteTokenMock.mockResolvedValue({
+      candidateSessionId: 99,
+    });
     const onResolved = jest.fn();
-    const { result } = renderHook(() => useCandidateBootstrap({ inviteToken: 'invite-token', onResolved }));
+    const { result } = renderHook(() =>
+      useCandidateBootstrap({ inviteToken: 'invite-token', onResolved }),
+    );
     await act(async () => {
       await result.current.load();
     });
     expect(result.current.state).toBe('ready');
-    expect(resolveCandidateInviteTokenMock).toHaveBeenCalledWith('invite-token');
+    expect(resolveCandidateInviteTokenMock).toHaveBeenCalledWith(
+      'invite-token',
+    );
   });
 
   it('sets error when inviteToken is missing', async () => {
-    const { result } = renderHook(() => useCandidateBootstrap({ inviteToken: null, onResolved: jest.fn() }));
+    const { result } = renderHook(() =>
+      useCandidateBootstrap({ inviteToken: null, onResolved: jest.fn() }),
+    );
     await act(async () => {
       await result.current.load();
     });
@@ -44,7 +52,13 @@ describe('useCandidateBootstrap core states', () => {
     resolveCandidateInviteTokenMock.mockResolvedValue(mockData);
     const onResolved = jest.fn();
     const onSetInviteToken = jest.fn();
-    const { result } = renderHook(() => useCandidateBootstrap({ inviteToken: 'invite-token', onResolved, onSetInviteToken }));
+    const { result } = renderHook(() =>
+      useCandidateBootstrap({
+        inviteToken: 'invite-token',
+        onResolved,
+        onSetInviteToken,
+      }),
+    );
     await act(async () => {
       await result.current.load();
     });
@@ -55,9 +69,15 @@ describe('useCandidateBootstrap core states', () => {
   });
 
   it('handles API errors with and without status', async () => {
-    resolveCandidateInviteTokenMock.mockRejectedValueOnce({ message: 'Session expired', status: 401 });
+    resolveCandidateInviteTokenMock.mockRejectedValueOnce({
+      message: 'Session expired',
+      status: 401,
+    });
     const one = renderHook(() =>
-      useCandidateBootstrap({ inviteToken: 'invite-token', onResolved: jest.fn() }),
+      useCandidateBootstrap({
+        inviteToken: 'invite-token',
+        onResolved: jest.fn(),
+      }),
     );
     await act(async () => {
       await one.result.current.load();
@@ -65,9 +85,14 @@ describe('useCandidateBootstrap core states', () => {
     expect(one.result.current.errorMessage).toBe('Session expired');
     expect(one.result.current.errorStatus).toBe(401);
 
-    resolveCandidateInviteTokenMock.mockRejectedValueOnce(new Error('Network error'));
+    resolveCandidateInviteTokenMock.mockRejectedValueOnce(
+      new Error('Network error'),
+    );
     const two = renderHook(() =>
-      useCandidateBootstrap({ inviteToken: 'invite-token', onResolved: jest.fn() }),
+      useCandidateBootstrap({
+        inviteToken: 'invite-token',
+        onResolved: jest.fn(),
+      }),
     );
     await act(async () => {
       await two.result.current.load();
@@ -77,8 +102,12 @@ describe('useCandidateBootstrap core states', () => {
   });
 
   it('works without onSetInviteToken callback', async () => {
-    resolveCandidateInviteTokenMock.mockResolvedValue({ candidateSessionId: 1 });
-    const { result } = renderHook(() => useCandidateBootstrap({ inviteToken: 'token', onResolved: jest.fn() }));
+    resolveCandidateInviteTokenMock.mockResolvedValue({
+      candidateSessionId: 1,
+    });
+    const { result } = renderHook(() =>
+      useCandidateBootstrap({ inviteToken: 'token', onResolved: jest.fn() }),
+    );
     await act(async () => {
       await result.current.load();
     });

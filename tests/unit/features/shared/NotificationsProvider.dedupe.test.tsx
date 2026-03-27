@@ -1,7 +1,10 @@
 import { render, screen } from '@testing-library/react';
 import { useEffect } from 'react';
 import userEvent from '@testing-library/user-event';
-import { NotificationsProvider, useNotifications } from '@/shared/notifications';
+import {
+  NotificationsProvider,
+  useNotifications,
+} from '@/shared/notifications';
 
 function TriggerButton({ id, title }: { id: string; title: string }) {
   const { notify } = useNotifications();

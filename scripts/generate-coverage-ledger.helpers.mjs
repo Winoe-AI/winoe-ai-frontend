@@ -46,14 +46,19 @@ export function coverageEntry(root, coverage, rel) {
 export function statusForCoverage(entry) {
   if (!entry) return 'not instrumented';
   const { statements, branches, functions, lines } = entry;
-  const all99 = [statements, branches, functions, lines].map((s) => s?.pct === 99).every(Boolean);
+  const all99 = [statements, branches, functions, lines]
+    .map((s) => s?.pct === 99)
+    .every(Boolean);
   if (all99) return 'covered (99%)';
   return `needs tests (S ${statements?.pct ?? 0} / B ${branches?.pct ?? 0} / F ${functions?.pct ?? 0} / L ${lines?.pct ?? 0})`;
 }
 
 export function findTestsForPath(rel) {
   const withoutSrc = rel.replace(/^src\//, '');
-  const aliasPattern = `@/${withoutSrc.replace(/\\/g, '/')}`.replace(/\\/g, '/');
+  const aliasPattern = `@/${withoutSrc.replace(/\\/g, '/')}`.replace(
+    /\\/g,
+    '/',
+  );
   const base = path.basename(rel, path.extname(rel));
   const patterns = [aliasPattern.replace(/\.[^.]+$/, ''), base];
   const results = new Set();
@@ -61,8 +66,15 @@ export function findTestsForPath(rel) {
   for (const pattern of patterns) {
     if (!pattern || pattern === 'index') continue;
     try {
-      const out = execSync(`rg --files-with-matches --glob "*.test.*" "${pattern.replace(/"/g, '\\"')}" tests`, { encoding: 'utf8' });
-      out.split('\n').map((line) => line.trim()).filter(Boolean).forEach((line) => results.add(line));
+      const out = execSync(
+        `rg --files-with-matches --glob "*.test.*" "${pattern.replace(/"/g, '\\"')}" tests`,
+        { encoding: 'utf8' },
+      );
+      out
+        .split('\n')
+        .map((line) => line.trim())
+        .filter(Boolean)
+        .forEach((line) => results.add(line));
     } catch {
       // no match
     }

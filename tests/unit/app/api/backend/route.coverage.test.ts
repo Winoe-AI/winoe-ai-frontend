@@ -36,7 +36,7 @@ jest.mock('next/server', () => ({
     }
   },
 }));
-jest.mock('@/lib/server/bff', () => ({
+jest.mock('@/platform/server/bff', () => ({
   REQUEST_ID_HEADER: 'x-request-id',
   UPSTREAM_HEADER: 'x-upstream',
   getBackendBaseUrl: () => 'http://backend',

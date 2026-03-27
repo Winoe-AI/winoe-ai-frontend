@@ -19,12 +19,26 @@ export async function installCandidateDay4HandoffMocks(
     const request = route.request();
     const method = request.method().toUpperCase();
     const pathname = new URL(request.url()).pathname;
-    const next = await handleDay4BackendRoute(route, { pathname, method, token, candidateSessionId, taskId, completed, deleted, statusAfterCompleteCalls, state });
+    const next = await handleDay4BackendRoute(route, {
+      pathname,
+      method,
+      token,
+      candidateSessionId,
+      taskId,
+      completed,
+      deleted,
+      statusAfterCompleteCalls,
+      state,
+    });
     completed = next.completed;
     deleted = next.deleted;
     statusAfterCompleteCalls = next.statusAfterCompleteCalls;
     if (next.handled) return;
-    await fulfillJson(route, { message: `Unhandled handoff route ${pathname}` }, 404);
+    await fulfillJson(
+      route,
+      { message: `Unhandled handoff route ${pathname}` },
+      404,
+    );
   });
 
   await page.route('https://storage.example.com/**', async (route) => {

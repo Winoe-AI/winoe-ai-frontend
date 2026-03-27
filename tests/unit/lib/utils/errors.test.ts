@@ -5,12 +5,13 @@ import {
   normalizeApiError,
   toStatus,
   toUserMessage,
-} from '@/lib/errors/errors';
+} from '@/platform/errors/errors';
 
 describe('lib/errors/errors', () => {
   const originalDebugErrors = process.env.NEXT_PUBLIC_TENON_DEBUG_ERRORS;
   afterEach(() => {
-    if (originalDebugErrors === undefined) delete process.env.NEXT_PUBLIC_TENON_DEBUG_ERRORS;
+    if (originalDebugErrors === undefined)
+      delete process.env.NEXT_PUBLIC_TENON_DEBUG_ERRORS;
     else process.env.NEXT_PUBLIC_TENON_DEBUG_ERRORS = originalDebugErrors;
   });
 
@@ -28,16 +29,29 @@ describe('lib/errors/errors', () => {
     expect(toUserMessage({}, 'fallback')).toBe('fallback');
     process.env.NEXT_PUBLIC_TENON_DEBUG_ERRORS = 'TRUE';
     expect(errorDetailEnabled()).toBe(true);
-    expect(toUserMessage({ detail: 'detail msg', message: 'msg' }, 'fallback', { includeDetail: true })).toBe('detail msg');
-    expect(toUserMessage({ detail: 'secret', message: 'shown' }, 'fallback', { includeDetail: false })).toBe('shown');
+    expect(
+      toUserMessage({ detail: 'detail msg', message: 'msg' }, 'fallback', {
+        includeDetail: true,
+      }),
+    ).toBe('detail msg');
+    expect(
+      toUserMessage({ detail: 'secret', message: 'shown' }, 'fallback', {
+        includeDetail: false,
+      }),
+    ).toBe('shown');
   });
 
   it('redacts secrets in debug message paths', () => {
     process.env.NEXT_PUBLIC_TENON_DEBUG_ERRORS = 'TRUE';
-    const bearer = new Error('Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.payload.signature');
+    const bearer = new Error(
+      'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.payload.signature',
+    );
     expect(toUserMessage(bearer, 'fallback')).toBe('Bearer [redacted]');
     expect(
-      toUserMessage({ message: 'Request failed: ?access_token=abc123&id_token=def456' }, 'fallback'),
+      toUserMessage(
+        { message: 'Request failed: ?access_token=abc123&id_token=def456' },
+        'fallback',
+      ),
     ).toBe('Request failed: ?access_token=[redacted]&id_token=[redacted]');
   });
 
@@ -78,9 +92,17 @@ describe('lib/errors/errors', () => {
   });
 
   it('extracts nested error codes and toggles errorDetailEnabled env', () => {
-    expect(normalizeApiError({ status: 400, error: { code: 'VALIDATION_ERROR' } }).code).toBe('VALIDATION_ERROR');
-    expect(normalizeApiError({ status: 400, detail: { code: 'DETAIL_CODE' } }).code).toBe('DETAIL_CODE');
-    expect(normalizeApiError({ status: 400, details: { code: 'DETAILS_CODE' } }).code).toBe('DETAILS_CODE');
+    expect(
+      normalizeApiError({ status: 400, error: { code: 'VALIDATION_ERROR' } })
+        .code,
+    ).toBe('VALIDATION_ERROR');
+    expect(
+      normalizeApiError({ status: 400, detail: { code: 'DETAIL_CODE' } }).code,
+    ).toBe('DETAIL_CODE');
+    expect(
+      normalizeApiError({ status: 400, details: { code: 'DETAILS_CODE' } })
+        .code,
+    ).toBe('DETAILS_CODE');
 
     delete process.env.NEXT_PUBLIC_TENON_DEBUG_ERRORS;
     expect(errorDetailEnabled()).toBe(false);

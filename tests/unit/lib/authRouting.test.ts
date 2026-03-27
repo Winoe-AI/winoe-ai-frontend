@@ -2,7 +2,7 @@ import {
   buildLoginUrl,
   buildReturnTo,
   sanitizeReturnTo,
-} from '@/lib/auth/routing';
+} from '@/platform/auth/routing';
 
 describe('sanitizeReturnTo', () => {
   it('allows safe relative paths', () => {

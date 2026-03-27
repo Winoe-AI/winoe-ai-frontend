@@ -1,4 +1,4 @@
-import type { CandidateDayWindow } from '@/features/candidate/api';
+import type { CandidateDayWindow } from '@/features/candidate/session/api';
 
 export type SchedulingViewProps = {
   title: string;

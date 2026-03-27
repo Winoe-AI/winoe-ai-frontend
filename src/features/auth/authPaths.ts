@@ -1,4 +1,8 @@
-import { buildReturnTo, modeForPath, type LoginMode } from '@/lib/auth/routing';
+import {
+  buildReturnTo,
+  modeForPath,
+  type LoginMode,
+} from '@/platform/auth/routing';
 
 function connectionForMode(mode?: LoginMode): string | null {
   if (mode === 'candidate') {

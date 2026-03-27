@@ -1,8 +1,11 @@
 import { render } from '@testing-library/react';
-import { WorkspacePanel } from '@/features/candidate/session/task/components/WorkspacePanel';
-import { getCandidateWorkspaceStatus, initCandidateWorkspace } from '@/features/candidate/api';
+import { WorkspacePanel } from '@/features/candidate/tasks/components/WorkspacePanel';
+import {
+  getCandidateWorkspaceStatus,
+  initCandidateWorkspace,
+} from '@/features/candidate/session/api';
 
-jest.mock('@/features/candidate/api', () => ({
+jest.mock('@/features/candidate/session/api', () => ({
   initCandidateWorkspace: jest.fn(),
   getCandidateWorkspaceStatus: jest.fn(),
 }));
@@ -15,6 +18,16 @@ export function resetWorkspacePanelMocks() {
   statusMock.mockReset();
 }
 
-export function renderWorkspacePanel(taskId: number, candidateSessionId: number, dayIndex = 2) {
-  return render(<WorkspacePanel taskId={taskId} candidateSessionId={candidateSessionId} dayIndex={dayIndex} />);
+export function renderWorkspacePanel(
+  taskId: number,
+  candidateSessionId: number,
+  dayIndex = 2,
+) {
+  return render(
+    <WorkspacePanel
+      taskId={taskId}
+      candidateSessionId={candidateSessionId}
+      dayIndex={dayIndex}
+    />,
+  );
 }

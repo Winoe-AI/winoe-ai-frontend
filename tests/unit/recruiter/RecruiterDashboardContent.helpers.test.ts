@@ -2,7 +2,7 @@ import {
   copyInviteLink,
   formatRecruiterError,
   formatSimulationCreatedDate,
-} from '@/features/recruiter/utils/formatters';
+} from '@/features/recruiter/utils/formattersUtils';
 
 const originalExecCommand = document.execCommand;
 const originalDebugErrors = process.env.NEXT_PUBLIC_TENON_DEBUG_ERRORS;

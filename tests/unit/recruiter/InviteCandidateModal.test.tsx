@@ -1,8 +1,10 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import type { ComponentProps } from 'react';
-import { InviteCandidateModal } from '@/features/recruiter/invitations/InviteCandidateModal';
+import { InviteCandidateModal } from '@/features/recruiter/simulation-management/invitations/InviteCandidateModal';
 
-const renderModal = (overrides: Partial<ComponentProps<typeof InviteCandidateModal>> = {}) =>
+const renderModal = (
+  overrides: Partial<ComponentProps<typeof InviteCandidateModal>> = {},
+) =>
   render(
     <InviteCandidateModal
       open
@@ -20,8 +22,12 @@ describe('InviteCandidateModal', () => {
   it('passes string values to submit handler', () => {
     const onSubmit = jest.fn();
     renderModal({ onSubmit });
-    fireEvent.change(screen.getByLabelText(/Candidate name/i), { target: { value: '  Jane Doe  ' } });
-    fireEvent.change(screen.getByLabelText(/Candidate email/i), { target: { value: '  JANE@EXAMPLE.COM  ' } });
+    fireEvent.change(screen.getByLabelText(/Candidate name/i), {
+      target: { value: '  Jane Doe  ' },
+    });
+    fireEvent.change(screen.getByLabelText(/Candidate email/i), {
+      target: { value: '  JANE@EXAMPLE.COM  ' },
+    });
     fireEvent.click(screen.getByText('Send invite'));
 
     expect(onSubmit).toHaveBeenCalledTimes(1);
@@ -47,15 +53,21 @@ describe('InviteCandidateModal', () => {
     );
 
     await waitFor(() => {
-      expect(screen.getByLabelText(/Candidate name/i)).toHaveValue('Ada Lovelace');
-      expect(screen.getByLabelText(/Candidate email/i)).toHaveValue('ada@example.com');
+      expect(screen.getByLabelText(/Candidate name/i)).toHaveValue(
+        'Ada Lovelace',
+      );
+      expect(screen.getByLabelText(/Candidate email/i)).toHaveValue(
+        'ada@example.com',
+      );
     });
   });
 
   it('blocks submit when candidate name is missing', () => {
     const onSubmit = jest.fn();
     renderModal({ onSubmit });
-    fireEvent.change(screen.getByLabelText(/Candidate email/i), { target: { value: 'jane@example.com' } });
+    fireEvent.change(screen.getByLabelText(/Candidate email/i), {
+      target: { value: 'jane@example.com' },
+    });
     fireEvent.click(screen.getByText('Send invite'));
     expect(onSubmit).not.toHaveBeenCalled();
     expect(screen.getByText(/Candidate name is required/i)).toBeInTheDocument();
@@ -85,7 +97,9 @@ describe('InviteCandidateModal', () => {
     );
 
     expect(getByLabelText(/Candidate name/i)).toHaveValue('Opened Name');
-    expect(getByLabelText(/Candidate email/i)).toHaveValue('opened@example.com');
+    expect(getByLabelText(/Candidate email/i)).toHaveValue(
+      'opened@example.com',
+    );
     fireEvent.click(getByText('Send invite'));
   });
 });

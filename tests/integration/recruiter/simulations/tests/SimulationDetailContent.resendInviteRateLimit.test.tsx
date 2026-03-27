@@ -20,17 +20,43 @@ describe('RecruiterSimulationDetailPage - resend invite rate limits', () => {
       const url = getRequestUrl(input);
       if (url === '/api/simulations') return simulationListResponse();
       if (url === '/api/simulations/1') return simulationDetailResponse();
-      if (url === '/api/simulations/1/candidates') return jsonResponse([{ candidateSessionId: 77, inviteEmail: 'rl@example.com', candidateName: 'Rate Limited', status: 'not_started', startedAt: null, completedAt: null, hasReport: false, inviteEmailStatus: 'failed', inviteEmailSentAt: null }]);
+      if (url === '/api/simulations/1/candidates')
+        return jsonResponse([
+          {
+            candidateSessionId: 77,
+            inviteEmail: 'rl@example.com',
+            candidateName: 'Rate Limited',
+            status: 'not_started',
+            startedAt: null,
+            completedAt: null,
+            hasReport: false,
+            inviteEmailStatus: 'failed',
+            inviteEmailSentAt: null,
+          },
+        ]);
       if (url === '/api/simulations/1/candidates/77/invite/resend') {
         expect(init?.method).toBe('POST');
-        return jsonResponse({ candidateSessionId: 77, inviteEmailStatus: 'rate_limited', inviteEmailSentAt: null }, 429);
+        return jsonResponse(
+          {
+            candidateSessionId: 77,
+            inviteEmailStatus: 'rate_limited',
+            inviteEmailSentAt: null,
+          },
+          429,
+        );
       }
       return textResponse('Not found', 404);
     });
     render(<RecruiterSimulationDetailPage />);
-    const resendBtn = await screen.findByRole('button', { name: /resend invite/i });
+    const resendBtn = await screen.findByRole('button', {
+      name: /resend invite/i,
+    });
     await user.click(resendBtn);
-    await waitFor(() => expect(screen.getAllByText(/Retry in \d+s/i).length).toBeGreaterThanOrEqual(1));
+    await waitFor(() =>
+      expect(
+        screen.getAllByText(/Retry in \d+s/i).length,
+      ).toBeGreaterThanOrEqual(1),
+    );
     expect(resendBtn).toBeDisabled();
   });
 
@@ -41,19 +67,43 @@ describe('RecruiterSimulationDetailPage - resend invite rate limits', () => {
       const url = getRequestUrl(input);
       if (url === '/api/simulations') return simulationListResponse();
       if (url === '/api/simulations/1') return simulationDetailResponse();
-      if (url === '/api/simulations/1/candidates') return jsonResponse([{ candidateSessionId: 55, inviteEmail: 'cool@example.com', candidateName: 'Cooldown Casey', status: 'not_started', startedAt: null, completedAt: null, hasReport: false, inviteEmailStatus: 'failed', inviteEmailSentAt: null }]);
+      if (url === '/api/simulations/1/candidates')
+        return jsonResponse([
+          {
+            candidateSessionId: 55,
+            inviteEmail: 'cool@example.com',
+            candidateName: 'Cooldown Casey',
+            status: 'not_started',
+            startedAt: null,
+            completedAt: null,
+            hasReport: false,
+            inviteEmailStatus: 'failed',
+            inviteEmailSentAt: null,
+          },
+        ]);
       if (url === '/api/simulations/1/candidates/55/invite/resend') {
         expect(init?.method).toBe('POST');
-        return jsonResponse({ candidateSessionId: 55, inviteEmailStatus: 'rate_limited', inviteEmailSentAt: null }, 429);
+        return jsonResponse(
+          {
+            candidateSessionId: 55,
+            inviteEmailStatus: 'rate_limited',
+            inviteEmailSentAt: null,
+          },
+          429,
+        );
       }
       return textResponse('Not found', 404);
     });
     render(<RecruiterSimulationDetailPage />);
-    const resendBtn = await screen.findByRole('button', { name: /resend invite/i });
+    const resendBtn = await screen.findByRole('button', {
+      name: /resend invite/i,
+    });
     await user.click(resendBtn);
     await waitFor(() => {
       expect(resendBtn).toBeDisabled();
-      expect(screen.getAllByText(/Retry in \d+s/i).length).toBeGreaterThanOrEqual(1);
+      expect(
+        screen.getAllByText(/Retry in \d+s/i).length,
+      ).toBeGreaterThanOrEqual(1);
     });
     act(() => {
       jest.advanceTimersByTime(30_000);

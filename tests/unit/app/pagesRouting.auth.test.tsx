@@ -4,7 +4,8 @@ import './pagesRouting.mocks';
 describe('app route auth pages', () => {
   it('renders auth login and logout pages', async () => {
     const { default: LoginPage } = await import('@/app/(auth)/auth/login/page');
-    const { default: LogoutPage } = await import('@/app/(auth)/auth/logout/page');
+    const { default: LogoutPage } =
+      await import('@/app/(auth)/auth/logout/page');
     render(await LoginPage({ searchParams: Promise.resolve({}) }));
     expect(screen.getByTestId('login-page')).toBeInTheDocument();
     render(await LogoutPage({ searchParams: Promise.resolve({}) }));

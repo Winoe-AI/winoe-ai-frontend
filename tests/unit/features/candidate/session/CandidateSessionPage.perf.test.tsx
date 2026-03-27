@@ -3,10 +3,13 @@ import CandidateSessionPage from '@/features/candidate/session/CandidateSessionP
 
 const useCandidateSessionControllerMock = jest.fn();
 
-jest.mock('@/features/candidate/session/hooks/useCandidateSessionController', () => ({
-  useCandidateSessionController: (...args: unknown[]) =>
-    useCandidateSessionControllerMock(...args),
-}));
+jest.mock(
+  '@/features/candidate/session/hooks/useCandidateSessionController',
+  () => ({
+    useCandidateSessionController: (...args: unknown[]) =>
+      useCandidateSessionControllerMock(...args),
+  }),
+);
 
 jest.mock('@/features/candidate/session/CandidateSessionView', () => ({
   CandidateSessionView: ({ title }: { title?: string }) => (
@@ -22,12 +25,16 @@ describe('CandidateSessionPage', () => {
   it('passes token to useCandidateSessionController', () => {
     useCandidateSessionControllerMock.mockReturnValue({ title: 'Running' });
     render(<CandidateSessionPage token="invite-token" />);
-    expect(useCandidateSessionControllerMock).toHaveBeenCalledWith('invite-token');
+    expect(useCandidateSessionControllerMock).toHaveBeenCalledWith(
+      'invite-token',
+    );
   });
 
   it('renders CandidateSessionView with controller view model', () => {
     useCandidateSessionControllerMock.mockReturnValue({ title: 'Scheduling' });
     render(<CandidateSessionPage token="invite-token" />);
-    expect(screen.getByTestId('candidate-session-view')).toHaveTextContent('Scheduling');
+    expect(screen.getByTestId('candidate-session-view')).toHaveTextContent(
+      'Scheduling',
+    );
   });
 });

@@ -1,9 +1,9 @@
 import { useCallback } from 'react';
 import { useAsyncLoader } from '@/shared/hooks';
-import { dashboardPerfDebugEnabled, logPerf, nowMs } from '../utils/perf';
-import type { DashboardPayload } from './dashboardTypes';
-import { fetchDashboard, isAbortError } from './dashboardApi';
-import type { DashboardState } from './dashboardState';
+import { dashboardPerfDebugEnabled, logPerf, nowMs } from '../utils/perfUtils';
+import type { DashboardPayload } from './useDashboardTypes';
+import { fetchDashboard, isAbortError } from './useDashboardApi';
+import type { DashboardState } from './useDashboardState';
 
 type Refs = {
   inflightRef: React.MutableRefObject<Promise<DashboardPayload> | null>;

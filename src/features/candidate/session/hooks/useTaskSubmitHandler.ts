@@ -1,12 +1,12 @@
-import { submitCandidateTask } from '@/features/candidate/api/tasks';
+import { submitCandidateTask } from '@/features/candidate/session/api/tasksApi';
 import { useNotifications } from '@/shared/notifications';
-import { normalizeApiError } from '@/lib/errors/errors';
-import { friendlySubmitError } from '../utils/errorMessages';
+import { normalizeApiError } from '@/platform/errors/errors';
+import { friendlySubmitError } from '../utils/errorMessagesUtils';
 import {
   extractTaskWindowClosedOverride,
   formatComeBackMessage,
 } from '../lib/windowState';
-import type { Task, SubmitPayload } from '../task/types';
+import type { Task, SubmitPayload } from '@/features/candidate/tasks/types';
 import {
   buildTaskSubmitArgs,
   shouldBlockEmptyTextSubmit,

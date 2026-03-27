@@ -1,6 +1,9 @@
 import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { NotificationsProvider, useNotifications } from '@/shared/notifications';
+import {
+  NotificationsProvider,
+  useNotifications,
+} from '@/shared/notifications';
 
 describe('NotificationsProvider copy label transitions', () => {
   afterEach(() => {
@@ -21,13 +24,25 @@ describe('NotificationsProvider copy label transitions', () => {
               id: 'copy-toast',
               tone: 'success',
               title: 'Invite sent',
-              actions: [{
-                label: 'Copy invite link',
-                onClick: () => {
-                  update('copy-toast', { actions: [{ label: 'Copied', disabled: true }] });
-                  setTimeout(() => update('copy-toast', { actions: [{ label: 'Copy invite link', onClick: () => {} }] }), 1800);
+              actions: [
+                {
+                  label: 'Copy invite link',
+                  onClick: () => {
+                    update('copy-toast', {
+                      actions: [{ label: 'Copied', disabled: true }],
+                    });
+                    setTimeout(
+                      () =>
+                        update('copy-toast', {
+                          actions: [
+                            { label: 'Copy invite link', onClick: () => {} },
+                          ],
+                        }),
+                      1800,
+                    );
+                  },
                 },
-              }],
+              ],
             })
           }
         >
@@ -36,12 +51,20 @@ describe('NotificationsProvider copy label transitions', () => {
       );
     }
 
-    render(<NotificationsProvider><CopyTrigger /></NotificationsProvider>);
+    render(
+      <NotificationsProvider>
+        <CopyTrigger />
+      </NotificationsProvider>,
+    );
     await user.click(screen.getByText('make'));
     await user.click(screen.getByRole('button', { name: /Copy invite link/i }));
     expect(screen.getByRole('button', { name: /Copied/i })).toBeDisabled();
 
-    act(() => { jest.advanceTimersByTime(1850); });
-    expect(screen.getByRole('button', { name: /Copy invite link/i })).toBeEnabled();
+    act(() => {
+      jest.advanceTimersByTime(1850);
+    });
+    expect(
+      screen.getByRole('button', { name: /Copy invite link/i }),
+    ).toBeEnabled();
   });
 });

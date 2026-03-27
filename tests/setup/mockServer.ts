@@ -1,10 +1,6 @@
 import { buildRequest, matches } from './mockServer.request';
 import { jsonResponse, toResponse } from './mockServer.response';
-import type {
-  Handler,
-  MockResolver,
-  RouteMatcher,
-} from './mockServer.types';
+import type { Handler, MockResolver, RouteMatcher } from './mockServer.types';
 
 export function createMockServer() {
   const handlers: Handler[] = [];
@@ -21,7 +17,9 @@ export function createMockServer() {
     if (!handler) {
       return toResponse({
         status: 404,
-        body: { message: `Unhandled request for ${req.method} ${req.url.pathname}` },
+        body: {
+          message: `Unhandled request for ${req.method} ${req.url.pathname}`,
+        },
       });
     }
     return toResponse(await handler.resolver(req));

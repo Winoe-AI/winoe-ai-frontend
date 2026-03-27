@@ -1,9 +1,12 @@
 import { formatDateTime } from '@/shared/formatters';
-import { OFFICIAL_REPO_CUTOFF_COPY } from '@/lib/copy/integrity';
+import { OFFICIAL_REPO_CUTOFF_COPY } from '@/platform/copy/integrity';
 import { cn } from './classnames';
 import { IntegrityCalloutLinks } from './IntegrityCalloutLinks';
 import { IntegrityCalloutCutoffDetails } from './IntegrityCalloutCutoffDetails';
-import { buildGithubCommitUrl, toTrimmedString } from './IntegrityCallout.utils';
+import {
+  buildGithubCommitUrl,
+  toTrimmedString,
+} from './IntegrityCallout.utils';
 
 export { buildGithubCommitUrl } from './IntegrityCallout.utils';
 
@@ -27,7 +30,10 @@ export function IntegrityCallout({
   const cleanRepoUrl = toTrimmedString(repoUrl);
   const cleanCodespaceUrl = toTrimmedString(codespaceUrl);
   const cleanCutoffCommitSha = toTrimmedString(cutoffCommitSha);
-  const cutoffCommitUrl = buildGithubCommitUrl(cleanRepoUrl, cleanCutoffCommitSha);
+  const cutoffCommitUrl = buildGithubCommitUrl(
+    cleanRepoUrl,
+    cleanCutoffCommitSha,
+  );
   const cutoffAtLabel = formatDateTime(cutoffAt ?? null);
   const shortSha =
     cleanCutoffCommitSha && cleanCutoffCommitSha.length > 12
@@ -53,7 +59,9 @@ export function IntegrityCallout({
       <div className={showClosedState ? 'mt-2 space-y-1' : 'space-y-1'}>
         <p>{OFFICIAL_REPO_CUTOFF_COPY}</p>
         <p>Work after cutoff will not be considered.</p>
-        {hasCutoffDetails ? <p>Evaluation is based on the commit shown below.</p> : null}
+        {hasCutoffDetails ? (
+          <p>Evaluation is based on the commit shown below.</p>
+        ) : null}
       </div>
 
       <IntegrityCalloutLinks

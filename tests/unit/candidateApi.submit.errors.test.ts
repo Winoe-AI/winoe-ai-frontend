@@ -18,7 +18,11 @@ describe('candidateApi submit error handling', () => {
     installFetchMock(fetchMock);
     const { submitCandidateTask } = await importCandidateApi();
     await expect(
-      submitCandidateTask({ taskId: 5, candidateSessionId: 9, contentText: 'Ok' }),
+      submitCandidateTask({
+        taskId: 5,
+        candidateSessionId: 9,
+        contentText: 'Ok',
+      }),
     ).rejects.toMatchObject({
       status: 0,
       message: expect.stringContaining('Network error'),

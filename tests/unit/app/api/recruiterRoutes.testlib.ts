@@ -7,22 +7,24 @@ export const parseUpstreamBodyMock = jest.fn();
 export const forwardJsonMock = jest.fn();
 
 jest.mock('next/server', () => {
-  const { MockNextRequest, MockNextResponse } = jest.requireActual('./mockNext');
+  const { MockNextRequest, MockNextResponse } =
+    jest.requireActual('./mockNext');
   return { NextRequest: MockNextRequest, NextResponse: MockNextResponse };
 });
 
-jest.mock('@/lib/server/bffAuth', () => ({
-  requireBffAuth: (...args: any[]) => requireBffAuthMock(...args),
-  mergeResponseCookies: (...args: any[]) => mergeResponseCookiesMock(...args),
+jest.mock('@/platform/server/bffAuth', () => ({
+  requireBffAuth: (...args: unknown[]) => requireBffAuthMock(...args),
+  mergeResponseCookies: (...args: unknown[]) =>
+    mergeResponseCookiesMock(...args),
 }));
 
-jest.mock('@/lib/server/bff', () => ({
+jest.mock('@/platform/server/bff', () => ({
   REQUEST_ID_HEADER: 'x-request-id',
   UPSTREAM_HEADER: 'x-upstream',
   getBackendBaseUrl: () => 'http://backend',
-  upstreamRequest: (...args: any[]) => upstreamRequestMock(...args),
-  parseUpstreamBody: (...args: any[]) => parseUpstreamBodyMock(...args),
-  forwardJson: (...args: any[]) => forwardJsonMock(...args),
+  upstreamRequest: (...args: unknown[]) => upstreamRequestMock(...args),
+  parseUpstreamBody: (...args: unknown[]) => parseUpstreamBodyMock(...args),
+  forwardJson: (...args: unknown[]) => forwardJsonMock(...args),
   resolveRequestId: () => 'req-1',
 }));
 

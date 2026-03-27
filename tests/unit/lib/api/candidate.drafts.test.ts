@@ -1,4 +1,9 @@
-import { importCandidateApi, mockPost, mockRequestWithMeta, resetCandidateApiMocks } from './candidate.testlib';
+import {
+  importCandidateApi,
+  mockPost,
+  mockRequestWithMeta,
+  resetCandidateApiMocks,
+} from './candidate.testlib';
 
 describe('candidate api task-draft helpers', () => {
   beforeEach(() => {
@@ -6,7 +11,8 @@ describe('candidate api task-draft helpers', () => {
   });
 
   it('rejects oversized draft payloads before network call', async () => {
-    const { putCandidateTaskDraft, MAX_DRAFT_CONTENT_BYTES } = await importCandidateApi();
+    const { putCandidateTaskDraft, MAX_DRAFT_CONTENT_BYTES } =
+      await importCandidateApi();
     await expect(
       putCandidateTaskDraft({
         taskId: 50,
@@ -15,14 +21,20 @@ describe('candidate api task-draft helpers', () => {
       }),
     ).rejects.toMatchObject({
       status: 413,
-      details: expect.objectContaining({ errorCode: 'DRAFT_CONTENT_TOO_LARGE' }),
+      details: expect.objectContaining({
+        errorCode: 'DRAFT_CONTENT_TOO_LARGE',
+      }),
     });
     expect(mockRequestWithMeta).not.toHaveBeenCalled();
   });
 
   it('maps DRAFT_CONTENT_TOO_LARGE backend responses to bounded-size message', async () => {
-    mockPost.mockRejectedValueOnce({ status: 413, details: { errorCode: 'DRAFT_CONTENT_TOO_LARGE' } });
-    const { putCandidateTaskDraft, MAX_DRAFT_CONTENT_BYTES } = await importCandidateApi();
+    mockPost.mockRejectedValueOnce({
+      status: 413,
+      details: { errorCode: 'DRAFT_CONTENT_TOO_LARGE' },
+    });
+    const { putCandidateTaskDraft, MAX_DRAFT_CONTENT_BYTES } =
+      await importCandidateApi();
     await expect(
       putCandidateTaskDraft({
         taskId: 51,

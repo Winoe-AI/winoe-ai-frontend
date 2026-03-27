@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { forwardJson } from '@/lib/server/bff';
+import { forwardJson } from '@/platform/server/bff';
 import { withRecruiterAuth } from '@/app/api/bffRouteHelpers';
 
 export const dynamic = 'force-dynamic';

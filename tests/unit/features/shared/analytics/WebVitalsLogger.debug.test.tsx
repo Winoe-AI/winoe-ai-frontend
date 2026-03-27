@@ -6,7 +6,8 @@ import { markWebVitalsCoverage } from './WebVitalsLogger.coverage';
 const useReportWebVitalsMock = jest.fn();
 
 jest.mock('next/web-vitals', () => ({
-  useReportWebVitals: (callback: (metric: unknown) => void) => useReportWebVitalsMock(callback),
+  useReportWebVitals: (callback: (metric: unknown) => void) =>
+    useReportWebVitalsMock(callback),
 }));
 
 describe('WebVitalsLogger callback behavior', () => {
@@ -25,9 +26,11 @@ describe('WebVitalsLogger callback behavior', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     capturedCallback = null;
-    useReportWebVitalsMock.mockImplementation((cb: (metric: unknown) => void) => {
-      capturedCallback = cb;
-    });
+    useReportWebVitalsMock.mockImplementation(
+      (cb: (metric: unknown) => void) => {
+        capturedCallback = cb;
+      },
+    );
   });
 
   it('renders null and registers callback', () => {

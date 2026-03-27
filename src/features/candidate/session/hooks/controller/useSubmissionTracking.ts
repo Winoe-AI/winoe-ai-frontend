@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { CandidateTask } from '../../CandidateSessionProvider';
-import { loadTextDraftSavedAt } from '../../task/utils/draftStorage';
+import { loadTextDraftSavedAt } from '@/features/candidate/tasks/utils/draftStorageUtils';
 import {
   loadRecordedSubmissionReference,
   saveRecordedSubmissionReference,
-} from '../../task/utils/submissionReferenceStorage';
+} from '@/features/candidate/tasks/utils/submissionReferenceStorageUtils';
 
 type Params = {
   candidateSessionId: number | null;
@@ -41,7 +41,11 @@ export function useSubmissionTracking({
         submittedAt: payload.submittedAt,
       });
       if (candidateSessionId === null) return;
-      saveRecordedSubmissionReference(candidateSessionId, currentTaskId, payload);
+      saveRecordedSubmissionReference(
+        candidateSessionId,
+        currentTaskId,
+        payload,
+      );
     },
     [candidateSessionId, currentTaskId],
   );

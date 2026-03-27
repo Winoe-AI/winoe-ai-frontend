@@ -17,7 +17,10 @@ class SimpleHeaders {
 class SimpleResponse {
   status: number;
   headers: SimpleHeaders;
-  constructor(_body: string, init: { status: number; headers?: Record<string, string> }) {
+  constructor(
+    _body: string,
+    init: { status: number; headers?: Record<string, string> },
+  ) {
     this.status = init.status;
     this.headers = new SimpleHeaders(init.headers);
   }
@@ -49,9 +52,14 @@ const buildResponse = (status = 200, location?: string) => {
 jest.mock('next/server', () => ({
   NextResponse: {
     redirect: (url: URL | string) => buildResponse(307, url.toString()),
-    json: (_body: unknown, init?: { status?: number; headers?: Record<string, string> }) => {
+    json: (
+      _body: unknown,
+      init?: { status?: number; headers?: Record<string, string> },
+    ) => {
       const res = buildResponse(init?.status ?? 200);
-      Object.entries(init?.headers ?? {}).forEach(([k, v]) => res.headers.set(k, String(v)));
+      Object.entries(init?.headers ?? {}).forEach(([k, v]) =>
+        res.headers.set(k, String(v)),
+      );
       return res;
     },
     next: () => buildResponse(200),
@@ -62,19 +70,24 @@ jest.mock('next/server', () => ({
     headers: Map<string, string>;
     method: string;
     signal: AbortSignal;
-    constructor(url: URL | string, init?: { method?: string; headers?: Record<string, string> }) {
+    constructor(
+      url: URL | string,
+      init?: { method?: string; headers?: Record<string, string> },
+    ) {
       this.url = url.toString();
       this.nextUrl = new URL(this.url);
       this.method = init?.method ?? 'GET';
       this.headers = new Map<string, string>();
-      Object.entries(init?.headers ?? {}).forEach(([k, v]) => this.headers.set(k.toLowerCase(), String(v)));
+      Object.entries(init?.headers ?? {}).forEach(([k, v]) =>
+        this.headers.set(k.toLowerCase(), String(v)),
+      );
       // @ts-expect-error minimal AbortSignal for route tests
       this.signal = { aborted: false };
     }
   },
 }));
 export const mockParseUpstreamBody = jest.fn(async () => ({}));
-jest.mock('@/lib/server/bff', () => ({
+jest.mock('@/platform/server/bff', () => ({
   forwardJson: jest.fn(),
   getBackendBaseUrl: jest.fn(() => 'http://upstream'),
   parseUpstreamBody: mockParseUpstreamBody,
@@ -83,12 +96,14 @@ jest.mock('@/lib/server/bff', () => ({
   UPSTREAM_HEADER: 'x-upstream',
   upstreamRequest: jest.fn(),
 }));
-jest.mock('@/lib/auth0-claims', () => ({ extractPermissions: jest.fn(() => ['p1', 'p2']) }));
-jest.mock('@/lib/auth0', () => ({ getSessionNormalized: jest.fn() }));
+jest.mock('@/platform/auth0/claims', () => ({
+  extractPermissions: jest.fn(() => ['p1', 'p2']),
+}));
+jest.mock('@/platform/auth0', () => ({ getSessionNormalized: jest.fn() }));
 export const resetRoutesBasicMocks = () => {
   jest.clearAllMocks();
   jest.resetModules();
-  const auth0 = jest.requireMock('@/lib/auth0');
+  const auth0 = jest.requireMock('@/platform/auth0');
   const getSessionMock = auth0.getSessionNormalized as jest.Mock;
   getSessionMock.mockResolvedValue({ user: null });
   return { getSessionMock };

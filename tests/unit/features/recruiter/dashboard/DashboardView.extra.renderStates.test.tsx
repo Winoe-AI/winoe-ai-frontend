@@ -1,9 +1,16 @@
 import { render, screen } from '@testing-library/react';
 import DashboardView from '@/features/recruiter/dashboard/RecruiterDashboardView';
-import { baseProps, resetDashboardExtraMocks } from './DashboardView.extra.testlib';
+import {
+  baseProps,
+  resetDashboardExtraMocks,
+} from './DashboardView.extra.testlib';
 
 jest.mock('next/navigation', () => ({
-  useRouter: () => ({ push: jest.fn(), replace: jest.fn(), prefetch: jest.fn() }),
+  useRouter: () => ({
+    push: jest.fn(),
+    replace: jest.fn(),
+    prefetch: jest.fn(),
+  }),
 }));
 
 describe('DashboardView extra render states', () => {
@@ -13,24 +20,14 @@ describe('DashboardView extra render states', () => {
 
   it('renders error state when profile load fails', () => {
     const props = baseProps();
-    render(
-      <DashboardView
-        {...props}
-        profile={null}
-        error="Boom"
-      />,
-    );
+    render(<DashboardView {...props} profile={null} error="Boom" />);
     expect(screen.getByText('Boom')).toBeInTheDocument();
   });
 
   it('renders profile loading skeleton when profileLoading is true', () => {
     const props = baseProps();
     const { container } = render(
-      <DashboardView
-        {...props}
-        profile={null}
-        profileLoading
-      />,
+      <DashboardView {...props} profile={null} profileLoading />,
     );
     expect(container.querySelector('.animate-pulse')).not.toBeNull();
   });

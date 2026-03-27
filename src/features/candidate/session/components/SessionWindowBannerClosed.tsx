@@ -1,4 +1,7 @@
-import { formatLocalDateTime, type DerivedWindowState } from '../lib/windowState';
+import {
+  formatLocalDateTime,
+  type DerivedWindowState,
+} from '../lib/windowState';
 
 type SessionWindowClosedBannerProps = {
   windowState: DerivedWindowState;

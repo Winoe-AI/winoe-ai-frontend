@@ -4,9 +4,7 @@ type PersistedOverrides = {
   started?: boolean;
 };
 
-export const buildPersistedSession = (
-  overrides: PersistedOverrides = {},
-) => ({
+export const buildPersistedSession = (overrides: PersistedOverrides = {}) => ({
   inviteToken: overrides.inviteToken ?? 'invite-token',
   candidateSessionId: overrides.candidateSessionId ?? 9,
   bootstrap: {

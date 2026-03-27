@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
-import RecruiterSimulationDetailPage from '@/features/recruiter/simulations/detail/RecruiterSimulationDetailPage';
-import { BRAND_NAME } from '@/lib/brand';
+import RecruiterSimulationDetailPage from '@/features/recruiter/simulation-management/detail/RecruiterSimulationDetailPage';
+import { BRAND_NAME } from '@/platform/config/brand';
 
 export const metadata: Metadata = {
   title: `Simulation detail | ${BRAND_NAME}`,

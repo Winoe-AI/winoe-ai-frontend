@@ -1,7 +1,10 @@
-import CandidateTaskView from '../../task/CandidateTaskView';
+import CandidateTaskView from '@/features/candidate/tasks/CandidateTaskView';
 import { TaskFallback } from '../TaskFallback';
 import type { CandidateTask } from '../../CandidateSessionProvider';
-import type { SubmitPayload, SubmitResponse } from '../../task/types';
+import type {
+  SubmitPayload,
+  SubmitResponse,
+} from '@/features/candidate/tasks/types';
 import type { WindowActionGate } from '../../lib/windowState';
 
 type Props = {

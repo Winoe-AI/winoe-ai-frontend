@@ -19,19 +19,31 @@ describe('CandidateSessionProvider state helpers', () => {
       JSON.stringify({
         inviteToken: 'old_token',
         candidateSessionId: 99,
-        bootstrap: { candidateSessionId: 99, status: 'in_progress', simulation: { title: 'Stale', role: 'Stale' } },
+        bootstrap: {
+          candidateSessionId: 99,
+          status: 'in_progress',
+          simulation: { title: 'Stale', role: 'Stale' },
+        },
         started: true,
         taskState: {
           isComplete: false,
           completedTaskIds: [1],
-          currentTask: { id: 9, dayIndex: 1, type: 'design', title: 'Stale Task', description: 'Stale description' },
+          currentTask: {
+            id: 9,
+            dayIndex: 1,
+            type: 'design',
+            title: 'Stale Task',
+            description: 'Stale description',
+          },
         },
       }),
     );
 
     await renderHarness();
     expect(screen.getByTestId('invite-token')).toHaveTextContent('none');
-    expect(screen.getByTestId('candidate-session-id')).toHaveTextContent('none');
+    expect(screen.getByTestId('candidate-session-id')).toHaveTextContent(
+      'none',
+    );
     expect(screen.getByTestId('started')).toHaveTextContent('false');
 
     const persisted = JSON.parse(sessionStorage.getItem(STORAGE_KEY) ?? '{}');
@@ -53,6 +65,8 @@ describe('CandidateSessionProvider state helpers', () => {
     fireEvent.click(screen.getByText('reset'));
     expect(screen.getByTestId('invite-token')).toHaveTextContent('none');
     expect(screen.getByTestId('started')).toHaveTextContent('false');
-    await waitFor(() => expect(screen.getByTestId('auth-status')).toHaveTextContent('idle'));
+    await waitFor(() =>
+      expect(screen.getByTestId('auth-status')).toHaveTextContent('idle'),
+    );
   });
 });

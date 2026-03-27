@@ -1,4 +1,4 @@
-import { normalizeApiError } from '@/lib/errors/errors';
+import { normalizeApiError } from '@/platform/errors/errors';
 
 describe('normalizeApiError', () => {
   const fallback = 'fallback';

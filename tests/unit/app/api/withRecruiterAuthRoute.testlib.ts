@@ -37,7 +37,7 @@ jest.mock('next/server', () => ({
 export const mockForwardJson = jest.fn();
 export const mockWithRecruiterAuth = jest.fn();
 
-jest.mock('@/lib/server/bff', () => ({
+jest.mock('@/platform/server/bff', () => ({
   forwardJson: (...args: unknown[]) => mockForwardJson(...args),
 }));
 

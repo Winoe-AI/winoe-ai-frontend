@@ -25,14 +25,22 @@ export async function installCandidateInvitesMocks(
   await page.route('**/api/backend/candidate/invites**', async (route) => {
     const request = route.request();
     if (request.method().toUpperCase() !== 'GET') {
-      await fulfillJson(route, { message: `Unhandled method for invites mock: ${request.method()}` }, 405);
+      await fulfillJson(
+        route,
+        { message: `Unhandled method for invites mock: ${request.method()}` },
+        405,
+      );
       return;
     }
     if (options.delayMs && options.delayMs > 0) {
       await new Promise((resolve) => setTimeout(resolve, options.delayMs));
     }
     if ((options.status ?? 200) >= 400) {
-      await fulfillJson(route, { message: options.message ?? 'Unable to load invites.' }, options.status ?? 500);
+      await fulfillJson(
+        route,
+        { message: options.message ?? 'Unable to load invites.' },
+        options.status ?? 500,
+      );
       return;
     }
     await fulfillJson(route, options.invites ?? defaultCandidateInvites(), 200);

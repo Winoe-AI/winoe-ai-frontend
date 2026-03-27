@@ -39,7 +39,9 @@ describe('DashboardView extra copy action behavior', () => {
     expect(copyInviteLinkMock).toHaveBeenCalledWith('http://invite');
     expect(updateMock).toHaveBeenCalledWith(
       expect.any(String),
-      expect.objectContaining({ actions: [{ label: 'Copied', disabled: true }] }),
+      expect.objectContaining({
+        actions: [{ label: 'Copied', disabled: true }],
+      }),
     );
 
     await act(async () => {
@@ -48,7 +50,9 @@ describe('DashboardView extra copy action behavior', () => {
     expect(updateMock).toHaveBeenLastCalledWith(
       expect.any(String),
       expect.objectContaining({
-        actions: expect.arrayContaining([expect.objectContaining({ label: 'Copy invite link' })]),
+        actions: expect.arrayContaining([
+          expect.objectContaining({ label: 'Copy invite link' }),
+        ]),
       }),
     );
   });
@@ -79,9 +83,13 @@ describe('DashboardView extra copy action behavior', () => {
     expect(updateMock).toHaveBeenCalledWith(
       expect.any(String),
       expect.objectContaining({
-        actions: expect.arrayContaining([expect.objectContaining({ label: 'Copy invite link' })]),
+        actions: expect.arrayContaining([
+          expect.objectContaining({ label: 'Copy invite link' }),
+        ]),
       }),
     );
-    expect(notifyMock).toHaveBeenCalledWith(expect.objectContaining({ tone: 'error' }));
+    expect(notifyMock).toHaveBeenCalledWith(
+      expect.objectContaining({ tone: 'error' }),
+    );
   });
 });

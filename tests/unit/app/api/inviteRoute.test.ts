@@ -29,10 +29,13 @@ describe('/api/simulations/[id]/invite route', () => {
     const mod = await import('@/app/api/simulations/[id]/invite/route');
     markMetadataCovered('@/app/api/simulations/[id]/invite/route');
 
-    const req = await createRequest('http://localhost/api/simulations/sim-1/invite', {
-      email: 'test@example.com',
-      name: 'Test User',
-    });
+    const req = await createRequest(
+      'http://localhost/api/simulations/sim-1/invite',
+      {
+        email: 'test@example.com',
+        name: 'Test User',
+      },
+    );
 
     await mod.POST(req as never, {
       params: Promise.resolve({ id: 'sim-1' }),

@@ -4,7 +4,7 @@ import { WorkspaceAndTests } from '@/features/candidate/session/views/WorkspaceA
 const getStatusMock = jest.fn();
 const initWorkspaceMock = jest.fn();
 
-jest.mock('@/features/candidate/api', () => ({
+jest.mock('@/features/candidate/session/api', () => ({
   getCandidateWorkspaceStatus: (...args: unknown[]) => getStatusMock(...args),
   initCandidateWorkspace: (...args: unknown[]) => initWorkspaceMock(...args),
 }));

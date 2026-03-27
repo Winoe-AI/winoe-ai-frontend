@@ -7,7 +7,7 @@ import {
   resetCreateSimulationMocks,
   routerMock,
 } from './CreateSimulationContent.testlib';
-import SimulationCreatePage from '@/features/recruiter/simulations/create/SimulationCreatePage';
+import SimulationCreatePage from '@/features/recruiter/simulation-management/create/SimulationCreatePage';
 
 describe('SimulationCreatePage errors + navigation', () => {
   beforeEach(() => {
@@ -16,14 +16,22 @@ describe('SimulationCreatePage errors + navigation', () => {
 
   it('redirects to login on 401 response', async () => {
     const user = userEvent.setup();
-    createSimulationMock.mockResolvedValueOnce({ id: '', ok: false, status: 401 });
+    createSimulationMock.mockResolvedValueOnce({
+      id: '',
+      ok: false,
+      status: 401,
+    });
     render(<SimulationCreatePage />);
 
     await user.type(screen.getByLabelText(/Title/i), 'Backend Sim');
-    await user.click(screen.getByRole('button', { name: /Create simulation/i }));
+    await user.click(
+      screen.getByRole('button', { name: /Create simulation/i }),
+    );
 
     await waitFor(() =>
-      expect(assignSpy).toHaveBeenCalledWith(expect.stringContaining('/auth/login?mode=recruiter')),
+      expect(assignSpy).toHaveBeenCalledWith(
+        expect.stringContaining('/auth/login?mode=recruiter'),
+      ),
     );
   });
 
@@ -38,7 +46,9 @@ describe('SimulationCreatePage errors + navigation', () => {
     render(<SimulationCreatePage />);
 
     await user.type(screen.getByLabelText(/Title/i), 'Backend Sim');
-    await user.click(screen.getByRole('button', { name: /Create simulation/i }));
+    await user.click(
+      screen.getByRole('button', { name: /Create simulation/i }),
+    );
     expect(await screen.findByText(/Server exploded/i)).toBeInTheDocument();
     expect(routerMock.refresh).not.toHaveBeenCalled();
   });
@@ -53,14 +63,19 @@ describe('SimulationCreatePage errors + navigation', () => {
         detail: [
           { loc: ['body', 'seniority'], msg: 'Invalid role level' },
           { loc: ['body', 'companyContext', 'domain'], msg: 'Invalid domain' },
-          { loc: ['body', 'ai', 'evalEnabledByDay', '4'], msg: 'Day 4 toggle is invalid' },
+          {
+            loc: ['body', 'ai', 'evalEnabledByDay', '4'],
+            msg: 'Day 4 toggle is invalid',
+          },
         ],
       },
     });
     render(<SimulationCreatePage />);
 
     await user.type(screen.getByLabelText(/Title/i), 'Backend Sim');
-    await user.click(screen.getByRole('button', { name: /Create simulation/i }));
+    await user.click(
+      screen.getByRole('button', { name: /Create simulation/i }),
+    );
     expect(await screen.findByText(/Invalid role level/i)).toBeInTheDocument();
     expect(screen.getByText(/Invalid domain/i)).toBeInTheDocument();
     expect(screen.getByText(/Day 4 toggle is invalid/i)).toBeInTheDocument();

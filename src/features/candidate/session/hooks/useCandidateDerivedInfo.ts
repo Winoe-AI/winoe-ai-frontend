@@ -2,9 +2,9 @@ import { useMemo } from 'react';
 import {
   INVITE_EXPIRED_MESSAGE,
   INVITE_UNAVAILABLE_MESSAGE,
-} from '@/lib/copy/invite';
-import { deriveCurrentDayIndex } from '../utils/taskTransforms';
-import { extractFirstUrl } from '../utils/extractUrl';
+} from '@/platform/copy/invite';
+import { deriveCurrentDayIndex } from '../utils/taskTransformsUtils';
+import { extractFirstUrl } from '../utils/extractUrlUtils';
 import type { CandidateSessionState } from '../CandidateSessionProvider';
 
 export function useCandidateDerivedInfo(

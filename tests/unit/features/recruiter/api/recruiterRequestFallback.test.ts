@@ -10,13 +10,13 @@ describe('runRecruiterFallback', () => {
   afterEach(() => {
     (global.fetch as jest.Mock).mockReset?.();
     global.fetch = realFetch;
-    jest.dontMock('@/lib/api/client');
+    jest.dontMock('@/platform/api-client/client');
   });
   it('prefers httpRequest when available', async () => {
     const httpRequestMock = jest.fn().mockResolvedValue({ ok: true });
     const bffFetchMock = jest.fn();
-    jest.doMock('@/lib/api/client', () => {
-      const actual = jest.requireActual('@/lib/api/client');
+    jest.doMock('@/platform/api-client/client', () => {
+      const actual = jest.requireActual('@/platform/api-client/client');
       return {
         ...actual,
         httpRequest: httpRequestMock,
@@ -24,7 +24,7 @@ describe('runRecruiterFallback', () => {
       };
     });
     const { runRecruiterFallback } =
-      await import('@/features/recruiter/api/recruiterRequestFallback');
+      await import('@/features/recruiter/api/recruiterRequestFallbackApi');
     const result = await runRecruiterFallback(
       '/backend/simulations',
       { headers: { 'x-test': '1' } },
@@ -42,8 +42,8 @@ describe('runRecruiterFallback', () => {
     (global.fetch as jest.Mock).mockResolvedValueOnce(
       makeJsonResponse({ ok: true }),
     );
-    jest.doMock('@/lib/api/client', () => {
-      const actual = jest.requireActual('@/lib/api/client');
+    jest.doMock('@/platform/api-client/client', () => {
+      const actual = jest.requireActual('@/platform/api-client/client');
       return {
         ...actual,
         httpRequest: undefined,
@@ -51,7 +51,7 @@ describe('runRecruiterFallback', () => {
       };
     });
     const { runRecruiterFallback } =
-      await import('@/features/recruiter/api/recruiterRequestFallback');
+      await import('@/features/recruiter/api/recruiterRequestFallbackApi');
     const result = await runRecruiterFallback(
       '/backend/simulations',
       {},
@@ -70,8 +70,8 @@ describe('runRecruiterFallback', () => {
     (global.fetch as jest.Mock).mockResolvedValueOnce(
       makeJsonResponse({ ok: true }),
     );
-    jest.doMock('@/lib/api/client', () => {
-      const actual = jest.requireActual('@/lib/api/client');
+    jest.doMock('@/platform/api-client/client', () => {
+      const actual = jest.requireActual('@/platform/api-client/client');
       return {
         ...actual,
         httpRequest: undefined,
@@ -79,7 +79,7 @@ describe('runRecruiterFallback', () => {
       };
     });
     const { runRecruiterFallback } =
-      await import('@/features/recruiter/api/recruiterRequestFallback');
+      await import('@/features/recruiter/api/recruiterRequestFallbackApi');
     await runRecruiterFallback('/api/backend/simulations', {}, 'GET');
     expect(global.fetch).toHaveBeenCalledWith(
       '/api/backend/simulations',

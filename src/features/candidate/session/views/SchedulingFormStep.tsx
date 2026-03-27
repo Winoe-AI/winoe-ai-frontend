@@ -30,16 +30,22 @@ export function SchedulingFormStep({
 }: SchedulingFormStepProps) {
   return (
     <div className="space-y-4 rounded-md border border-gray-200 p-4">
-      <label className="block text-sm font-medium text-gray-800">Start date</label>
+      <label className="block text-sm font-medium text-gray-800">
+        Start date
+      </label>
       <Input
         type="date"
         value={scheduleDate}
         onChange={(event) => onScheduleDateChange(event.target.value)}
         aria-label="Start date"
       />
-      {scheduleDateError ? <p className="text-sm text-red-700">{scheduleDateError}</p> : null}
+      {scheduleDateError ? (
+        <p className="text-sm text-red-700">{scheduleDateError}</p>
+      ) : null}
 
-      <label className="block text-sm font-medium text-gray-800">Timezone (IANA)</label>
+      <label className="block text-sm font-medium text-gray-800">
+        Timezone (IANA)
+      </label>
       <Input
         type="text"
         value={scheduleTimezone}
@@ -54,13 +60,17 @@ export function SchedulingFormStep({
         ))}
       </datalist>
       {scheduleTimezoneDetected ? (
-        <p className="text-xs text-gray-500">Detected timezone: {scheduleTimezoneDetected}</p>
+        <p className="text-xs text-gray-500">
+          Detected timezone: {scheduleTimezoneDetected}
+        </p>
       ) : (
         <p className="text-xs text-gray-500">
           We could not detect your timezone. Enter it manually.
         </p>
       )}
-      {scheduleTimezoneError ? <p className="text-sm text-red-700">{scheduleTimezoneError}</p> : null}
+      {scheduleTimezoneError ? (
+        <p className="text-sm text-red-700">{scheduleTimezoneError}</p>
+      ) : null}
 
       <div className="flex gap-3 pt-2">
         <Button variant="secondary" onClick={onDashboard}>

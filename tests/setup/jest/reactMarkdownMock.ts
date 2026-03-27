@@ -4,8 +4,16 @@ jest.mock('remark-gfm', () => () => null);
 jest.mock('remark-breaks', () => () => null);
 
 jest.mock('react-markdown', () => {
-  return function MockReactMarkdown({ children, className }: { children: React.ReactNode; className?: string }) {
-    const asString = Array.isArray(children) ? children.join('') : ((children as string) ?? '');
+  return function MockReactMarkdown({
+    children,
+    className,
+  }: {
+    children: React.ReactNode;
+    className?: string;
+  }) {
+    const asString = Array.isArray(children)
+      ? children.join('')
+      : ((children as string) ?? '');
     const lines = String(asString ?? '').split(/\n+/);
     const elements: Array<React.ReactNode> = [];
     let listItems: Array<React.ReactNode> = [];
@@ -22,7 +30,13 @@ jest.mock('react-markdown', () => {
         }
         if (match.index > 0) nodes.push(remaining.slice(0, match.index));
         const tag = match[1].startsWith('**') ? 'strong' : 'em';
-        nodes.push(React.createElement(tag, { key: `inline-${nodes.length}` }, match[2] ?? match[3] ?? ''));
+        nodes.push(
+          React.createElement(
+            tag,
+            { key: `inline-${nodes.length}` },
+            match[2] ?? match[3] ?? '',
+          ),
+        );
         remaining = remaining.slice(match.index + match[1].length);
       }
       return nodes;
@@ -30,25 +44,48 @@ jest.mock('react-markdown', () => {
 
     const flushList = () => {
       if (listItems.length === 0) return;
-      elements.push(React.createElement('ul', { key: `list-${elements.length}` }, [...listItems]));
+      elements.push(
+        React.createElement('ul', { key: `list-${elements.length}` }, [
+          ...listItems,
+        ]),
+      );
       listItems = [];
     };
 
     lines.forEach((line, idx) => {
       if (line.startsWith('# ')) {
         flushList();
-        elements.push(React.createElement('h1', { key: `h1-${idx}` }, parseInline(line.slice(2))));
+        elements.push(
+          React.createElement(
+            'h1',
+            { key: `h1-${idx}` },
+            parseInline(line.slice(2)),
+          ),
+        );
         return;
       }
       if (line.startsWith('- ')) {
-        listItems.push(React.createElement('li', { key: `li-${idx}` }, parseInline(line.slice(2))));
+        listItems.push(
+          React.createElement(
+            'li',
+            { key: `li-${idx}` },
+            parseInline(line.slice(2)),
+          ),
+        );
         return;
       }
       flushList();
-      if (line.trim()) elements.push(React.createElement('p', { key: `p-${idx}` }, parseInline(line)));
+      if (line.trim())
+        elements.push(
+          React.createElement('p', { key: `p-${idx}` }, parseInline(line)),
+        );
     });
     flushList();
 
-    return React.createElement('div', { 'data-testid': 'react-markdown', className }, elements);
+    return React.createElement(
+      'div',
+      { 'data-testid': 'react-markdown', className },
+      elements,
+    );
   };
 });

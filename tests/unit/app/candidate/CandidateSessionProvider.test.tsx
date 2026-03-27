@@ -18,12 +18,22 @@ describe('CandidateSessionProvider persistence', () => {
       JSON.stringify({
         inviteToken: 'invite_tok',
         candidateSessionId: 55,
-        bootstrap: { candidateSessionId: 10, status: 'in_progress', simulation: { title: 'Sim', role: 'Backend' } },
+        bootstrap: {
+          candidateSessionId: 10,
+          status: 'in_progress',
+          simulation: { title: 'Sim', role: 'Backend' },
+        },
         started: true,
         taskState: {
           isComplete: false,
           completedTaskIds: [1],
-          currentTask: { id: 9, dayIndex: 1, type: 'design', title: 'Persisted Task', description: 'Persisted Description' },
+          currentTask: {
+            id: 9,
+            dayIndex: 1,
+            type: 'design',
+            title: 'Persisted Task',
+            description: 'Persisted Description',
+          },
         },
       }),
     );
@@ -54,9 +64,11 @@ describe('CandidateSessionProvider persistence', () => {
   });
 
   it('handles storage errors gracefully without throwing', async () => {
-    const getItemSpy = jest.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
-      throw new Error('denied');
-    });
+    const getItemSpy = jest
+      .spyOn(Storage.prototype, 'getItem')
+      .mockImplementation(() => {
+        throw new Error('denied');
+      });
     await expect(renderHarness()).resolves.not.toThrow();
     getItemSpy.mockRestore();
   });

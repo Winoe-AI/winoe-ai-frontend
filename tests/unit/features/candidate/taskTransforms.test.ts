@@ -2,7 +2,7 @@ import {
   deriveCurrentDayIndex,
   normalizeCompletedTaskIds,
   toTask,
-} from '@/features/candidate/session/utils/taskTransforms';
+} from '@/features/candidate/session/utils/taskTransformsUtils';
 
 describe('taskTransforms', () => {
   it('normalizes completed ids from root or progress', () => {

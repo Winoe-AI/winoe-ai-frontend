@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { ReactNode } from 'react';
 import './globals.css';
-import { BRAND_NAME } from '@/lib/brand';
+import { BRAND_NAME } from '@/platform/config/brand';
 import { NotificationsProvider } from '@/shared/notifications';
 import { QueryProvider } from '@/shared/query';
 

@@ -32,7 +32,11 @@ describe('CandidateSessionPage debug/perf paths', () => {
   it('does not log debug output when TENON_DEBUG_PERF is not set', async () => {
     useCandidateSessionMock.mockReturnValue(baseState());
     await act(async () => render(<CandidateSessionPage token="inv" />));
-    await waitFor(() => expect(screen.getByTestId('run-tests-panel')).toBeInTheDocument());
-    expect(consoleDebugSpy).not.toHaveBeenCalledWith(expect.stringContaining('[candidate-session]'));
+    await waitFor(() =>
+      expect(screen.getByTestId('run-tests-panel')).toBeInTheDocument(),
+    );
+    expect(consoleDebugSpy).not.toHaveBeenCalledWith(
+      expect.stringContaining('[candidate-session]'),
+    );
   });
 });

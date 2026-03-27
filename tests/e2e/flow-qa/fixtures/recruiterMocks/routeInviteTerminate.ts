@@ -6,9 +6,14 @@ export async function handleInviteAndTerminateRoutes(
 ): Promise<boolean> {
   const { route, request, method, pathname, state } = ctx;
 
-  if (/^\/api\/simulations\/([^/]+)\/invite$/.test(pathname) && method === 'POST') {
+  if (
+    /^\/api\/simulations\/([^/]+)\/invite$/.test(pathname) &&
+    method === 'POST'
+  ) {
     state.inviteRequestCount += 1;
-    const payload = request.postDataJSON() as Record<string, unknown> | undefined;
+    const payload = request.postDataJSON() as
+      | Record<string, unknown>
+      | undefined;
     await fulfillJson(
       route,
       {
@@ -24,14 +29,28 @@ export async function handleInviteAndTerminateRoutes(
     return true;
   }
 
-  if (/^\/api\/simulations\/([^/]+)\/candidates\/([^/]+)\/invite\/resend$/.test(pathname) && method === 'POST') {
+  if (
+    /^\/api\/simulations\/([^/]+)\/candidates\/([^/]+)\/invite\/resend$/.test(
+      pathname,
+    ) &&
+    method === 'POST'
+  ) {
     state.resendInviteCount += 1;
-    await fulfillJson(route, { retryAfterSeconds: 30, inviteEmailStatus: 'sent' });
+    await fulfillJson(route, {
+      retryAfterSeconds: 30,
+      inviteEmailStatus: 'sent',
+    });
     return true;
   }
 
-  if (/^\/api\/simulations\/([^/]+)\/terminate$/.test(pathname) && method === 'POST') {
-    await fulfillJson(route, { status: 'queued', cleanupJobIds: ['cleanup-job-1'] });
+  if (
+    /^\/api\/simulations\/([^/]+)\/terminate$/.test(pathname) &&
+    method === 'POST'
+  ) {
+    await fulfillJson(route, {
+      status: 'queued',
+      cleanupJobIds: ['cleanup-job-1'],
+    });
     return true;
   }
 

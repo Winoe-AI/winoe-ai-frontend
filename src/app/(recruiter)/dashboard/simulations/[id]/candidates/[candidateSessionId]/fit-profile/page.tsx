@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
-import FitProfilePage from '@/features/recruiter/simulations/candidates/fitProfile/FitProfilePage';
-import { BRAND_NAME } from '@/lib/brand';
+import FitProfilePage from '@/features/recruiter/fit-profile/FitProfilePage';
+import { BRAND_NAME } from '@/platform/config/brand';
 
 export const metadata: Metadata = {
   title: `Candidate fit profile | ${BRAND_NAME}`,

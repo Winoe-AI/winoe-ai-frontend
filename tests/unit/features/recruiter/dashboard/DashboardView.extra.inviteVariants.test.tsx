@@ -1,4 +1,11 @@
-import { notifyMock, openInviteModal, renderDashboardExtra, resetDashboardExtraMocks, submitInvite, inviteFlowSubmitMock } from './DashboardView.extra.testlib';
+import {
+  notifyMock,
+  openInviteModal,
+  renderDashboardExtra,
+  resetDashboardExtraMocks,
+  submitInvite,
+  inviteFlowSubmitMock,
+} from './DashboardView.extra.testlib';
 
 describe('DashboardView extra invite result variants', () => {
   let consoleErrorSpy: jest.SpyInstance;
@@ -39,7 +46,9 @@ describe('DashboardView extra invite result variants', () => {
     await renderDashboardExtra();
     openInviteModal();
     await submitInvite('Ann', 'a@test.com');
-    expect(notifyMock).toHaveBeenCalledWith(expect.objectContaining({ actions: undefined }));
+    expect(notifyMock).toHaveBeenCalledWith(
+      expect.objectContaining({ actions: undefined }),
+    );
   });
 
   it('does not toast when invite submit returns null', async () => {

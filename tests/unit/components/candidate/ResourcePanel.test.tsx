@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import { ResourcePanel } from '@/features/candidate/session/task/components/ResourcePanel';
+import { ResourcePanel } from '@/features/candidate/tasks/components/ResourcePanel';
 
 describe('ResourcePanel', () => {
   it('renders a link when a url is provided', () => {

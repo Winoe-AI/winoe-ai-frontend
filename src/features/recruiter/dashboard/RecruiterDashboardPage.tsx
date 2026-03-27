@@ -3,7 +3,7 @@
 import { useEffect, useRef } from 'react';
 import RecruiterDashboardView from '@/features/recruiter/dashboard/RecruiterDashboardView';
 import { useDashboardData } from './hooks/useDashboardData';
-import { logPerf, nowMs } from './utils/perf';
+import { logPerf, nowMs } from './utils/perfUtils';
 
 export default function RecruiterDashboardPage() {
   const renderStartRef = useRef(nowMs());

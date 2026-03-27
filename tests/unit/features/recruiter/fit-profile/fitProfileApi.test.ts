@@ -1,4 +1,4 @@
-import { normalizeFitProfilePayload } from '@/features/recruiter/simulations/candidates/fitProfile/fitProfile.api';
+import { normalizeFitProfilePayload } from '@/features/recruiter/fit-profile/fitProfile.api';
 
 describe('normalizeFitProfilePayload', () => {
   it('treats human_review_required day scores as AI-disabled', () => {

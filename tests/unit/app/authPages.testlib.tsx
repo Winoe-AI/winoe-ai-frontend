@@ -29,7 +29,7 @@ export const sanitizeReturnToMock = jest.fn(
   (value?: string | null) => value?.trim() || '/',
 );
 export const modeForPathMock = jest.fn(() => 'candidate');
-jest.mock('@/lib/auth/routing', () => ({
+jest.mock('@/platform/auth/routing', () => ({
   sanitizeReturnTo: sanitizeReturnToMock,
   modeForPath: modeForPathMock,
 }));

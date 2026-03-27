@@ -9,10 +9,16 @@ export async function handleDashboardAndSimulationRoutes(
 
   if (pathname === '/api/dashboard' && method === 'GET') {
     if (options.dashboardDelayMs && options.dashboardDelayMs > 0) {
-      await new Promise((resolve) => setTimeout(resolve, options.dashboardDelayMs));
+      await new Promise((resolve) =>
+        setTimeout(resolve, options.dashboardDelayMs),
+      );
     }
     await fulfillJson(route, {
-      profile: { name: 'Recruiter QA', email: 'recruiter.qa@tenon.ai', role: 'recruiter' },
+      profile: {
+        name: 'Recruiter QA',
+        email: 'recruiter.qa@tenon.ai',
+        role: 'recruiter',
+      },
       simulations: data.simulations,
       profileError: null,
       simulationsError: null,
@@ -26,7 +32,9 @@ export async function handleDashboardAndSimulationRoutes(
   }
 
   if (pathname === '/api/simulations' && method === 'POST') {
-    const payload = request.postDataJSON() as Record<string, unknown> | undefined;
+    const payload = request.postDataJSON() as
+      | Record<string, unknown>
+      | undefined;
     data.simulations = [
       {
         id: data.createSimulationId,
@@ -44,16 +52,25 @@ export async function handleDashboardAndSimulationRoutes(
 
   const simulationDetailMatch = pathname.match(/^\/api\/simulations\/([^/]+)$/);
   if (simulationDetailMatch && method === 'GET') {
-    await fulfillJson(route, buildDefaultDetail(decodePathSegment(simulationDetailMatch[1])));
+    await fulfillJson(
+      route,
+      buildDefaultDetail(decodePathSegment(simulationDetailMatch[1])),
+    );
     return true;
   }
 
-  if (/^\/api\/simulations\/([^/]+)\/candidates$/.test(pathname) && method === 'GET') {
+  if (
+    /^\/api\/simulations\/([^/]+)\/candidates$/.test(pathname) &&
+    method === 'GET'
+  ) {
     await fulfillJson(route, data.candidates);
     return true;
   }
 
-  if (/^\/api\/simulations\/([^/]+)\/candidates\/compare$/.test(pathname) && method === 'GET') {
+  if (
+    /^\/api\/simulations\/([^/]+)\/candidates\/compare$/.test(pathname) &&
+    method === 'GET'
+  ) {
     await fulfillJson(route, data.compareRows);
     return true;
   }

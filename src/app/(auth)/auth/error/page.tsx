@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import AuthErrorPage from '@/features/auth/AuthErrorPage';
-import { BRAND_NAME } from '@/lib/brand';
-import { modeForPath, sanitizeReturnTo } from '@/lib/auth/routing';
+import { BRAND_NAME } from '@/platform/config/brand';
+import { modeForPath, sanitizeReturnTo } from '@/platform/auth/routing';
 
 export const metadata: Metadata = {
   title: `Sign-in error | ${BRAND_NAME}`,

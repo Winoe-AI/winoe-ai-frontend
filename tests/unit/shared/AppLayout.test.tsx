@@ -20,7 +20,7 @@ jest.mock('next/link', () => {
   return LinkMock;
 });
 
-jest.mock('@/lib/auth0', () => ({
+jest.mock('@/platform/auth0', () => ({
   auth0: {
     getSession: jest.fn(),
   },

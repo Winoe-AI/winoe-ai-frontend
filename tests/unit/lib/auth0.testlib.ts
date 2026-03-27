@@ -7,12 +7,33 @@ jest.mock('next/server', () => {
     const cookies = new Map<string, { name: string; value: string }>();
     return {
       status,
-      headers: { get: (k: string) => headers.get(k) ?? null, set: (k: string, v: string) => headers.set(k, v), delete: (k: string) => headers.delete(k) },
-      cookies: { set: (name: string | { name: string; value: string }, value?: string) => typeof name === 'object' ? void cookies.set(name.name, { name: name.name, value: name.value }) : void cookies.set(name, { name, value: value ?? '' }), getAll: () => Array.from(cookies.values()) },
+      headers: {
+        get: (k: string) => headers.get(k) ?? null,
+        set: (k: string, v: string) => headers.set(k, v),
+        delete: (k: string) => headers.delete(k),
+      },
+      cookies: {
+        set: (
+          name: string | { name: string; value: string },
+          value?: string,
+        ) =>
+          typeof name === 'object'
+            ? void cookies.set(name.name, {
+                name: name.name,
+                value: name.value,
+              })
+            : void cookies.set(name, { name, value: value ?? '' }),
+        getAll: () => Array.from(cookies.values()),
+      },
     };
   };
   return {
-    NextResponse: { redirect: (url: URL | string) => buildResponse(307, url.toString()), json: (_body: unknown, init?: { status?: number }) => buildResponse(init?.status ?? 200), next: () => buildResponse(200) },
+    NextResponse: {
+      redirect: (url: URL | string) => buildResponse(307, url.toString()),
+      json: (_body: unknown, init?: { status?: number }) =>
+        buildResponse(init?.status ?? 200),
+      next: () => buildResponse(200),
+    },
     NextRequest: class {
       url: string;
       nextUrl: URL;
@@ -26,16 +47,29 @@ jest.mock('next/server', () => {
 
 import { NextResponse } from 'next/server';
 
-export const mockAuth0Instance = { middleware: jest.fn(async () => NextResponse.next()), getSession: jest.fn(), getAccessToken: jest.fn() };
+export const mockAuth0Instance = {
+  middleware: jest.fn(async () => NextResponse.next()),
+  getSession: jest.fn(),
+  getAccessToken: jest.fn(),
+};
 export const Auth0ClientMock = jest.fn((config: unknown) => {
   void config;
   return mockAuth0Instance;
 });
 
-jest.mock('@auth0/nextjs-auth0/server', () => ({ Auth0Client: Auth0ClientMock }));
-jest.mock('@/lib/auth0-claims', () => {
-  const actual = jest.requireActual('@/lib/auth0-claims');
-  return { ...actual, normalizeUserClaims: (user: Record<string, unknown>) => ({ ...user, normalized: true }), extractPermissions: actual.extractPermissions };
+jest.mock('@auth0/nextjs-auth0/server', () => ({
+  Auth0Client: Auth0ClientMock,
+}));
+jest.mock('@/platform/auth0/claims', () => {
+  const actual = jest.requireActual('@/platform/auth0/claims');
+  return {
+    ...actual,
+    normalizeUserClaims: (user: Record<string, unknown>) => ({
+      ...user,
+      normalized: true,
+    }),
+    extractPermissions: actual.extractPermissions,
+  };
 });
 
 export const sanitizeReturnToMock = jest.fn((v?: string | null) => v ?? '/');
@@ -43,8 +77,8 @@ export const modeForPathMock = jest.fn((path?: string | null) => {
   void path;
   return 'candidate';
 });
-jest.mock('@/lib/auth/routing', () => {
-  const actual = jest.requireActual('@/lib/auth/routing');
+jest.mock('@/platform/auth/routing', () => {
+  const actual = jest.requireActual('@/platform/auth/routing');
   return {
     ...actual,
     sanitizeReturnTo: (v?: string | null) => sanitizeReturnToMock(v),
@@ -53,7 +87,7 @@ jest.mock('@/lib/auth/routing', () => {
 });
 
 export async function importAuth0() {
-  return import('@/lib/auth0');
+  return import('@/platform/auth0');
 }
 
 export const getAuth0Config = () => {

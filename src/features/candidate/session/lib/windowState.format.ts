@@ -28,7 +28,9 @@ export function formatLocalDateTime(
 export function formatComeBackMessage(
   override: Pick<TaskWindowClosedOverride, 'nextOpenAt' | 'windowStartAt'>,
 ): string {
-  const label = formatLocalDateTime(override.nextOpenAt ?? override.windowStartAt);
+  const label = formatLocalDateTime(
+    override.nextOpenAt ?? override.windowStartAt,
+  );
   if (label) return `This day is currently closed. Come back at ${label}.`;
   return 'This day is currently closed outside the scheduled window.';
 }

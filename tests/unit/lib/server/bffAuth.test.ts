@@ -5,7 +5,11 @@ jest.mock('next/server', () => {
     body?: unknown;
     cookies = {
       store: new Map<string, CookieValue>(),
-      set: (cookie: CookieValue) => this.cookies.store.set(typeof cookie === 'string' ? cookie : cookie.name, cookie),
+      set: (cookie: CookieValue) =>
+        this.cookies.store.set(
+          typeof cookie === 'string' ? cookie : cookie.name,
+          cookie,
+        ),
       get: (name: string) => this.cookies.store.get(name),
       getAll: () => Array.from(this.cookies.store.values()),
     };
@@ -31,21 +35,36 @@ jest.mock('next/server', () => {
 });
 
 import { NextRequest, NextResponse } from 'next/server';
-import { requireBffAuth, mergeResponseCookies } from '@/lib/server/bffAuth';
+import {
+  requireBffAuth,
+  mergeResponseCookies,
+} from '@/platform/server/bffAuth';
 
 const getSessionNormalizedMock = jest.fn();
 let auth0Mock: { getAccessToken: jest.Mock };
-jest.mock('@/lib/auth0', () => ({ auth0: { getAccessToken: jest.fn() }, getSessionNormalized: (...args: unknown[]) => getSessionNormalizedMock(...args) }));
-jest.mock('@/lib/auth0-claims', () => {
-  const actual = jest.requireActual('@/lib/auth0-claims');
-  return { ...actual, extractPermissions: jest.fn(() => ['candidate:access']), hasPermission: jest.fn((perms: string[], req: string) => perms.includes(req)) };
+jest.mock('@/platform/auth0', () => ({
+  auth0: { getAccessToken: jest.fn() },
+  getSessionNormalized: (...args: unknown[]) =>
+    getSessionNormalizedMock(...args),
+}));
+jest.mock('@/platform/auth0/claims', () => {
+  const actual = jest.requireActual('@/platform/auth0/claims');
+  return {
+    ...actual,
+    extractPermissions: jest.fn(() => ['candidate:access']),
+    hasPermission: jest.fn((perms: string[], req: string) =>
+      perms.includes(req),
+    ),
+  };
 });
 
 describe('bffAuth utilities', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     delete process.env.TENON_DEBUG_PERF;
-    auth0Mock = jest.requireMock('@/lib/auth0').auth0 as { getAccessToken: jest.Mock };
+    auth0Mock = jest.requireMock('@/platform/auth0').auth0 as {
+      getAccessToken: jest.Mock;
+    };
   });
 
   it('merges response cookies', () => {
@@ -65,13 +84,18 @@ describe('bffAuth utilities', () => {
 
   it('returns 403 when permission missing', async () => {
     getSessionNormalizedMock.mockResolvedValue({ user: { email: 'a' } });
-    const res = await requireBffAuth(new NextRequest('http://x'), { requirePermission: 'recruiter:access' });
+    const res = await requireBffAuth(new NextRequest('http://x'), {
+      requirePermission: 'recruiter:access',
+    });
     expect(res.ok).toBe(false);
     if (!res.ok) expect(res.response.status).toBe(403);
   });
 
   it('returns 401 when access token cannot be obtained', async () => {
-    getSessionNormalizedMock.mockResolvedValue({ user: { email: 'a' }, accessToken: null });
+    getSessionNormalizedMock.mockResolvedValue({
+      user: { email: 'a' },
+      accessToken: null,
+    });
     auth0Mock.getAccessToken.mockResolvedValue(null);
     const res = await requireBffAuth(new NextRequest('http://x'));
     expect(res.ok).toBe(false);
@@ -81,7 +105,10 @@ describe('bffAuth utilities', () => {
   it('returns success when token present and logs perf when enabled', async () => {
     process.env.TENON_DEBUG_PERF = 'true';
     const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
-    getSessionNormalizedMock.mockResolvedValue({ user: { email: 'a' }, accessToken: { token: 'tok' } });
+    getSessionNormalizedMock.mockResolvedValue({
+      user: { email: 'a' },
+      accessToken: { token: 'tok' },
+    });
     auth0Mock.getAccessToken.mockResolvedValue({ token: 'tok' });
     const res = await requireBffAuth(new NextRequest('http://x'));
     expect(res.ok).toBe(true);
@@ -89,7 +116,10 @@ describe('bffAuth utilities', () => {
   });
 
   it('handles auth0.getAccessToken throwing', async () => {
-    getSessionNormalizedMock.mockResolvedValue({ user: { email: 'a' }, accessToken: { token: 'tok' } });
+    getSessionNormalizedMock.mockResolvedValue({
+      user: { email: 'a' },
+      accessToken: { token: 'tok' },
+    });
     auth0Mock.getAccessToken.mockRejectedValue(new Error('fail'));
     const res = await requireBffAuth(new NextRequest('http://x'));
     expect(res.ok).toBe(false);

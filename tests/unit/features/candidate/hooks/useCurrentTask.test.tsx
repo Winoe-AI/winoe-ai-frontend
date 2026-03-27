@@ -2,8 +2,8 @@ import React from 'react';
 import { act, render, screen } from '@testing-library/react';
 import { useCurrentTask } from '@/features/candidate/session/hooks/useCurrentTask';
 
-jest.mock('@/features/candidate/api', () => {
-  const actual = jest.requireActual('@/features/candidate/api');
+jest.mock('@/features/candidate/session/api', () => {
+  const actual = jest.requireActual('@/features/candidate/session/api');
   return {
     __esModule: true,
     ...actual,
@@ -11,7 +11,7 @@ jest.mock('@/features/candidate/api', () => {
   };
 });
 
-const getTaskMock = jest.requireMock('@/features/candidate/api')
+const getTaskMock = jest.requireMock('@/features/candidate/session/api')
   .getCandidateCurrentTask as jest.Mock;
 
 function Harness({

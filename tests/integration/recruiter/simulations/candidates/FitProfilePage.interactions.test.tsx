@@ -18,10 +18,16 @@ describe('FitProfilePage interactions', () => {
 
   it('wires print button to window.print', async () => {
     const printSpy = jest.spyOn(window, 'print').mockImplementation(() => {});
-    setFetchForFitProfile(async (url) => (url === '/api/candidate_sessions/2/fit_profile' ? jsonResponse(READY_PAYLOAD) : textResponse('Not found', 404)));
+    setFetchForFitProfile(async (url) =>
+      url === '/api/candidate_sessions/2/fit_profile'
+        ? jsonResponse(READY_PAYLOAD)
+        : textResponse('Not found', 404),
+    );
     renderFitProfilePage();
     const user = userEvent.setup();
-    await user.click(await screen.findByRole('button', { name: /Print \/ Save PDF/i }));
+    await user.click(
+      await screen.findByRole('button', { name: /Print \/ Save PDF/i }),
+    );
     expect(printSpy).toHaveBeenCalledTimes(1);
     printSpy.mockRestore();
   });

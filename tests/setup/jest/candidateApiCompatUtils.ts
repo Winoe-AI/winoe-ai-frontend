@@ -1,13 +1,24 @@
-export function canCallCompatFn(value: unknown): value is (...args: unknown[]) => unknown {
+export function canCallCompatFn(
+  value: unknown,
+): value is (...args: unknown[]) => unknown {
   if (typeof value !== 'function') return false;
-  const maybeMock = value as { _isMockFunction?: boolean; getMockImplementation?: () => unknown };
+  const maybeMock = value as {
+    _isMockFunction?: boolean;
+    getMockImplementation?: () => unknown;
+  };
   if (!maybeMock._isMockFunction) return true;
-  return typeof maybeMock.getMockImplementation === 'function' && maybeMock.getMockImplementation() != null;
+  return (
+    typeof maybeMock.getMockImplementation === 'function' &&
+    maybeMock.getMockImplementation() != null
+  );
 }
 
 export const resolveCompat = () => {
   try {
-    return jest.requireMock('@/features/candidate/api') as Record<string, unknown>;
+    return jest.requireMock('@/features/candidate/session/api') as Record<
+      string,
+      unknown
+    >;
   } catch {
     return {} as Record<string, unknown>;
   }

@@ -25,11 +25,11 @@ jest.mock('next/server', () => ({
   },
 }));
 
-jest.mock('@/lib/auth/authCookies', () => ({
+jest.mock('@/platform/auth/authCookies', () => ({
   isAuthCookie: jest.fn(() => true),
 }));
 
-jest.mock('@/lib/auth/routing', () => ({
+jest.mock('@/platform/auth/routing', () => ({
   sanitizeReturnTo: jest.fn((v) => v || '/'),
   modeForPath: jest.fn(() => 'recruiter'),
 }));

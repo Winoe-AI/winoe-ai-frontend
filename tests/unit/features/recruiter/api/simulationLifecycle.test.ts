@@ -4,11 +4,11 @@ import {
   patchScenarioVersion,
   regenerateSimulationScenario,
   retrySimulationGeneration,
-} from '@/features/recruiter/api/simulationLifecycle';
+} from '@/features/recruiter/api/simulationLifecycleApi';
 
 const mockRequestRecruiterBff = jest.fn();
 
-jest.mock('@/features/recruiter/api/requestRecruiterBff', () => ({
+jest.mock('@/features/recruiter/api/requestRecruiterBffApi', () => ({
   requestRecruiterBff: (...args: unknown[]) => mockRequestRecruiterBff(...args),
 }));
 

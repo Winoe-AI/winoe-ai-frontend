@@ -1,4 +1,4 @@
-import { normalizeDayWindows } from '../utils/schedule';
+import { normalizeDayWindows } from '../utils/scheduleUtils';
 import type { PickWindowArgs, WindowStatePhase } from './windowState.types';
 import { toIsoOrNull } from './windowState.parse';
 
@@ -31,7 +31,8 @@ export function pickWindow(params: PickWindowArgs): {
     };
   }
   const first = windows[0] ?? null;
-  if (!first) return { dayIndex: index, windowStartAt: null, windowEndAt: null };
+  if (!first)
+    return { dayIndex: index, windowStartAt: null, windowEndAt: null };
   return {
     dayIndex: first.dayIndex,
     windowStartAt: toIsoOrNull(first.windowStartAt),

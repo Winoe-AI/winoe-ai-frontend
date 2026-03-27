@@ -2,7 +2,7 @@ import type {
   CandidateCurrentDayWindow,
   CandidateDayWindow,
   CandidateRecordedSubmission,
-} from '@/features/candidate/api';
+} from '@/features/candidate/session/api';
 
 export type SimulationSummary = { title: string; role: string };
 

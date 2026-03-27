@@ -1,6 +1,9 @@
 import Button from '@/shared/ui/Button';
 import type { SchedulingViewProps } from './SchedulingView.types';
-import { formatScheduleDate, formatScheduleTimeRange } from './SchedulingView.format';
+import {
+  formatScheduleDate,
+  formatScheduleTimeRange,
+} from './SchedulingView.format';
 
 type SchedulingConfirmStepProps = Pick<
   SchedulingViewProps,
@@ -35,7 +38,9 @@ export function SchedulingConfirmStep({
         </p>
       </div>
       <div>
-        <h2 className="text-sm font-semibold text-gray-900">5-day schedule preview</h2>
+        <h2 className="text-sm font-semibold text-gray-900">
+          5-day schedule preview
+        </h2>
         <ul className="mt-2 space-y-2">
           {schedulePreviewWindows.map((window) => (
             <li

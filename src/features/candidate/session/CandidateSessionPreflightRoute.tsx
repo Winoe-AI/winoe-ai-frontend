@@ -32,7 +32,11 @@ export function CandidateSessionPreflightRoute({
     return <LoadingView message="Loading your tasks and workspace." />;
   }
 
-  const accessRoute = CandidateSessionAccessRoute({ props, view, errorMessage });
+  const accessRoute = CandidateSessionAccessRoute({
+    props,
+    view,
+    errorMessage,
+  });
   if (accessRoute) return accessRoute;
 
   const scheduleRoute = CandidateSessionSchedulingRoute({ props, view });

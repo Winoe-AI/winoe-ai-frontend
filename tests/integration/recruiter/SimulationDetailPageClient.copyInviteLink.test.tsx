@@ -16,18 +16,41 @@ describe('RecruiterSimulationDetailPage - copy invite link', () => {
     });
 
     mockFetchHandlers({
-      '/api/simulations': jsonResponse([{ id: 'sim-1', title: 'Simulation sim-1', templateKey: 'python-fastapi' }]),
-      '/api/simulations/sim-1/candidates': jsonResponse([{ candidateSessionId: 11, inviteEmail: 'a@example.com', candidateName: 'Alex', status: 'in_progress', inviteUrl: 'https://example.com/invite', startedAt: null, completedAt: null, hasReport: false }]),
+      '/api/simulations': jsonResponse([
+        {
+          id: 'sim-1',
+          title: 'Simulation sim-1',
+          templateKey: 'python-fastapi',
+        },
+      ]),
+      '/api/simulations/sim-1/candidates': jsonResponse([
+        {
+          candidateSessionId: 11,
+          inviteEmail: 'a@example.com',
+          candidateName: 'Alex',
+          status: 'in_progress',
+          inviteUrl: 'https://example.com/invite',
+          startedAt: null,
+          completedAt: null,
+          hasReport: false,
+        },
+      ]),
     });
 
     renderPage();
-    await user.click(await screen.findByRole('button', { name: /Copy invite link/i }));
+    await user.click(
+      await screen.findByRole('button', { name: /Copy invite link/i }),
+    );
     expect(clipboardWrite).toHaveBeenCalled();
     const copiedMessages = await screen.findAllByText(/Invite link copied/i);
     expect(copiedMessages.length).toBeGreaterThan(0);
 
     clipboardWrite.mockRejectedValueOnce(new Error('nope'));
-    await user.click(screen.getByRole('button', { name: /Copied|Copy invite link/i }));
-    expect(await screen.findByLabelText(/Manual invite link/i)).toBeInTheDocument();
+    await user.click(
+      screen.getByRole('button', { name: /Copied|Copy invite link/i }),
+    );
+    expect(
+      await screen.findByLabelText(/Manual invite link/i),
+    ).toBeInTheDocument();
   });
 });

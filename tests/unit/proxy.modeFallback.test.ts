@@ -13,7 +13,9 @@ describe('proxy - mode fallback', () => {
     modeForPathMock.mockReturnValueOnce(undefined);
     getSessionNormalizedMock.mockResolvedValue(null);
 
-    const res = await proxy(new NextRequest(new URL('http://localhost/unknown')));
+    const res = await proxy(
+      new NextRequest(new URL('http://localhost/unknown')),
+    );
     expect(res?.headers.get('location')).toContain('/auth/login');
     expect(modeForPathMock).toHaveBeenCalled();
   });

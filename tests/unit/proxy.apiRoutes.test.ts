@@ -30,7 +30,9 @@ describe('proxy - public and api routes', () => {
     mockAuth0.middleware.mockResolvedValue(authResp);
     getSessionNormalizedMock.mockResolvedValue(null);
 
-    const res = await proxy(new NextRequest(new URL('http://localhost/api/simulations')));
+    const res = await proxy(
+      new NextRequest(new URL('http://localhost/api/simulations')),
+    );
     expect(res?.status).toBe(200);
     expect(res?.headers.get('location')).toBeNull();
     expect(res?.cookies.getAll().find((c) => c.name === 'a')?.value).toBe('b');
@@ -45,13 +47,17 @@ describe('proxy - public and api routes', () => {
     const res = await proxy(new NextRequest(new URL('http://localhost/api')));
     expect(res?.status).toBe(200);
     expect(res?.headers.get('location')).toBeNull();
-    expect(res?.cookies.getAll().find((c) => c.name === 'api')?.value).toBe('root');
+    expect(res?.cookies.getAll().find((c) => c.name === 'api')?.value).toBe(
+      'root',
+    );
     expect(getSessionNormalizedMock).not.toHaveBeenCalled();
   });
 
   it('treats /apiary as non-api and applies auth gating', async () => {
     getSessionNormalizedMock.mockResolvedValue(null);
-    const res = await proxy(new NextRequest(new URL('http://localhost/apiary')));
+    const res = await proxy(
+      new NextRequest(new URL('http://localhost/apiary')),
+    );
     expect(res?.status).toBe(307);
     expect(res?.headers.get('location')).toContain('/auth/login');
   });

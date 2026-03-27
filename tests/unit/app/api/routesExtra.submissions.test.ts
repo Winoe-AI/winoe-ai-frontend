@@ -11,7 +11,11 @@ describe('API routes extra coverage - submissions', () => {
   afterEach(resetRoutesExtraMocks);
 
   it('builds path without search params', async () => {
-    mockRequireBffAuth.mockResolvedValue({ ok: true, accessToken: 'tok-sub', cookies: [] });
+    mockRequireBffAuth.mockResolvedValue({
+      ok: true,
+      accessToken: 'tok-sub',
+      cookies: [],
+    });
     mockForwardJson.mockResolvedValue(NextResponse.json({ items: [] }));
 
     const { GET } = await import('@/app/api/submissions/route');
@@ -31,9 +35,12 @@ describe('API routes extra coverage - submissions', () => {
     });
     const { GET } = await import('@/app/api/submissions/[submissionId]/route');
     markMetadataCovered('@/app/api/submissions/[submissionId]/route');
-    const res = await GET(new NextRequest('http://localhost/api/submissions/99'), {
-      params: Promise.resolve({ submissionId: '99' }),
-    });
+    const res = await GET(
+      new NextRequest('http://localhost/api/submissions/99'),
+      {
+        params: Promise.resolve({ submissionId: '99' }),
+      },
+    );
     expect(res.status).toBe(403);
   });
 });

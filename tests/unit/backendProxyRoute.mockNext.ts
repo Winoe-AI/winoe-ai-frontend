@@ -7,8 +7,9 @@ const buildHeaders = (
 ) => {
   const store = new Map<string, string>();
   if (init && typeof (init as { forEach?: unknown }).forEach === 'function') {
-    (init as { forEach: (cb: (value: string, key: string) => void) => void })
-      .forEach((value, key) => store.set(key.toLowerCase(), value));
+    (
+      init as { forEach: (cb: (value: string, key: string) => void) => void }
+    ).forEach((value, key) => store.set(key.toLowerCase(), value));
   } else {
     Object.entries((init as Record<string, string>) ?? {}).forEach(([k, v]) =>
       store.set(k.toLowerCase(), v),
@@ -54,7 +55,11 @@ export class MockNextRequest {
 
   constructor(
     url: URL | string,
-    init?: { method?: string; headers?: Record<string, string>; body?: string | ArrayBuffer },
+    init?: {
+      method?: string;
+      headers?: Record<string, string>;
+      body?: string | ArrayBuffer;
+    },
   ) {
     this.url = url.toString();
     this.nextUrl = new URL(this.url);

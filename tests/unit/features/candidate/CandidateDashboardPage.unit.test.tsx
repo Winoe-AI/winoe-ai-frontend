@@ -1,7 +1,7 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import CandidateDashboardPage from '@/features/candidate/dashboard/CandidateDashboardPage';
+import CandidateDashboardPage from '@/features/candidate/portal/CandidateDashboardPage';
 import { useCandidateSession } from '@/features/candidate/session/CandidateSessionProvider';
-import { listCandidateInvites } from '@/features/candidate/api';
+import { listCandidateInvites } from '@/features/candidate/session/api';
 import {
   fallbackInvite,
   sortedInvites,
@@ -11,7 +11,7 @@ jest.mock('@/features/candidate/session/CandidateSessionProvider', () => ({
   useCandidateSession: jest.fn(),
 }));
 
-jest.mock('@/features/candidate/api', () => ({
+jest.mock('@/features/candidate/session/api', () => ({
   listCandidateInvites: jest.fn(),
 }));
 

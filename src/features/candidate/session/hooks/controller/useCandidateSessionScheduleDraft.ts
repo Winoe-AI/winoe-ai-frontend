@@ -1,8 +1,15 @@
 import { useCallback, useMemo, useState } from 'react';
-import { buildSchedulePreview, isValidIanaTimezone, toDateInputInTimezone } from '../../utils/schedule';
-import type { CandidateSessionScheduleParams } from './candidateSessionSchedule.types';
-import { validateScheduleDraft } from './validateScheduleDraft';
-type Params = Pick<CandidateSessionScheduleParams, 'bootstrap' | 'detectedTimezone'>;
+import {
+  buildSchedulePreview,
+  isValidIanaTimezone,
+  toDateInputInTimezone,
+} from '../../utils/scheduleUtils';
+import type { CandidateSessionScheduleParams } from './useCandidateSessionSchedule.types';
+import { validateScheduleDraft } from './useValidateScheduleDraft';
+type Params = Pick<
+  CandidateSessionScheduleParams,
+  'bootstrap' | 'detectedTimezone'
+>;
 
 export function useCandidateSessionScheduleDraft({
   bootstrap,
@@ -12,7 +19,9 @@ export function useCandidateSessionScheduleDraft({
   const [scheduleTimezoneState, setScheduleTimezone] = useState<string | null>(
     null,
   );
-  const [scheduleDateError, setScheduleDateError] = useState<string | null>(null);
+  const [scheduleDateError, setScheduleDateError] = useState<string | null>(
+    null,
+  );
   const [scheduleTimezoneError, setScheduleTimezoneError] = useState<
     string | null
   >(null);
@@ -21,7 +30,10 @@ export function useCandidateSessionScheduleDraft({
   );
 
   const scheduleTimezoneValue =
-    scheduleTimezoneState ?? bootstrap?.candidateTimezone ?? detectedTimezone ?? '';
+    scheduleTimezoneState ??
+    bootstrap?.candidateTimezone ??
+    detectedTimezone ??
+    '';
   const bootstrapScheduleDate =
     bootstrap?.scheduledStartAt && scheduleTimezoneValue
       ? toDateInputInTimezone(bootstrap.scheduledStartAt, scheduleTimezoneValue)

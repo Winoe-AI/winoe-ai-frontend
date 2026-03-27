@@ -5,10 +5,10 @@ Next.js App Router (React 19 + TypeScript) UI for Tenon 5-day simulations. Candi
 ## Architecture
 
 - App Router routes live in `src/app`.
-- Middleware auth gating lives in `src/proxy.ts` and `middleware.ts`.
+- Middleware auth gating lives in `src/platform/middleware/proxy.ts` and `middleware.ts`.
 - Candidate API calls use `apiClient` or `requestWithMeta` against `NEXT_PUBLIC_TENON_API_BASE_URL` (defaults to `/api/backend`).
 - Recruiter API calls use the `/api` BFF routes with Auth0 access tokens.
-- Features live in `src/features`, shared UI in `src/shared`, and infra in `src/lib`.
+- Features live in `src/features`, shared UI in `src/shared`, and infra in `src/platform`.
 
 ## Quick Start
 

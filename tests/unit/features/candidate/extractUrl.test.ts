@@ -1,4 +1,4 @@
-import { extractFirstUrl } from '@/features/candidate/session/utils/extractUrl';
+import { extractFirstUrl } from '@/features/candidate/session/utils/extractUrlUtils';
 
 describe('extractFirstUrl', () => {
   it('returns null when no url exists', () => {

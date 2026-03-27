@@ -35,7 +35,9 @@ export function loadPersistedState(dispatch: ReducerPair['dispatch']) {
     const raw = sessionStorage.getItem(STORAGE_KEY);
     if (!raw) return;
     const parsed = JSON.parse(raw) as Partial<PersistedState>;
-    const persistedInviteToken = normalizePersistedInviteToken(parsed?.inviteToken);
+    const persistedInviteToken = normalizePersistedInviteToken(
+      parsed?.inviteToken,
+    );
     const routeToken = activeRouteToken();
     const isRouteTokenMismatch =
       routeToken !== null && persistedInviteToken !== routeToken;

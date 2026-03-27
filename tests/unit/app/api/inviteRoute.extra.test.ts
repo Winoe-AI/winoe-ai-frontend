@@ -15,7 +15,9 @@ describe('/api/simulations/[id]/invite route extra cases', () => {
     mockForwardJson.mockResolvedValue({});
 
     const mod = await import('@/app/api/simulations/[id]/invite/route');
-    const req = await createRequest('http://localhost/api/simulations/sim-2/invite');
+    const req = await createRequest(
+      'http://localhost/api/simulations/sim-2/invite',
+    );
     await mod.POST(req as never, { params: Promise.resolve({ id: 'sim-2' }) });
 
     expect(mockForwardJson).toHaveBeenCalledWith(
@@ -28,7 +30,10 @@ describe('/api/simulations/[id]/invite route extra cases', () => {
     mockForwardJson.mockResolvedValue({});
 
     const mod = await import('@/app/api/simulations/[id]/invite/route');
-    const req = await createRequest('http://localhost/api/simulations/sim%2F1/invite', {});
+    const req = await createRequest(
+      'http://localhost/api/simulations/sim%2F1/invite',
+      {},
+    );
     await mod.POST(req as never, { params: Promise.resolve({ id: 'sim/1' }) });
 
     expect(mockForwardJson).toHaveBeenCalledWith(

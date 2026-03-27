@@ -18,7 +18,13 @@ describe('candidateApi current task', () => {
       jsonRes({
         isComplete: false,
         completedTaskIds: [],
-        currentTask: { id: 2, dayIndex: 1, type: 'design', title: 'Plan', description: 'Draw it' },
+        currentTask: {
+          id: 2,
+          dayIndex: 1,
+          type: 'design',
+          title: 'Plan',
+          description: 'Draw it',
+        },
       }),
     );
     installFetchMock(fetchMock);
@@ -27,7 +33,9 @@ describe('candidateApi current task', () => {
     expect(result.currentTask?.id).toBe(2);
     expect(fetchMock).toHaveBeenCalledWith(
       '/api/backend/candidate/session/44/current_task',
-      expect.objectContaining({ headers: expect.objectContaining({ 'x-candidate-session-id': '44' }) }),
+      expect.objectContaining({
+        headers: expect.objectContaining({ 'x-candidate-session-id': '44' }),
+      }),
     );
   });
 
@@ -68,6 +76,8 @@ describe('candidateApi current task', () => {
     fetchMock.mockRejectedValue(new TypeError('offline'));
     installFetchMock(fetchMock);
     const { getCandidateCurrentTask } = await importCandidateApi();
-    await expect(getCandidateCurrentTask(10)).rejects.toMatchObject({ status: 0 });
+    await expect(getCandidateCurrentTask(10)).rejects.toMatchObject({
+      status: 0,
+    });
   });
 });

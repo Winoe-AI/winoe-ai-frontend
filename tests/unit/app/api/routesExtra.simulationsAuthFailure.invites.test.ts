@@ -19,9 +19,12 @@ describe('API routes extra coverage - simulations auth failure invites', () => {
   it('POST invite returns auth failure', async () => {
     const { POST } = await import('@/app/api/simulations/[id]/invite/route');
     markMetadataCovered('@/app/api/simulations/[id]/invite/route');
-    const res = await POST(new NextRequest('http://localhost/api/simulations/id/invite'), {
-      params: Promise.resolve({ id: 'id' }),
-    });
+    const res = await POST(
+      new NextRequest('http://localhost/api/simulations/id/invite'),
+      {
+        params: Promise.resolve({ id: 'id' }),
+      },
+    );
     expect(res.status).toBe(401);
   });
 
@@ -31,7 +34,9 @@ describe('API routes extra coverage - simulations auth failure invites', () => {
     const { POST } = await import(routePath);
     markMetadataCovered(routePath);
     const res = await POST(
-      new NextRequest('http://localhost/api/simulations/id/candidates/one/invite/resend'),
+      new NextRequest(
+        'http://localhost/api/simulations/id/candidates/one/invite/resend',
+      ),
       { params: Promise.resolve({ id: 'id', candidateSessionId: 'one' }) },
     );
     expect(res.status).toBe(401);

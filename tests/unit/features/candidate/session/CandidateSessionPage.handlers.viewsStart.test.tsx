@@ -1,4 +1,10 @@
-import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from '@testing-library/react';
 import {
   CandidateSessionPage,
   baseState,
@@ -25,7 +31,9 @@ describe('CandidateSessionPage handlers - view and start flows', () => {
       },
     });
     await act(async () => render(<CandidateSessionPage token="inv" />));
-    await waitFor(() => expect(screen.queryByTestId('run-tests-panel')).not.toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.queryByTestId('run-tests-panel')).not.toBeInTheDocument(),
+    );
   });
 
   it('handles day 1 design task without workspace panel', async () => {
@@ -34,18 +42,39 @@ describe('CandidateSessionPage handlers - view and start flows', () => {
       ...state,
       state: {
         ...state.state,
-        taskState: { ...state.state.taskState, currentTask: { id: 1, dayIndex: 1, type: 'design' as const, title: 'Design Task', description: 'Plan the architecture' } },
+        taskState: {
+          ...state.state.taskState,
+          currentTask: {
+            id: 1,
+            dayIndex: 1,
+            type: 'design' as const,
+            title: 'Design Task',
+            description: 'Plan the architecture',
+          },
+        },
       },
     });
     await act(async () => render(<CandidateSessionPage token="inv" />));
-    await waitFor(() => expect(screen.getByTestId('task-view')).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByTestId('task-view')).toBeInTheDocument(),
+    );
     expect(screen.queryByTestId('workspace-panel')).not.toBeInTheDocument();
     expect(screen.queryByTestId('run-tests-panel')).not.toBeInTheDocument();
   });
 
   it('triggers handleStart and fetchCurrentTask on start button click', async () => {
     const setStarted = jest.fn();
-    getCurrentTaskMock.mockResolvedValue({ isComplete: false, completedTaskIds: [], currentTask: { id: 1, dayIndex: 1, type: 'design', title: 'Design Task', description: '' } });
+    getCurrentTaskMock.mockResolvedValue({
+      isComplete: false,
+      completedTaskIds: [],
+      currentTask: {
+        id: 1,
+        dayIndex: 1,
+        type: 'design',
+        title: 'Design Task',
+        description: '',
+      },
+    });
     const state = baseState();
     useCandidateSessionMock.mockReturnValue({
       ...state,
@@ -53,7 +82,16 @@ describe('CandidateSessionPage handlers - view and start flows', () => {
       state: {
         ...state.state,
         started: false,
-        taskState: { ...state.state.taskState, currentTask: { id: 1, dayIndex: 1, type: 'design', title: 'Design Task', description: '' } },
+        taskState: {
+          ...state.state.taskState,
+          currentTask: {
+            id: 1,
+            dayIndex: 1,
+            type: 'design',
+            title: 'Design Task',
+            description: '',
+          },
+        },
       },
     });
     await act(async () => render(<CandidateSessionPage token="inv" />));

@@ -1,8 +1,8 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { queryKeys } from '@/shared/query';
-import type { DashboardOptions, DashboardPayload } from './dashboardTypes';
-import { fetchDashboard, isAbortError } from './dashboardApi';
+import type { DashboardOptions, DashboardPayload } from './useDashboardTypes';
+import { fetchDashboard, isAbortError } from './useDashboardApi';
 
 function isCancelledQueryError(error: unknown) {
   return (

@@ -1,12 +1,12 @@
 import type { ComponentType } from 'react';
 import dynamic from 'next/dynamic';
 import type { CandidateTask } from '../../CandidateSessionProvider';
-import type { PollResult } from '../../task/hooks/runTestsTypes';
+import type { PollResult } from '@/features/candidate/tasks/hooks/useRunTestsTypes';
 import type { WindowActionGate } from '../../lib/windowState';
 import type {
   CodingWorkspace,
   CodingWorkspaceSnapshot,
-} from '../../task/utils/codingWorkspace';
+} from '@/features/candidate/tasks/utils/codingWorkspaceUtils';
 import type { WorkspaceAndTestsProps } from '../WorkspaceAndTests';
 
 const LazyWorkspaceAndTests = dynamic<WorkspaceAndTestsProps>(

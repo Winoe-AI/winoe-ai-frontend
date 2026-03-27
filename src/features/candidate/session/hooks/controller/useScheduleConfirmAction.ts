@@ -1,10 +1,28 @@
 import { useCallback } from 'react';
-import { isScheduleLocked, localDateAtHourToUtcIso } from '../../utils/schedule';
-import type { CandidateSessionScheduleParams, SetNullableString } from './candidateSessionSchedule.types';
-import { handleScheduleConfirmError } from './handleScheduleConfirmError';
-import { submitCandidateSchedule } from './submitCandidateSchedule';
+import {
+  isScheduleLocked,
+  localDateAtHourToUtcIso,
+} from '../../utils/scheduleUtils';
+import type {
+  CandidateSessionScheduleParams,
+  SetNullableString,
+} from './useCandidateSessionSchedule.types';
+import { handleScheduleConfirmError } from './useHandleScheduleConfirmError';
+import { submitCandidateSchedule } from './useSubmitCandidateSchedule';
 
-type Params = Pick<CandidateSessionScheduleParams, 'token' | 'bootstrap' | 'setView' | 'runInit' | 'markStart' | 'markEnd' | 'redirectToLogin' | 'setErrorStatus' | 'setErrorMessage' | 'session'> & {
+type Params = Pick<
+  CandidateSessionScheduleParams,
+  | 'token'
+  | 'bootstrap'
+  | 'setView'
+  | 'runInit'
+  | 'markStart'
+  | 'markEnd'
+  | 'redirectToLogin'
+  | 'setErrorStatus'
+  | 'setErrorMessage'
+  | 'session'
+> & {
   scheduleDateValue: string;
   scheduleTimezoneValue: string;
   validateForm: () => boolean;
@@ -41,9 +59,14 @@ export function useScheduleConfirmAction({
     const timezoneValue = scheduleTimezoneValue.trim();
     let scheduledStartAtUtc = '';
     try {
-      scheduledStartAtUtc = localDateAtHourToUtcIso({ dateInput: scheduleDateValue, timezone: timezoneValue });
+      scheduledStartAtUtc = localDateAtHourToUtcIso({
+        dateInput: scheduleDateValue,
+        timezone: timezoneValue,
+      });
     } catch (err) {
-      setScheduleDateError((err as Error).message || 'Unable to parse start date.');
+      setScheduleDateError(
+        (err as Error).message || 'Unable to parse start date.',
+      );
       setView('scheduling');
       return;
     }
@@ -81,5 +104,23 @@ export function useScheduleConfirmAction({
         setScheduleDateError,
       });
     }
-  }, [validateForm, setView, scheduleTimezoneValue, scheduleDateValue, setScheduleDateError, setScheduleSubmitError, markStart, token, session, bootstrap, clearScheduleErrors, markEnd, redirectToLogin, setErrorStatus, setErrorMessage, runInit, setScheduleTimezoneError]);
+  }, [
+    validateForm,
+    setView,
+    scheduleTimezoneValue,
+    scheduleDateValue,
+    setScheduleDateError,
+    setScheduleSubmitError,
+    markStart,
+    token,
+    session,
+    bootstrap,
+    clearScheduleErrors,
+    markEnd,
+    redirectToLogin,
+    setErrorStatus,
+    setErrorMessage,
+    runInit,
+    setScheduleTimezoneError,
+  ]);
 }

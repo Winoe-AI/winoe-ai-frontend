@@ -1,12 +1,12 @@
-import { RunTestsPanel } from '../task/components/RunTestsPanel';
-import { WorkspacePanel } from '../task/components/WorkspacePanel';
+import { RunTestsPanel } from '@/features/candidate/tasks/components/RunTestsPanel';
+import { WorkspacePanel } from '@/features/candidate/tasks/components/WorkspacePanel';
 import type { CandidateTask } from '../CandidateSessionProvider';
-import type { PollResult } from '../task/hooks/runTestsTypes';
+import type { PollResult } from '@/features/candidate/tasks/hooks/useRunTestsTypes';
 import type { WindowActionGate } from '../lib/windowState';
 import type {
   CodingWorkspace,
   CodingWorkspaceSnapshot,
-} from '../task/utils/codingWorkspace';
+} from '@/features/candidate/tasks/utils/codingWorkspaceUtils';
 
 export type WorkspaceAndTestsProps = {
   task: CandidateTask;

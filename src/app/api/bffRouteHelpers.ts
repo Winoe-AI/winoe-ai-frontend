@@ -3,9 +3,12 @@ import {
   REQUEST_ID_HEADER,
   forwardJson,
   resolveRequestId,
-} from '@/lib/server/bff';
-import { BRAND_SLUG } from '@/lib/brand';
-import { mergeResponseCookies, requireBffAuth } from '@/lib/server/bffAuth';
+} from '@/platform/server/bff';
+import { BRAND_SLUG } from '@/platform/config/brand';
+import {
+  mergeResponseCookies,
+  requireBffAuth,
+} from '@/platform/server/bffAuth';
 import { errorResponse } from './errorResponse';
 
 export const BFF_HEADER = `x-${BRAND_SLUG}-bff`;

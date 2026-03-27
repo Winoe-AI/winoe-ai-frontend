@@ -1,6 +1,6 @@
 import { useCandidateSession } from '@/features/candidate/session/CandidateSessionProvider';
 import { useTaskSubmission } from '@/features/candidate/session/hooks/useTaskSubmission';
-import { resolveCandidateInviteToken } from '@/features/candidate/api';
+import { resolveCandidateInviteToken } from '@/features/candidate/session/api';
 
 jest.mock('@/features/candidate/session/CandidateSessionProvider', () => ({
   useCandidateSession: jest.fn(),
@@ -10,8 +10,8 @@ jest.mock('@/features/candidate/session/hooks/useTaskSubmission', () => ({
   useTaskSubmission: jest.fn(),
 }));
 
-jest.mock('@/features/candidate/api', () => ({
-  ...jest.requireActual('@/features/candidate/api'),
+jest.mock('@/features/candidate/session/api', () => ({
+  ...jest.requireActual('@/features/candidate/session/api'),
   resolveCandidateInviteToken: jest.fn(),
   getCandidateCurrentTask: jest.fn(),
   pollCandidateTestRun: jest.fn(),

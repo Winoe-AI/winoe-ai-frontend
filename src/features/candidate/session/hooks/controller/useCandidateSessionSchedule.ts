@@ -1,4 +1,4 @@
-import type { CandidateSessionScheduleParams } from './candidateSessionSchedule.types';
+import type { CandidateSessionScheduleParams } from './useCandidateSessionSchedule.types';
 import { useCandidateSessionScheduleDraft } from './useCandidateSessionScheduleDraft';
 import { useCandidateSessionScheduleSubmit } from './useCandidateSessionScheduleSubmit';
 import { useCandidateSessionScheduleViewState } from './useCandidateSessionScheduleViewState';

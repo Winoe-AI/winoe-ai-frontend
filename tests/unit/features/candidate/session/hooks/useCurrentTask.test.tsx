@@ -5,9 +5,14 @@ import { useCurrentTask } from '@/features/candidate/session/hooks/useCurrentTas
 const getCandidateCurrentTaskMock = jest.fn();
 const friendlyTaskErrorMock = jest.fn(() => 'friendly-task-error');
 
-jest.mock('@/features/candidate/api', () => ({ getCandidateCurrentTask: (...args: unknown[]) => getCandidateCurrentTaskMock(...args) }));
-jest.mock('@/features/candidate/session/utils/errorMessages', () => ({
-  ...jest.requireActual('@/features/candidate/session/utils/errorMessages'),
+jest.mock('@/features/candidate/session/api', () => ({
+  getCandidateCurrentTask: (...args: unknown[]) =>
+    getCandidateCurrentTaskMock(...args),
+}));
+jest.mock('@/features/candidate/session/utils/errorMessagesUtils', () => ({
+  ...jest.requireActual(
+    '@/features/candidate/session/utils/errorMessagesUtils',
+  ),
   friendlyTaskError: (...args: unknown[]) => friendlyTaskErrorMock(...args),
 }));
 
@@ -20,11 +25,14 @@ const baseProps = () => ({
   clearTaskError: jest.fn(),
 });
 
-const HookHarness = forwardRef<HookReturn, ReturnType<typeof baseProps>>((props, ref) => {
-  const hook = useCurrentTask(props);
-  useImperativeHandle(ref, () => hook, [hook]);
-  return null;
-});
+const HookHarness = forwardRef<HookReturn, ReturnType<typeof baseProps>>(
+  (props, ref) => {
+    const hook = useCurrentTask(props);
+    useImperativeHandle(ref, () => hook, [hook]);
+    return null;
+  },
+);
+HookHarness.displayName = 'HookHarness';
 
 describe('useCurrentTask', () => {
   beforeEach(() => {
@@ -44,7 +52,9 @@ describe('useCurrentTask', () => {
   it('dedupes in-flight requests', async () => {
     const ref = React.createRef<HookReturn>();
     let resolveTask: (val: unknown) => void;
-    getCandidateCurrentTaskMock.mockReturnValue(new Promise((res) => (resolveTask = res)) as unknown as Promise<unknown>);
+    getCandidateCurrentTaskMock.mockReturnValue(
+      new Promise((res) => (resolveTask = res)) as unknown as Promise<unknown>,
+    );
 
     render(<HookHarness ref={ref} {...baseProps()} />);
     await act(async () => {
@@ -54,7 +64,17 @@ describe('useCurrentTask', () => {
     expect(getCandidateCurrentTaskMock).toHaveBeenCalledTimes(1);
 
     await act(async () => {
-      resolveTask?.({ isComplete: false, completedTaskIds: [1], currentTask: { id: 1, dayIndex: 2, type: 'code', title: 't', description: 'd' } });
+      resolveTask?.({
+        isComplete: false,
+        completedTaskIds: [1],
+        currentTask: {
+          id: 1,
+          dayIndex: 2,
+          type: 'code',
+          title: 't',
+          description: 'd',
+        },
+      });
     });
   });
 
@@ -64,7 +84,13 @@ describe('useCurrentTask', () => {
     getCandidateCurrentTaskMock.mockResolvedValue({
       isComplete: true,
       progress: { completedTaskIds: [3, 4] },
-      currentTask: { id: 7, dayIndex: 3, type: 'design', title: 'Design', description: 'desc' },
+      currentTask: {
+        id: 7,
+        dayIndex: 3,
+        type: 'design',
+        title: 'Design',
+        description: 'desc',
+      },
     });
 
     render(<HookHarness ref={ref} {...props} />);
@@ -77,14 +103,23 @@ describe('useCurrentTask', () => {
     expect(props.setTaskLoaded).toHaveBeenCalledWith({
       isComplete: true,
       completedTaskIds: [3, 4],
-      currentTask: { id: 7, dayIndex: 3, type: 'design', title: 'Design', description: 'desc' },
+      currentTask: {
+        id: 7,
+        dayIndex: 3,
+        type: 'design',
+        title: 'Design',
+        description: 'desc',
+      },
     });
   });
 
   it('sets friendly error on failure', async () => {
     const props = baseProps();
     const ref = React.createRef<HookReturn>();
-    getCandidateCurrentTaskMock.mockRejectedValue({ status: 410, message: 'expired' });
+    getCandidateCurrentTaskMock.mockRejectedValue({
+      status: 410,
+      message: 'expired',
+    });
 
     render(<HookHarness ref={ref} {...props} />);
     await act(async () => {

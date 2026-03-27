@@ -21,13 +21,14 @@ describe('bff helpers', () => {
 
   beforeAll(async () => {
     jest.mock('@auth0/nextjs-auth0/server', () => ({ Auth0Client: jest.fn() }));
-    // Provide minimal globals required by Next polyfills during import
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (global as any).Request = class {};
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (global as any).Response = class {};
+    const globalScope = global as unknown as {
+      Request: typeof Request;
+      Response: typeof Response;
+    };
+    globalScope.Request = class {} as unknown as typeof Request;
+    globalScope.Response = class {} as unknown as typeof Response;
 
-    const mod = await import('@/lib/server/bff');
+    const mod = await import('@/platform/server/bff');
     parseRetryAfterMs = mod.__testables.parseRetryAfterMs;
     jitteredBackoffMs = mod.__testables.jitteredBackoffMs;
     getFetchDispatcher = mod.__testables.getFetchDispatcher;

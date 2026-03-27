@@ -8,10 +8,14 @@ export const routerMock = { push: jest.fn(), replace: jest.fn() };
 jest.mock('@/features/candidate/session/CandidateSessionProvider', () => ({
   useCandidateSession: () => useCandidateSessionMock(),
 }));
-jest.mock('@/features/candidate/session/hooks/useCandidateSessionActions', () => ({
-  useCandidateSessionActions: (...args: unknown[]) => useCandidateSessionActionsMock(...args),
-}));
-jest.mock('@/features/candidate/session/task/handoff/handoffApi', () => ({
+jest.mock(
+  '@/features/candidate/session/hooks/useCandidateSessionActions',
+  () => ({
+    useCandidateSessionActions: (...args: unknown[]) =>
+      useCandidateSessionActionsMock(...args),
+  }),
+);
+jest.mock('@/features/candidate/tasks/handoff/handoffApi', () => ({
   getHandoffStatus: (...args: unknown[]) => getHandoffStatusMock(...args),
   initHandoffUpload: jest.fn(),
   uploadFileToSignedUrl: jest.fn(),
@@ -19,7 +23,8 @@ jest.mock('@/features/candidate/session/task/handoff/handoffApi', () => ({
 }));
 jest.mock('next/navigation', () => ({ useRouter: () => routerMock }));
 
-const makeIso = (offsetMs: number) => new Date(Date.now() + offsetMs).toISOString();
+const makeIso = (offsetMs: number) =>
+  new Date(Date.now() + offsetMs).toISOString();
 const makeDay4HandoffTask = (): CandidateTask => ({
   id: 44,
   dayIndex: 4,
@@ -35,10 +40,15 @@ export const makeStatusReady = () => ({
   transcriptStatus: 'ready',
   transcriptProgressPct: null,
   transcriptText: 'Recovered transcript body',
-  transcriptSegments: [{ id: null, startMs: 1000, endMs: 3000, text: 'Recovered segment line' }],
+  transcriptSegments: [
+    { id: null, startMs: 1000, endMs: 3000, text: 'Recovered segment line' },
+  ],
 });
 
-export function buildSessionContext(day4StartOffsetMs: number, day4EndOffsetMs: number) {
+export function buildSessionContext(
+  day4StartOffsetMs: number,
+  day4EndOffsetMs: number,
+) {
   return {
     state: {
       inviteToken: 'inv',
@@ -48,8 +58,16 @@ export function buildSessionContext(day4StartOffsetMs: number, day4EndOffsetMs: 
         status: 'in_progress' as const,
         simulation: { title: 'Simulation', role: 'Engineer' },
         dayWindows: [
-          { dayIndex: 4, windowStartAt: makeIso(day4StartOffsetMs), windowEndAt: makeIso(day4EndOffsetMs) },
-          { dayIndex: 5, windowStartAt: makeIso(120 * 60 * 1000), windowEndAt: makeIso(180 * 60 * 1000) },
+          {
+            dayIndex: 4,
+            windowStartAt: makeIso(day4StartOffsetMs),
+            windowEndAt: makeIso(day4EndOffsetMs),
+          },
+          {
+            dayIndex: 5,
+            windowStartAt: makeIso(120 * 60 * 1000),
+            windowEndAt: makeIso(180 * 60 * 1000),
+          },
         ],
         currentDayWindow: {
           dayIndex: 4,
@@ -59,7 +77,13 @@ export function buildSessionContext(day4StartOffsetMs: number, day4EndOffsetMs: 
         },
       },
       started: true,
-      taskState: { loading: false, error: null, isComplete: false, completedTaskIds: [11, 22, 33], currentTask: makeDay4HandoffTask() },
+      taskState: {
+        loading: false,
+        error: null,
+        isComplete: false,
+        completedTaskIds: [11, 22, 33],
+        currentTask: makeDay4HandoffTask(),
+      },
       authStatus: 'ready' as const,
       authError: null,
     },
@@ -85,13 +109,25 @@ export function resetHandoffRecoveryMocks() {
     fetchCurrentTask: jest.fn().mockResolvedValue(undefined),
     handleSubmit: jest.fn().mockResolvedValue(undefined),
     handleStartTests: jest.fn().mockResolvedValue({ runId: 'run-1' }),
-    handlePollTests: jest.fn().mockResolvedValue({ status: 'running', passed: null, failed: null, total: null, stdout: null, stderr: null, workflowUrl: null, commitSha: null }),
+    handlePollTests: jest.fn().mockResolvedValue({
+      status: 'running',
+      passed: null,
+      failed: null,
+      total: null,
+      stdout: null,
+      stderr: null,
+      workflowUrl: null,
+      commitSha: null,
+    }),
     runInit: jest.fn(),
     loginHref: '/auth/login?mode=candidate',
     inviteErrorCopy: 'Invite unavailable.',
     submitting: false,
   });
-  getHandoffStatusMock.mockImplementation((params: { taskId: number; candidateSessionId: number }) =>
-    params.taskId === 44 && params.candidateSessionId === 99 ? Promise.resolve(makeStatusReady()) : Promise.reject({ status: 404 }),
+  getHandoffStatusMock.mockImplementation(
+    (params: { taskId: number; candidateSessionId: number }) =>
+      params.taskId === 44 && params.candidateSessionId === 99
+        ? Promise.resolve(makeStatusReady())
+        : Promise.reject({ status: 404 }),
   );
 }

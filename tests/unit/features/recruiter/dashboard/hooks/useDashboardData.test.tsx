@@ -5,13 +5,13 @@ const fetchDashboard = jest.fn();
 const logPerfMock = jest.fn();
 let locationAssign: jest.Mock;
 
-jest.mock('@/features/recruiter/dashboard/hooks/dashboardApi', () => ({
+jest.mock('@/features/recruiter/dashboard/hooks/useDashboardApi', () => ({
   fetchDashboard: (...args: unknown[]) => fetchDashboard(...args),
   isAbortError: (err: unknown) =>
     (err as { name?: string })?.name === 'AbortError',
 }));
 
-jest.mock('@/features/recruiter/dashboard/utils/perf', () => ({
+jest.mock('@/features/recruiter/dashboard/utils/perfUtils', () => ({
   dashboardPerfDebugEnabled: true,
   logPerf: (...args: unknown[]) => logPerfMock(...args),
   nowMs: () => 100,

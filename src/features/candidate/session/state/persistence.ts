@@ -13,13 +13,5 @@ export function usePersistedState(
 
   useEffect(() => {
     persistCandidateSessionState(state);
-  }, [
-    state.bootstrap,
-    state.candidateSessionId,
-    state.inviteToken,
-    state.started,
-    state.taskState.completedTaskIds,
-    state.taskState.currentTask,
-    state.taskState.isComplete,
-  ]);
+  }, [state]);
 }

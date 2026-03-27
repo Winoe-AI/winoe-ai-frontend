@@ -43,12 +43,16 @@ describe('health route', () => {
   });
 
   it('returns failure on fetch errors', async () => {
-    global.fetch = jest.fn().mockRejectedValue(new Error('down')) as unknown as typeof fetch;
+    global.fetch = jest
+      .fn()
+      .mockRejectedValue(new Error('down')) as unknown as typeof fetch;
     const mod = await import('@/app/api/health/route');
     const res = await mod.GET();
     expect(res.status).toBe(503);
 
-    global.fetch = jest.fn().mockRejectedValue('boom') as unknown as typeof fetch;
+    global.fetch = jest
+      .fn()
+      .mockRejectedValue('boom') as unknown as typeof fetch;
     const second = await mod.GET();
     expect(second.status).toBe(503);
   });

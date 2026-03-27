@@ -1,4 +1,10 @@
-import { act, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from '@testing-library/react';
 import {
   CandidateSessionPage,
   baseState,
@@ -23,24 +29,51 @@ describe('CandidateSessionPage handlers - submit and error flows', () => {
       jest.advanceTimersByTime(1200);
       await Promise.resolve();
     });
-    expect(submitTaskMock).toHaveBeenCalledWith({ taskId: 1, candidateSessionId: 99, contentText: undefined });
-    await waitFor(() => expect(getCurrentTaskMock.mock.calls.some((call) => (call[1] as { skipCache?: boolean } | undefined)?.skipCache)).toBe(true));
+    expect(submitTaskMock).toHaveBeenCalledWith({
+      taskId: 1,
+      candidateSessionId: 99,
+      contentText: undefined,
+    });
+    await waitFor(() =>
+      expect(
+        getCurrentTaskMock.mock.calls.some(
+          (call) => (call[1] as { skipCache?: boolean } | undefined)?.skipCache,
+        ),
+      ).toBe(true),
+    );
     jest.useRealTimers();
   });
 
   it('shows error when start fetch fails after clicking start', async () => {
-    getCurrentTaskMock.mockRejectedValueOnce({ status: 500, message: 'task boom' });
+    getCurrentTaskMock.mockRejectedValueOnce({
+      status: 500,
+      message: 'task boom',
+    });
     const state = baseState();
     useCandidateSessionMock.mockReturnValue({
       ...state,
-      state: { ...state.state, started: false, taskState: { loading: true, error: null, isComplete: false, completedTaskIds: [], currentTask: null } },
+      state: {
+        ...state.state,
+        started: false,
+        taskState: {
+          loading: true,
+          error: null,
+          isComplete: false,
+          completedTaskIds: [],
+          currentTask: null,
+        },
+      },
     });
     await act(async () => render(<CandidateSessionPage token="inv" />));
     await act(async () => {
-      fireEvent.click(await screen.findByRole('button', { name: /Start simulation/i }));
+      fireEvent.click(
+        await screen.findByRole('button', { name: /Start simulation/i }),
+      );
       await Promise.resolve();
     });
-    expect(await screen.findByTestId('state-message')).toHaveTextContent(/Unable to load simulation/i);
+    expect(await screen.findByTestId('state-message')).toHaveTextContent(
+      /Unable to load simulation/i,
+    );
   });
 
   it('handles task fetch failure during bootstrap', async () => {
@@ -51,7 +84,13 @@ describe('CandidateSessionPage handlers - submit and error flows', () => {
       state: {
         ...state.state,
         started: true,
-        taskState: { loading: false, error: null, isComplete: false, completedTaskIds: [], currentTask: null },
+        taskState: {
+          loading: false,
+          error: null,
+          isComplete: false,
+          completedTaskIds: [],
+          currentTask: null,
+        },
       },
     });
     await act(async () => render(<CandidateSessionPage token="inv" />));
@@ -62,7 +101,15 @@ describe('CandidateSessionPage handlers - submit and error flows', () => {
     const state = baseState();
     useCandidateSessionMock.mockReturnValue({
       ...state,
-      state: { ...state.state, started: true, taskState: { ...state.state.taskState, loading: false, currentTask: null } },
+      state: {
+        ...state.state,
+        started: true,
+        taskState: {
+          ...state.state.taskState,
+          loading: false,
+          currentTask: null,
+        },
+      },
     });
     await act(async () => render(<CandidateSessionPage token="inv" />));
     await waitFor(() => expect(getCurrentTaskMock).toHaveBeenCalled());

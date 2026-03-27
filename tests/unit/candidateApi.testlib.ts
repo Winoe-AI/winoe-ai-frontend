@@ -14,7 +14,7 @@ const originalApiBase = process.env.NEXT_PUBLIC_TENON_API_BASE_URL;
 export async function importCandidateApi() {
   jest.resetModules();
   process.env.NEXT_PUBLIC_TENON_API_BASE_URL = 'http://api.example.com';
-  return import('@/features/candidate/api');
+  return import('@/features/candidate/session/api');
 }
 
 export const installFetchMock = (fetchMock: FetchMock) => {

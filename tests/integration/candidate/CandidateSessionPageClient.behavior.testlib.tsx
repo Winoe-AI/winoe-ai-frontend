@@ -1,6 +1,6 @@
 import { screen } from '@testing-library/react';
 import type { UserEvent } from '@testing-library/user-event';
-import { __resetHttpClientCache } from '@/lib/api/client';
+import { __resetHttpClientCache } from '@/platform/api-client/client';
 import { renderCandidateWithProviders } from '../../setup';
 
 export const routerMock = {
@@ -24,7 +24,11 @@ export const CandidateSessionPage = (
 ).default;
 
 export const setSessionPath = (token: string) => {
-  window.history.replaceState({}, '', `/candidate/session/${encodeURIComponent(token)}`);
+  window.history.replaceState(
+    {},
+    '',
+    `/candidate/session/${encodeURIComponent(token)}`,
+  );
 };
 
 export const resetBehaviorEnv = (token = 'valid-token') => {
@@ -41,7 +45,8 @@ export const restoreFetch = () => {
   global.fetch = realFetch;
 };
 
-export const renderSessionPage = (token: string) => renderCandidateWithProviders(<CandidateSessionPage token={token} />);
+export const renderSessionPage = (token: string) =>
+  renderCandidateWithProviders(<CandidateSessionPage token={token} />);
 
 export const baseSession = (overrides: Record<string, unknown> = {}) => ({
   candidateSessionId: 321,
@@ -56,8 +61,16 @@ export const baseSession = (overrides: Record<string, unknown> = {}) => ({
 });
 
 export const sampleWindows = [
-  { dayIndex: 1, windowStartAt: '2099-01-01T14:00:00Z', windowEndAt: '2099-01-01T22:00:00Z' },
-  { dayIndex: 2, windowStartAt: '2099-01-02T14:00:00Z', windowEndAt: '2099-01-02T22:00:00Z' },
+  {
+    dayIndex: 1,
+    windowStartAt: '2099-01-01T14:00:00Z',
+    windowEndAt: '2099-01-01T22:00:00Z',
+  },
+  {
+    dayIndex: 2,
+    windowStartAt: '2099-01-02T14:00:00Z',
+    windowEndAt: '2099-01-02T22:00:00Z',
+  },
 ];
 
 export const fillScheduleAndContinue = async (user: UserEvent) => {

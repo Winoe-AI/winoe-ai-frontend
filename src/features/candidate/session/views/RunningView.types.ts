@@ -1,11 +1,14 @@
 import type { CandidateTask } from '../CandidateSessionProvider';
 import type { DerivedWindowState, WindowActionGate } from '../lib/windowState';
-import type { PollResult } from '../task/hooks/runTestsTypes';
-import type { SubmitPayload, SubmitResponse } from '../task/types';
+import type { PollResult } from '@/features/candidate/tasks/hooks/useRunTestsTypes';
+import type {
+  SubmitPayload,
+  SubmitResponse,
+} from '@/features/candidate/tasks/types';
 import type {
   CodingWorkspace,
   CodingWorkspaceSnapshot,
-} from '../task/utils/codingWorkspace';
+} from '@/features/candidate/tasks/utils/codingWorkspaceUtils';
 
 export type RunningViewProps = {
   title: string;
