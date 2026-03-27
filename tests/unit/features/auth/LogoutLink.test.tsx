@@ -54,9 +54,7 @@ describe('LogoutLink', () => {
   it('navigates on pointerup for primary clicks', () => {
     const { assignSpy, restore } = mockLocationAssign();
     render(<LogoutLink>Logout</LogoutLink>);
-
     firePointerUp(screen.getByText('Logout'), { button: 0, buttons: 1 });
-
     expect(assignSpy).toHaveBeenCalledTimes(1);
     expect(assignSpy).toHaveBeenCalledWith('/auth/logout');
     restore();
@@ -65,9 +63,7 @@ describe('LogoutLink', () => {
   it('navigates on mouseup when pointerup did not handle', () => {
     const { assignSpy, restore } = mockLocationAssign();
     render(<LogoutLink>Logout</LogoutLink>);
-
     fireEvent.mouseUp(screen.getByText('Logout'), { button: 0 });
-
     expect(assignSpy).toHaveBeenCalledTimes(1);
     expect(assignSpy).toHaveBeenCalledWith('/auth/logout');
     restore();
@@ -76,7 +72,6 @@ describe('LogoutLink', () => {
   it('avoids double handling when pointerup already navigated', () => {
     const { assignSpy, restore } = mockLocationAssign();
     render(<LogoutLink>Logout</LogoutLink>);
-
     const link = screen.getByText('Logout');
     firePointerUp(link, { button: 0, buttons: 1 });
     fireEvent.mouseUp(link, { button: 0 });
@@ -88,13 +83,11 @@ describe('LogoutLink', () => {
   it('ignores modified or non-primary clicks', () => {
     const { assignSpy, restore } = mockLocationAssign();
     render(<LogoutLink>Logout</LogoutLink>);
-
     const link = screen.getByText('Logout');
     firePointerUp(link, { button: 2, buttons: 2 });
     firePointerUp(link, { button: 0, buttons: 1, metaKey: true });
     firePointerUp(link, { button: 0, buttons: 1, ctrlKey: true });
     fireEvent.mouseUp(link, { button: 0, shiftKey: true });
-
     expect(assignSpy).not.toHaveBeenCalled();
     restore();
   });

@@ -1,11 +1,6 @@
 'use client';
 import Link from 'next/link';
-import { useCallback } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
-import { queryKeys } from '@/shared/query';
 import type { CandidateSession } from '@/features/recruiter/types';
-import { fetchCandidateFitProfile } from '@/features/recruiter/simulations/candidates/fitProfile/fitProfile.api';
-import { reloadCandidateSubmissions } from '@/features/recruiter/simulations/candidates/hooks/reloadCandidateSubmissions';
 import type { RowState } from '../hooks/types';
 import { CandidateDateCell } from './CandidateDateCell';
 import { CandidateDayProgressCell } from './CandidateDayProgressCell';
@@ -14,6 +9,7 @@ import { CandidateInviteCell } from './CandidateInviteCell';
 import { CandidateReportCell } from './CandidateReportCell';
 import { CandidateStatusCell } from './CandidateStatusCell';
 import { CandidateVerificationCell } from './CandidateVerificationCell';
+import { useCandidateRowPrefetch } from './useCandidateRowPrefetch';
 
 type Props = {
   candidate: CandidateSession;
@@ -40,37 +36,11 @@ export function CandidateRow({
   onResend,
   onCloseManual,
 }: Props) {
-  const queryClient = useQueryClient();
   const submissionsHref = `/dashboard/simulations/${simulationId}/candidates/${candidate.candidateSessionId}`;
-
-  const prefetchCandidateData = useCallback(() => {
-    const candidateSessionId = String(candidate.candidateSessionId);
-    void Promise.all([
-      queryClient.prefetchQuery({
-        queryKey: queryKeys.recruiter.candidateSubmissions(
-          simulationId,
-          candidateSessionId,
-        ),
-        queryFn: ({ signal }) =>
-          reloadCandidateSubmissions({
-            simulationId,
-            candidateSessionId,
-            pageSize: 8,
-            showAll: false,
-            preloadArtifacts: false,
-            skipCache: false,
-            signal,
-          }),
-        staleTime: 10_000,
-      }),
-      queryClient.prefetchQuery({
-        queryKey: queryKeys.recruiter.fitProfileStatus(candidateSessionId),
-        queryFn: ({ signal }) =>
-          fetchCandidateFitProfile(candidateSessionId, signal),
-        staleTime: 10_000,
-      }),
-    ]);
-  }, [candidate.candidateSessionId, queryClient, simulationId]);
+  const prefetchCandidateData = useCandidateRowPrefetch(
+    simulationId,
+    candidate.candidateSessionId,
+  );
 
   return (
     <tr data-testid={`candidate-row-${candidate.candidateSessionId}`}>

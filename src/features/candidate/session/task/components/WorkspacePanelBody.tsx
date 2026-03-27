@@ -1,7 +1,6 @@
 import type { ReactNode } from 'react';
-import Button from '@/shared/ui/Button';
-import { Skeleton } from '@/shared/ui/Skeleton';
 import type { CandidateWorkspaceStatus } from '@/features/candidate/api';
+import { WorkspacePanelErrorState, WorkspacePanelLoadingState } from './WorkspacePanelBodyStates';
 
 type Props = {
   workspace: CandidateWorkspaceStatus | null;
@@ -16,7 +15,6 @@ type Props = {
   readOnly: boolean;
   readOnlyReason: string | null;
 };
-
 export function WorkspacePanelBody({
   workspace,
   loading,
@@ -36,39 +34,21 @@ export function WorkspacePanelBody({
     : workspace?.repoUrl
       ? { href: workspace.repoUrl, label: 'Open Repo' }
       : null;
-
-  if (loading) {
-    return (
-      <div className="mt-4 space-y-2 text-sm text-gray-600">
-        <Skeleton className="h-4 w-40" />
-        <Skeleton className="h-3 w-56 bg-gray-100" />
-        <Skeleton className="h-3 w-48 bg-gray-100" />
-      </div>
-    );
-  }
-
+  if (loading) return <WorkspacePanelLoadingState />;
   if (error) {
     return (
       <div className="mt-3 space-y-2">
-        <div className="rounded border border-red-200 bg-red-50 p-3 text-sm text-red-800">
-          <div>{error}</div>
-          <div className="mt-2 flex gap-2">
-            <Button
-              size="sm"
-              variant="secondary"
-              onClick={onRefresh}
-              disabled={readOnly || refreshing}
-            >
-              {refreshing ? 'Refreshing…' : 'Retry'}
-            </Button>
-          </div>
-        </div>
+        <WorkspacePanelErrorState
+          error={error}
+          onRefresh={onRefresh}
+          readOnly={readOnly}
+          refreshing={refreshing}
+        />
         {fallbackPanel ? <div>{fallbackPanel}</div> : null}
         {integrityCallout ? <div>{integrityCallout}</div> : null}
       </div>
     );
   }
-
   return (
     <div className="mt-3 space-y-2 text-sm text-gray-700">
       {notice ? (

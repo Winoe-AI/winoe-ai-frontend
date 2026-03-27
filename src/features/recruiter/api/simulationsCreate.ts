@@ -1,10 +1,10 @@
-import { extractBackendMessage, fallbackStatus } from '@/lib/api/errors/errors';
+import { extractBackendMessage } from '@/lib/api/errors/errors';
 import type { CreateSimulationInput, CreateSimulationResponse } from './types';
 import { normalizeCreateSimulationResponse } from './simulationsNormalize';
 import { isRecord } from './simUtils';
-import { throwMappedApiError } from '@/lib/api/errors/errorMapping';
 import { requestRecruiterBff } from './requestRecruiterBff';
 import { extractProvidedSimulationEvalEnabledByDay } from './simulationAiEval';
+import { mapCreateSimulationError } from './simulationsCreate.errors';
 
 export async function createSimulation(
   input: CreateSimulationInput,
@@ -81,28 +81,6 @@ export async function createSimulation(
     }
     return normalized;
   } catch (caught: unknown) {
-    if (!(caught instanceof TypeError) && caught) {
-      try {
-        throwMappedApiError(
-          caught,
-          'Unable to create simulation right now.',
-          'recruiter',
-        );
-      } catch (mapped) {
-        const status = (mapped as { status?: number }).status ?? 0;
-        const message =
-          (mapped as { message?: string }).message ??
-          'Unable to create simulation right now.';
-        const details = (mapped as { details?: unknown }).details;
-        return { ok: false, status, id: '', message, details };
-      }
-    }
-    const status = fallbackStatus(caught, 0);
-    const details = (caught as { details?: unknown })?.details;
-    const message =
-      extractBackendMessage(details ?? caught, true) ??
-      (caught instanceof Error ? caught.message : null) ??
-      'Unable to create simulation right now.';
-    return { ok: false, status, id: '', message, details };
+    return mapCreateSimulationError(caught);
   }
 }

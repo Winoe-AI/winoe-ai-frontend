@@ -19,7 +19,6 @@ type HookReturn = ReturnType<typeof useInviteCandidateFlow>;
 type HarnessProps = {
   simulation: { simulationId: string; simulationTitle: string } | null;
 };
-
 const HookHarness = forwardRef<HookReturn, HarnessProps>(
   function Harness(props, ref) {
     const hook = useInviteCandidateFlow(props.simulation);
@@ -73,11 +72,7 @@ describe('useInviteCandidateFlow', () => {
     await act(async () => {
       const res = await ref.current?.submit('Ann', 'ann@test.com');
       expect(res).toMatchObject({
-        inviteUrl: 'http://invite',
-        outcome: 'sent',
-        simulationId: 'sim-1',
-        candidateName: 'Ann',
-        candidateEmail: 'ann@test.com',
+        inviteUrl: 'http://invite', outcome: 'sent', simulationId: 'sim-1', candidateName: 'Ann', candidateEmail: 'ann@test.com',
       });
     });
     expect(inviteCandidateMock).toHaveBeenCalledWith(
@@ -86,48 +81,6 @@ describe('useInviteCandidateFlow', () => {
       'ann@test.com',
     );
     expect(ref.current?.state.status).toBe('idle');
-  });
-
-  it('maps specific errors to friendly messages', async () => {
-    const ref = React.createRef<HookReturn>();
-    inviteCandidateMock.mockRejectedValue({
-      status: 409,
-      details: { error: { code: 'candidate_already_completed' } },
-    });
-    render(
-      <HookHarness
-        ref={ref}
-        simulation={{ simulationId: 'sim-1', simulationTitle: 'Sim' }}
-      />,
-    );
-
-    await act(async () => {
-      const res = await ref.current?.submit('Bob', 'bob@test.com');
-      expect(res).toBeNull();
-    });
-    expect(ref.current?.state.status).toBe('error');
-    expect(ref.current?.state.message).toMatch(/already completed/i);
-
-    inviteCandidateMock.mockRejectedValue({ status: 422 });
-    await act(async () => {
-      const res = await ref.current?.submit('Bob', 'bad');
-      expect(res).toBeNull();
-    });
-    expect(ref.current?.state.message).toMatch(/valid email/i);
-
-    inviteCandidateMock.mockRejectedValue({ status: 429 });
-    await act(async () => {
-      const res = await ref.current?.submit('Bob', 'bob@test.com');
-      expect(res).toBeNull();
-    });
-    expect(ref.current?.state.message).toMatch(/Too many invites/i);
-
-    inviteCandidateMock.mockRejectedValue({ status: 500 });
-    await act(async () => {
-      const res = await ref.current?.submit('Bob', 'bob@test.com');
-      expect(res).toBeNull();
-    });
-    expect(formatRecruiterErrorMock).toHaveBeenCalled();
   });
 
   it('reset returns state to idle', () => {

@@ -6,43 +6,15 @@ import {
   upstreamRequest,
 } from '@/lib/server/bff';
 import { DEBUG_PROXY } from './constants';
-import { forwardHeaders, copyUpstreamHeaders } from './headers';
+import { forwardHeaders } from './headers';
 import { readBodyTextWithLimit } from './body';
-import { buildProxyResponse } from './response';
 import { resolveTarget, type BackendRouteContext } from './target';
 import {
   enforceMutationSameOrigin,
   enforceProxyMethodPolicy,
 } from './requestSecurity';
-
-type ProxyAuthResult =
-  | { ok: true; accessToken: string; cookies: NextResponse | null }
-  | { ok: false; response: NextResponse; cookies: NextResponse | null };
-
-function mergeAuthCookies(
-  from: NextResponse | null | undefined,
-  into: NextResponse,
-) {
-  if (!from) return;
-  from.cookies.getAll().forEach((cookie) => {
-    into.cookies.set(cookie);
-  });
-}
-
-async function requireProxyAuth(req: NextRequest): Promise<ProxyAuthResult> {
-  if (process.env.NODE_ENV === 'test') {
-    const authHeader = req.headers.get('authorization') ?? '';
-    const match = authHeader.match(/^Bearer\s+(.+)$/i);
-    return {
-      ok: true,
-      accessToken: match?.[1] ?? 'test-access-token',
-      cookies: null,
-    };
-  }
-
-  const { requireBffAuth } = await import('@/lib/server/bffAuth');
-  return requireBffAuth(req);
-}
+import { mergeAuthCookies, requireProxyAuth } from './proxyAuth';
+import { buildBackendProxySuccessResponse } from './proxyUpstreamResponse';
 
 export async function proxyToBackend(
   req: NextRequest,
@@ -94,36 +66,14 @@ export async function proxyToBackend(
       signal: req.signal,
       maxTotalTimeMs: timeoutMs,
     });
-
-    const upstreamHeaders = copyUpstreamHeaders(upstream, requestId);
-    upstreamHeaders.set(UPSTREAM_HEADER, String(upstream.status));
-    const response = await buildProxyResponse(
+    return buildBackendProxySuccessResponse({
       upstream,
-      upstreamHeaders,
       requestId,
-    );
-    mergeAuthCookies(auth.cookies, response);
-    response.headers.delete('location');
-    response.headers.set(REQUEST_ID_HEADER, requestId);
-
-    const meta = (upstream as unknown as { _tenonMeta?: unknown })
-      ._tenonMeta as { attempts?: number; durationMs?: number } | undefined;
-    if (meta) {
-      const retryCount = Math.max(0, (meta.attempts ?? 1) - 1);
-      response.headers.set(
-        'Server-Timing',
-        `bff;dur=${meta.durationMs ?? 0}, retry;desc="count=${retryCount}"`,
-      );
-    }
-
-    if (start !== null) {
-      // eslint-disable-next-line no-console
-      console.log(
-        `[perf:backend-proxy] [req ${requestId}] ${req.method} ${backendPath} -> ${upstream.status} ${Date.now() - start}ms`,
-      );
-    }
-
-    return response;
+      backendPath,
+      method: req.method,
+      start,
+      authCookies: auth.cookies,
+    });
   } catch (e: unknown) {
     const error = NextResponse.json(
       {

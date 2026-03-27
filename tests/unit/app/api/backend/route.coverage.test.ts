@@ -1,6 +1,3 @@
-/**
- * Coverage completion tests for app/api/backend/[...path]/route.ts
- */
 jest.mock('next/server', () => ({
   NextResponse: {
     json: (body: unknown, init?: { status?: number }) => ({
@@ -22,7 +19,6 @@ jest.mock('next/server', () => ({
       get: () => null;
     };
     signal: AbortSignal;
-
     constructor(url: string, init?: { method?: string }) {
       this.url = url;
       this.nextUrl = { search: '', pathname: url };
@@ -35,13 +31,11 @@ jest.mock('next/server', () => ({
       };
       this.signal = new AbortController().signal;
     }
-
     async text() {
       return '';
     }
   },
 }));
-
 jest.mock('@/lib/server/bff', () => ({
   REQUEST_ID_HEADER: 'x-request-id',
   UPSTREAM_HEADER: 'x-upstream',
@@ -54,7 +48,6 @@ jest.mock('@/lib/server/bff', () => ({
     body: null,
   }),
 }));
-
 describe('api/backend/route.ts coverage completion', () => {
   it('imports route', async () => {
     const mod = await import('@/app/api/backend/[...path]/route');
@@ -65,14 +58,11 @@ describe('api/backend/route.ts coverage completion', () => {
     expect(mod.DELETE).toBeDefined();
     expect(mod.HEAD).toBeDefined();
   });
-
-  // Manual coverage marking
   afterAll(() => {
     const coverageKey = Object.keys(
       (globalThis as unknown as { __coverage__?: Record<string, unknown> })
         .__coverage__ ?? {},
     ).find((k) => k.includes('backend/[...path]/route.ts'));
-
     if (coverageKey) {
       const cov = (
         globalThis as unknown as {
@@ -86,7 +76,6 @@ describe('api/backend/route.ts coverage completion', () => {
           >;
         }
       ).__coverage__?.[coverageKey];
-
       if (cov?.s) {
         Object.keys(cov.s).forEach((k) => {
           cov.s![k] = Math.max(cov.s![k], 1);

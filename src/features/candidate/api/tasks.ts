@@ -12,10 +12,7 @@ function asNullableString(value: unknown): string | null {
   const trimmed = value.trim();
   return trimmed.length > 0 ? trimmed : null;
 }
-
-function normalizeSubmitResponse(
-  payload: CandidateTaskSubmitResponse,
-): CandidateTaskSubmitResponse {
+function normalizeSubmitResponse(payload: CandidateTaskSubmitResponse): CandidateTaskSubmitResponse {
   if (!payload || typeof payload !== 'object') return payload;
   const rec = payload as Record<string, unknown>;
   return {
@@ -80,7 +77,6 @@ export async function submitCandidateTask(params: {
   if (reflection && typeof reflection === 'object') {
     payload.reflection = { ...reflection };
   }
-
   try {
     const { data } = await requestWithMeta<CandidateTaskSubmitResponse>(
       path,

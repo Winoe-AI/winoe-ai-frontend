@@ -4,16 +4,9 @@ import type { RowState } from '../hooks/types';
 import type { ScenarioEditorDraft } from '../scenario';
 import type { ScenarioVersionItem } from '../scenario/types';
 import type { SimulationPlan } from '../utils/plan';
+import type { SearchState } from './types.search';
 
-export type SearchState = {
-  search: string;
-  setSearch: (value: string) => void;
-  pagedCandidates: CandidateSession[];
-  visibleCandidates: CandidateSession[];
-  page: number;
-  pageCount: number;
-  setPage: (page: number) => void;
-};
+export type { SearchState } from './types.search';
 
 export type SimulationDetailViewProps = {
   simulationId: string;

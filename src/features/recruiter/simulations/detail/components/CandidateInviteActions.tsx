@@ -1,10 +1,8 @@
 'use client';
 import Button from '@/shared/ui/Button';
-import { StatusPill } from '@/shared/ui/StatusPill';
 import type { CandidateSession } from '@/features/recruiter/types';
-import { formatCooldown } from '../utils/formatters';
-import { ManualInviteLink } from './ManualInviteLink';
 import type { RowState } from '../hooks/types';
+import { CandidateInviteStatusMessages } from './CandidateInviteStatusMessages';
 
 type Props = {
   candidate: CandidateSession;
@@ -39,6 +37,9 @@ export function CandidateInviteActions({
     rowState.resending || cooldownActive || !inviteResendEnabled;
   const copyDisabled =
     rowState.resending || !inviteLink || !inviteResendEnabled;
+  const resendDisabledTitle = inviteResendEnabled
+    ? undefined
+    : (inviteResendDisabledReason ?? undefined);
 
   return (
     <div className="flex flex-col gap-2">
@@ -49,11 +50,7 @@ export function CandidateInviteActions({
           size="sm"
           onClick={() => onCopy(candidate)}
           disabled={copyDisabled}
-          title={
-            inviteResendEnabled
-              ? undefined
-              : (inviteResendDisabledReason ?? undefined)
-          }
+          title={resendDisabledTitle}
         >
           {rowState.copied ? 'Copied' : 'Copy invite link'}
         </Button>
@@ -63,50 +60,21 @@ export function CandidateInviteActions({
           size="sm"
           onClick={() => onResend(candidate)}
           disabled={resendDisabled}
-          title={
-            inviteResendEnabled
-              ? undefined
-              : (inviteResendDisabledReason ?? undefined)
-          }
+          title={resendDisabledTitle}
         >
           {rowState.resending ? 'Resending…' : 'Resend invite'}
         </Button>
       </div>
-
-      {!inviteResendEnabled && inviteResendDisabledReason ? (
-        <div className="text-xs text-gray-600">
-          {inviteResendDisabledReason}
-        </div>
-      ) : null}
-
-      {!inviteLink && (
-        <div className="text-xs text-gray-600">
-          Invite link unavailable — resend invite or refresh.
-        </div>
-      )}
-
-      {rowState.manualCopyOpen && rowState.manualCopyUrl ? (
-        <ManualInviteLink
-          url={rowState.manualCopyUrl}
-          onClose={() => onCloseManual(candidate.candidateSessionId)}
-        />
-      ) : null}
-
-      {cooldownActive && (
-        <div className="text-xs text-gray-600">
-          {cooldownRemainingMs
-            ? formatCooldown(cooldownRemainingMs)
-            : 'Rate limited — try again soon'}
-        </div>
-      )}
-
-      {rowState.error ? (
-        <div className="text-xs text-red-600">{rowState.error}</div>
-      ) : null}
-
-      {rowState.message ? (
-        <StatusPill label={rowState.message} tone="success" />
-      ) : null}
+      <CandidateInviteStatusMessages
+        candidateSessionId={candidate.candidateSessionId}
+        rowState={rowState}
+        inviteLink={inviteLink}
+        inviteResendEnabled={inviteResendEnabled}
+        inviteResendDisabledReason={inviteResendDisabledReason}
+        cooldownActive={cooldownActive}
+        cooldownRemainingMs={cooldownRemainingMs}
+        onCloseManual={onCloseManual}
+      />
     </div>
   );
 }

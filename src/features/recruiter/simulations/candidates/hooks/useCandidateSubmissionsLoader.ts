@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useRef } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { queryKeys } from '@/shared/query';
-import { reloadCandidateSubmissions } from './reloadCandidateSubmissions';
 import type { LoaderSetters } from './loaderTypes';
+import { useCandidateSubmissionsLoadActions } from './useCandidateSubmissionsLoadActions';
 
 type LoaderParams = {
   simulationId: string;
@@ -28,34 +28,16 @@ export function useCandidateSubmissionsLoader({
     simulationId,
     candidateSessionId,
   );
-
-  const applyResult = useCallback(
-    (result: Awaited<ReturnType<typeof reloadCandidateSubmissions>>) => {
-      setters.setCandidate(result.candidate);
-      setters.setItems(result.items);
-      setters.setArtifacts((prev) => ({
-        ...prev,
-        ...result.artifacts,
-      }));
-      setters.setArtifactWarning(result.artifactWarning);
-      setters.setError(result.error);
-    },
-    [setters],
-  );
-
-  const runLoad = useCallback(
-    (signal?: AbortSignal, skipCache?: boolean) =>
-      reloadCandidateSubmissions({
-        simulationId,
-        candidateSessionId,
-        pageSize,
-        showAll: showAllRef.current,
-        preloadArtifacts: showAllRef.current,
-        skipCache,
-        signal: signal ?? new AbortController().signal,
-      }),
-    [candidateSessionId, pageSize, simulationId],
-  );
+  const { applyResult, runLoad, reload } = useCandidateSubmissionsLoadActions({
+    simulationId,
+    candidateSessionId,
+    pageSize,
+    queryClient,
+    queryKey,
+    showAllRef,
+    pendingOptsRef,
+    setters,
+  });
 
   const submissionsQuery = useQuery({
     queryKey,
@@ -77,40 +59,6 @@ export function useCandidateSubmissionsLoader({
         : 'Request failed';
     setters.setError(message);
   }, [setters, submissionsQuery.error]);
-
-  const reload = useCallback(
-    async (opts?: { skipCache?: boolean }) => {
-      pendingOptsRef.current = opts ?? null;
-      setters.setArtifactWarning(null);
-      setters.setError(null);
-      setters.setLoading(true);
-
-      try {
-        if (opts?.skipCache) {
-          await queryClient.invalidateQueries({
-            queryKey,
-            refetchType: 'none',
-          });
-          await queryClient.fetchQuery({
-            queryKey,
-            queryFn: ({ signal }) => runLoad(signal, true),
-            staleTime: 0,
-          });
-        } else {
-          await queryClient.invalidateQueries({
-            queryKey,
-            refetchType: 'none',
-          });
-          await queryClient.fetchQuery({
-            queryKey,
-            queryFn: ({ signal }) => runLoad(signal, false),
-            staleTime: 0,
-          });
-        }
-      } catch {}
-    },
-    [queryClient, queryKey, runLoad, setters],
-  );
 
   useEffect(() => {
     showAllRef.current = showAll;

@@ -1,12 +1,10 @@
 'use client';
-import Link from 'next/link';
-import Button from '@/shared/ui/Button';
 import { InlineBadge } from '@/shared/ui/InlineBadge';
 import PageHeader from '@/shared/ui/PageHeader';
 import { StatusPill } from '@/shared/ui/StatusPill';
 import { statusMeta } from '@/shared/status/statusMeta';
-import { RegenerateScenarioButton } from '../scenario';
-
+import { SimulationDetailHeaderActions } from './SimulationDetailHeaderActions';
+import { lockLabel } from './simulationDetailHeaderLockLabel';
 type Props = {
   simulationId: string;
   simulationStatus: string | null;
@@ -30,14 +28,6 @@ type Props = {
   onOpenTerminateModal: () => void;
   onInvite: () => void;
 };
-
-function lockLabel(locked: boolean, lockedAt: string | null): string {
-  if (!locked) return 'Unlocked';
-  if (!lockedAt) return 'Locked';
-  const parsed = new Date(lockedAt);
-  if (Number.isNaN(parsed.getTime())) return 'Locked';
-  return `Locked ${parsed.toLocaleDateString()}`;
-}
 
 export function SimulationDetailHeaderCore({
   simulationId,
@@ -74,53 +64,22 @@ export function SimulationDetailHeaderCore({
           title={title}
           subtitle={`Simulation ID: ${simulationId} · Template: ${templateKey}`}
         />
-        <div className="flex flex-wrap items-center justify-end gap-2">
-          {canApprove ? (
-            <Button
-              onClick={onApprove}
-              size="sm"
-              loading={approveLoading}
-              disabled={!canApprove}
-            >
-              {approveButtonLabel}
-            </Button>
-          ) : null}
-          <RegenerateScenarioButton
-            loading={regenerateLoading}
-            disabled={regenerateDisabled}
-            currentVersionLabel={scenarioVersionLabel}
-            onConfirm={onRegenerate}
-          />
-          <Button
-            onClick={onInvite}
-            size="sm"
-            disabled={!inviteEnabled}
-            title={
-              inviteEnabled ? undefined : (inviteDisabledReason ?? undefined)
-            }
-          >
-            Invite candidate
-          </Button>
-          <Button
-            type="button"
-            size="sm"
-            variant="secondary"
-            className="border-red-300 text-red-700 hover:bg-red-50 focus:ring-red-500"
-            onClick={onOpenTerminateModal}
-            disabled={simulationStatus === 'terminated' || terminatePending}
-            loading={terminatePending}
-          >
-            {simulationStatus === 'terminated'
-              ? 'Simulation terminated'
-              : 'Terminate simulation'}
-          </Button>
-          <Link
-            className="text-sm text-blue-600 hover:underline"
-            href="/dashboard"
-          >
-            ← Back to dashboard
-          </Link>
-        </div>
+        <SimulationDetailHeaderActions
+          canApprove={canApprove}
+          approveButtonLabel={approveButtonLabel}
+          approveLoading={approveLoading}
+          onApprove={onApprove}
+          regenerateLoading={regenerateLoading}
+          regenerateDisabled={regenerateDisabled}
+          scenarioVersionLabel={scenarioVersionLabel}
+          onRegenerate={onRegenerate}
+          inviteEnabled={inviteEnabled}
+          inviteDisabledReason={inviteDisabledReason}
+          onInvite={onInvite}
+          simulationStatus={simulationStatus}
+          terminatePending={terminatePending}
+          onOpenTerminateModal={onOpenTerminateModal}
+        />
       </div>
       <div className="flex flex-wrap items-center gap-2">
         <StatusPill label={status.label} tone={status.tone} />

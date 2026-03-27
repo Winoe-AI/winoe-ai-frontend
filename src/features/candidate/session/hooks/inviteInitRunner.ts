@@ -4,23 +4,11 @@ import {
   INVITE_EXPIRED_MESSAGE,
   INVITE_UNAVAILABLE_MESSAGE,
 } from '@/lib/copy/invite';
-import { friendlyBootstrapError } from '../utils/errorMessages';
 import { hasScheduleConfigured, isScheduleLocked } from '../utils/schedule';
-import type { ViewState } from '../CandidateSessionView';
+import { handleInviteInitError } from './inviteInitRunner.error';
+import type { InviteInitParams } from './inviteInitRunner.types';
 
-export type InviteInitParams = {
-  setCandidateSessionId: (id: number | null) => void;
-  setBootstrap: (b: CandidateSessionBootstrapResponse) => void;
-  clearTaskError: () => void;
-  setView: (v: ViewState) => void;
-  setAuthMessage: (m: string | null) => void;
-  setErrorMessage: (m: string | null) => void;
-  setErrorStatus: (s: number | null) => void;
-  redirectToLogin: () => void;
-  fetchTask: (opts?: { sessionId?: number }) => Promise<void>;
-  markStart: (label: string) => void;
-  markEnd: (label: string, extra?: Record<string, unknown>) => void;
-};
+export type { InviteInitParams } from './inviteInitRunner.types';
 
 export const inviteErrorCopy = (status: number | null, msg: string | null) =>
   msg ?? (status === 410 ? INVITE_EXPIRED_MESSAGE : INVITE_UNAVAILABLE_MESSAGE);
@@ -81,26 +69,7 @@ export function createInviteInit(params: InviteInitParams) {
       params.setView('running');
       params.markEnd('candidate:init', { status: 'success' });
     } catch (err) {
-      const status = (err as { status?: number }).status;
-      if (status === 401) {
-        params.markEnd('candidate:init', { status: 'auth_redirect' });
-        params.redirectToLogin();
-      } else if (status === 403) {
-        params.setErrorStatus(403);
-        params.setErrorMessage(friendlyBootstrapError(err));
-        params.setView('accessDenied');
-        params.markEnd('candidate:init', { status: 'access_denied' });
-      } else if (status === 410) {
-        params.setErrorStatus(410);
-        params.setErrorMessage(friendlyBootstrapError(err));
-        params.setView('expired');
-        params.markEnd('candidate:init', { status: 'expired' });
-      } else {
-        params.setErrorStatus(status ?? null);
-        params.setErrorMessage(friendlyBootstrapError(err));
-        params.setView('error');
-        params.markEnd('candidate:init', { status: 'error' });
-      }
+      handleInviteInitError(params, err);
     }
   };
 

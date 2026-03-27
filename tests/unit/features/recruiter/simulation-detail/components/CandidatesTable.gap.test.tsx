@@ -1,20 +1,3 @@
-/**
- * @jest-environment jsdom
- */
-
-/**
- * GAP-FILLING TESTS: CandidatesTable
- *
- * Gap identified: Existing tests focus on higher-level recruiter detail flows.
- * Direct branch and interaction checks for this table wrapper were missing:
- * - Error branch retry interaction
- * - Empty-state invite disabling semantics
- * - Content branch search/pagination affordances and deep-link rendering
- *
- * Existing tests: tests/unit/features/recruiter/simulation-detail/RecruiterSimulationDetailPage.test.tsx
- * Coverage before: 100% lines/branches/functions/statements (quality gap only)
- */
-
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { CandidatesTable } from '@/features/recruiter/simulations/detail/components/CandidatesTable';
@@ -41,9 +24,7 @@ const candidate: CandidateSession = {
   dayProgress: { current: 2, total: 5 },
 };
 
-const buildProps = (
-  overrides?: Partial<React.ComponentProps<typeof CandidatesTable>>,
-): React.ComponentProps<typeof CandidatesTable> => ({
+const buildProps = (overrides?: Partial<React.ComponentProps<typeof CandidatesTable>>): React.ComponentProps<typeof CandidatesTable> => ({
   loading: false,
   error: null,
   onRetry: jest.fn(),
@@ -85,7 +66,6 @@ describe('CandidatesTable gap coverage', () => {
     await user.click(screen.getByRole('button', { name: /Retry/i }));
     expect(props.onRetry).toHaveBeenCalledTimes(1);
   });
-
   it('renders empty-state invite controls with disabled reason metadata', () => {
     const props = buildProps({
       totalCount: 0,
@@ -94,7 +74,6 @@ describe('CandidatesTable gap coverage', () => {
       inviteEnabled: false,
       inviteDisabledReason: 'Invites are disabled while cleanup is running.',
     });
-
     render(<CandidatesTable {...props} />);
     const inviteButton = screen.getByRole('button', {
       name: /Invite your first candidate/i,
@@ -102,26 +81,17 @@ describe('CandidatesTable gap coverage', () => {
 
     expect(screen.getByText('No candidates yet')).toBeInTheDocument();
     expect(inviteButton).toBeDisabled();
-    expect(inviteButton).toHaveAttribute(
-      'title',
-      'Invites are disabled while cleanup is running.',
-    );
+    expect(inviteButton).toHaveAttribute('title', 'Invites are disabled while cleanup is running.');
   });
-
   it('renders searchable content mode and candidate submission deep-link', async () => {
     const user = userEvent.setup();
     const props = buildProps();
-
     render(<CandidatesTable {...props} />);
     expect(screen.getByLabelText(/Search candidates/i)).toBeInTheDocument();
 
     await user.type(screen.getByLabelText(/Search candidates/i), 'Ada');
     expect(props.setSearch).toHaveBeenCalled();
-
     const viewLink = screen.getByRole('link', { name: /View submissions/i });
-    expect(viewLink).toHaveAttribute(
-      'href',
-      '/dashboard/simulations/sim-1/candidates/101',
-    );
+    expect(viewLink).toHaveAttribute('href', '/dashboard/simulations/sim-1/candidates/101');
   });
 });

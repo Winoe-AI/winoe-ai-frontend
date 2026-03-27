@@ -3,6 +3,12 @@ import { auth0, getSessionNormalized } from '@/lib/auth0';
 import { extractPermissions, hasPermission } from '@/lib/auth0-claims';
 import { normalizeAccessToken } from '@/lib/auth0/helpers';
 import type { AuthResult } from './bff/authTypes';
+import {
+  allowLocalTokenFallback,
+  buildAuthSuccessResult,
+  buildForbiddenResult,
+  buildNotAuthenticatedResult,
+} from './bffAuth.helpers';
 
 export function mergeResponseCookies(
   from: NextResponse | null | undefined,
@@ -31,14 +37,7 @@ export async function requireBffAuth(
   const session = await getSessionNormalized();
   if (!session) {
     logPerf('unauthenticated');
-    return {
-      ok: false,
-      response: NextResponse.json(
-        { message: 'Not authenticated' },
-        { status: 401 },
-      ),
-      cookies: cookieCarrier,
-    };
+    return buildNotAuthenticatedResult(cookieCarrier);
   }
 
   const permissions = extractPermissions(
@@ -51,11 +50,7 @@ export async function requireBffAuth(
     !hasPermission(permissions, options.requirePermission)
   ) {
     logPerf('forbidden');
-    return {
-      ok: false,
-      response: NextResponse.json({ message: 'Forbidden' }, { status: 403 }),
-      cookies: cookieCarrier,
-    };
+    return buildForbiddenResult(cookieCarrier);
   }
 
   try {
@@ -64,65 +59,42 @@ export async function requireBffAuth(
     });
     const accessToken = normalizeAccessToken(tokenResult);
     if (!accessToken) {
-      const allowLocalFallback =
-        process.env.NODE_ENV === 'development' ||
-        process.env.VERCEL_ENV?.toLowerCase() === 'development';
-      if (allowLocalFallback && sessionAccessToken) {
-        const result: AuthResult = {
-          ok: true,
+      if (allowLocalTokenFallback() && sessionAccessToken) {
+        const result = buildAuthSuccessResult({
           accessToken: sessionAccessToken,
           permissions,
           session,
           cookies: cookieCarrier,
-        };
+        });
         logPerf('fallback-token');
         return result;
       }
       logPerf('missing-token');
-      return {
-        ok: false,
-        response: NextResponse.json(
-          { message: 'Not authenticated' },
-          { status: 401 },
-        ),
-        cookies: cookieCarrier,
-      };
+      return buildNotAuthenticatedResult(cookieCarrier);
     }
 
-    const result: AuthResult = {
-      ok: true,
+    const result = buildAuthSuccessResult({
       accessToken,
       permissions,
       session,
       cookies: cookieCarrier,
-    };
+    });
     logPerf('ok');
     return result;
   } catch (e: unknown) {
-    const allowLocalFallback =
-      process.env.NODE_ENV === 'development' ||
-      process.env.VERCEL_ENV?.toLowerCase() === 'development';
-    if (allowLocalFallback && sessionAccessToken) {
-      const result: AuthResult = {
-        ok: true,
+    if (allowLocalTokenFallback() && sessionAccessToken) {
+      const result = buildAuthSuccessResult({
         accessToken: sessionAccessToken,
         permissions,
         session,
         cookies: cookieCarrier,
-      };
+      });
       logPerf('fallback-token');
       return result;
     }
     const message =
       e instanceof Error ? e.message : 'Unable to obtain access token';
     logPerf('token-error');
-    return {
-      ok: false,
-      response: NextResponse.json(
-        { message: 'Not authenticated', detail: message },
-        { status: 401 },
-      ),
-      cookies: cookieCarrier,
-    };
+    return buildNotAuthenticatedResult(cookieCarrier, message);
   }
 }

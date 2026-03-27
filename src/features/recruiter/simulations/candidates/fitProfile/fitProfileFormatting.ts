@@ -30,31 +30,6 @@ export function recommendationToneClass(value: string): string {
   return 'border-amber-200 bg-amber-50 text-amber-800';
 }
 
-export function formatRubricKey(value: string): string {
-  return value
-    .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
-    .replace(/[_-]+/g, ' ')
-    .replace(/\s+/g, ' ')
-    .trim()
-    .replace(/\b\w/g, (char) => char.toUpperCase());
-}
-
-export function formatRubricValue(value: unknown): string {
-  if (typeof value === 'number' && Number.isFinite(value)) return String(value);
-  if (typeof value === 'string') return value;
-  if (typeof value === 'boolean') return value ? 'Yes' : 'No';
-  if (Array.isArray(value)) {
-    const parts = value
-      .map((item) => formatRubricValue(item))
-      .filter((item) => item.length > 0);
-    return parts.join(', ');
-  }
-  if (value && typeof value === 'object') {
-    return JSON.stringify(value);
-  }
-  return 'N/A';
-}
-
 export function formatTranscriptTime(ms: number | null): string | null {
   if (ms === null || !Number.isFinite(ms) || ms < 0) return null;
   const totalSeconds = Math.floor(ms / 1000);
@@ -82,27 +57,8 @@ export function formatCalibrationText(
   }
   return `Recommendation calibrated using rubric-aligned evidence across ${dayCount} scored day${dayCount === 1 ? '' : 's'}.`;
 }
-
-export function safeExternalUrl(value: string | null): string | null {
-  if (!value) return null;
-  try {
-    const parsed = new URL(value);
-    if (parsed.protocol === 'https:' || parsed.protocol === 'http:') {
-      return parsed.toString();
-    }
-    return null;
-  } catch {
-    return null;
-  }
-}
-
-export function printableEvidenceUrl(value: string): string {
-  try {
-    const parsed = new URL(value);
-    parsed.search = '';
-    parsed.hash = '';
-    return parsed.toString();
-  } catch {
-    return value.replace(/[?#].*$/, '');
-  }
-}
+export { formatRubricKey, formatRubricValue } from './fitProfileFormatting.rubric';
+export {
+  printableEvidenceUrl,
+  safeExternalUrl,
+} from './fitProfileFormatting.url';

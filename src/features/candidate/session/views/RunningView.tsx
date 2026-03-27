@@ -1,45 +1,9 @@
 import { RunningIntroSection } from './components/RunningIntroSection';
 import { RunningPanelsSection } from './components/RunningPanelsSection';
 import { SessionWindowBanner } from '../components/SessionWindowBanner';
-import type { CandidateTask } from '../CandidateSessionProvider';
-import type { SubmitPayload, SubmitResponse } from '../task/types';
-import type { PollResult } from '../task/hooks/runTestsTypes';
-import type { DerivedWindowState, WindowActionGate } from '../lib/windowState';
-import type {
-  CodingWorkspace,
-  CodingWorkspaceSnapshot,
-} from '../task/utils/codingWorkspace';
+import type { RunningViewProps } from './RunningView.types';
 
-export type RunningViewProps = {
-  title: string;
-  role: string;
-  completedCount: number;
-  currentDayIndex: number;
-  currentTask: CandidateTask | null;
-  candidateSessionId: number | null;
-  taskError: string | null;
-  taskLoading: boolean;
-  resourceLink: string | null;
-  submitting: boolean;
-  showWorkspacePanel: boolean;
-  showRecordingPanel: boolean;
-  showDocsPanel: boolean;
-  windowState: DerivedWindowState;
-  actionGate: WindowActionGate;
-  codingWorkspace?: CodingWorkspace | null;
-  lastDraftSavedAt: number | null;
-  lastSubmissionAt: string | null;
-  lastSubmissionId: number | null;
-  onRetryTask: () => void;
-  onSubmit: (
-    payload: SubmitPayload,
-  ) => Promise<SubmitResponse | void> | SubmitResponse | void;
-  onStartTests: () => Promise<{ runId: string }>;
-  onPollTests: (runId: string) => Promise<PollResult>;
-  onDashboard: () => void;
-  onTaskWindowClosed: (err: unknown) => void;
-  onCodingWorkspaceSnapshot?: (snapshot: CodingWorkspaceSnapshot) => void;
-};
+export type { RunningViewProps } from './RunningView.types';
 
 export function RunningView({
   title,

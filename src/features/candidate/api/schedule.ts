@@ -21,12 +21,7 @@ function scheduleErrorCode(details: unknown): string | null {
   if (typeof rec.code === 'string' && rec.code.trim()) return rec.code.trim();
   return null;
 }
-
-function throwScheduleError(
-  status: number,
-  message: string,
-  details: unknown,
-): never {
+function throwScheduleError(status: number, message: string, details: unknown): never {
   const err = new HttpError(status, message);
   (err as { details?: unknown }).details = details;
   throw err;

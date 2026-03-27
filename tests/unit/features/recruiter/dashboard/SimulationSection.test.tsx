@@ -50,7 +50,6 @@ describe('SimulationSection', () => {
     fireEvent.click(screen.getByRole('button', { name: /Retry/i }));
     expect(onRetry).toHaveBeenCalled();
   });
-
   it('shows list when simulations present and handles invite click', () => {
     const onInvite = jest.fn();
     render(
@@ -65,7 +64,6 @@ describe('SimulationSection', () => {
     expect(onInvite).toHaveBeenCalledWith(sample[0]);
     expect(screen.queryByText(/Refreshing/i)).not.toBeInTheDocument();
   });
-
   it('shows empty list placeholder when no sims and no error', () => {
     const { container } = render(
       <SimulationSection
@@ -77,7 +75,6 @@ describe('SimulationSection', () => {
     );
     expect(container.querySelector('[data-testid=\"sim-list\"]')).toBeTruthy();
   });
-
   it('shows refreshing label when loading with existing sims', () => {
     render(
       <SimulationSection
@@ -89,7 +86,6 @@ describe('SimulationSection', () => {
     );
     expect(screen.getByText(/Refreshing/)).toBeInTheDocument();
   });
-
   it('omits retry button when onRetry is undefined', () => {
     render(
       <SimulationSection

@@ -5,7 +5,6 @@ import {
   toHttpError,
 } from '@/lib/api/errors/utils/errors';
 import { normalizeApiError } from '@/lib/errors/errors';
-
 describe('api errors helpers', () => {
   it('extracts backend message/ detail variants', () => {
     expect(extractBackendMessage('  plain  ')).toBe('plain');
@@ -18,34 +17,27 @@ describe('api errors helpers', () => {
     );
     expect(extractBackendMessage({})).toBeNull();
   });
-
   it('skips plain strings when allowPlainString is false', () => {
     expect(extractBackendMessage('plain', false)).toBeNull();
   });
-
   it('falls back to default status when missing', () => {
     expect(fallbackStatus({ status: 500 }, 400)).toBe(500);
     expect(fallbackStatus({}, 400)).toBe(400);
     expect(fallbackStatus(null, 401)).toBe(401);
   });
-
   it('wraps different error shapes into HttpError', () => {
     const httpErr = new HttpError(418, 'teapot');
     expect(toHttpError(httpErr, { status: 500, message: 'x' })).toBe(httpErr);
-
     const typeErr = new TypeError('network');
     const wrappedType = toHttpError(typeErr, { status: 500, message: 'x' });
     expect(wrappedType).toBeInstanceOf(HttpError);
     expect(wrappedType.status).toBe(0);
-
     const objectErr = { status: 503, message: 'backend down' };
     const wrappedObj = toHttpError(objectErr, { status: 500, message: 'x' });
     expect(wrappedObj).toMatchObject({ status: 503, message: 'backend down' });
-
     const unknown = toHttpError('boom', { status: 500, message: 'fallback' });
     expect(unknown).toMatchObject({ status: 500, message: 'fallback' });
   });
-
   it('normalizes api errors with actionable messages', () => {
     expect(normalizeApiError({ status: 401, message: 'nope' }).action).toBe(
       'signin',
@@ -66,7 +58,6 @@ describe('api errors helpers', () => {
       'contact_support',
     );
   });
-
   it('extracts code from nested detail.code', () => {
     expect(
       normalizeApiError({
@@ -75,31 +66,26 @@ describe('api errors helpers', () => {
       }).code,
     ).toBe('validation_error');
   });
-
   it('extracts code from top-level error object', () => {
     expect(normalizeApiError({ code: 'direct_code', status: 400 }).code).toBe(
       'direct_code',
     );
   });
-
   it('handles 403 as signin action', () => {
     expect(
       normalizeApiError({ status: 403, message: 'forbidden' }).action,
     ).toBe('signin');
   });
-
   it('handles 408 as retry action', () => {
     expect(normalizeApiError({ status: 408, message: 'timeout' }).action).toBe(
       'retry',
     );
   });
-
   it('handles 504 as retry action', () => {
     expect(
       normalizeApiError({ status: 504, message: 'gateway timeout' }).action,
     ).toBe('retry');
   });
-
   it('falls back to retry for other errors', () => {
     expect(
       normalizeApiError({ status: 400, message: 'bad request' }).action,

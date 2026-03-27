@@ -5,6 +5,7 @@ import {
   useCandidateSession,
 } from '@/features/candidate/session/CandidateSessionProvider';
 import { BRAND_SLUG } from '@/lib/brand';
+import { buildPersistedSession } from './CandidateSessionProvider.testFixtures';
 
 const renderWithProvider = () =>
   renderHook(() => useCandidateSession(), {
@@ -40,30 +41,7 @@ describe('CandidateSessionProvider', () => {
   const storageKey = `${BRAND_SLUG}:candidate_session_v1`;
 
   it('restores persisted invite, session id, bootstrap, and started flag', () => {
-    sessionStorage.setItem(
-      storageKey,
-      JSON.stringify({
-        inviteToken: 'invite-token',
-        candidateSessionId: 9,
-        bootstrap: {
-          candidateSessionId: 9,
-          status: 'in_progress',
-          simulation: { title: 'Sim', role: 'Role' },
-        },
-        started: true,
-        taskState: {
-          isComplete: false,
-          completedTaskIds: [1],
-          currentTask: {
-            id: 55,
-            dayIndex: 1,
-            type: 'design',
-            title: 'Task',
-            description: 'Prompt',
-          },
-        },
-      }),
-    );
+    sessionStorage.setItem(storageKey, JSON.stringify(buildPersistedSession()));
 
     const { result } = renderWithProvider();
     expect(result.current.state.inviteToken).toBe('invite-token');
@@ -100,27 +78,7 @@ describe('CandidateSessionProvider', () => {
     setSessionPath('new-token');
     sessionStorage.setItem(
       storageKey,
-      JSON.stringify({
-        inviteToken: 'old-token',
-        candidateSessionId: 9,
-        bootstrap: {
-          candidateSessionId: 9,
-          status: 'in_progress',
-          simulation: { title: 'Sim', role: 'Role' },
-        },
-        started: true,
-        taskState: {
-          isComplete: false,
-          completedTaskIds: [1],
-          currentTask: {
-            id: 55,
-            dayIndex: 1,
-            type: 'design',
-            title: 'Task',
-            description: 'Prompt',
-          },
-        },
-      }),
+      JSON.stringify(buildPersistedSession({ inviteToken: 'old-token' })),
     );
 
     const { result } = renderWithProvider();

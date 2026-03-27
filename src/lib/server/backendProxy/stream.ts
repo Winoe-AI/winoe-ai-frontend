@@ -12,7 +12,7 @@ export async function readStreamWithLimit(res: Response, limit: number) {
       total += value.byteLength;
       if (total > limit) {
         if (typeof res.body.cancel === 'function')
-          await res.body.cancel().catch(() => undefined);
+          await Promise.resolve(res.body.cancel()).catch(() => undefined);
         return { exceeded: true };
       }
       chunks.push(value);

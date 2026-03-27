@@ -62,17 +62,14 @@ export function TaskTextInput({
       </>
     );
   }
-
   const handleModeChange = (next: 'write' | 'preview') => {
     startPreviewTransition(() => {
       setMode(next);
     });
   };
-
   return (
     <>
       <TaskTextToolbar mode={mode} onChange={handleModeChange} />
-
       {mode === 'write' ? (
         <textarea
           className="w-full min-h-[360px] md:min-h-[420px] rounded-md border p-3 text-sm leading-6 resize-y"
@@ -94,7 +91,6 @@ export function TaskTextInput({
           />
         </div>
       )}
-
       <TaskTextFooter length={value.length} savedAt={savedAt} />
     </>
   );

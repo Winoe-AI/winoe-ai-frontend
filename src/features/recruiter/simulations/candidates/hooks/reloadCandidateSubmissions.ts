@@ -1,22 +1,18 @@
-import type { CandidateSession } from '@/features/recruiter/types';
 import type { SubmissionArtifact, SubmissionListItem } from '../types';
 import { loadArtifacts } from './artifactLoader';
 import { loadCandidateAndSubmissions } from './candidateLoader';
 import { formatReloadError } from './reloadErrors';
+import {
+  buildArtifactWarning,
+  invalidCandidateIdResult,
+  isAbortError,
+  reloadErrorResult,
+} from './reloadCandidateSubmissions.helpers';
+import type { ReloadResult } from './reloadCandidateSubmissions.types';
 
-export type ReloadResult = {
-  candidate: CandidateSession | null;
-  items: SubmissionListItem[];
-  artifacts: Record<number, SubmissionArtifact>;
-  artifactWarning: string | null;
-  error: string | null;
-};
+export type { ReloadResult } from './reloadCandidateSubmissions.types';
 
-const isAbortError = (err: unknown) =>
-  (err instanceof DOMException && err.name === 'AbortError') ||
-  (err &&
-    typeof err === 'object' &&
-    (err as { name?: unknown }).name === 'AbortError');
+const FALLBACK_MESSAGE = 'Unable to verify candidate access.';
 
 export async function reloadCandidateSubmissions(params: {
   simulationId: string;
@@ -27,7 +23,6 @@ export async function reloadCandidateSubmissions(params: {
   skipCache?: boolean;
   signal: AbortSignal;
 }): Promise<ReloadResult> {
-  const fallbackMessage = 'Unable to verify candidate access.';
   const {
     simulationId,
     candidateSessionId,
@@ -38,15 +33,8 @@ export async function reloadCandidateSubmissions(params: {
     signal,
   } = params;
 
-  if (!candidateSessionId || !/^\d+$/.test(candidateSessionId)) {
-    return {
-      candidate: null,
-      items: [],
-      artifacts: {},
-      artifactWarning: null,
-      error: 'Invalid candidate id.',
-    };
-  }
+  if (!candidateSessionId || !/^\d+$/.test(candidateSessionId))
+    return invalidCandidateIdResult();
 
   try {
     const { candidate, ordered, latestIds, error } =
@@ -60,14 +48,7 @@ export async function reloadCandidateSubmissions(params: {
       });
 
     if (error) {
-      const message = formatReloadError(error, fallbackMessage);
-      return {
-        candidate: null,
-        items: [],
-        artifacts: {},
-        artifactWarning: null,
-        error: message,
-      };
+      return reloadErrorResult(formatReloadError(error, FALLBACK_MESSAGE));
     }
 
     if (!preloadArtifacts) {
@@ -84,29 +65,15 @@ export async function reloadCandidateSubmissions(params: {
       skipCache,
     });
 
-    const artifactWarning =
-      hadError && Object.keys(artifacts).length === 0
-        ? 'Details unavailable for submissions.'
-        : hadError
-          ? 'Some submission details are unavailable.'
-          : null;
-
     return {
       candidate,
       items: ordered,
       artifacts,
-      artifactWarning,
+      artifactWarning: buildArtifactWarning(hadError, artifacts),
       error: null,
     };
   } catch (e: unknown) {
     if (signal.aborted || isAbortError(e)) throw e;
-    const message = formatReloadError(e, fallbackMessage);
-    return {
-      candidate: null,
-      items: [],
-      artifacts: {},
-      artifactWarning: null,
-      error: message,
-    };
+    return reloadErrorResult(formatReloadError(e, FALLBACK_MESSAGE));
   }
 }

@@ -28,7 +28,6 @@ export function SimulationCompanyContextFields({
       <p className="mt-1 text-xs text-gray-500">
         Optional context to improve scenario relevance.
       </p>
-
       <div className="mt-3 grid gap-3 sm:grid-cols-2">
         <div>
           <label
@@ -41,17 +40,11 @@ export function SimulationCompanyContextFields({
             id="companyDomain"
             className="mt-1 w-full"
             value={values.companyDomain}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              onChange('companyDomain', e.target.value)
-            }
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => onChange('companyDomain', e.target.value)}
             maxLength={MAX_COMPANY_CONTEXT_VALUE_CHARS}
             placeholder="Fintech, healthcare, ecommerce..."
             aria-invalid={Boolean(errors.companyDomain)}
-            aria-describedby={
-              errors.companyDomain
-                ? 'companyDomain-error'
-                : 'companyDomain-help'
-            }
+            aria-describedby={errors.companyDomain ? 'companyDomain-error' : 'companyDomain-help'}
             disabled={isSubmitting}
           />
           <p id="companyDomain-help" className="mt-1 text-xs text-gray-500">
@@ -74,23 +67,14 @@ export function SimulationCompanyContextFields({
             id="companyProductArea"
             className="mt-1 w-full"
             value={values.companyProductArea}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              onChange('companyProductArea', e.target.value)
-            }
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => onChange('companyProductArea', e.target.value)}
             maxLength={MAX_COMPANY_CONTEXT_VALUE_CHARS}
             placeholder="Payments, identity, onboarding..."
             aria-invalid={Boolean(errors.companyProductArea)}
-            aria-describedby={
-              errors.companyProductArea
-                ? 'companyProductArea-error'
-                : 'companyProductArea-help'
-            }
+            aria-describedby={errors.companyProductArea ? 'companyProductArea-error' : 'companyProductArea-help'}
             disabled={isSubmitting}
           />
-          <p
-            id="companyProductArea-help"
-            className="mt-1 text-xs text-gray-500"
-          >
+          <p id="companyProductArea-help" className="mt-1 text-xs text-gray-500">
             {values.companyProductArea.length}/{MAX_COMPANY_CONTEXT_VALUE_CHARS}
           </p>
           <SimulationFieldError

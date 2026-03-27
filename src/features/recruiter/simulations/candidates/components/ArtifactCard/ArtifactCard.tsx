@@ -1,49 +1,40 @@
 'use client';
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import type { SubmissionArtifact } from '../../types';
 import { IntegrityCallout } from '@/shared/ui/IntegrityCallout';
-import {
-  deriveRepoInfo,
-  formatDateTime,
-  hasContent,
-  shouldShowGithubSection,
-} from '../../utils/formatters';
-import { deriveTestStatus } from '@/shared/formatters';
 import { ArtifactHeader } from './ArtifactHeader';
 import { ArtifactGithubSection } from './ArtifactGithubSection';
 import { ArtifactTestResults } from './ArtifactTestResults';
 import { ArtifactTextAnswer } from './ArtifactTextAnswer';
-import { formatDiffSummary } from './artifactUtils';
 import { ArtifactDay4Handoff } from './ArtifactDay4Handoff';
 import { isHandoffArtifact } from '../../utils/handoff';
+import { deriveArtifactCardState } from './artifactCardState';
+import { useArtifactPreviewText } from './useArtifactPreviewText';
 
 type Props = { artifact: SubmissionArtifact; repoLinkLabel?: string | null };
 
 export function ArtifactCard({ artifact, repoLinkLabel }: Props) {
   const isDay4Handoff = isHandoffArtifact(artifact);
-  const { repoUrl, repoFullName } = deriveRepoInfo(artifact);
-  const workflowUrl =
-    artifact.workflowUrl ?? artifact.testResults?.workflowUrl ?? null;
-  const commitUrl =
-    artifact.commitUrl ?? artifact.testResults?.commitUrl ?? null;
-  const diffSummaryText = formatDiffSummary(artifact.diffSummary);
-  const submittedAt = formatDateTime(artifact.submittedAt);
-  const status = deriveTestStatus(artifact.testResults);
-  const hasText = hasContent(artifact.contentText);
-  const showGithub = shouldShowGithubSection(artifact);
-  const showIntegrity =
-    artifact.task.dayIndex === 2 ||
-    artifact.task.dayIndex === 3 ||
-    Boolean(artifact.cutoffCommitSha);
+  const {
+    commitUrl,
+    diffSummaryText,
+    hasText,
+    repoFullName,
+    repoUrl,
+    showGithub,
+    showIntegrity,
+    status,
+    submittedAt,
+    workflowUrl,
+  } = deriveArtifactCardState(artifact);
 
   const [expanded, setExpanded] = useState(false);
   const [showOutput, setShowOutput] = useState(false);
-  const previewText = useMemo(() => {
-    if (!hasText) return null;
-    const text = (artifact.contentText as string).trim();
-    if (expanded || text.length <= 300) return text;
-    return `${text.slice(0, 300)}…`;
-  }, [artifact.contentText, expanded, hasText]);
+  const previewText = useArtifactPreviewText(
+    artifact.contentText,
+    hasText,
+    expanded,
+  );
 
   return (
     <div className="rounded border border-gray-200 bg-white p-4">

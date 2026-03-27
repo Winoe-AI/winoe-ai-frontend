@@ -1,36 +1,29 @@
 import { MockNextRequest, MockNextResponse } from './mockNext';
-
 const requireBffAuthMock = jest.fn();
 const mergeResponseCookiesMock = jest.fn();
 const forwardJsonMock = jest.fn();
 const resolveRequestIdMock = jest.fn(() => 'req-auth');
-
 jest.mock('next/server', () => {
   const { MockNextRequest, MockNextResponse } =
     jest.requireActual('./mockNext');
   return { NextRequest: MockNextRequest, NextResponse: MockNextResponse };
 });
-
 jest.mock('@/lib/server/bffAuth', () => ({
   requireBffAuth: (...args: unknown[]) => requireBffAuthMock(...args),
   mergeResponseCookies: (...args: unknown[]) =>
     mergeResponseCookiesMock(...args),
 }));
-
 jest.mock('@/lib/server/bff', () => ({
   forwardJson: (...args: unknown[]) => forwardJsonMock(...args),
   resolveRequestId: (...args: unknown[]) => resolveRequestIdMock(...args),
   REQUEST_ID_HEADER: 'x-request-id',
 }));
-
 describe('auth-related API routes', () => {
   const originalNodeEnv = process.env.NODE_ENV;
   const originalVercelEnv = process.env.VERCEL_ENV;
-
   beforeEach(() => {
     jest.clearAllMocks();
   });
-
   afterEach(() => {
     process.env.NODE_ENV = originalNodeEnv;
     if (originalVercelEnv === undefined) {
@@ -39,7 +32,6 @@ describe('auth-related API routes', () => {
       process.env.VERCEL_ENV = originalVercelEnv;
     }
   });
-
   it('auth/access-token returns 410 in local development', async () => {
     process.env.NODE_ENV = 'development';
     delete process.env.VERCEL_ENV;
@@ -50,7 +42,6 @@ describe('auth-related API routes', () => {
       message: 'This endpoint has been disabled.',
     });
   });
-
   it('auth/access-token returns 404 in preview/prod', async () => {
     process.env.VERCEL_ENV = 'preview';
     const { GET } = await import('@/app/api/auth/access-token/route');
@@ -60,7 +51,6 @@ describe('auth-related API routes', () => {
       message: 'Not found',
     });
   });
-
   it('dev/access-token returns 410 in local development', async () => {
     process.env.NODE_ENV = 'development';
     delete process.env.VERCEL_ENV;
@@ -71,7 +61,6 @@ describe('auth-related API routes', () => {
       message: 'This endpoint has been disabled.',
     });
   });
-
   it('auth/me forwards profile request with request id', async () => {
     requireBffAuthMock.mockResolvedValue({
       ok: true,
@@ -89,7 +78,6 @@ describe('auth-related API routes', () => {
       }),
     );
   });
-
   it('auth/me returns auth failure path', async () => {
     const resp = MockNextResponse.json(
       { message: 'forbidden' },

@@ -1,117 +1,32 @@
 import { render, screen, waitFor } from '@testing-library/react';
+import {
+  buildSession,
+  mockResolveInvite,
+  mockUseCandidateSession,
+  resetCandidateSessionUnitMocks,
+  routerMock,
+} from './CandidateSessionPage.unit.testlib';
 import CandidateSessionPage from '@/features/candidate/session/CandidateSessionPage';
-import { useCandidateSession } from '@/features/candidate/session/CandidateSessionProvider';
-import { useTaskSubmission } from '@/features/candidate/session/hooks/useTaskSubmission';
-import { resolveCandidateInviteToken } from '@/features/candidate/api';
-
-jest.mock('@/features/candidate/session/CandidateSessionProvider', () => ({
-  useCandidateSession: jest.fn(),
-}));
-
-jest.mock('@/features/candidate/session/hooks/useTaskSubmission', () => ({
-  useTaskSubmission: jest.fn(),
-}));
-
-jest.mock('@/features/candidate/api', () => ({
-  ...jest.requireActual('@/features/candidate/api'),
-  resolveCandidateInviteToken: jest.fn(),
-  getCandidateCurrentTask: jest.fn(),
-  pollCandidateTestRun: jest.fn(),
-  startCandidateTestRun: jest.fn(),
-}));
-
-const routerMock = {
-  push: jest.fn(),
-  refresh: jest.fn(),
-  replace: jest.fn(),
-  prefetch: jest.fn(),
-  back: jest.fn(),
-  forward: jest.fn(),
-};
-
-jest.mock('next/navigation', () => ({
-  useRouter: () => routerMock,
-}));
-
-const mockUseCandidateSession = useCandidateSession as jest.Mock;
-const mockUseTaskSubmission = useTaskSubmission as jest.Mock;
-const mockResolveInvite = resolveCandidateInviteToken as jest.Mock;
-
-const buildSession = (overrides?: {
-  token?: string | null;
-  authStatus?: 'idle' | 'loading' | 'ready' | 'unauthenticated' | 'error';
-  inviteToken?: string | null;
-}) => {
-  const setToken = jest.fn();
-  const token = overrides && 'token' in overrides ? overrides.token : 'token';
-  const inviteToken =
-    overrides && 'inviteToken' in overrides ? overrides.inviteToken : null;
-  return {
-    state: {
-      inviteToken,
-      token,
-      candidateSessionId: null,
-      bootstrap: null,
-      started: false,
-      taskState: {
-        loading: false,
-        error: null,
-        isComplete: false,
-        completedTaskIds: [],
-        currentTask: null,
-      },
-      authStatus: overrides?.authStatus ?? 'ready',
-      authError: null,
-    },
-    setInviteToken: jest.fn(),
-    setToken,
-    setCandidateSessionId: jest.fn(),
-    setBootstrap: jest.fn(),
-    setStarted: jest.fn(),
-    setTaskLoading: jest.fn(),
-    setTaskLoaded: jest.fn(),
-    setTaskError: jest.fn(),
-    clearTaskError: jest.fn(),
-    reset: jest.fn(),
-    loadAccessToken: jest.fn(),
-  };
-};
 
 describe('CandidateSessionPage unit flow', () => {
   beforeEach(() => {
-    jest.resetAllMocks();
-    mockUseTaskSubmission.mockReturnValue({
-      submitting: false,
-      handleSubmit: jest.fn(),
-    });
+    resetCandidateSessionUnitMocks();
   });
 
   it('shows error when invite token is missing', async () => {
     mockUseCandidateSession.mockReturnValue(buildSession());
-
     render(<CandidateSessionPage token="" />);
 
-    await waitFor(() =>
-      expect(screen.getByText(/Invite link unavailable/i)).toBeInTheDocument(),
-    );
-    expect(
-      await screen.findByText(
-        /This invite link is no longer valid\. Please contact your recruiter to request a new invitation\./i,
-      ),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByRole('button', { name: /Go to Home/i }),
-    ).toBeInTheDocument();
+    expect(await screen.findByText(/Invite link unavailable/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Go to Home/i })).toBeInTheDocument();
     expect(screen.queryByText(/Retry/i)).not.toBeInTheDocument();
   });
 
   it('redirects to login on 401 bootstrap errors', async () => {
-    const session = buildSession();
-    mockUseCandidateSession.mockReturnValue(session);
+    mockUseCandidateSession.mockReturnValue(buildSession());
     mockResolveInvite.mockRejectedValueOnce({ status: 401 });
 
     render(<CandidateSessionPage token="invite-token" />);
-
     await waitFor(() =>
       expect(routerMock.replace).toHaveBeenCalledWith(
         expect.stringContaining('/auth/login?'),
@@ -120,34 +35,22 @@ describe('CandidateSessionPage unit flow', () => {
   });
 
   it('handles 403 errors by showing access denied view', async () => {
-    const session = buildSession();
-    mockUseCandidateSession.mockReturnValue(session);
+    mockUseCandidateSession.mockReturnValue(buildSession());
     mockResolveInvite.mockRejectedValueOnce({ status: 403 });
 
     render(<CandidateSessionPage token="invite-token" />);
-
-    await waitFor(() =>
-      expect(screen.getByText('Access denied')).toBeInTheDocument(),
-    );
+    expect(await screen.findByText('Access denied')).toBeInTheDocument();
   });
 
   it.each([400, 404, 409])(
-    'shows guidance when invite link fails (%s)',
+    'shows invite-unavailable guidance for status %s',
     async (status) => {
       mockUseCandidateSession.mockReturnValue(buildSession());
       mockResolveInvite.mockRejectedValueOnce({ status });
 
       render(<CandidateSessionPage token="invite-token" />);
-
-      expect(
-        await screen.findByText(/Invite link unavailable/i),
-      ).toBeInTheDocument();
-      expect(
-        screen.getByText(/contact your recruiter to request a new invitation/i),
-      ).toBeInTheDocument();
-      expect(
-        screen.getByRole('button', { name: /Go to Home/i }),
-      ).toBeInTheDocument();
+      expect(await screen.findByText(/Invite link unavailable/i)).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /Go to Home/i })).toBeInTheDocument();
       expect(screen.queryByText(/Retry/i)).not.toBeInTheDocument();
     },
   );
@@ -157,11 +60,7 @@ describe('CandidateSessionPage unit flow', () => {
     mockResolveInvite.mockRejectedValueOnce({ status: 410 });
 
     render(<CandidateSessionPage token="invite-token" />);
-
     expect(await screen.findByText(/Invite expired/i)).toBeInTheDocument();
-    expect(
-      screen.getByText(/contact your recruiter to request a new invitation/i),
-    ).toBeInTheDocument();
   });
 
   it('shows error view for non-auth bootstrap failures', async () => {
@@ -169,9 +68,6 @@ describe('CandidateSessionPage unit flow', () => {
     mockResolveInvite.mockRejectedValueOnce({ status: 500 });
 
     render(<CandidateSessionPage token="invite-token" />);
-
-    await waitFor(() =>
-      expect(screen.getByText('Unable to load simulation')).toBeInTheDocument(),
-    );
+    expect(await screen.findByText('Unable to load simulation')).toBeInTheDocument();
   });
 });

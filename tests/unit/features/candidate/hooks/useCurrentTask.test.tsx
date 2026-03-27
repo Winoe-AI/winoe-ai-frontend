@@ -30,7 +30,6 @@ function Harness({
     setTaskError,
     clearTaskError: jest.fn(),
   });
-
   return <button onClick={() => void fetchCurrentTask()}>fetch</button>;
 }
 
@@ -53,7 +52,6 @@ describe('useCurrentTask', () => {
         description: 'desc',
       },
     });
-
     render(
       <Harness
         candidateSessionId={99}
@@ -61,11 +59,9 @@ describe('useCurrentTask', () => {
         setTaskError={setTaskError}
       />,
     );
-
     await act(async () => {
       screen.getByText('fetch').click();
     });
-
     expect(getTaskMock).toHaveBeenCalledWith(99);
     expect(setTaskLoaded).toHaveBeenCalledWith({
       isComplete: false,
@@ -85,7 +81,6 @@ describe('useCurrentTask', () => {
     const setTaskLoaded = jest.fn();
     const setTaskError = jest.fn();
     getTaskMock.mockRejectedValue(new Error('network'));
-
     render(
       <Harness
         candidateSessionId={100}
@@ -93,11 +88,9 @@ describe('useCurrentTask', () => {
         setTaskError={setTaskError}
       />,
     );
-
     await act(async () => {
       screen.getByText('fetch').click();
     });
-
     expect(setTaskLoaded).not.toHaveBeenCalled();
     expect(setTaskError).toHaveBeenCalled();
   });
