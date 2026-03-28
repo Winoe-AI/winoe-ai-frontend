@@ -920,9 +920,7 @@
   ],
   "routeStateSourceSignals": {
     "/": [],
-    "/auth/error": [
-      "error"
-    ],
+    "/auth/error": ["error"],
     "/auth/login": [],
     "/auth/logout": [],
     "/candidate-sessions/[token]": [
@@ -931,10 +929,7 @@
       "submitting",
       "success"
     ],
-    "/candidate/dashboard": [
-      "error",
-      "loading"
-    ],
+    "/candidate/dashboard": ["error", "loading"],
     "/candidate/session/[token]": [
       "disabled",
       "error",
@@ -949,15 +944,8 @@
       "submitting",
       "success"
     ],
-    "/dashboard": [
-      "error",
-      "loading",
-      "success"
-    ],
-    "/dashboard/simulations/[id]": [
-      "error",
-      "loading"
-    ],
+    "/dashboard": ["error", "loading", "success"],
+    "/dashboard/simulations/[id]": ["error", "loading"],
     "/dashboard/simulations/[id]/candidates/[candidateSessionId]": [],
     "/dashboard/simulations/[id]/candidates/[candidateSessionId]/fit-profile": [
       "disabled",
@@ -966,16 +954,12 @@
       "submitting",
       "success"
     ],
-    "/dashboard/simulations/new": [
-      "loading"
-    ],
+    "/dashboard/simulations/new": ["loading"],
     "/not-authorized": []
   },
   "routeStateRequirements": {
     "/": [],
-    "/auth/error": [
-      "error"
-    ],
+    "/auth/error": ["error"],
     "/auth/login": [],
     "/auth/logout": [],
     "/candidate-sessions/[token]": [],
@@ -1002,18 +986,8 @@
       "submitting",
       "success"
     ],
-    "/dashboard": [
-      "disabled",
-      "empty",
-      "error",
-      "loading",
-      "success"
-    ],
-    "/dashboard/simulations/[id]": [
-      "empty",
-      "error",
-      "loading"
-    ],
+    "/dashboard": ["disabled", "empty", "error", "loading", "success"],
+    "/dashboard/simulations/[id]": ["empty", "error", "loading"],
     "/dashboard/simulations/[id]/candidates/[candidateSessionId]": [
       "disabled",
       "empty",
@@ -1038,8 +1012,6 @@
       "submitting",
       "success"
     ],
-    "/not-authorized": [
-      "error"
-    ]
+    "/not-authorized": ["error"]
   }
 }

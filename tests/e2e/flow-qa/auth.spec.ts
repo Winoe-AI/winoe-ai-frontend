@@ -12,12 +12,12 @@ test.describe('Auth Flows', () => {
       /\/auth\/login\?returnTo=%2Fcandidate%2Fdashboard&mode=candidate/i,
     );
     await expect(
-      page.getByRole('heading', { name: /sign in to continue your simulation/i }),
+      page.getByRole('heading', {
+        name: /sign in to continue your simulation/i,
+      }),
     ).toBeVisible();
     await expect(
-      page
-        .getByRole('link', { name: /continue with auth0/i })
-        .first(),
+      page.getByRole('link', { name: /continue with auth0/i }).first(),
     ).toHaveAttribute(
       'href',
       /\/auth\/login\?returnTo=%2Fcandidate%2Fdashboard&mode=candidate&connection=Tenon-Candidates/i,
@@ -48,7 +48,9 @@ test.describe('Auth Flows', () => {
         /\/auth\/login\?returnTo=%2Fcandidate%2Fdashboard&mode=candidate/i,
       );
       await expect(
-        page.getByRole('heading', { name: /sign in to continue your simulation/i }),
+        page.getByRole('heading', {
+          name: /sign in to continue your simulation/i,
+        }),
       ).toBeVisible();
       await expect(
         page.getByRole('link', { name: /continue with auth0/i }).first(),

@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { execSync } from 'node:child_process';
+import { execFileSync } from 'node:child_process';
 
 export function collectSourceFiles(root, sourceDir = 'src') {
   const rows = [];
@@ -66,8 +66,9 @@ export function findTestsForPath(rel) {
   for (const pattern of patterns) {
     if (!pattern || pattern === 'index') continue;
     try {
-      const out = execSync(
-        `rg --files-with-matches --glob "*.test.*" "${pattern.replace(/"/g, '\\"')}" tests`,
+      const out = execFileSync(
+        'rg',
+        ['--files-with-matches', '--glob', '*.test.*', pattern, 'tests'],
         { encoding: 'utf8' },
       );
       out

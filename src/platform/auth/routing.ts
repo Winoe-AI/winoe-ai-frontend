@@ -36,6 +36,10 @@ export function sanitizeReturnTo(value: string | null | undefined): string {
       candidate.includes('://') ||
       lower.startsWith('javascript:') ||
       lower.startsWith('/javascript:') ||
+      lower.startsWith('data:') ||
+      lower.startsWith('/data:') ||
+      lower.startsWith('vbscript:') ||
+      lower.startsWith('/vbscript:') ||
       AUTH_PREFIXES.some(
         (prefix) =>
           lower === prefix ||
