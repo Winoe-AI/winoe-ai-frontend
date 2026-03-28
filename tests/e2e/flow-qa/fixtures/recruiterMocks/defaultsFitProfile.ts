@@ -1,7 +1,8 @@
 import { iso } from './shared';
+import { makeFitProfileStatusPayload } from '../../../../setup/fixtures/backendContracts';
 
 export function buildDefaultFitProfilePayload(candidateSessionId: number) {
-  return {
+  return makeFitProfileStatusPayload({
     status: 'ready',
     generatedAt: iso('2026-03-18T08:00:00Z'),
     report: {
@@ -75,5 +76,5 @@ export function buildDefaultFitProfilePayload(candidateSessionId: number) {
       },
       warnings: [],
     },
-  };
+  });
 }

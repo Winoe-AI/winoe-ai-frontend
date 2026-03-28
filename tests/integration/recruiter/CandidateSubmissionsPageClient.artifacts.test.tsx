@@ -61,4 +61,32 @@ describe('CandidateSubmissionsPage client artifacts', () => {
       ]),
     );
   });
+
+  it('renders partial artifact warning when some detail requests fail', async () => {
+    const getMock = jest.fn((path: string) => {
+      if (path.includes('/simulations/sim-1/candidates'))
+        return [makeCandidate('Dee', 'completed')];
+      if (path.includes('/submissions?candidateSessionId=900'))
+        return {
+          items: [
+            makeListItem(10, 2, 'Debug API'),
+            makeListItem(11, 3, 'Fix pipeline'),
+          ],
+        };
+      if (path.includes('/submissions/10'))
+        return makeDetail(10, 2, 'Debug API', 'code', 'stdout ok');
+      if (path.includes('/submissions/11'))
+        return Promise.reject(new Error('artifact unavailable'));
+      throw new Error(`Unexpected path ${path}`);
+    });
+
+    setClientScenario(getMock);
+
+    render(<CandidateSubmissionsPage />);
+
+    expect(
+      await screen.findByText(/Some submission details are unavailable\./i),
+    ).toBeInTheDocument();
+    expect(await screen.findByText(/Day 2: Debug API/i)).toBeInTheDocument();
+  });
 });

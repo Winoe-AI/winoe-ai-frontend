@@ -5,6 +5,10 @@ import type {
 } from './types';
 import { defaultCandidateInvites } from './invites';
 import { fulfillJson, nowIso } from './shared';
+import {
+  makeCandidateCurrentTaskPayload,
+  makeCandidateSessionResolvePayload,
+} from '../../../../setup/fixtures/backendContracts';
 
 export async function handleSessionCoreRoute(
   route: Route,
@@ -24,14 +28,17 @@ export async function handleSessionCoreRoute(
     pathname === `/api/backend/candidate/session/${params.token}` &&
     method === 'GET'
   ) {
-    await fulfillJson(route, {
-      candidateSessionId: params.candidateSessionId,
-      status: params.options.isCompleteInitially ? 'completed' : 'in_progress',
-      simulation: {
-        title: params.simulationTitle,
-        role: params.simulationRole,
-      },
-    });
+    await fulfillJson(
+      route,
+      makeCandidateSessionResolvePayload({
+        candidateSessionId: params.candidateSessionId,
+        status: params.options.isCompleteInitially ? 'completed' : 'in_progress',
+        simulation: {
+          title: params.simulationTitle,
+          role: params.simulationRole,
+        },
+      }),
+    );
     return { handled: true, submitted: params.submitted };
   }
   if (pathname === '/api/backend/candidate/invites' && method === 'GET') {
@@ -51,15 +58,18 @@ export async function handleSessionCoreRoute(
         params.options.completedTaskIds ??
         [])
       : (params.options.completedTaskIds ?? []);
-    await fulfillJson(route, {
-      isComplete: params.submitted
-        ? (params.options.isCompleteAfterSubmit ?? false)
-        : (params.options.isCompleteInitially ?? false),
-      completedTaskIds: completed,
-      currentTask: params.submitted
-        ? (params.options.nextTaskAfterSubmit ?? params.options.initialTask)
-        : params.options.initialTask,
-    });
+    await fulfillJson(
+      route,
+      makeCandidateCurrentTaskPayload({
+        isComplete: params.submitted
+          ? (params.options.isCompleteAfterSubmit ?? false)
+          : (params.options.isCompleteInitially ?? false),
+        completedTaskIds: completed,
+        currentTask: params.submitted
+          ? (params.options.nextTaskAfterSubmit ?? params.options.initialTask)
+          : params.options.initialTask,
+      }),
+    );
     return { handled: true, submitted: params.submitted };
   }
   if (pathname.endsWith('/submit') && method === 'POST') {

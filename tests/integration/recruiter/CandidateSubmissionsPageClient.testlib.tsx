@@ -5,6 +5,10 @@ import {
   __resetHttpClientCache,
 } from '@/platform/api-client/client';
 import { __resetCandidateCache } from '@/features/recruiter/api';
+import {
+  makeSubmissionDetailPayload,
+  makeSubmissionListItemPayload,
+} from '../../setup/fixtures/backendContracts';
 
 export const params = { id: 'sim-1', candidateSessionId: '900' };
 
@@ -62,15 +66,16 @@ export const makeListItem = (
   dayIndex: number,
   title: string,
   type = 'code',
-) => ({
-  submissionId,
-  candidateSessionId: 900,
-  taskId: 100 + submissionId,
-  dayIndex,
-  type,
-  submittedAt: '2025-01-02T00:00:00Z',
-  title,
-});
+) =>
+  makeSubmissionListItemPayload({
+    submissionId,
+    candidateSessionId: 900,
+    taskId: 100 + submissionId,
+    dayIndex,
+    type,
+    submittedAt: '2025-01-02T00:00:00Z',
+    title,
+  });
 
 export const makeDetail = (
   submissionId: number,
@@ -78,14 +83,15 @@ export const makeDetail = (
   title: string,
   type = 'code',
   stdout?: string,
-) => ({
-  submissionId,
-  candidateSessionId: 900,
-  task: { taskId: 100 + submissionId, dayIndex, type, title, prompt: null },
-  contentText: null,
-  code: null,
-  testResults: stdout ? { passed: 1, failed: 0, total: 1, stdout } : null,
-  submittedAt: '2025-01-02T00:00:00Z',
-});
+) =>
+  makeSubmissionDetailPayload({
+    submissionId,
+    candidateSessionId: 900,
+    task: { taskId: 100 + submissionId, dayIndex, type, title, prompt: null },
+    contentText: null,
+    code: null,
+    testResults: stdout ? { passed: 1, failed: 0, total: 1, stdout } : null,
+    submittedAt: '2025-01-02T00:00:00Z',
+  });
 
 export { CandidateSubmissionsPage };
