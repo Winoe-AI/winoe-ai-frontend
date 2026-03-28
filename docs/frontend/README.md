@@ -1,21 +1,29 @@
-# Tenon Frontend Docs
+# Frontend Documentation Index
 
-These documents describe the current frontend implementation and how it maps to backend APIs. They are derived from the codebase and kept intentionally concrete.
+This directory is the frontend code-truth documentation set for `tenon-frontend`.
 
-## Structure Summary
+## Scope
 
-- App Router only under `src/app` (no Pages Router).
-- Feature modules live in `src/features` for candidate, recruiter, auth, and marketing.
-- Shared UI, hooks, and utilities live in `src/shared`.
-- API client, Auth0 helpers, and server BFF/proxy live in `src/lib`.
-- Auth gating is enforced by middleware in `src/proxy.ts` and `middleware.ts`.
+- Reflects implementation in `src/app`, `src/features`, `src/platform`, and `src/shared`.
+- Cross-references backend route truth from `../tenon-backend/app/**/routes/**`.
+- Inline source comments remain disallowed by ESLint (`no-comments/disallowComments`), so module-level docs live in catalogs.
 
-## Contents
+## Documents
 
-- `docs/frontend/routes.md` (routes and feature layout)
-- `docs/frontend/flows.md` (candidate and recruiter flows)
-- `docs/frontend/api-map.md` (frontend to backend endpoints)
-- `docs/frontend/config.md` (environment variables and runtime config)
-- `docs/frontend/local-dev.md` (local dev and testing)
-- `docs/frontend/planned.md` (planned or incomplete UI)
-- `docs/README_COPY.md` (copy-paste-ready full README)
+- `docs/frontend/inventory.md`: tracked documentation inventory (`Document | Location | Status | Issues | Action`).
+- `docs/frontend/routes.md`: current route map (App routes, API routes, middleware boundary).
+- `docs/frontend/pages.md`: route-by-route page behavior, params, load-time calls, and UX states.
+- `docs/frontend/flows.md`: candidate and recruiter user flows mapped to current UI behavior.
+- `docs/frontend/api-integration.md`: canonical endpoint matrix with frontend callsites, payloads, auth mode, usage sites, and backend verification status.
+- `docs/frontend/api-map.md`: short summary and pointer to `api-integration.md`.
+- `docs/frontend/config.md`: runtime/build/test config and env var references.
+- `docs/frontend/local-dev.md`: local setup and verification steps.
+- `docs/frontend/planned.md`: known implementation gaps and integration follow-ups.
+- `docs/frontend/components-catalog.md`: generated full-sweep catalog for all `src/**/*.tsx` component/page modules.
+- `docs/frontend/hooks-catalog.md`: generated full-sweep catalog for exported `use*` hooks.
+- `docs/frontend/utilities-catalog.md`: generated full-sweep catalog for utility/constants/type modules.
+
+## Related
+
+- Root `README.md`: onboarding and command entrypoint.
+- `docs/README_COPY.md`: exact copy of root README.

@@ -7,33 +7,31 @@ describe('global error route', () => {
   });
 
   it('shows digest in production and message in development', async () => {
-    const { default: GlobalError } = await import('@/app/global-error');
+    const { GlobalErrorContent } = await import('@/app/global-error');
     const reset = jest.fn();
 
     render(
-      GlobalError({
+      GlobalErrorContent({
         error: Object.assign(new Error('fail'), { digest: '123' }),
         reset,
       }),
-      { container: document.documentElement },
     );
     expect(screen.getByText(/Error id: 123/)).toBeInTheDocument();
 
     const prevEnv = process.env.NODE_ENV;
     process.env.NODE_ENV = 'development';
     render(
-      GlobalError({
+      GlobalErrorContent({
         error: Object.assign(new Error('boom'), { digest: undefined }),
         reset,
       }),
-      { container: document.documentElement },
     );
     expect(screen.getByText(/boom/)).toBeInTheDocument();
     process.env.NODE_ENV = prevEnv;
   });
 
   it('go-home button updates location href', async () => {
-    const { default: GlobalError } = await import('@/app/global-error');
+    const { GlobalErrorContent } = await import('@/app/global-error');
     const originalLocation = window.location;
     const reset = jest.fn();
 
@@ -44,11 +42,10 @@ describe('global error route', () => {
     window.location = stubLocation as unknown as Location;
 
     render(
-      GlobalError({
+      GlobalErrorContent({
         error: Object.assign(new Error('boom'), { digest: undefined }),
         reset,
       }),
-      { container: document.documentElement },
     );
     screen.getByRole('button', { name: /Go home/i }).click();
     expect(stubLocation.href).toBe('/');

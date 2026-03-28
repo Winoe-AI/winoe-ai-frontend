@@ -1,4 +1,6 @@
-export function makeSimulationCreatePayload(overrides: Record<string, unknown> = {}) {
+export function makeSimulationCreatePayload(
+  overrides: Record<string, unknown> = {},
+) {
   return {
     id: 'sim-created-1',
     title: 'Frontend Platform Modernization',
@@ -9,7 +11,9 @@ export function makeSimulationCreatePayload(overrides: Record<string, unknown> =
   };
 }
 
-export function makeSimulationDetailPayload(overrides: Record<string, unknown> = {}) {
+export function makeSimulationDetailPayload(
+  overrides: Record<string, unknown> = {},
+) {
   return {
     id: 'sim-1',
     title: 'Frontend Platform Modernization',
@@ -33,7 +37,9 @@ export function makeSimulationDetailPayload(overrides: Record<string, unknown> =
   };
 }
 
-export function makeSimulationInvitePayload(overrides: Record<string, unknown> = {}) {
+export function makeSimulationInvitePayload(
+  overrides: Record<string, unknown> = {},
+) {
   return {
     candidateSessionId: 'candidate-session-1',
     token: 'invite-token-1',
@@ -43,7 +49,9 @@ export function makeSimulationInvitePayload(overrides: Record<string, unknown> =
   };
 }
 
-export function makeSimulationsComparePayload(overrides: Record<string, unknown> = {}) {
+export function makeSimulationsComparePayload(
+  overrides: Record<string, unknown> = {},
+) {
   return {
     candidateSessionId: '900',
     candidateName: 'Jane Candidate',
@@ -65,7 +73,9 @@ export function makeSimulationsComparePayload(overrides: Record<string, unknown>
   };
 }
 
-export function makeCandidateSessionResolvePayload(overrides: Record<string, unknown> = {}) {
+export function makeCandidateSessionResolvePayload(
+  overrides: Record<string, unknown> = {},
+) {
   return {
     candidateSessionId: 77,
     status: 'in_progress',
@@ -77,7 +87,9 @@ export function makeCandidateSessionResolvePayload(overrides: Record<string, unk
   };
 }
 
-export function makeCandidateSessionSchedulePayload(overrides: Record<string, unknown> = {}) {
+export function makeCandidateSessionSchedulePayload(
+  overrides: Record<string, unknown> = {},
+) {
   return {
     candidateSessionId: 77,
     scheduledStartAt: '2026-03-27T14:00:00Z',
@@ -94,7 +106,9 @@ export function makeCandidateSessionSchedulePayload(overrides: Record<string, un
   };
 }
 
-export function makeCandidateCurrentTaskPayload(overrides: Record<string, unknown> = {}) {
+export function makeCandidateCurrentTaskPayload(
+  overrides: Record<string, unknown> = {},
+) {
   return {
     isComplete: false,
     completedTaskIds: [1],
@@ -109,7 +123,9 @@ export function makeCandidateCurrentTaskPayload(overrides: Record<string, unknow
   };
 }
 
-export function makeSubmissionListItemPayload(overrides: Record<string, unknown> = {}) {
+export function makeSubmissionListItemPayload(
+  overrides: Record<string, unknown> = {},
+) {
   return {
     submissionId: 501,
     candidateSessionId: 900,
@@ -121,14 +137,18 @@ export function makeSubmissionListItemPayload(overrides: Record<string, unknown>
   };
 }
 
-export function makeSubmissionListPayload(overrides: Record<string, unknown> = {}) {
+export function makeSubmissionListPayload(
+  overrides: Record<string, unknown> = {},
+) {
   return {
     items: [makeSubmissionListItemPayload()],
     ...overrides,
   };
 }
 
-export function makeSubmissionDetailPayload(overrides: Record<string, unknown> = {}) {
+export function makeSubmissionDetailPayload(
+  overrides: Record<string, unknown> = {},
+) {
   return {
     submissionId: 501,
     candidateSessionId: 900,
@@ -162,7 +182,9 @@ export function makeRunStatusPayload(overrides: Record<string, unknown> = {}) {
   };
 }
 
-export function makeCodespaceStatusPayload(overrides: Record<string, unknown> = {}) {
+export function makeCodespaceStatusPayload(
+  overrides: Record<string, unknown> = {},
+) {
   return {
     repoUrl: 'https://github.com/tenon-ai/candidate-repo',
     repoName: 'candidate-repo',
@@ -189,7 +211,9 @@ export function makeHandoffPayload(overrides: Record<string, unknown> = {}) {
   };
 }
 
-export function makeFitProfileStatusPayload(overrides: Record<string, unknown> = {}) {
+export function makeFitProfileStatusPayload(
+  overrides: Record<string, unknown> = {},
+) {
   return {
     status: 'ready',
     generatedAt: '2026-03-18T08:00:00Z',
@@ -206,7 +230,9 @@ export function makeFitProfileStatusPayload(overrides: Record<string, unknown> =
   };
 }
 
-export function makeFitProfileGeneratePayload(overrides: Record<string, unknown> = {}) {
+export function makeFitProfileGeneratePayload(
+  overrides: Record<string, unknown> = {},
+) {
   return {
     jobId: 'fit-job-1',
     status: 'queued',

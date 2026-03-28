@@ -32,7 +32,9 @@ export async function handleSessionCoreRoute(
       route,
       makeCandidateSessionResolvePayload({
         candidateSessionId: params.candidateSessionId,
-        status: params.options.isCompleteInitially ? 'completed' : 'in_progress',
+        status: params.options.isCompleteInitially
+          ? 'completed'
+          : 'in_progress',
         simulation: {
           title: params.simulationTitle,
           role: params.simulationRole,

@@ -27,12 +27,18 @@ describe('useCandidateDashboardActions', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     (queryClient.fetchQuery as jest.Mock).mockImplementation(
-      async ({ queryFn }: { queryFn: (ctx: { signal?: AbortSignal }) => any }) =>
-        queryFn({ signal: undefined }),
+      async ({
+        queryFn,
+      }: {
+        queryFn: (ctx: { signal?: AbortSignal }) => unknown;
+      }) => queryFn({ signal: undefined }),
     );
     (queryClient.prefetchQuery as jest.Mock).mockImplementation(
-      async ({ queryFn }: { queryFn: (ctx: { signal?: AbortSignal }) => any }) =>
-        queryFn({ signal: undefined }),
+      async ({
+        queryFn,
+      }: {
+        queryFn: (ctx: { signal?: AbortSignal }) => unknown;
+      }) => queryFn({ signal: undefined }),
     );
   });
 
@@ -103,7 +109,9 @@ describe('useCandidateDashboardActions', () => {
   });
 
   it('prefetches bootstrap and current task for active invite token', async () => {
-    resolveCandidateInviteTokenMock.mockResolvedValue({ candidateSessionId: 9 });
+    resolveCandidateInviteTokenMock.mockResolvedValue({
+      candidateSessionId: 9,
+    });
     getCandidateCurrentTaskMock.mockResolvedValue({
       isComplete: false,
       completedTaskIds: [],

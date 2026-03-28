@@ -81,10 +81,10 @@ describe('routes coverage auth + global errors', () => {
   });
 
   it('renders global error with retry and hides digest in production', async () => {
-    const { default: GlobalError } = await import('@/app/global-error');
+    const { GlobalErrorContent } = await import('@/app/global-error');
     const reset = jest.fn();
     const first = render(
-      GlobalError({
+      GlobalErrorContent({
         error: Object.assign(new Error('boom'), { digest: '123' }),
         reset,
       }),
@@ -93,7 +93,7 @@ describe('routes coverage auth + global errors', () => {
     expect(reset).toHaveBeenCalled();
     first.unmount();
 
-    render(GlobalError({ error: new Error('fail'), reset: jest.fn() }));
+    render(GlobalErrorContent({ error: new Error('fail'), reset: jest.fn() }));
     expect(screen.queryByText(/Error id/)).not.toBeInTheDocument();
   });
 });

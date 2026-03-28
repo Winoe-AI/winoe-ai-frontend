@@ -1,4 +1,7 @@
-import { fetchDashboard, isAbortError } from '@/features/recruiter/dashboard/hooks/useDashboardApi';
+import {
+  fetchDashboard,
+  isAbortError,
+} from '@/features/recruiter/dashboard/hooks/useDashboardApi';
 
 const httpResultMock = jest.fn();
 const mapApiErrorMock = jest.fn();

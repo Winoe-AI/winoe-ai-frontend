@@ -14,7 +14,10 @@ async function openAndSubmitInvite() {
     await screen.findByRole('button', { name: 'Invite candidate' }),
   );
   await user.type(screen.getByLabelText(/Candidate name/i), 'Alex');
-  await user.type(screen.getByLabelText(/Candidate email/i), 'alex@example.com');
+  await user.type(
+    screen.getByLabelText(/Candidate email/i),
+    'alex@example.com',
+  );
   await user.click(screen.getByRole('button', { name: /Send invite/i }));
 }
 
@@ -47,9 +50,13 @@ describe('RecruiterDashboardPage invite error variants', () => {
       await screen.findByText(/Enter a valid email address\./i),
     ).toBeInTheDocument();
 
-    await userEvent.setup().click(screen.getByRole('button', { name: /Send invite/i }));
+    await userEvent
+      .setup()
+      .click(screen.getByRole('button', { name: /Send invite/i }));
     expect(
-      await screen.findByText(/Too many invites sent\. Please wait and try again\./i),
+      await screen.findByText(
+        /Too many invites sent\. Please wait and try again\./i,
+      ),
     ).toBeInTheDocument();
   });
 

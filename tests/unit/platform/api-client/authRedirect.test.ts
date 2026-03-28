@@ -124,9 +124,11 @@ describe('authRedirect', () => {
 
   it('swallows location.assign errors', async () => {
     setUserAgent('Mozilla/5.0 Chrome');
-    const assign = setWindow(jest.fn(() => {
-      throw new Error('assign failed');
-    }));
+    const assign = setWindow(
+      jest.fn(() => {
+        throw new Error('assign failed');
+      }),
+    );
 
     const { authRedirect } = await import('@/platform/api-client/authRedirect');
 

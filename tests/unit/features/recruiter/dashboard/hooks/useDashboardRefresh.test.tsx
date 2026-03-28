@@ -15,8 +15,8 @@ jest.mock('@/features/recruiter/dashboard/hooks/useDashboardApi', () => ({
   isAbortError: (err: unknown) =>
     Boolean(
       err &&
-        typeof err === 'object' &&
-        (err as { name?: string }).name === 'AbortError',
+      typeof err === 'object' &&
+      (err as { name?: string }).name === 'AbortError',
     ),
 }));
 
@@ -32,12 +32,10 @@ describe('useDashboardRefresh', () => {
   let loadMock: jest.Mock;
   let abortMock: jest.Mock;
   let capturedLoader: ((signal?: AbortSignal) => Promise<unknown>) | null;
-  let capturedOptions:
-    | {
-        onSuccess?: (value: any) => void;
-        onError?: (error: unknown) => string | null;
-      }
-    | null;
+  let capturedOptions: {
+    onSuccess?: (value: unknown) => void;
+    onError?: (error: unknown) => string | null;
+  } | null;
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -105,7 +103,7 @@ describe('useDashboardRefresh', () => {
     loadMock.mockReturnValue(inflight);
 
     const refs = {
-      inflightRef: { current: null as Promise<any> | null },
+      inflightRef: { current: null as Promise<unknown> | null },
       controllerRef: {
         current: { abort: priorAbort } as unknown as AbortController,
       },

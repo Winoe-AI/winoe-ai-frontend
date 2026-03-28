@@ -20,7 +20,9 @@ test.describe('Recruiter Critical Journey (flow-qa mocked)', () => {
     });
 
     await page.goto('/dashboard');
-    await expect(page.getByRole('heading', { name: /dashboard/i })).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: /dashboard/i }),
+    ).toBeVisible();
     await expect(
       page.getByRole('link', { name: /frontend platform modernization/i }),
     ).toBeVisible();
@@ -33,7 +35,9 @@ test.describe('Recruiter Critical Journey (flow-qa mocked)', () => {
     await page.getByLabel(/^role$/i).fill('Senior Frontend Engineer');
     await page.getByLabel(/tech stack/i).fill('TypeScript + Next.js');
 
-    const createButton = page.getByRole('button', { name: /create simulation/i });
+    const createButton = page.getByRole('button', {
+      name: /create simulation/i,
+    });
     await expect(createButton).toBeEnabled();
 
     const createResponsePromise = page.waitForResponse(
@@ -56,7 +60,10 @@ test.describe('Recruiter Critical Journey (flow-qa mocked)', () => {
     await expect(page).toHaveURL(createdSimulationUrl);
     await expect(page.getByText(/5-day simulation plan/i)).toBeVisible();
 
-    await page.getByRole('button', { name: /invite candidate/i }).first().click();
+    await page
+      .getByRole('button', { name: /invite candidate/i })
+      .first()
+      .click();
     await expect(
       page.getByRole('heading', { name: /invite candidate/i }),
     ).toBeVisible();
@@ -86,8 +93,7 @@ test.describe('Recruiter Critical Journey (flow-qa mocked)', () => {
     ).toBeVisible();
     await expect(page.getByText(/latest github artifacts/i)).toBeVisible();
 
-    const fitProfileUrl =
-      `/dashboard/simulations/${QA_BASE_SIMULATION_ID}/candidates/${QA_CANDIDATE_SESSION_ID}/fit-profile`;
+    const fitProfileUrl = `/dashboard/simulations/${QA_BASE_SIMULATION_ID}/candidates/${QA_CANDIDATE_SESSION_ID}/fit-profile`;
     await page.goto(fitProfileUrl);
 
     await expect(page).toHaveURL(fitProfileUrl);

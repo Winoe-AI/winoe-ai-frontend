@@ -8,7 +8,20 @@ test.describe('Auth Flows', () => {
 
     await auth.gotoLogin('returnTo=%2Fcandidate%2Fdashboard&mode=candidate');
 
-    await expect(page).toHaveURL(/auth0\.com\/u\/login/i);
+    await expect(page).toHaveURL(
+      /\/auth\/login\?returnTo=%2Fcandidate%2Fdashboard&mode=candidate/i,
+    );
+    await expect(
+      page.getByRole('heading', { name: /sign in to continue your simulation/i }),
+    ).toBeVisible();
+    await expect(
+      page
+        .getByRole('link', { name: /continue with auth0/i })
+        .first(),
+    ).toHaveAttribute(
+      'href',
+      /\/auth\/login\?returnTo=%2Fcandidate%2Fdashboard&mode=candidate&connection=Tenon-Candidates/i,
+    );
   });
 
   test.describe('Candidate-only Session', () => {
@@ -28,14 +41,21 @@ test.describe('Auth Flows', () => {
   test.describe('Recruiter-only Session', () => {
     test.use({ storageState: storageStates.recruiterOnly });
 
-    test('candidate route redirects to not-authorized', async ({ page }) => {
+    test('candidate route redirects to candidate login', async ({ page }) => {
       await page.goto('/candidate/dashboard');
 
-      await expect(page).toHaveURL(/\/not-authorized\?mode=candidate/);
+      await expect(page).toHaveURL(
+        /\/auth\/login\?returnTo=%2Fcandidate%2Fdashboard&mode=candidate/i,
+      );
       await expect(
-        page.getByRole('heading', { name: /not authorized/i }),
+        page.getByRole('heading', { name: /sign in to continue your simulation/i }),
       ).toBeVisible();
-      await expect(page.getByText(/need candidate access/i)).toBeVisible();
+      await expect(
+        page.getByRole('link', { name: /continue with auth0/i }).first(),
+      ).toHaveAttribute(
+        'href',
+        /\/auth\/login\?returnTo=%2Fcandidate%2Fdashboard&mode=candidate&connection=Tenon-Candidates/i,
+      );
     });
 
     test('auth clear route redirects to auth error with cleared state', async ({

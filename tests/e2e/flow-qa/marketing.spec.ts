@@ -26,15 +26,21 @@ test.describe('Marketing Flows', () => {
   test.describe('Signed-in marketing shell', () => {
     test.use({ storageState: storageStates.recruiterOnly });
 
-    test('landing page redirects signed-in users to dashboard', async ({
+    test('landing page renders signed-in shell with dashboard entry point', async ({
       page,
     }) => {
       await page.goto('/');
 
-      await expect(page).toHaveURL('/dashboard');
+      await expect(page).toHaveURL('/');
       await expect(
-        page.getByRole('heading', { name: /dashboard/i }),
+        page.getByRole('heading', { name: /welcome back/i }),
       ).toBeVisible();
+      await expect(
+        page.getByRole('link', { name: /go to dashboard/i }),
+      ).toHaveAttribute('href', '/dashboard');
+      await expect(
+        page.getByRole('link', { name: /candidate portal/i }),
+      ).toHaveAttribute('href', '/candidate/dashboard');
     });
   });
 });

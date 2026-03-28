@@ -71,11 +71,16 @@ test.describe('Candidate Critical Journey (flow-qa mocked)', () => {
 
     await page.goto(`/candidate-sessions/${QA_INVITE_TOKEN}`);
     const startButton = page.getByRole('button', { name: /start simulation/i });
-    if ((await startButton.count()) > 0) {
+    const day4Heading = page.getByText(/^day 4 • handoff$/i);
+    const startVisible = await startButton
+      .first()
+      .isVisible({ timeout: 5_000 })
+      .catch(() => false);
+    if (startVisible) {
       await startButton.first().click();
     }
 
-    await expect(page.getByText(/^day 4 • handoff$/i)).toBeVisible();
+    await expect(day4Heading).toBeVisible();
     await page.locator('input[type="file"]').setInputFiles({
       name: 'handoff.mp4',
       mimeType: 'video/mp4',
@@ -88,7 +93,10 @@ test.describe('Candidate Critical Journey (flow-qa mocked)', () => {
       .check();
     await page.getByRole('button', { name: /^complete upload$/i }).click();
     await expect(
-      page.getByRole('status').filter({ hasText: /transcript processing/i }).first(),
+      page
+        .getByRole('status')
+        .filter({ hasText: /transcript processing/i })
+        .first(),
     ).toBeVisible();
   });
 
@@ -115,19 +123,29 @@ test.describe('Candidate Critical Journey (flow-qa mocked)', () => {
 
     await page
       .getByLabel(/^challenges$/i)
-      .fill('I balanced speed, correctness, and clear communication with tradeoffs.');
+      .fill(
+        'I balanced speed, correctness, and clear communication with tradeoffs.',
+      );
     await page
       .getByLabel(/^decisions$/i)
-      .fill('I prioritized deterministic behavior and test coverage for critical user journeys.');
+      .fill(
+        'I prioritized deterministic behavior and test coverage for critical user journeys.',
+      );
     await page
       .getByLabel(/^tradeoffs$/i)
-      .fill('I deferred optional polish to keep key flows stable and observable.');
+      .fill(
+        'I deferred optional polish to keep key flows stable and observable.',
+      );
     await page
       .getByLabel(/^communication \/ handoff$/i)
-      .fill('I documented release steps, known risks, and fallback plans for reviewers.');
+      .fill(
+        'I documented release steps, known risks, and fallback plans for reviewers.',
+      );
     await page
       .getByLabel(/^what you would do next$/i)
-      .fill('Next, I would improve diagnostics around flaky transitions and artifact retries.');
+      .fill(
+        'Next, I would improve diagnostics around flaky transitions and artifact retries.',
+      );
 
     const submitResponsePromise = page.waitForResponse(
       (resp) =>

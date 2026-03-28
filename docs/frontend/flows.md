@@ -1,26 +1,86 @@
 # User Flows
 
-## Candidate Happy Path
+## Candidate Flow (Current Implementation)
 
-1. Open invite link at `/candidate/session/[token]` and sign in via Auth0 if prompted. UI states: `LoadingView`, `AuthView`, `ErrorView`. Key components: `CandidateSessionPage`, `CandidateSessionView`, `AuthView`. APIs: `GET /api/auth/access-token`, `GET /candidate/session/{token}`, `GET /candidate/session/{id}/current_task`.
-2. Onboarding start screen. UI state: `StartView` with day overview and start actions. Key components: `StartView`, `StartIntro`, `StartActions`. APIs: none.
-3. Day 1 text task submission. UI states: `RunningView`, editor, submit states (`idle`, `submitting`, `submitted`), error banner. Key components: `CandidateTaskView`, `TaskTextInput`, `TaskStatus`. APIs: `POST /tasks/{taskId}/submit` with `x-candidate-session-id`, then `GET /candidate/session/{id}/current_task`.
-4. Day 2 GitHub-native task. UI states: workspace loading and provisioning notices, test run states (`idle`, `starting`, `running`, `passed`, `failed`, `timeout`), submit states. Key components: `WorkspacePanel`, `RunTestsPanel`, `CandidateTaskView`. APIs: `GET /tasks/{taskId}/codespace/status`, `POST /tasks/{taskId}/codespace/init`, `POST /tasks/{taskId}/run`, `GET /tasks/{taskId}/run/{runId}`, `POST /tasks/{taskId}/submit`. Run tests disables while running and persists `runId` in session storage to resume polling.
-5. Day 3 GitHub-native task. UI states and APIs are the same as Day 2.
-6. Day 4 handoff task. UI states: resource panel shows recording link if present, text editor for response. Key components: `ResourcePanel`, `CandidateTaskView`. APIs: `POST /tasks/{taskId}/submit`.
-7. Day 5 documentation task. UI states: resource panel shows docs link if present, text editor with markdown preview. Key components: `ResourcePanel`, `CandidateTaskView`. APIs: `POST /tasks/{taskId}/submit`.
-8. Completion. UI state: `CompleteView` when `isComplete` is true. Key components: `CompleteView`. APIs: none.
+1. Candidate opens `/candidate/session/[token]`.
 
-Notes on current behavior:
+- Middleware enforces authenticated candidate access.
+- Bootstrap resolves invite via `GET /candidate/session/{token}`.
+- If schedule is missing, view moves to scheduling.
+- If schedule exists but window is not open, view moves to locked state.
 
-- Candidate access is enforced by middleware and Auth0 session. The invite token resolves a session but is not sufficient on its own.
-- Email verification is enforced by the backend when required. The UI surfaces a 403 message but does not include a dedicated verification UI.
+2. Candidate schedules session when required.
 
-## Recruiter Happy Path
+- API: `POST /candidate/session/{token}/schedule`.
+- Success stores schedule/day windows in candidate session state.
+- Validation errors (422), auth errors, and expired invites are surfaced in scheduling UI.
 
-1. Sign in via `/auth/login`. UI states: login page, Auth0 redirect, not-authorized screen if missing permissions. Key components: `LoginPage`, `NotAuthorizedPage`. APIs: Auth0 handled by middleware and `/api/auth/access-token` for session tokens.
-2. Dashboard load at `/dashboard`. UI states: profile skeleton, simulations skeleton, error messages, empty state. Key components: `RecruiterDashboardPage`, `DashboardContent`, `RecruiterSimulationList`. APIs: `GET /api/dashboard` (BFF aggregator).
-3. Create simulation at `/dashboard/simulations/new`. UI states: validation errors and submit feedback. Key components: `SimulationCreatePage`, `SimulationCreateForm`. APIs: `POST /api/simulations` with `templateKey`, `title`, `role`, `techStack`, `seniority`, `focus`.
-4. Invite candidates from dashboard or simulation detail. UI states: invite modal, loading/submitted toasts, error messaging. Key components: `InviteCandidateModal`, `useInviteToasts`. APIs: `POST /api/simulations/{id}/invite`.
-5. Simulation detail at `/dashboard/simulations/[id]`. UI states: plan loading and error, candidates loading and empty/error, search results, resend invite cooldown. Key components: `SimulationDetailView`, `CandidatesTable`, `SimulationPlanSection`. APIs: `GET /api/simulations/{id}`, `GET /api/simulations/{id}/candidates`, `POST /api/simulations/{id}/candidates/{candidateSessionId}/invite/resend`.
-6. Candidate submissions at `/dashboard/simulations/[id]/candidates/[candidateSessionId]`. UI states: submissions skeleton, empty/error states, artifact warning banner, pagination. Key components: `CandidateSubmissionsView`, `ArtifactCard`, `SubmissionsTable`. APIs: `GET /api/submissions?candidateSessionId=...`, `GET /api/submissions/{submissionId}`, and candidate verification via `GET /api/simulations/{id}/candidates`.
+3. Candidate works current task.
+
+- Current task API: `GET /candidate/session/{candidateSessionId}/current_task`.
+- Submission API: `POST /tasks/{taskId}/submit`.
+- Refresh path reloads current task after submit.
+
+4. Coding task workflow (Day 2/3 style tasks).
+
+- Workspace status: `GET /tasks/{taskId}/codespace/status`.
+- Workspace init fallback: `POST /tasks/{taskId}/codespace/init`.
+- Run tests: `POST /tasks/{taskId}/run` then poll `GET /tasks/{taskId}/run/{runId}`.
+
+5. Draft autosave behavior.
+
+- Load draft: `GET /tasks/{taskId}/draft`.
+- Save draft: `PUT /tasks/{taskId}/draft`.
+- Used by text/reflection task autosave hooks.
+
+6. Day 4 handoff upload workflow.
+
+- Status refresh: `GET /tasks/{taskId}/handoff/status`.
+- Upload init: `POST /tasks/{taskId}/handoff/upload/init`.
+- Browser direct upload: signed URL upload via XHR (external storage URL, not backend app route).
+- Upload complete: `POST /tasks/{taskId}/handoff/upload/complete`.
+- Delete recording: `POST /recordings/{recordingId}/delete`.
+
+7. Day 5 reflection workflow.
+
+- Uses structured reflection form UI (`Day5ReflectionPanel` and related hooks/components).
+- Persists through standard task submit + draft endpoints.
+
+## Recruiter Flow (Current Implementation)
+
+1. Recruiter opens `/dashboard`.
+
+- API: `GET /api/dashboard`.
+- Server-side dashboard handler fans out to backend `/api/auth/me` and `/api/simulations`.
+
+2. Recruiter creates simulation (`/dashboard/simulations/new`).
+
+- API: `POST /api/simulations`.
+
+3. Recruiter opens simulation detail (`/dashboard/simulations/[id]`).
+
+- APIs:
+  - `GET /api/simulations/{id}`
+  - `GET /api/simulations/{id}/candidates`
+  - `GET /api/simulations/{id}/candidates/compare`
+  - `POST /api/simulations/{id}/invite`
+  - `POST /api/simulations/{id}/candidates/{candidateSessionId}/invite/resend`
+  - `POST /api/simulations/{id}/terminate`
+
+4. Recruiter submission review (`/dashboard/simulations/[id]/candidates/[candidateSessionId]`).
+
+- APIs:
+  - `GET /api/submissions?candidateSessionId=...`
+  - `GET /api/submissions/{submissionId}`
+  - candidate verification via candidates list endpoint
+
+5. Recruiter fit profile (`/dashboard/simulations/[id]/candidates/[candidateSessionId]/fit-profile`).
+
+- APIs:
+  - `GET /api/candidate_sessions/{candidateSessionId}/fit_profile`
+  - `POST /api/candidate_sessions/{candidateSessionId}/fit_profile/generate`
+
+## Flow Notes
+
+- `/api/auth/access-token` and `/api/dev/access-token` exist but are currently disabled (`410`) in local-enabled mode and unavailable outside local.
+- Scenario lifecycle actions (`activate`, `scenario regenerate/approve/patch`, `jobs poll`) currently call `/api/backend/*` paths from recruiter client code. Backend-equivalent routes exist under `/api/*`; see mismatch matrix in `docs/frontend/api-integration.md`.

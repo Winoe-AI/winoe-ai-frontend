@@ -10,6 +10,7 @@ const securityHeaders = buildSecurityHeaders(isProd, isDeployProd);
 
 const nextConfig: NextConfig = {
   transpilePackages: ['react-markdown', 'remark-gfm', 'remark-breaks'],
+  allowedDevOrigins: ['127.0.0.1', 'localhost'],
   async rewrites() {
     // API proxying is handled explicitly in /app/api/backend/[...path] to avoid
     // catch-all rewrites shadowing BFF route handlers.

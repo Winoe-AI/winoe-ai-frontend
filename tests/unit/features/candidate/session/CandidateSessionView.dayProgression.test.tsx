@@ -30,7 +30,9 @@ describe('CandidateSessionView day progression checkpoints', () => {
     render(<CandidateSessionView {...props} />);
 
     expect(screen.getByRole('textbox')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /Save draft/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /Save draft/i }),
+    ).toBeInTheDocument();
     expect(
       screen.queryByText(/This day is closed and read-only/i),
     ).not.toBeInTheDocument();
@@ -64,7 +66,9 @@ describe('CandidateSessionView day progression checkpoints', () => {
 
     expect(screen.getByLabelText(/^Challenges$/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/^Decisions$/i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /^Preview$/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /^Preview$/i }),
+    ).toBeInTheDocument();
   });
 
   it('shows lockout-visible state for Day 5 when the window is closed', () => {

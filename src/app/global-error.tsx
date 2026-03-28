@@ -2,13 +2,12 @@
 
 import Button from '@/shared/ui/Button';
 
-export default function GlobalError({
-  error,
-  reset,
-}: {
+export type GlobalErrorProps = {
   error: Error & { digest?: string };
   reset: () => void;
-}) {
+};
+
+export function GlobalErrorContent({ error, reset }: GlobalErrorProps) {
   const isDev = process.env.NODE_ENV === 'development';
   const detail = isDev
     ? error.message
@@ -17,35 +16,41 @@ export default function GlobalError({
       : null;
 
   return (
+    <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50 px-4 text-center text-gray-900">
+      <div className="max-w-md space-y-4 rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+        <div className="text-xl font-semibold">Something went wrong</div>
+        <p className="text-sm text-gray-700">
+          We hit an unexpected error while loading this page. Try refreshing or
+          head back to the previous screen.
+        </p>
+        {detail ? (
+          <p className="rounded bg-gray-100 px-3 py-2 text-xs text-gray-700">
+            {detail}
+          </p>
+        ) : null}
+        <div className="flex flex-wrap justify-center gap-2">
+          <Button onClick={() => reset()}>Retry</Button>
+          <Button
+            variant="secondary"
+            onClick={() => {
+              if (typeof window !== 'undefined') {
+                window.location.href = '/';
+              }
+            }}
+          >
+            Go home
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default function GlobalError(props: GlobalErrorProps) {
+  return (
     <html lang="en">
       <body>
-        <div className="flex min-h-screen flex-col items-center justify-center bg-gray-50 px-4 text-center text-gray-900">
-          <div className="max-w-md space-y-4 rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-            <div className="text-xl font-semibold">Something went wrong</div>
-            <p className="text-sm text-gray-700">
-              We hit an unexpected error while loading this page. Try refreshing
-              or head back to the previous screen.
-            </p>
-            {detail ? (
-              <p className="rounded bg-gray-100 px-3 py-2 text-xs text-gray-700">
-                {detail}
-              </p>
-            ) : null}
-            <div className="flex flex-wrap justify-center gap-2">
-              <Button onClick={() => reset()}>Retry</Button>
-              <Button
-                variant="secondary"
-                onClick={() => {
-                  if (typeof window !== 'undefined') {
-                    window.location.href = '/';
-                  }
-                }}
-              >
-                Go home
-              </Button>
-            </div>
-          </div>
-        </div>
+        <GlobalErrorContent {...props} />
       </body>
     </html>
   );
