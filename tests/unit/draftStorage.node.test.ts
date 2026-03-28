@@ -7,7 +7,7 @@ import {
   loadTextDraft,
   loadTextDraftSavedAt,
   saveTextDraft,
-} from '@/features/candidate/session/task/utils/draftStorage';
+} from '@/features/candidate/tasks/utils/draftStorageUtils';
 
 describe('draftStorage without window', () => {
   it('returns safe defaults when sessionStorage is unavailable', () => {

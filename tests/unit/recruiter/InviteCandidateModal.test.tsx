@@ -1,28 +1,33 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { InviteCandidateModal } from '@/features/recruiter/invitations/InviteCandidateModal';
+import type { ComponentProps } from 'react';
+import { InviteCandidateModal } from '@/features/recruiter/simulation-management/invitations/InviteCandidateModal';
+
+const renderModal = (
+  overrides: Partial<ComponentProps<typeof InviteCandidateModal>> = {},
+) =>
+  render(
+    <InviteCandidateModal
+      open
+      title="Test Simulation"
+      state={{ status: 'idle' }}
+      onClose={() => undefined}
+      onSubmit={() => undefined}
+      initialName=""
+      initialEmail=""
+      {...overrides}
+    />,
+  );
 
 describe('InviteCandidateModal', () => {
   it('passes string values to submit handler', () => {
     const onSubmit = jest.fn();
-    render(
-      <InviteCandidateModal
-        open
-        title="Test Simulation"
-        state={{ status: 'idle' }}
-        onClose={() => undefined}
-        onSubmit={onSubmit}
-        initialName=""
-        initialEmail=""
-      />,
-    );
-
+    renderModal({ onSubmit });
     fireEvent.change(screen.getByLabelText(/Candidate name/i), {
       target: { value: '  Jane Doe  ' },
     });
     fireEvent.change(screen.getByLabelText(/Candidate email/i), {
       target: { value: '  JANE@EXAMPLE.COM  ' },
     });
-
     fireEvent.click(screen.getByText('Send invite'));
 
     expect(onSubmit).toHaveBeenCalledTimes(1);
@@ -34,18 +39,7 @@ describe('InviteCandidateModal', () => {
   });
 
   it('hydrates initial values when opened', async () => {
-    const { rerender } = render(
-      <InviteCandidateModal
-        open={false}
-        title="Test Simulation"
-        state={{ status: 'idle' }}
-        onClose={() => undefined}
-        onSubmit={() => undefined}
-        initialName=""
-        initialEmail=""
-      />,
-    );
-
+    const { rerender } = renderModal({ open: false });
     rerender(
       <InviteCandidateModal
         open
@@ -70,39 +64,23 @@ describe('InviteCandidateModal', () => {
 
   it('blocks submit when candidate name is missing', () => {
     const onSubmit = jest.fn();
-    render(
-      <InviteCandidateModal
-        open
-        title="Test Simulation"
-        state={{ status: 'idle' }}
-        onClose={() => undefined}
-        onSubmit={onSubmit}
-        initialName=""
-        initialEmail=""
-      />,
-    );
-
+    renderModal({ onSubmit });
     fireEvent.change(screen.getByLabelText(/Candidate email/i), {
       target: { value: 'jane@example.com' },
     });
     fireEvent.click(screen.getByText('Send invite'));
-
     expect(onSubmit).not.toHaveBeenCalled();
     expect(screen.getByText(/Candidate name is required/i)).toBeInTheDocument();
   });
 
   it('renders nothing when closed and still resets when opened later', () => {
-    const { rerender, queryByRole, getByLabelText, getByText } = render(
-      <InviteCandidateModal
-        open={false}
-        title="Later"
-        state={{ status: 'idle' }}
-        onClose={() => undefined}
-        onSubmit={jest.fn()}
-        initialName="Closed Name"
-        initialEmail="closed@example.com"
-      />,
-    );
+    const { rerender, queryByRole, getByLabelText, getByText } = renderModal({
+      open: false,
+      title: 'Later',
+      onSubmit: jest.fn(),
+      initialName: 'Closed Name',
+      initialEmail: 'closed@example.com',
+    });
 
     expect(queryByRole('dialog')).toBeNull();
 
@@ -122,8 +100,6 @@ describe('InviteCandidateModal', () => {
     expect(getByLabelText(/Candidate email/i)).toHaveValue(
       'opened@example.com',
     );
-
-    // Valid submit path executes the onClick guard even when inputs are valid
     fireEvent.click(getByText('Send invite'));
   });
 });

@@ -6,10 +6,10 @@ import { CandidateSessionProvider } from '@/features/candidate/session/Candidate
 import {
   getCandidateCurrentTask,
   resolveCandidateInviteToken,
-} from '@/features/candidate/api';
+} from '@/features/candidate/session/api';
 
-jest.mock('@/features/candidate/api', () => {
-  const actual = jest.requireActual('@/features/candidate/api');
+jest.mock('@/features/candidate/session/api', () => {
+  const actual = jest.requireActual('@/features/candidate/session/api');
   return {
     __esModule: true,
     ...actual,
@@ -26,18 +26,12 @@ const routerMock = {
   back: jest.fn(),
   forward: jest.fn(),
 };
-
-jest.mock('next/navigation', () => ({
-  useRouter: () => routerMock,
-}));
+jest.mock('next/navigation', () => ({ useRouter: () => routerMock }));
 
 const currentTaskMock = getCandidateCurrentTask as unknown as jest.Mock;
 const resolveMock = resolveCandidateInviteToken as unknown as jest.Mock;
-
-function renderWithProvider(ui: React.ReactNode) {
-  return render(<CandidateSessionProvider>{ui}</CandidateSessionProvider>);
-}
-
+const renderWithProvider = (ui: React.ReactNode) =>
+  render(<CandidateSessionProvider>{ui}</CandidateSessionProvider>);
 const realFetch = global.fetch;
 const fetchMock = jest.fn();
 
@@ -88,37 +82,22 @@ describe('CandidateSessionPage', () => {
       screen.getByText(/Do not paste tokens or secrets/i),
     ).toBeInTheDocument();
     expect(screen.getByText(/Use the repo link provided/i)).toBeInTheDocument();
-
     await waitFor(() => expect(resolveMock).toHaveBeenCalledTimes(1));
 
-    expect(
-      await screen.findByRole('button', { name: /Start simulation/i }),
-    ).toBeInTheDocument();
     const user = userEvent.setup();
-    await user.click(screen.getByRole('button', { name: /Start simulation/i }));
-
+    await user.click(
+      await screen.findByRole('button', { name: /Start simulation/i }),
+    );
     expect(await screen.findByText(/Role:\s*Backend/i)).toBeInTheDocument();
-    const dayTitles = await screen.findAllByText('Day 1 — Architecture');
-    expect(dayTitles.length).toBeGreaterThan(0);
+    expect(
+      (await screen.findAllByText('Day 1 — Architecture')).length,
+    ).toBeGreaterThan(0);
     expect(currentTaskMock).toHaveBeenCalledWith(123);
   });
 
-  it('redirects to login when invite bootstrap returns 401', async () => {
+  it('redirects to login and hides auth card when invite bootstrap returns 401', async () => {
     resolveMock.mockRejectedValueOnce({ status: 401 });
     renderWithProvider(<CandidateSessionPage token="VALID_TOKEN" />);
-
-    await waitFor(() =>
-      expect(routerMock.replace).toHaveBeenCalledWith(
-        expect.stringContaining('/auth/login?'),
-      ),
-    );
-  });
-
-  it('does not render auth card when invite bootstrap is rejected with 401', async () => {
-    resolveMock.mockRejectedValueOnce({ status: 401 });
-
-    renderWithProvider(<CandidateSessionPage token="VALID_TOKEN" />);
-
     await waitFor(() =>
       expect(routerMock.replace).toHaveBeenCalledWith(
         expect.stringContaining('/auth/login?'),

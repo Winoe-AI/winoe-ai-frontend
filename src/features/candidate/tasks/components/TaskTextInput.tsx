@@ -1,0 +1,97 @@
+import { useDeferredValue, useState, useTransition } from 'react';
+import dynamic from 'next/dynamic';
+import type { MarkdownPreviewProps } from '@/shared/ui/Markdown';
+import { TaskTextToolbar } from './TaskTextToolbar';
+import { TaskTextFooter } from './TaskTextFooter';
+
+const LazyMarkdownPreview = dynamic(
+  () => import('@/shared/ui/Markdown').then((m) => m.MarkdownPreview),
+  {
+    loading: () => (
+      <div className="text-xs text-gray-500" aria-label="loading-markdown">
+        Loading preview…
+      </div>
+    ),
+    ssr: false,
+  },
+);
+
+let PreviewComponent: React.ComponentType<MarkdownPreviewProps> =
+  LazyMarkdownPreview;
+if (process.env.NODE_ENV === 'test') {
+  const mod =
+    require('@/shared/ui/Markdown') as typeof import('@/shared/ui/Markdown'); // eslint-disable-line @typescript-eslint/no-require-imports
+  PreviewComponent = mod.MarkdownPreview;
+}
+
+type TaskTextInputProps = {
+  value: string;
+  onChange: (value: string) => void;
+  disabled: boolean;
+  readOnly?: boolean;
+  readOnlyReason?: string | null;
+  savedAt: number | null;
+};
+
+export function TaskTextInput({
+  value,
+  onChange,
+  disabled,
+  readOnly = false,
+  readOnlyReason = null,
+  savedAt,
+}: TaskTextInputProps) {
+  const [mode, setMode] = useState<'write' | 'preview'>('write');
+  const [previewPending, startPreviewTransition] = useTransition();
+  const deferredPreviewValue = useDeferredValue(value);
+
+  if (readOnly) {
+    return (
+      <>
+        <p className="mb-2 text-xs text-gray-600">
+          {readOnlyReason ??
+            'This day is closed. Finalized content is shown in read-only mode.'}
+        </p>
+        <div className="w-full min-h-[360px] md:min-h-[420px] rounded-md border bg-white p-3">
+          <PreviewComponent
+            content={value}
+            emptyPlaceholder="No finalized submission is available for this day."
+          />
+        </div>
+        <TaskTextFooter length={value.length} savedAt={savedAt} />
+      </>
+    );
+  }
+  const handleModeChange = (next: 'write' | 'preview') => {
+    startPreviewTransition(() => {
+      setMode(next);
+    });
+  };
+  return (
+    <>
+      <TaskTextToolbar mode={mode} onChange={handleModeChange} />
+      {mode === 'write' ? (
+        <textarea
+          className="w-full min-h-[360px] md:min-h-[420px] rounded-md border p-3 text-sm leading-6 resize-y"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder="Write your response here… Markdown supported (e.g., # Heading, **bold**, - list)"
+          disabled={disabled}
+        />
+      ) : (
+        <div className="w-full min-h-[360px] md:min-h-[420px] rounded-md border bg-white p-3">
+          {previewPending ? (
+            <div className="mb-2 text-xs text-gray-500">
+              Refreshing preview…
+            </div>
+          ) : null}
+          <PreviewComponent
+            content={deferredPreviewValue}
+            emptyPlaceholder="Add content to preview your Markdown formatting."
+          />
+        </div>
+      )}
+      <TaskTextFooter length={value.length} savedAt={savedAt} />
+    </>
+  );
+}

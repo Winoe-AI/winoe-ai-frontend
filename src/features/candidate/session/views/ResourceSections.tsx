@@ -1,4 +1,4 @@
-import { ResourcePanel } from '../task/components/ResourcePanel';
+import { ResourcePanel } from '@/features/candidate/tasks/components/ResourcePanel';
 
 type Props = {
   showRecording: boolean;

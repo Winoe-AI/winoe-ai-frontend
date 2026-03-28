@@ -1,6 +1,6 @@
 import { useCallback, useRef } from 'react';
-import { getCandidateCurrentTask } from '@/features/candidate/api';
-import { friendlyTaskError } from '../utils/errorMessages';
+import { getCandidateCurrentTask } from '@/features/candidate/session/api/tasksApi';
+import { friendlyTaskError } from '../utils/errorMessagesUtils';
 import type { CandidateTask } from '../CandidateSessionProvider';
 
 type Params = {

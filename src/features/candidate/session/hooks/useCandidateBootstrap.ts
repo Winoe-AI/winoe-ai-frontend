@@ -1,6 +1,6 @@
 import { useCallback, useRef, useState } from 'react';
-import { resolveCandidateInviteToken } from '@/features/candidate/api';
-import { friendlyBootstrapError } from '../utils/errorMessages';
+import { resolveCandidateInviteToken } from '@/features/candidate/session/api';
+import { friendlyBootstrapError } from '../utils/errorMessagesUtils';
 
 export type BootstrapState = 'idle' | 'loading' | 'ready' | 'error';
 

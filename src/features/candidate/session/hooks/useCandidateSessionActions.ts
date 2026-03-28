@@ -1,5 +1,4 @@
 import { useMemo } from 'react';
-import { useRunInit } from './useRunInit';
 import { useTaskAutoload } from './useTaskAutoload';
 import { useAuthRedirect } from './useAuthRedirect';
 import { useCandidateInviteActions } from './useCandidateInviteActions';
@@ -44,7 +43,6 @@ export function useCandidateSessionActions({
 
   const testActions = useCandidateTestActions({ session, onTaskWindowClosed });
 
-  useRunInit(inviteActions.runInit, token);
   useTaskAutoload({
     view,
     state: session.state,

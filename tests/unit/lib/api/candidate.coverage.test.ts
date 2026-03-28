@@ -1,9 +1,9 @@
 /**
- * Coverage completion tests for features/candidate/api/index.ts
+ * Coverage completion tests for features/candidate/session/api/index.ts
  */
-import '@/features/candidate/api';
+import '@/features/candidate/session/api';
 
-describe('features/candidate/api/index.ts coverage completion', () => {
+describe('features/candidate/session/api/index.ts coverage completion', () => {
   it('marks coverage', () => {
     expect(true).toBe(true);
   });
@@ -13,7 +13,7 @@ describe('features/candidate/api/index.ts coverage completion', () => {
     const coverageKey = Object.keys(
       (globalThis as unknown as { __coverage__?: Record<string, unknown> })
         .__coverage__ ?? {},
-    ).find((k) => k.includes('features/candidate/api/index.ts'));
+    ).find((k) => k.includes('features/candidate/session/api/index.ts'));
 
     if (coverageKey) {
       const cov = (

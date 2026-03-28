@@ -1,6 +1,3 @@
-/**
- * Additional tests for auth clear route coverage
- */
 import { NextRequest } from 'next/server';
 
 jest.mock('next/server', () => {
@@ -41,8 +38,8 @@ jest.mock('next/server', () => {
   };
 });
 
-jest.mock('@/lib/auth/authCookies', () => {
-  const actual = jest.requireActual('@/lib/auth/authCookies');
+jest.mock('@/platform/auth/authCookies', () => {
+  const actual = jest.requireActual('@/platform/auth/authCookies');
   return {
     ...actual,
     isAuthCookie: jest.fn(
@@ -51,14 +48,25 @@ jest.mock('@/lib/auth/authCookies', () => {
   };
 });
 
-jest.mock('@/lib/auth/routing', () => {
-  const actual = jest.requireActual('@/lib/auth/routing');
+jest.mock('@/platform/auth/routing', () => {
+  const actual = jest.requireActual('@/platform/auth/routing');
   return {
     ...actual,
     sanitizeReturnTo: jest.fn((value?: string | null) => value?.trim() || '/'),
     modeForPath: jest.fn(() => 'candidate'),
   };
 });
+
+const withCookies = (
+  req: NextRequest,
+  cookies: Array<{ name: string; value: string }> = [],
+) => {
+  (
+    req as unknown as {
+      cookies: { getAll: () => Array<{ name: string; value: string }> };
+    }
+  ).cookies = { getAll: () => cookies };
+};
 
 describe('auth clear route extra coverage', () => {
   beforeEach(() => {
@@ -73,27 +81,18 @@ describe('auth clear route extra coverage', () => {
   it('ignores empty cookie domain env', async () => {
     process.env.TENON_AUTH0_COOKIE_DOMAIN = '   ';
     jest.resetModules();
-
     const { GET } = await import('@/app/(auth)/auth/clear/route');
     const req = new NextRequest('http://test.example.com/auth/clear');
-    (
-      req as unknown as {
-        cookies: { getAll: () => Array<{ name: string; value: string }> };
-      }
-    ).cookies = {
-      getAll: () => [{ name: 'appSession', value: '1' }],
-    };
+    withCookies(req, [{ name: 'appSession', value: '1' }]);
 
     const res = (await GET(req as unknown as NextRequest)) as {
-      status: number;
       cookies: {
         getAll: () => Array<{ name: string; value?: string; domain?: string }>;
       };
     };
-
-    // Should use hostname since env is whitespace
-    const deleted = res.cookies.getAll();
-    expect(deleted.some((c) => c.domain === 'test.example.com')).toBe(true);
+    expect(
+      res.cookies.getAll().some((c) => c.domain === 'test.example.com'),
+    ).toBe(true);
   });
 
   it('handles returnTo with query string', async () => {
@@ -101,9 +100,7 @@ describe('auth clear route extra coverage', () => {
     const req = new NextRequest(
       'http://localhost/auth/clear?returnTo=%2Fdash%3Ffoo%3Dbar',
     );
-    (req as unknown as { cookies: { getAll: () => unknown[] } }).cookies = {
-      getAll: () => [],
-    };
+    withCookies(req);
     const res = await GET(req as unknown as NextRequest);
     expect(res.headers.get('location')).toContain('returnTo=');
   });
@@ -113,11 +110,8 @@ describe('auth clear route extra coverage', () => {
     const req = new NextRequest(
       'http://localhost/auth/clear?returnTo=%2F&mode=invalid',
     );
-    (req as unknown as { cookies: { getAll: () => unknown[] } }).cookies = {
-      getAll: () => [],
-    };
+    withCookies(req);
     const res = await GET(req as unknown as NextRequest);
-    // Should fall back to modeForPath which returns 'candidate'
     expect(res.headers.get('location')).toContain('mode=candidate');
   });
 
@@ -126,9 +120,7 @@ describe('auth clear route extra coverage', () => {
     const req = new NextRequest(
       'http://localhost/auth/clear?returnTo=%2F&mode=candidate',
     );
-    (req as unknown as { cookies: { getAll: () => unknown[] } }).cookies = {
-      getAll: () => [],
-    };
+    withCookies(req);
     const res = await GET(req as unknown as NextRequest);
     expect(res.headers.get('location')).toContain('mode=candidate');
   });

@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import type {
   CandidateCurrentDayWindow,
   CandidateDayWindow,
-} from '@/features/candidate/api';
+} from '@/features/candidate/session/api';
 import {
   deriveWindowState,
   type TaskWindowClosedOverride,

@@ -1,6 +1,9 @@
 import { useCallback, useRef } from 'react';
-import { getCandidateCurrentTask } from '@/features/candidate/api';
-import { normalizeCompletedTaskIds, toTask } from '../utils/taskTransforms';
+import { getCandidateCurrentTask } from '@/features/candidate/session/api/tasksApi';
+import {
+  normalizeCompletedTaskIds,
+  toTask,
+} from '../utils/taskTransformsUtils';
 import type { CandidateTask } from '../CandidateSessionProvider';
 
 type TaskLoaderDeps = {

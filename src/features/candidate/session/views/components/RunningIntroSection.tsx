@@ -1,4 +1,4 @@
-import CandidateTaskProgress from '../../task/CandidateTaskProgress';
+import CandidateTaskProgress from '@/features/candidate/tasks/CandidateTaskProgress';
 import { SessionRetryBanner } from '../SessionRetryBanner';
 import { RunningHeader } from './RunningHeader';
 

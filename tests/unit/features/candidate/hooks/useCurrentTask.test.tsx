@@ -2,8 +2,8 @@ import React from 'react';
 import { act, render, screen } from '@testing-library/react';
 import { useCurrentTask } from '@/features/candidate/session/hooks/useCurrentTask';
 
-jest.mock('@/features/candidate/api', () => {
-  const actual = jest.requireActual('@/features/candidate/api');
+jest.mock('@/features/candidate/session/api', () => {
+  const actual = jest.requireActual('@/features/candidate/session/api');
   return {
     __esModule: true,
     ...actual,
@@ -11,7 +11,7 @@ jest.mock('@/features/candidate/api', () => {
   };
 });
 
-const getTaskMock = jest.requireMock('@/features/candidate/api')
+const getTaskMock = jest.requireMock('@/features/candidate/session/api')
   .getCandidateCurrentTask as jest.Mock;
 
 function Harness({
@@ -30,7 +30,6 @@ function Harness({
     setTaskError,
     clearTaskError: jest.fn(),
   });
-
   return <button onClick={() => void fetchCurrentTask()}>fetch</button>;
 }
 
@@ -53,7 +52,6 @@ describe('useCurrentTask', () => {
         description: 'desc',
       },
     });
-
     render(
       <Harness
         candidateSessionId={99}
@@ -61,11 +59,9 @@ describe('useCurrentTask', () => {
         setTaskError={setTaskError}
       />,
     );
-
     await act(async () => {
       screen.getByText('fetch').click();
     });
-
     expect(getTaskMock).toHaveBeenCalledWith(99);
     expect(setTaskLoaded).toHaveBeenCalledWith({
       isComplete: false,
@@ -85,7 +81,6 @@ describe('useCurrentTask', () => {
     const setTaskLoaded = jest.fn();
     const setTaskError = jest.fn();
     getTaskMock.mockRejectedValue(new Error('network'));
-
     render(
       <Harness
         candidateSessionId={100}
@@ -93,11 +88,9 @@ describe('useCurrentTask', () => {
         setTaskError={setTaskError}
       />,
     );
-
     await act(async () => {
       screen.getByText('fetch').click();
     });
-
     expect(setTaskLoaded).not.toHaveBeenCalled();
     expect(setTaskError).toHaveBeenCalled();
   });

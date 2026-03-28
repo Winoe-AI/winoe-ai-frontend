@@ -5,10 +5,11 @@ jest.mock('next/server', () => {
     body?: unknown;
     cookies = {
       store: new Map<string, CookieValue>(),
-      set: (cookie: CookieValue) => {
-        const key = typeof cookie === 'string' ? cookie : cookie.name;
-        this.cookies.store.set(key, cookie);
-      },
+      set: (cookie: CookieValue) =>
+        this.cookies.store.set(
+          typeof cookie === 'string' ? cookie : cookie.name,
+          cookie,
+        ),
       get: (name: string) => this.cookies.store.get(name),
       getAll: () => Array.from(this.cookies.store.values()),
     };
@@ -34,19 +35,20 @@ jest.mock('next/server', () => {
 });
 
 import { NextRequest, NextResponse } from 'next/server';
-import { requireBffAuth, mergeResponseCookies } from '@/lib/server/bffAuth';
+import {
+  requireBffAuth,
+  mergeResponseCookies,
+} from '@/platform/server/bffAuth';
 
 const getSessionNormalizedMock = jest.fn();
 let auth0Mock: { getAccessToken: jest.Mock };
-
-jest.mock('@/lib/auth0', () => ({
+jest.mock('@/platform/auth0', () => ({
   auth0: { getAccessToken: jest.fn() },
   getSessionNormalized: (...args: unknown[]) =>
     getSessionNormalizedMock(...args),
 }));
-
-jest.mock('@/lib/auth0-claims', () => {
-  const actual = jest.requireActual('@/lib/auth0-claims');
+jest.mock('@/platform/auth0/claims', () => {
+  const actual = jest.requireActual('@/platform/auth0/claims');
   return {
     ...actual,
     extractPermissions: jest.fn(() => ['candidate:access']),
@@ -60,7 +62,7 @@ describe('bffAuth utilities', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     delete process.env.TENON_DEBUG_PERF;
-    auth0Mock = jest.requireMock('@/lib/auth0').auth0 as {
+    auth0Mock = jest.requireMock('@/platform/auth0').auth0 as {
       getAccessToken: jest.Mock;
     };
   });
@@ -77,9 +79,7 @@ describe('bffAuth utilities', () => {
     getSessionNormalizedMock.mockResolvedValue(null);
     const res = await requireBffAuth(new NextRequest('http://x'));
     expect(res.ok).toBe(false);
-    if (!res.ok) {
-      expect(res.response.status).toBe(401);
-    }
+    if (!res.ok) expect(res.response.status).toBe(401);
   });
 
   it('returns 403 when permission missing', async () => {

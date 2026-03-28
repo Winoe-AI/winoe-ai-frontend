@@ -1,19 +1,24 @@
 import React from 'react';
 import { act, render, screen } from '@testing-library/react';
 import { useTaskSubmission } from '@/features/candidate/session/hooks/useTaskSubmission';
-import type { Task } from '@/features/candidate/session/task/types';
+import type { Task } from '@/features/candidate/tasks/types';
 
-jest.mock('@/features/candidate/api', () => {
-  const actual = jest.requireActual('@/features/candidate/api');
-  return {
-    __esModule: true,
-    ...actual,
-    submitCandidateTask: jest.fn(),
-  };
-});
+jest.mock('@/features/candidate/session/api', () => ({
+  __esModule: true,
+  ...jest.requireActual('@/features/candidate/session/api'),
+  submitCandidateTask: jest.fn(),
+}));
 
-const submitMock = jest.requireMock('@/features/candidate/api')
+const submitMock = jest.requireMock('@/features/candidate/session/api')
   .submitCandidateTask as jest.Mock;
+type HarnessProps = {
+  candidateSessionId: number | null;
+  currentTask: Task | null;
+  setTaskError: jest.Mock;
+  clearTaskError: jest.Mock;
+  refreshTask: jest.Mock;
+  payload?: { contentText?: string };
+};
 
 function Harness({
   candidateSessionId,
@@ -22,14 +27,7 @@ function Harness({
   clearTaskError,
   refreshTask,
   payload = { contentText: 'answer' },
-}: {
-  candidateSessionId: number | null;
-  currentTask: Task | null;
-  setTaskError: jest.Mock;
-  clearTaskError: jest.Mock;
-  refreshTask: jest.Mock;
-  payload?: { contentText?: string };
-}) {
+}: HarnessProps) {
   const { submitting, handleSubmit } = useTaskSubmission({
     candidateSessionId,
     currentTask,
@@ -47,15 +45,10 @@ function Harness({
 }
 
 describe('useTaskSubmission', () => {
-  beforeEach(() => {
-    submitMock.mockReset();
-  });
+  beforeEach(() => submitMock.mockReset());
 
   it('blocks empty text submissions', async () => {
     const setTaskError = jest.fn();
-    const clearTaskError = jest.fn();
-    const refreshTask = jest.fn();
-
     render(
       <Harness
         candidateSessionId={5}
@@ -67,28 +60,20 @@ describe('useTaskSubmission', () => {
           description: '',
         }}
         setTaskError={setTaskError}
-        clearTaskError={clearTaskError}
-        refreshTask={refreshTask}
+        clearTaskError={jest.fn()}
+        refreshTask={jest.fn()}
         payload={{ contentText: ' ' }}
       />,
     );
-
-    await act(async () => {
-      // empty text triggers validation
-      screen.getByText('submit').click();
-    });
-
+    await act(async () => screen.getByText('submit').click());
     expect(setTaskError).toHaveBeenCalled();
     expect(submitMock).not.toHaveBeenCalled();
   });
 
   it('submits and schedules refresh', async () => {
-    const setTaskError = jest.fn();
-    const clearTaskError = jest.fn();
     const refreshTask = jest.fn();
     submitMock.mockResolvedValue({ ok: true });
     jest.useFakeTimers();
-
     render(
       <Harness
         candidateSessionId={5}
@@ -99,35 +84,25 @@ describe('useTaskSubmission', () => {
           title: 'Design',
           description: '',
         }}
-        setTaskError={setTaskError}
-        clearTaskError={clearTaskError}
+        setTaskError={jest.fn()}
+        clearTaskError={jest.fn()}
         refreshTask={refreshTask}
       />,
     );
-
-    await act(async () => {
-      screen.getByText('submit').click();
-    });
-
+    await act(async () => screen.getByText('submit').click());
     expect(submitMock).toHaveBeenCalledWith({
       taskId: 1,
       candidateSessionId: 5,
       contentText: 'answer',
     });
-
-    await act(async () => {
-      jest.runAllTimers();
-    });
+    await act(async () => jest.runAllTimers());
     expect(refreshTask).toHaveBeenCalled();
     jest.useRealTimers();
   });
 
   it('submits GitHub-native tasks without code or text payloads', async () => {
     const setTaskError = jest.fn();
-    const clearTaskError = jest.fn();
-    const refreshTask = jest.fn();
     submitMock.mockResolvedValue({ ok: true });
-
     render(
       <Harness
         candidateSessionId={12}
@@ -139,16 +114,12 @@ describe('useTaskSubmission', () => {
           description: '',
         }}
         setTaskError={setTaskError}
-        clearTaskError={clearTaskError}
-        refreshTask={refreshTask}
+        clearTaskError={jest.fn()}
+        refreshTask={jest.fn()}
         payload={{}}
       />,
     );
-
-    await act(async () => {
-      screen.getByText('submit').click();
-    });
-
+    await act(async () => screen.getByText('submit').click());
     expect(setTaskError).not.toHaveBeenCalled();
     expect(submitMock).toHaveBeenCalledWith({
       taskId: 12,

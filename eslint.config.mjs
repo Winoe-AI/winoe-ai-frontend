@@ -32,6 +32,8 @@ const eslintConfig = defineConfig([
     'next-env.d.ts',
     'coverage/**',
     '.qa/**',
+    'qa_verifications/**',
+    'code-quality/testing-coverage/passes/**',
   ]),
 ]);
 

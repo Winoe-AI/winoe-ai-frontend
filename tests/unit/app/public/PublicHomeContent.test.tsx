@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import MarketingHomePage from '@/features/marketing/home/MarketingHomePage';
-import { BRAND_NAME } from '@/lib/brand';
+import { BRAND_NAME } from '@/platform/config/brand';
 
 describe('PublicHomeContent', () => {
   it('shows signed-in state with user links', () => {

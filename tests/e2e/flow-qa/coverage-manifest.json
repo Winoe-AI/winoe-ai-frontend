@@ -27,7 +27,11 @@
     },
     {
       "route": "/candidate-sessions/[token]",
-      "specs": ["candidate-session.spec.ts", "candidate-day4.spec.ts"],
+      "specs": [
+        "candidate-session.spec.ts",
+        "candidate-day4.spec.ts",
+        "candidate-critical-journey.spec.ts"
+      ],
       "states": ["legacy_redirect"]
     },
     {
@@ -45,6 +49,7 @@
         "candidate-day4.spec.ts",
         "candidate-day5.spec.ts",
         "candidate-completion.spec.ts",
+        "candidate-critical-journey.spec.ts",
         "error-states.spec.ts",
         "responsive.spec.ts"
       ],
@@ -70,6 +75,7 @@
       "specs": [
         "auth.spec.ts",
         "recruiter-dashboard.spec.ts",
+        "recruiter-critical-journey.spec.ts",
         "error-states.spec.ts",
         "navigation.spec.ts",
         "responsive.spec.ts"
@@ -78,22 +84,36 @@
     },
     {
       "route": "/dashboard/simulations/[id]",
-      "specs": ["recruiter-sim-detail.spec.ts", "recruiter-create-sim.spec.ts"],
+      "specs": [
+        "recruiter-sim-detail.spec.ts",
+        "recruiter-create-sim.spec.ts",
+        "recruiter-critical-journey.spec.ts"
+      ],
       "states": ["loaded", "search", "resend_cooldown", "terminate_modal"]
     },
     {
       "route": "/dashboard/simulations/[id]/candidates/[candidateSessionId]",
-      "specs": ["recruiter-submissions.spec.ts"],
+      "specs": [
+        "recruiter-submissions.spec.ts",
+        "recruiter-critical-journey.spec.ts"
+      ],
       "states": ["loaded", "artifact_expand"]
     },
     {
       "route": "/dashboard/simulations/[id]/candidates/[candidateSessionId]/fit-profile",
-      "specs": ["recruiter-submissions.spec.ts"],
+      "specs": [
+        "recruiter-submissions.spec.ts",
+        "recruiter-critical-journey.spec.ts"
+      ],
       "states": ["ready", "back_navigation"]
     },
     {
       "route": "/dashboard/simulations/new",
-      "specs": ["recruiter-create-sim.spec.ts", "navigation.spec.ts"],
+      "specs": [
+        "recruiter-create-sim.spec.ts",
+        "recruiter-critical-journey.spec.ts",
+        "navigation.spec.ts"
+      ],
       "states": ["validation", "submit_success"]
     },
     {
@@ -118,13 +138,20 @@
     {
       "name": "Create Simulation",
       "endpoint": "/api/simulations",
-      "specs": ["recruiter-create-sim.spec.ts"],
+      "specs": [
+        "recruiter-create-sim.spec.ts",
+        "recruiter-critical-journey.spec.ts"
+      ],
       "assertions": ["success", "validation_error"]
     },
     {
       "name": "Invite Candidate",
       "endpoint": "/api/simulations/[id]/invite",
-      "specs": ["recruiter-dashboard.spec.ts", "recruiter-sim-detail.spec.ts"],
+      "specs": [
+        "recruiter-dashboard.spec.ts",
+        "recruiter-sim-detail.spec.ts",
+        "recruiter-critical-journey.spec.ts"
+      ],
       "assertions": ["success", "validation_error"]
     },
     {
@@ -153,7 +180,8 @@
         "candidate-day2.spec.ts",
         "candidate-day3.spec.ts",
         "candidate-day4.spec.ts",
-        "candidate-day5.spec.ts"
+        "candidate-day5.spec.ts",
+        "candidate-critical-journey.spec.ts"
       ],
       "assertions": ["success", "validation_error", "timeout_error"]
     }

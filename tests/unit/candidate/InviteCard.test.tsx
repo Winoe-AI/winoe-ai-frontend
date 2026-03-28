@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { InviteCard } from '@/features/candidate/dashboard/components/InviteCard';
-import type { CandidateInvite } from '@/features/candidate/api';
+import { InviteCard } from '@/features/candidate/portal/components/InviteCard';
+import type { CandidateInvite } from '@/features/candidate/session/api';
 
 const baseInvite: CandidateInvite = {
   candidateSessionId: 1,

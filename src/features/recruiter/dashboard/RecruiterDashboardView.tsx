@@ -8,7 +8,7 @@ import { useDashboardInvites } from './hooks/useDashboardInvites';
 
 const InviteCandidateModal = dynamic(
   () =>
-    import('@/features/recruiter/invitations/InviteCandidateModal').then(
+    import('@/features/recruiter/simulation-management/invitations/InviteCandidateModal').then(
       (mod) => mod.InviteCandidateModal,
     ),
   {

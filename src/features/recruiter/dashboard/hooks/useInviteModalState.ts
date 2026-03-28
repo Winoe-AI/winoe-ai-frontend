@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useInviteCandidateFlow } from './useInviteCandidateFlow';
 import type { InviteModalState } from '../types';
-import type { InviteUiState } from '@/features/recruiter/invitations/InviteCandidateModal';
+import type { InviteUiState } from '@/features/recruiter/simulation-management/invitations/InviteCandidateTypes';
 
 export function useInviteModalState() {
   const [modal, setModal] = useState<InviteModalState>({

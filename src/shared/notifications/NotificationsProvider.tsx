@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext } from 'react';
+import { createContext, useContext, useMemo } from 'react';
 import { ToastContainer } from './components/ToastContainer';
 import { useToastQueue } from './hooks/useToastQueue';
 import type { NotificationsContextValue } from './types';
@@ -21,9 +21,13 @@ export function NotificationsProvider({
   children: React.ReactNode;
 }) {
   const { toasts, notify, dismiss, update } = useToastQueue();
+  const contextValue = useMemo(
+    () => ({ notify, dismiss, update }),
+    [dismiss, notify, update],
+  );
 
   return (
-    <NotificationsContext.Provider value={{ notify, dismiss, update }}>
+    <NotificationsContext.Provider value={contextValue}>
       {children}
       <ToastContainer toasts={toasts} dismiss={dismiss} />
     </NotificationsContext.Provider>

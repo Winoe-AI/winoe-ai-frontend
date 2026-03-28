@@ -1,14 +1,12 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import CandidateDashboardPage, {
   extractInviteToken,
-} from '@/features/candidate/dashboard/CandidateDashboardPage';
+} from '@/features/candidate/portal/CandidateDashboardPage';
 import { CandidateSessionProvider } from '@/features/candidate/session/CandidateSessionProvider';
-import { listCandidateInvites } from '@/features/candidate/api';
-
-jest.mock('@/features/candidate/api', () => ({
+import { listCandidateInvites } from '@/features/candidate/session/api';
+jest.mock('@/features/candidate/session/api', () => ({
   listCandidateInvites: jest.fn(),
 }));
-
 const routerMock = {
   push: jest.fn(),
   refresh: jest.fn(),
@@ -17,13 +15,10 @@ const routerMock = {
   back: jest.fn(),
   forward: jest.fn(),
 };
-
 jest.mock('next/navigation', () => ({
   useRouter: () => routerMock,
 }));
-
 const listInvitesMock = listCandidateInvites as jest.Mock;
-
 function renderPage(signedInEmail: string | null = 'candidate@example.com') {
   return render(
     <CandidateSessionProvider>
@@ -31,7 +26,6 @@ function renderPage(signedInEmail: string | null = 'candidate@example.com') {
     </CandidateSessionProvider>,
   );
 }
-
 describe('CandidateDashboardPage', () => {
   beforeEach(() => {
     Object.values(routerMock).forEach((fn) => fn.mockReset());
@@ -39,7 +33,6 @@ describe('CandidateDashboardPage', () => {
     listInvitesMock.mockResolvedValue([]);
     sessionStorage.clear();
   });
-
   it('shows invites list with continue CTA', async () => {
     listInvitesMock.mockResolvedValue([
       {
@@ -55,25 +48,18 @@ describe('CandidateDashboardPage', () => {
         isExpired: false,
       },
     ]);
-
     renderPage();
-
     expect(await screen.findByText(/Infra Simulation/i)).toBeInTheDocument();
-
     fireEvent.click(screen.getByRole('button', { name: /Continue/i }));
     expect(routerMock.push).toHaveBeenCalledWith('/candidate/session/INV123');
   });
-
   it('shows empty state when no invites', async () => {
     listInvitesMock.mockResolvedValue([]);
-
     renderPage();
-
     await waitFor(() =>
       expect(screen.getByText(/No invites yet/i)).toBeInTheDocument(),
     );
   });
-
   it('disables CTA for expired invites', async () => {
     listInvitesMock.mockResolvedValue([
       {
@@ -89,36 +75,29 @@ describe('CandidateDashboardPage', () => {
         isExpired: true,
       },
     ]);
-
     renderPage();
-
     expect(await screen.findByText(/Old Simulation/i)).toBeInTheDocument();
     const cta = screen.getByRole('button', {
       name: /Start simulation|Continue/i,
     });
     expect(cta).toBeDisabled();
   });
-
   it('redirects to login when invite lookup returns 401', async () => {
     listInvitesMock.mockRejectedValueOnce({ status: 401 });
     renderPage(null);
-
     await waitFor(() => expect(listInvitesMock).toHaveBeenCalled());
     expect(routerMock.replace).toHaveBeenCalled();
   });
-
   it('parses canonical invite links and navigates', () => {
     expect(
       extractInviteToken('https://app.test/candidate/session/INV123'),
     ).toBe('INV123');
   });
-
   it('parses legacy invite links and normalizes to canonical route', () => {
     expect(
       extractInviteToken('https://app.test/candidate-sessions/INV123'),
     ).toBe('INV123');
   });
-
   it('strips query/hash when parsing raw tokens', () => {
     expect(extractInviteToken(' INV123?utm=1 ')).toBe('INV123');
     expect(extractInviteToken('INV123#frag')).toBe('INV123');

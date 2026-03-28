@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { isAuthCookie } from '@/lib/auth/authCookies';
-import { modeForPath, sanitizeReturnTo } from '@/lib/auth/routing';
+import { isAuthCookie } from '@/platform/auth/authCookies';
+import { modeForPath, sanitizeReturnTo } from '@/platform/auth/routing';
 
 function resolveCookieDomain(request: NextRequest) {
   const envDomain = process.env.TENON_AUTH0_COOKIE_DOMAIN;

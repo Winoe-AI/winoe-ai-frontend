@@ -4,7 +4,7 @@
 import { renderHook } from '@testing-library/react';
 import { useTaskSubmission } from '@/features/candidate/session/hooks/useTaskSubmission';
 
-jest.mock('@/features/candidate/api', () => ({
+jest.mock('@/features/candidate/session/api', () => ({
   HttpError: class HttpError extends Error {
     status?: number;
     constructor(status?: number) {

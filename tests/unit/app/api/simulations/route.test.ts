@@ -9,12 +9,8 @@ jest.mock('next/server', () => {
   const buildResponse = (status = 200) => ({
     status,
     headers: buildHeaders(),
-    cookies: {
-      set: () => undefined,
-      getAll: () => [],
-    },
+    cookies: { set: () => undefined, getAll: () => [] },
   });
-
   return {
     NextResponse: {
       json: (_body: unknown, init?: { status?: number }) =>
@@ -44,15 +40,15 @@ jest.mock('next/server', () => {
 });
 
 import { NextRequest, NextResponse } from 'next/server';
-import * as bffAuth from '@/lib/server/bffAuth';
-import * as bff from '@/lib/server/bff';
+import * as bffAuth from '@/platform/server/bffAuth';
+import * as bff from '@/platform/server/bff';
 import { GET, POST } from '@/app/api/simulations/route';
 
-jest.mock('@/lib/server/bffAuth', () => ({
+jest.mock('@/platform/server/bffAuth', () => ({
   requireBffAuth: jest.fn(),
   mergeResponseCookies: jest.fn(),
 }));
-jest.mock('@/lib/server/bff', () => ({
+jest.mock('@/platform/server/bff', () => ({
   forwardJson: jest.fn(),
   UPSTREAM_HEADER: 'x-tenon-upstream-status',
   resolveRequestId: jest.fn(() => 'req-123'),
@@ -71,9 +67,7 @@ const forwardJson = bff.forwardJson as jest.MockedFunction<
 >;
 
 describe('api/simulations route', () => {
-  beforeEach(() => {
-    jest.resetAllMocks();
-  });
+  beforeEach(() => jest.resetAllMocks());
 
   it('returns 401 json when auth fails on POST', async () => {
     requireBffAuth.mockResolvedValue({
@@ -84,11 +78,9 @@ describe('api/simulations route', () => {
       ),
       cookies: NextResponse.next(),
     });
-
     const res = await POST(
       new NextRequest(new URL('http://localhost/api/simulations')),
     );
-
     expect(res.status).toBe(401);
     expect(requireBffAuth).toHaveBeenCalledWith(expect.any(NextRequest), {
       requirePermission: 'recruiter:access',
@@ -104,15 +96,12 @@ describe('api/simulations route', () => {
       session: {} as never,
       cookies: NextResponse.next(),
     });
-
     forwardJson.mockResolvedValue(
       NextResponse.json({ id: 'abc123' }, { status: 201 }),
     );
-
     const res = await POST(
       new NextRequest(new URL('http://localhost/api/simulations')),
     );
-
     expect(res.status).toBe(201);
     expect(res.headers.get('x-tenon-bff')).toBe('simulations-create');
     expect(forwardJson).toHaveBeenCalled();
@@ -124,11 +113,9 @@ describe('api/simulations route', () => {
       response: NextResponse.json({ message: 'Forbidden' }, { status: 403 }),
       cookies: NextResponse.next(),
     });
-
     const res = await GET(
       new NextRequest(new URL('http://localhost/api/simulations')),
     );
-
     expect(res.status).toBe(403);
     expect(requireBffAuth).toHaveBeenCalledWith(expect.any(NextRequest), {
       requirePermission: 'recruiter:access',

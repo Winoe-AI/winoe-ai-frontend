@@ -1,9 +1,9 @@
-jest.mock('@/lib/api/client/request', () => ({
+jest.mock('@/platform/api-client/client/request', () => ({
   requestWithMeta: jest.fn(),
 }));
 
-import { bffClient } from '@/lib/api/client';
-import { requestWithMeta } from '@/lib/api/client/request';
+import { bffClient } from '@/platform/api-client/client';
+import { requestWithMeta } from '@/platform/api-client/client/request';
 
 const mockClient = requestWithMeta as unknown as jest.Mock;
 

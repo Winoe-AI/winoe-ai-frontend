@@ -10,7 +10,7 @@ describe('brand config', () => {
     process.env.NEXT_PUBLIC_TENON_AUTH0_CLAIM_NAMESPACE =
       'https://custom.example';
 
-    const { CUSTOM_CLAIM_NAMESPACE } = await import('@/lib/brand');
+    const { CUSTOM_CLAIM_NAMESPACE } = await import('@/platform/config/brand');
     expect(CUSTOM_CLAIM_NAMESPACE).toBe('https://custom.example/');
   });
 
@@ -18,14 +18,14 @@ describe('brand config', () => {
     process.env.NEXT_PUBLIC_TENON_AUTH0_CLAIM_NAMESPACE =
       'https://namespaced.example/';
 
-    const { CUSTOM_CLAIM_NAMESPACE } = await import('@/lib/brand');
+    const { CUSTOM_CLAIM_NAMESPACE } = await import('@/platform/config/brand');
     expect(CUSTOM_CLAIM_NAMESPACE).toBe('https://namespaced.example/');
   });
 
   it('falls back to brand domain when env missing', async () => {
     delete process.env.NEXT_PUBLIC_TENON_AUTH0_CLAIM_NAMESPACE;
     const { CUSTOM_CLAIM_NAMESPACE, BRAND_DOMAIN } =
-      await import('@/lib/brand');
+      await import('@/platform/config/brand');
     expect(CUSTOM_CLAIM_NAMESPACE).toBe(`https://${BRAND_DOMAIN}/`);
   });
 });

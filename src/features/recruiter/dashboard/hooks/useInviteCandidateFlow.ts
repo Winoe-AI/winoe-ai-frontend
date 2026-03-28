@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react';
 import { inviteCandidate } from '@/features/recruiter/api';
-import { formatRecruiterError } from '../../utils/formatters';
-import { friendlyInviteError, toSafeString } from '../utils/inviteHelpers';
+import { formatRecruiterError } from '../../utils/formattersUtils';
+import { friendlyInviteError, toSafeString } from '../utils/inviteHelpersUtils';
 import type {
   InviteModalState,
   InviteSuccess,

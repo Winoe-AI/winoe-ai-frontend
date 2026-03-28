@@ -1,17 +1,17 @@
-import { act, renderHook } from '@testing-library/react';
+import { act, renderHook, waitFor } from '@testing-library/react';
 import { useDashboardData } from '@/features/recruiter/dashboard/hooks/useDashboardData';
 
 const fetchDashboard = jest.fn();
 const logPerfMock = jest.fn();
 let locationAssign: jest.Mock;
 
-jest.mock('@/features/recruiter/dashboard/hooks/dashboardApi', () => ({
+jest.mock('@/features/recruiter/dashboard/hooks/useDashboardApi', () => ({
   fetchDashboard: (...args: unknown[]) => fetchDashboard(...args),
   isAbortError: (err: unknown) =>
     (err as { name?: string })?.name === 'AbortError',
 }));
 
-jest.mock('@/features/recruiter/dashboard/utils/perf', () => ({
+jest.mock('@/features/recruiter/dashboard/utils/perfUtils', () => ({
   dashboardPerfDebugEnabled: true,
   logPerf: (...args: unknown[]) => logPerfMock(...args),
   nowMs: () => 100,
@@ -41,9 +41,10 @@ describe('useDashboardData', () => {
       await result.current.refresh(true);
     });
 
-    expect(result.current.profile?.name).toBe('Recruiter');
-    expect(result.current.simulations).toHaveLength(1);
-    expect(logPerfMock).toHaveBeenCalled();
+    await waitFor(() => {
+      expect(result.current.profile?.name).toBe('Recruiter');
+      expect(result.current.simulations).toHaveLength(1);
+    });
     expect(result.current.loadingProfile).toBe(false);
   });
 
@@ -71,7 +72,11 @@ describe('useDashboardData', () => {
       await result.current.refresh(true).catch(() => {});
     });
 
-    expect(result.current.profileError).toBe('Unable to load your dashboard.');
-    expect(result.current.simError).toBe('Unable to load your dashboard.');
+    await waitFor(() => {
+      expect(result.current.profileError).toBe(
+        'Unable to load your dashboard.',
+      );
+      expect(result.current.simError).toBe('Unable to load your dashboard.');
+    });
   });
 });

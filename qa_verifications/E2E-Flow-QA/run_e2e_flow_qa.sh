@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# Playwright sets FORCE_COLOR; unset NO_COLOR to prevent Node warning spam
+# ("The 'NO_COLOR' env is ignored due to the 'FORCE_COLOR' env being set.").
+unset NO_COLOR || true
+
 usage() {
   cat <<'USAGE'
 Usage: run_e2e_flow_qa.sh [options]

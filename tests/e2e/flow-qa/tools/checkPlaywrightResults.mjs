@@ -2,82 +2,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
-
-function parseArgs(argv) {
-  const parsed = {
-    file: '',
-    label: 'suite',
-    maxUnexpected: 0,
-    maxFlaky: 0,
-    maxSkipped: 0,
-    output: '',
-  };
-
-  for (let i = 2; i < argv.length; i += 1) {
-    const key = argv[i];
-    const next = argv[i + 1];
-    switch (key) {
-      case '--file':
-        parsed.file = next ?? '';
-        i += 1;
-        break;
-      case '--label':
-        parsed.label = next ?? parsed.label;
-        i += 1;
-        break;
-      case '--max-unexpected':
-        parsed.maxUnexpected = Number(next ?? parsed.maxUnexpected);
-        i += 1;
-        break;
-      case '--max-flaky':
-        parsed.maxFlaky = Number(next ?? parsed.maxFlaky);
-        i += 1;
-        break;
-      case '--max-skipped':
-        parsed.maxSkipped = Number(next ?? parsed.maxSkipped);
-        i += 1;
-        break;
-      case '--output':
-        parsed.output = next ?? '';
-        i += 1;
-        break;
-      default:
-        throw new Error(`Unknown option: ${key}`);
-    }
-  }
-
-  if (!parsed.file) {
-    throw new Error('Missing required --file <path> argument.');
-  }
-  return parsed;
-}
-
-function readStats(filePath) {
-  if (!fs.existsSync(filePath)) {
-    throw new Error(`Results file not found: ${filePath}`);
-  }
-
-  const raw = JSON.parse(fs.readFileSync(filePath, 'utf8'));
-  const stats = raw?.stats ?? {};
-  const summary = {
-    expected: Number(stats.expected ?? 0),
-    skipped: Number(stats.skipped ?? 0),
-    unexpected: Number(stats.unexpected ?? 0),
-    flaky: Number(stats.flaky ?? 0),
-    durationMs: Number(stats.duration ?? 0),
-  };
-
-  if (
-    Number.isNaN(summary.expected) ||
-    Number.isNaN(summary.skipped) ||
-    Number.isNaN(summary.unexpected) ||
-    Number.isNaN(summary.flaky)
-  ) {
-    throw new Error(`Invalid Playwright stats payload in ${filePath}`);
-  }
-
-  return summary;
-}
+import { parseArgs, readStats } from './checkPlaywrightResults.lib.mjs';
 
 function main() {
   const args = parseArgs(process.argv);
@@ -132,9 +57,7 @@ function main() {
   }
 
   console.error(`${args.label}: quality gate failed`);
-  for (const failure of failures) {
-    console.error(`- ${failure}`);
-  }
+  for (const failure of failures) console.error(`- ${failure}`);
   process.exit(1);
 }
 

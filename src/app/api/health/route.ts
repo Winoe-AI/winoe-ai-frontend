@@ -3,7 +3,7 @@ import {
   UPSTREAM_HEADER,
   getBackendBaseUrl,
   parseUpstreamBody,
-} from '@/lib/server/bff';
+} from '@/platform/server/bff';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';

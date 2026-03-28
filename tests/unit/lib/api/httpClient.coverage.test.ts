@@ -1,7 +1,7 @@
 /**
  * Coverage completion tests for lib/api/client/index.ts
  */
-import '@/lib/api/client';
+import '@/platform/api-client/client';
 
 describe('client/index.ts coverage completion', () => {
   it('marks coverage', () => {

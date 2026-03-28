@@ -16,7 +16,7 @@ beforeAll(async () => {
     NextRequest: class {},
   }));
 
-  jest.doMock('@/lib/auth0', () => ({
+  jest.doMock('@/platform/auth0', () => ({
     auth0: { getAccessToken: jest.fn(async () => 'token') },
     getSessionNormalized: jest.fn(async () => ({
       user: {},
@@ -24,12 +24,12 @@ beforeAll(async () => {
     })),
   }));
 
-  jest.doMock('@/lib/auth0-claims', () => ({
+  jest.doMock('@/platform/auth0/claims', () => ({
     extractPermissions: jest.fn(() => ['p1']),
     hasPermission: jest.fn(() => true),
   }));
 
-  await import('@/lib/server/bffAuth');
+  await import('@/platform/server/bffAuth');
 });
 
 describe('bffAuth.ts coverage completion', () => {

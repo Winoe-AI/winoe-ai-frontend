@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
-import { proxyToBackend } from '@/lib/server/backendProxy/proxy';
-import type { BackendRouteContext } from '@/lib/server/backendProxy/target';
+import { proxyToBackend } from '@/platform/server/backendProxy/proxy';
+import type { BackendRouteContext } from '@/platform/server/backendProxy/target';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';

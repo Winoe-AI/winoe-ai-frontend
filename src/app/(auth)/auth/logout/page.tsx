@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import LogoutPage from '@/features/auth/LogoutPage';
-import { BRAND_NAME } from '@/lib/brand';
+import { BRAND_NAME } from '@/platform/config/brand';
 
 export const metadata: Metadata = {
   title: `Log out | ${BRAND_NAME}`,

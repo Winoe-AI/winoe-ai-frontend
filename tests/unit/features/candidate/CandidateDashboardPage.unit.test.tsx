@@ -1,13 +1,17 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import CandidateDashboardPage from '@/features/candidate/dashboard/CandidateDashboardPage';
+import CandidateDashboardPage from '@/features/candidate/portal/CandidateDashboardPage';
 import { useCandidateSession } from '@/features/candidate/session/CandidateSessionProvider';
-import { listCandidateInvites } from '@/features/candidate/api';
+import { listCandidateInvites } from '@/features/candidate/session/api';
+import {
+  fallbackInvite,
+  sortedInvites,
+} from './CandidateDashboardPage.unit.fixtures';
 
 jest.mock('@/features/candidate/session/CandidateSessionProvider', () => ({
   useCandidateSession: jest.fn(),
 }));
 
-jest.mock('@/features/candidate/api', () => ({
+jest.mock('@/features/candidate/session/api', () => ({
   listCandidateInvites: jest.fn(),
 }));
 
@@ -69,32 +73,7 @@ describe('CandidateDashboardPage unit flow', () => {
   });
 
   it('sorts invites by last activity or expiry', async () => {
-    listInvitesMock.mockResolvedValueOnce([
-      {
-        candidateSessionId: 1,
-        token: 'tok-1',
-        title: 'Older',
-        role: 'Eng',
-        company: 'Co',
-        status: 'in_progress',
-        progress: { completed: 1, total: 3 },
-        expiresAt: '2024-01-01',
-        lastActivityAt: '2024-01-01',
-        isExpired: false,
-      },
-      {
-        candidateSessionId: 2,
-        token: 'tok-2',
-        title: 'Newer',
-        role: 'Eng',
-        company: 'Co',
-        status: 'in_progress',
-        progress: { completed: 2, total: 3 },
-        expiresAt: '2025-01-01',
-        lastActivityAt: '2025-01-02',
-        isExpired: false,
-      },
-    ]);
+    listInvitesMock.mockResolvedValueOnce(sortedInvites);
 
     render(<CandidateDashboardPage signedInEmail="c@example.com" />);
 
@@ -106,20 +85,7 @@ describe('CandidateDashboardPage unit flow', () => {
   });
 
   it('uses fallback token when invite is missing token', async () => {
-    listInvitesMock.mockResolvedValueOnce([
-      {
-        candidateSessionId: 1,
-        token: null,
-        title: 'Fallback',
-        role: 'Eng',
-        company: 'Co',
-        status: 'not_started',
-        progress: null,
-        expiresAt: null,
-        lastActivityAt: null,
-        isExpired: false,
-      },
-    ]);
+    listInvitesMock.mockResolvedValueOnce([fallbackInvite]);
 
     render(<CandidateDashboardPage signedInEmail="c@example.com" />);
 

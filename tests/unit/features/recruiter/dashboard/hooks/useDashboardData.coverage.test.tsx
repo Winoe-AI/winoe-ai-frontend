@@ -4,7 +4,7 @@
 import { renderHook, waitFor } from '@testing-library/react';
 import { useDashboardData } from '@/features/recruiter/dashboard/hooks/useDashboardData';
 
-jest.mock('@/features/recruiter/dashboard/hooks/dashboardApi', () => ({
+jest.mock('@/features/recruiter/dashboard/hooks/useDashboardApi', () => ({
   fetchDashboard: jest.fn().mockResolvedValue({ simulations: [], profile: {} }),
   isAbortError: jest.fn(),
 }));

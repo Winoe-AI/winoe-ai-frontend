@@ -20,7 +20,8 @@ describe('dashboard perf utilities', () => {
 
   it('returns null when performance is unavailable', async () => {
     setPerformance(undefined);
-    const { nowMs } = await import('@/features/recruiter/dashboard/utils/perf');
+    const { nowMs } =
+      await import('@/features/recruiter/dashboard/utils/perfUtils');
     expect(nowMs()).toBeNull();
   });
 
@@ -30,8 +31,7 @@ describe('dashboard perf utilities', () => {
       .spyOn(console, 'info')
       .mockImplementation(() => undefined);
     const { logPerf } =
-      await import('@/features/recruiter/dashboard/utils/perf');
-
+      await import('@/features/recruiter/dashboard/utils/perfUtils');
     logPerf('noop');
     expect(infoSpy).not.toHaveBeenCalled();
   });
@@ -43,8 +43,7 @@ describe('dashboard perf utilities', () => {
       .spyOn(console, 'info')
       .mockImplementation(() => undefined) as Mock;
     const { logPerf } =
-      await import('@/features/recruiter/dashboard/utils/perf');
-
+      await import('@/features/recruiter/dashboard/utils/perfUtils');
     logPerf('dashboard', 1000, { status: 200 });
     expect(infoSpy).toHaveBeenCalledWith(
       expect.stringContaining('[tenon][perf] dashboard'),
@@ -54,7 +53,8 @@ describe('dashboard perf utilities', () => {
 
   it('returns null when performance.now is not a function', async () => {
     setPerformance({ now: 'not-a-function' } as unknown as Performance);
-    const { nowMs } = await import('@/features/recruiter/dashboard/utils/perf');
+    const { nowMs } =
+      await import('@/features/recruiter/dashboard/utils/perfUtils');
     expect(nowMs()).toBeNull();
   });
 
@@ -65,8 +65,7 @@ describe('dashboard perf utilities', () => {
       .spyOn(console, 'info')
       .mockImplementation(() => undefined);
     const { logPerf } =
-      await import('@/features/recruiter/dashboard/utils/perf');
-
+      await import('@/features/recruiter/dashboard/utils/perfUtils');
     logPerf('test-label', 1000);
     expect(infoSpy).not.toHaveBeenCalled();
   });
@@ -78,8 +77,7 @@ describe('dashboard perf utilities', () => {
       .spyOn(console, 'info')
       .mockImplementation(() => undefined) as Mock;
     const { logPerf } =
-      await import('@/features/recruiter/dashboard/utils/perf');
-
+      await import('@/features/recruiter/dashboard/utils/perfUtils');
     logPerf('no-start');
     expect(infoSpy).toHaveBeenCalledWith(
       expect.stringContaining('[tenon][perf] no-start'),
@@ -96,8 +94,7 @@ describe('dashboard perf utilities', () => {
       .spyOn(console, 'info')
       .mockImplementation(() => undefined);
     const { logPerf } =
-      await import('@/features/recruiter/dashboard/utils/perf');
-
+      await import('@/features/recruiter/dashboard/utils/perfUtils');
     logPerf('enabled');
     expect(infoSpy).toHaveBeenCalled();
   });

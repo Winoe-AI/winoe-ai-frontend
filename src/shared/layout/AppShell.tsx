@@ -1,8 +1,8 @@
 import { ReactNode } from 'react';
 import { NavigationPerfLogger } from '@/shared/analytics/NavigationPerfLogger';
 import { WebVitalsLogger } from '@/shared/analytics/WebVitalsLogger';
-import { getCachedSessionNormalized } from '@/lib/auth0';
-import { extractPermissions } from '@/lib/auth0-claims';
+import { getCachedSessionNormalized } from '@/platform/auth0';
+import { extractPermissions } from '@/platform/auth0/claims';
 import { AppHeader } from './AppHeader';
 import { contentContainer } from './layoutStyles';
 

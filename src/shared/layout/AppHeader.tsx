@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { BRAND_NAME } from '@/lib/brand';
+import { BRAND_NAME } from '@/platform/config/brand';
 import { AppNav } from './AppNav';
 import { contentContainer } from './layoutStyles';
 

@@ -1,19 +1,17 @@
-import { submitCandidateTask } from '@/features/candidate/api';
+import { submitCandidateTask } from '@/features/candidate/session/api/tasksApi';
 import { useNotifications } from '@/shared/notifications';
-import { normalizeApiError } from '@/lib/errors/errors';
-import { friendlySubmitError } from '../utils/errorMessages';
-import {
-  isCodeTask,
-  isGithubNativeDay,
-  isTextTask,
-} from '../task/utils/taskGuards';
-import { isDay5ReflectionTask } from '../task/utils/day5Reflection';
+import { normalizeApiError } from '@/platform/errors/errors';
+import { friendlySubmitError } from '../utils/errorMessagesUtils';
 import {
   extractTaskWindowClosedOverride,
   formatComeBackMessage,
 } from '../lib/windowState';
-import type { Task, SubmitPayload } from '../task/types';
-
+import type { Task, SubmitPayload } from '@/features/candidate/tasks/types';
+import {
+  buildTaskSubmitArgs,
+  shouldBlockEmptyTextSubmit,
+  toRecordedSubmission,
+} from './useTaskSubmitHandler.helpers';
 type Deps = {
   candidateSessionId: number | null;
   currentTask: Task | null;
@@ -41,67 +39,31 @@ export function useTaskSubmitHandler({
   setRefreshTimer,
 }: Deps) {
   const { notify } = useNotifications();
-
   const handleSubmit = async (payload: SubmitPayload) => {
     if (!candidateSessionId || !currentTask) return;
-
-    const type = String(currentTask.type);
-    const wantsText = isTextTask(type);
-    const isCode = isCodeTask(type);
-    const isGithubNative = isGithubNativeDay(currentTask.dayIndex) || isCode;
-    const day5Reflection = isDay5ReflectionTask(currentTask);
-
-    if (!isGithubNative && wantsText && !day5Reflection) {
-      const trimmed = (payload.contentText ?? '').trim();
-      if (!trimmed) {
-        setTaskError('Please enter an answer before submitting.');
-        return;
-      }
+    if (shouldBlockEmptyTextSubmit(currentTask, payload)) {
+      setTaskError('Please enter an answer before submitting.');
+      return;
     }
-
     setSubmitting(true);
     clearTaskError();
-
     try {
-      const submitArgs: {
-        taskId: number;
-        candidateSessionId: number;
-        contentText?: string;
-        reflection?: SubmitPayload['reflection'];
-      } = {
-        taskId: currentTask.id,
-        candidateSessionId,
-        contentText: isGithubNative ? undefined : payload.contentText,
-      };
-      if (!isGithubNative && payload.reflection) {
-        submitArgs.reflection = payload.reflection;
+      const resp = await submitCandidateTask(
+        buildTaskSubmitArgs(currentTask, candidateSessionId, payload),
+      );
+      const recordedSubmission = toRecordedSubmission(resp);
+      if (recordedSubmission) {
+        onSubmissionRecorded?.(recordedSubmission);
       }
-
-      const resp = await submitCandidateTask(submitArgs);
-
-      if (
-        resp &&
-        typeof resp === 'object' &&
-        typeof (resp as { submissionId?: unknown }).submissionId === 'number' &&
-        typeof (resp as { submittedAt?: unknown }).submittedAt === 'string'
-      ) {
-        onSubmissionRecorded?.({
-          submissionId: (resp as { submissionId: number }).submissionId,
-          submittedAt: (resp as { submittedAt: string }).submittedAt,
-        });
-      }
-
       setRefreshTimer(() => {
         void refreshTask({ skipCache: true });
       });
-
       notify({
         id: `submit-${currentTask.id}`,
         tone: 'success',
         title: 'Submission received',
         description: 'We are refreshing your progress.',
       });
-
       return resp;
     } catch (err) {
       const windowClosed = extractTaskWindowClosedOverride(err);

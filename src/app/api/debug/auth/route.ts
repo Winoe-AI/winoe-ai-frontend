@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
-import { getSessionNormalized } from '@/lib/auth0';
-import { extractPermissions } from '@/lib/auth0-claims';
-import { CUSTOM_CLAIM_ROLES } from '@/lib/brand';
+import { getSessionNormalized } from '@/platform/auth0';
+import { extractPermissions } from '@/platform/auth0/claims';
+import { CUSTOM_CLAIM_ROLES } from '@/platform/config/brand';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';

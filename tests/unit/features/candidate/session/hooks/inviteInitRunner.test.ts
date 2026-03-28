@@ -1,8 +1,8 @@
-import { createInviteInit } from '@/features/candidate/session/hooks/inviteInitRunner';
+import { createInviteInit } from '@/features/candidate/session/hooks/useInviteInitRunner';
 
 const resolveCandidateInviteTokenMock = jest.fn();
 
-jest.mock('@/features/candidate/api', () => ({
+jest.mock('@/features/candidate/session/api', () => ({
   resolveCandidateInviteToken: (...args: unknown[]) =>
     resolveCandidateInviteTokenMock(...args),
 }));

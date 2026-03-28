@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import Button from '@/shared/ui/Button';
 import LogoutLink from '@/features/auth/LogoutLink';
-import { BRAND_NAME } from '@/lib/brand';
+import { BRAND_NAME } from '@/platform/config/brand';
 import { AuthPageLayout } from './AuthPageLayout';
 
 export default function LogoutPage() {

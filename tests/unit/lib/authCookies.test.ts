@@ -1,4 +1,7 @@
-import { isAuthCookie, normalizeAuthCookieName } from '@/lib/auth/authCookies';
+import {
+  isAuthCookie,
+  normalizeAuthCookieName,
+} from '@/platform/auth/authCookies';
 
 describe('authCookies helpers', () => {
   it('normalizes secure/host prefixes', () => {

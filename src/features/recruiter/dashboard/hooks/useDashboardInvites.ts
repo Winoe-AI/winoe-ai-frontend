@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useInviteModalState } from './useInviteModalState';
-import { useInviteToasts } from '@/features/recruiter/invitations/useInviteToasts';
+import { useInviteToasts } from '@/features/recruiter/simulation-management/invitations/useInviteToasts';
 
 type Params = { onRefresh: () => void };
 

@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { BRAND_NAME } from '@/lib/brand';
+import { BRAND_NAME } from '@/platform/config/brand';
 import RecruiterDashboardPage from '@/features/recruiter/dashboard/RecruiterDashboardPage';
 
 export const metadata: Metadata = {

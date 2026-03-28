@@ -23,7 +23,18 @@ test.describe('Navigation Flows', () => {
     });
     await recruiterLoginLink.click();
 
-    await expect(page).toHaveURL(/auth0\.com\/u\/login/i);
+    await expect(page).toHaveURL(
+      /\/auth\/login\?returnTo=%2Fdashboard&mode=recruiter&connection=Tenon-Recruiters/i,
+    );
+    await expect(
+      page.getByRole('heading', { name: /recruiter login/i }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole('link', { name: /continue with auth0/i }).first(),
+    ).toHaveAttribute(
+      'href',
+      /\/auth\/login\?returnTo=%2Fdashboard&mode=recruiter&connection=Tenon-Recruiters/i,
+    );
   });
 
   test.describe('Recruiter navigation', () => {

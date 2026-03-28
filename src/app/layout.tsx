@@ -1,8 +1,9 @@
 import type { Metadata, Viewport } from 'next';
 import { ReactNode } from 'react';
 import './globals.css';
-import { BRAND_NAME } from '@/lib/brand';
+import { BRAND_NAME } from '@/platform/config/brand';
 import { NotificationsProvider } from '@/shared/notifications';
+import { QueryProvider } from '@/shared/query';
 
 export const metadata: Metadata = {
   title: BRAND_NAME,
@@ -19,7 +20,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en">
       <body>
-        <NotificationsProvider>{children}</NotificationsProvider>
+        <QueryProvider>
+          <NotificationsProvider>{children}</NotificationsProvider>
+        </QueryProvider>
       </body>
     </html>
   );

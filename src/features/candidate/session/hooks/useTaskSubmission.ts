@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useTaskSubmitHandler } from './useTaskSubmitHandler';
-import type { Task } from '../task/types';
+import type { Task } from '@/features/candidate/tasks/types';
 
 type Params = {
   candidateSessionId: number | null;

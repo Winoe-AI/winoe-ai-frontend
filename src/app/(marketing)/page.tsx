@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
-import { getCachedSessionNormalized } from '@/lib/auth0';
-import { BRAND_NAME } from '@/lib/brand';
+import { getCachedSessionNormalized } from '@/platform/auth0';
+import { BRAND_NAME } from '@/platform/config/brand';
 import MarketingHomePage from '@/features/marketing/home/MarketingHomePage';
 
 export const metadata: Metadata = {

@@ -3,7 +3,7 @@ import {
   createInviteInit,
   inviteErrorCopy,
   type InviteInitParams,
-} from './inviteInitRunner';
+} from './useInviteInitRunner';
 
 type Params = InviteInitParams & { token: string };
 

@@ -1,4 +1,4 @@
-import { BRAND_SLUG } from '@/lib/brand';
+import { BRAND_SLUG } from '@/platform/config/brand';
 import type { Action, CandidateSessionState, TaskState } from './types';
 
 export const STORAGE_KEY = `${BRAND_SLUG}:candidate_session_v1`;

@@ -1,4 +1,7 @@
-import type { SimulationListItem } from '@/features/recruiter/api';
+import type {
+  CandidateSession,
+  SimulationListItem,
+} from '@/features/recruiter/api/typesApi';
 
 export type RecruiterProfile = {
   id: number;
@@ -21,25 +24,4 @@ export type InviteSuccess = {
   simulationId: string;
 };
 
-export type CandidateSession = {
-  candidateSessionId: number;
-  inviteEmail: string | null;
-  candidateName: string | null;
-  status: 'not_started' | 'in_progress' | 'completed' | string;
-  startedAt: string | null;
-  completedAt: string | null;
-  hasReport: boolean;
-  reportReady?: boolean | null;
-  reportId?: string | null;
-  inviteToken?: string | null;
-  inviteUrl?: string | null;
-  inviteEmailStatus?: 'sent' | 'failed' | 'rate_limited' | string | null;
-  inviteEmailSentAt?: string | null;
-  inviteEmailError?: string | null;
-  verified?: boolean | null;
-  verificationStatus?: string | null;
-  verifiedAt?: string | null;
-  dayProgress?: { current: number; total: number } | null;
-};
-
-export type { SimulationListItem };
+export type { CandidateSession, SimulationListItem };

@@ -6,8 +6,12 @@ import {
   type ToastInput,
   type ToastState,
 } from '../types';
-import { buildToast } from './toastBuilders';
-import { clearAllTimers, clearToastTimer, setToastTimer } from './toastTimers';
+import { buildToast } from './useToastBuilders';
+import {
+  clearAllTimers,
+  clearToastTimer,
+  setToastTimer,
+} from './useToastTimers';
 
 export function useToastQueue(): NotificationsContextValue & {
   toasts: ToastState[];

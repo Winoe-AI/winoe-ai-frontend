@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import LoginPage from '@/features/auth/LoginPage';
-import { BRAND_NAME } from '@/lib/brand';
-import { sanitizeReturnTo } from '@/lib/auth/routing';
+import { BRAND_NAME } from '@/platform/config/brand';
+import { sanitizeReturnTo } from '@/platform/auth/routing';
 
 export const metadata: Metadata = {
   title: `Recruiter login | ${BRAND_NAME}`,

@@ -20,29 +20,29 @@ beforeAll(async () => {
     },
   }));
 
-  jest.doMock('@/lib/auth0', () => ({
+  jest.doMock('@/platform/auth0', () => ({
     auth0: { getAccessToken: jest.fn(async () => ({ token: 't' })) },
     getSessionNormalized: jest.fn(async () => ({
       user: { permissions: ['recruiter:access'] },
     })),
   }));
 
-  jest.doMock('@/lib/auth0-claims', () => ({
+  jest.doMock('@/platform/auth0/claims', () => ({
     extractPermissions: jest.fn(() => ['recruiter:access']),
     hasPermission: jest.fn(() => true),
   }));
 
-  jest.doMock('@/lib/server/bffAuth', () => ({
+  jest.doMock('@/platform/server/bffAuth', () => ({
     mergeResponseCookies: jest.fn(),
   }));
 
-  jest.doMock('@/lib/auth/routing', () => ({
+  jest.doMock('@/platform/auth/routing', () => ({
     buildLoginUrl: jest.fn(() => '/auth/login'),
     buildNotAuthorizedUrl: jest.fn(() => '/not-authorized'),
     modeForPath: jest.fn(() => 'recruiter'),
   }));
 
-  await import('@/proxy');
+  await import('@/platform/middleware/proxy');
 });
 
 describe('proxy.ts coverage completion', () => {

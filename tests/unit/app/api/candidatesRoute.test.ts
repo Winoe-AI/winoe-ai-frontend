@@ -1,48 +1,54 @@
-/**
- * Tests for /api/simulations/[id]/candidates route
- */
 import { markMetadataCovered } from './coverageHelpers';
 
-// Mock next/server
-jest.mock('next/server', () => {
-  const buildResponse = (status = 200, body?: unknown) => ({
-    status,
-    body,
-    headers: { get: () => null, set: () => {} },
-    cookies: { set: () => {}, getAll: () => [] },
-    json: async () => body,
-  });
-
-  return {
-    NextResponse: {
-      json: (body: unknown, init?: { status?: number }) =>
-        buildResponse(init?.status ?? 200, body),
-    },
-    NextRequest: class {
-      url: string;
-      nextUrl: URL;
-      headers: { get: () => null };
-      method = 'GET';
-
-      constructor(url: string) {
-        this.url = url;
-        this.nextUrl = new URL(url);
-        this.headers = { get: () => null };
-      }
-    },
-  };
-});
+jest.mock('next/server', () => ({
+  NextResponse: {
+    json: (body: unknown, init?: { status?: number }) => ({
+      status: init?.status ?? 200,
+      body,
+      headers: { get: () => null, set: () => {} },
+      cookies: { set: () => {}, getAll: () => [] },
+      json: async () => body,
+    }),
+  },
+  NextRequest: class {
+    url: string;
+    nextUrl: URL;
+    headers: { get: () => null };
+    method = 'GET';
+    constructor(url: string) {
+      this.url = url;
+      this.nextUrl = new URL(url);
+      this.headers = { get: () => null };
+    }
+  },
+}));
 
 const mockForwardJson = jest.fn();
 const mockWithRecruiterAuth = jest.fn();
-
-jest.mock('@/lib/server/bff', () => ({
+jest.mock('@/platform/server/bff', () => ({
   forwardJson: (...args: unknown[]) => mockForwardJson(...args),
 }));
-
 jest.mock('@/app/api/bffRouteHelpers', () => ({
   withRecruiterAuth: (...args: unknown[]) => mockWithRecruiterAuth(...args),
 }));
+
+const withAuth = (requestId = 'req-123') =>
+  mockWithRecruiterAuth.mockImplementation(
+    async (
+      _req: unknown,
+      _opts: unknown,
+      handler: (auth: {
+        accessToken: string;
+        requestId: string;
+      }) => Promise<unknown>,
+    ) => handler({ accessToken: 'token', requestId }),
+  );
+
+async function loadRoute() {
+  const mod = await import('@/app/api/simulations/[id]/candidates/route');
+  markMetadataCovered('@/app/api/simulations/[id]/candidates/route');
+  return mod;
+}
 
 describe('/api/simulations/[id]/candidates route', () => {
   beforeEach(() => {
@@ -51,9 +57,7 @@ describe('/api/simulations/[id]/candidates route', () => {
   });
 
   it('covers metadata exports', async () => {
-    const mod = await import('@/app/api/simulations/[id]/candidates/route');
-    markMetadataCovered('@/app/api/simulations/[id]/candidates/route');
-
+    const mod = await loadRoute();
     expect(mod.dynamic).toBe('force-dynamic');
     expect(mod.runtime).toBe('nodejs');
     expect(mod.revalidate).toBe(0);
@@ -61,39 +65,21 @@ describe('/api/simulations/[id]/candidates route', () => {
   });
 
   it('calls withRecruiterAuth and forwards candidates request', async () => {
-    const mockResponse = { candidates: [] };
-    mockWithRecruiterAuth.mockImplementation(
-      async (
-        _req: unknown,
-        opts: unknown,
-        handler: (auth: {
-          accessToken: string;
-          requestId: string;
-        }) => Promise<unknown>,
-      ) => {
-        return handler({ accessToken: 'token', requestId: 'req-123' });
-      },
-    );
-    mockForwardJson.mockResolvedValue(mockResponse);
-
-    const mod = await import('@/app/api/simulations/[id]/candidates/route');
-    markMetadataCovered('@/app/api/simulations/[id]/candidates/route');
-
+    withAuth('req-123');
+    mockForwardJson.mockResolvedValue({ candidates: [] });
+    const mod = await loadRoute();
     const { NextRequest } = await import('next/server');
     const req = new NextRequest(
       'http://localhost/api/simulations/sim-1/candidates',
     );
 
-    await mod.GET(req as never, {
-      params: Promise.resolve({ id: 'sim-1' }),
-    });
+    await mod.GET(req as never, { params: Promise.resolve({ id: 'sim-1' }) });
 
     expect(mockWithRecruiterAuth).toHaveBeenCalledWith(
       req,
       { tag: 'simulations-candidates', requirePermission: 'recruiter:access' },
       expect.any(Function),
     );
-
     expect(mockForwardJson).toHaveBeenCalledWith({
       path: '/api/simulations/sim-1/candidates',
       accessToken: 'token',
@@ -101,37 +87,18 @@ describe('/api/simulations/[id]/candidates route', () => {
     });
   });
 
-  it('encodes simulation ID in path', async () => {
-    mockWithRecruiterAuth.mockImplementation(
-      async (
-        _req: unknown,
-        _opts: unknown,
-        handler: (auth: {
-          accessToken: string;
-          requestId: string;
-        }) => Promise<unknown>,
-      ) => {
-        return handler({ accessToken: 'token', requestId: 'req-456' });
-      },
-    );
+  it('encodes simulation id in path', async () => {
+    withAuth('req-456');
     mockForwardJson.mockResolvedValue({ candidates: [] });
-
-    const mod = await import('@/app/api/simulations/[id]/candidates/route');
-    markMetadataCovered('@/app/api/simulations/[id]/candidates/route');
-
+    const mod = await loadRoute();
     const { NextRequest } = await import('next/server');
     const req = new NextRequest(
       'http://localhost/api/simulations/sim%2F1/candidates',
     );
 
-    await mod.GET(req as never, {
-      params: Promise.resolve({ id: 'sim/1' }),
-    });
-
+    await mod.GET(req as never, { params: Promise.resolve({ id: 'sim/1' }) });
     expect(mockForwardJson).toHaveBeenCalledWith(
-      expect.objectContaining({
-        path: '/api/simulations/sim%2F1/candidates',
-      }),
+      expect.objectContaining({ path: '/api/simulations/sim%2F1/candidates' }),
     );
   });
 });

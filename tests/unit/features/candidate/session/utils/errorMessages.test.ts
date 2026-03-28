@@ -3,7 +3,7 @@ import {
   friendlyTaskError,
   friendlyClaimError,
   friendlySubmitError,
-} from '@/features/candidate/session/utils/errorMessages';
+} from '@/features/candidate/session/utils/errorMessagesUtils';
 
 const httpErr = (status: number, message?: string) =>
   Object.assign(new Error(message ?? `err-${status}`), { status });

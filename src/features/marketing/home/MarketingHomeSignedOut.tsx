@@ -1,5 +1,5 @@
 import LoginLink from '@/features/auth/LoginLink';
-import { BRAND_NAME } from '@/lib/brand';
+import { BRAND_NAME } from '@/platform/config/brand';
 import { ActionRow } from '../shared/ActionRow';
 import { primaryCtaClass, secondaryCtaClass } from '../shared/ctaClasses';
 

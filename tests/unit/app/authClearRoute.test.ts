@@ -1,5 +1,4 @@
 import { NextRequest } from 'next/server';
-
 jest.mock('next/server', () => {
   const { MockNextRequest } = jest.requireActual('../app/api/mockNext');
   const makeResp = (status: number, location?: string) => {
@@ -37,83 +36,65 @@ jest.mock('next/server', () => {
     },
   };
 });
-
-jest.mock('@/lib/auth/authCookies', () => {
-  const actual = jest.requireActual('@/lib/auth/authCookies');
-  return {
-    ...actual,
-    isAuthCookie: jest.fn(
-      (name: string) => name.startsWith('a0:') || name === 'appSession',
-    ),
-  };
-});
-
-jest.mock('@/lib/auth/routing', () => {
-  const actual = jest.requireActual('@/lib/auth/routing');
-  return {
-    ...actual,
-    sanitizeReturnTo: jest.fn((value?: string | null) => value?.trim() || '/'),
-    modeForPath: jest.fn(() => 'candidate'),
-  };
-});
-
+jest.mock('@/platform/auth/authCookies', () => ({
+  ...jest.requireActual('@/platform/auth/authCookies'),
+  isAuthCookie: jest.fn(
+    (name: string) => name.startsWith('a0:') || name === 'appSession',
+  ),
+}));
+jest.mock('@/platform/auth/routing', () => ({
+  ...jest.requireActual('@/platform/auth/routing'),
+  sanitizeReturnTo: jest.fn((value?: string | null) => value?.trim() || '/'),
+  modeForPath: jest.fn(() => 'candidate'),
+}));
+const setReqCookies = (
+  req: NextRequest,
+  cookies: Array<{ name: string; value: string }>,
+) => {
+  (
+    req as unknown as {
+      cookies: { getAll: () => Array<{ name: string; value: string }> };
+    }
+  ).cookies = { getAll: () => cookies };
+};
 describe('auth clear route', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
-
+  beforeEach(() => jest.clearAllMocks());
   it('clears auth cookies and sets domain when configured', async () => {
     process.env.TENON_AUTH0_COOKIE_DOMAIN = 'tenon.dev';
     const { GET } = await import('@/app/(auth)/auth/clear/route');
     const req = new NextRequest(
       'http://localhost/auth/clear?returnTo=%2Fdash&mode=recruiter',
     );
-    (
-      req as unknown as {
-        cookies: { getAll: () => Array<{ name: string; value: string }> };
-      }
-    ).cookies = {
-      getAll: () => [
-        { name: 'appSession', value: '1' },
-        { name: 'a0:state', value: '2' },
-        { name: 'other', value: 'x' },
-      ],
-    };
-
+    setReqCookies(req, [
+      { name: 'appSession', value: '1' },
+      { name: 'a0:state', value: '2' },
+      { name: 'other', value: 'x' },
+    ]);
     const res = (await GET(req as unknown as NextRequest)) as {
       status: number;
       cookies: { getAll: () => Array<{ name: string; value?: string }> };
     };
     expect(res.status).toBe(307);
-    const deleted = res.cookies.getAll().map((c) => c.name);
-    expect(deleted).toEqual(expect.arrayContaining(['appSession', 'a0:state']));
-    process.env.TENON_AUTH0_COOKIE_DOMAIN = undefined;
+    expect(res.cookies.getAll().map((c) => c.name)).toEqual(
+      expect.arrayContaining(['appSession', 'a0:state']),
+    );
+    delete process.env.TENON_AUTH0_COOKIE_DOMAIN;
   });
-
   it('falls back to mode derived from returnTo when param missing', async () => {
     const { GET } = await import('@/app/(auth)/auth/clear/route');
     const req = new NextRequest(
       'http://localhost/auth/clear?returnTo=%2Fcandidate%2Fdashboard',
     );
-    (req as unknown as { cookies: { getAll: () => unknown[] } }).cookies = {
-      getAll: () => [],
-    };
+    setReqCookies(req, []);
     const res = await GET(req as unknown as NextRequest);
     expect(res.headers.get('location')).toContain('mode=candidate');
   });
-
   it('does not set domain when hostname has no dot', async () => {
     delete process.env.TENON_AUTH0_COOKIE_DOMAIN;
     jest.resetModules();
     const { GET } = await import('@/app/(auth)/auth/clear/route');
     const req = new NextRequest('http://localhost/auth/clear');
-    (
-      req as unknown as {
-        cookies: { getAll: () => Array<{ name: string; value: string }> };
-      }
-    ).cookies = {
-      getAll: () => [{ name: 'appSession', value: '1' }],
-    };
+    setReqCookies(req, [{ name: 'appSession', value: '1' }]);
     const res = (await GET(req as unknown as NextRequest)) as {
       status: number;
       cookies: {
@@ -121,40 +102,29 @@ describe('auth clear route', () => {
       };
     };
     expect(res.status).toBe(307);
-    const deleted = res.cookies.getAll();
-    expect(deleted.some((c) => c.domain)).toBe(false);
+    expect(res.cookies.getAll().some((c) => c.domain)).toBe(false);
   });
-
   it('uses hostname with dot as domain when env not set', async () => {
     delete process.env.TENON_AUTH0_COOKIE_DOMAIN;
     jest.resetModules();
     const { GET } = await import('@/app/(auth)/auth/clear/route');
     const req = new NextRequest('http://tenon.example.com/auth/clear');
-    (
-      req as unknown as {
-        cookies: { getAll: () => Array<{ name: string; value: string }> };
-      }
-    ).cookies = {
-      getAll: () => [{ name: 'appSession', value: '1' }],
-    };
+    setReqCookies(req, [{ name: 'appSession', value: '1' }]);
     const res = (await GET(req as unknown as NextRequest)) as {
-      status: number;
       cookies: {
         getAll: () => Array<{ name: string; value?: string; domain?: string }>;
       };
     };
-    const deleted = res.cookies.getAll();
-    expect(deleted.some((c) => c.domain === 'tenon.example.com')).toBe(true);
+    expect(
+      res.cookies.getAll().some((c) => c.domain === 'tenon.example.com'),
+    ).toBe(true);
   });
-
   it('uses recruiter mode when param is recruiter', async () => {
     const { GET } = await import('@/app/(auth)/auth/clear/route');
     const req = new NextRequest(
       'http://localhost/auth/clear?returnTo=%2F&mode=recruiter',
     );
-    (req as unknown as { cookies: { getAll: () => unknown[] } }).cookies = {
-      getAll: () => [],
-    };
+    setReqCookies(req, []);
     const res = await GET(req as unknown as NextRequest);
     expect(res.headers.get('location')).toContain('mode=recruiter');
   });

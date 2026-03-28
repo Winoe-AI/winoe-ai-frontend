@@ -3,7 +3,7 @@ import {
   loadTextDraft,
   loadTextDraftSavedAt,
   saveTextDraft,
-} from '@/features/candidate/session/task/utils/draftStorage';
+} from '@/features/candidate/tasks/utils/draftStorageUtils';
 
 describe('draftStorage helpers', () => {
   beforeEach(() => {

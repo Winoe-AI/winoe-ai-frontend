@@ -2,7 +2,7 @@ import {
   extractPermissions,
   getUserEmail,
   normalizeUserClaims,
-} from '@/lib/auth0-claims';
+} from '@/platform/auth0/claims';
 
 const makeToken = (claims: Record<string, unknown>) => {
   const header = Buffer.from('{}').toString('base64url');

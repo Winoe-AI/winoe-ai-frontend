@@ -2,7 +2,7 @@
  * Coverage completion tests for lib/auth/routing.ts
  */
 beforeAll(async () => {
-  await import('@/lib/auth/routing');
+  await import('@/platform/auth/routing');
 });
 
 describe('routing.ts coverage completion', () => {

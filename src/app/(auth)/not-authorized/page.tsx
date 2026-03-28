@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import type { Metadata } from 'next';
-import { BRAND_NAME } from '@/lib/brand';
-import { sanitizeReturnTo } from '@/lib/auth/routing';
+import { BRAND_NAME } from '@/platform/config/brand';
+import { sanitizeReturnTo } from '@/platform/auth/routing';
 
 export const metadata: Metadata = {
   title: `Not authorized | ${BRAND_NAME}`,

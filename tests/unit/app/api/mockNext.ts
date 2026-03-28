@@ -1,28 +1,6 @@
-class MockHeaders {
-  private store = new Map<string, string>();
-
-  constructor(init?: Record<string, string>) {
-    Object.entries(init ?? {}).forEach(([k, v]) =>
-      this.store.set(k.toLowerCase(), String(v)),
-    );
-  }
-
-  get(key: string) {
-    return this.store.get(key.toLowerCase()) ?? null;
-  }
-
-  set(key: string, value: string) {
-    this.store.set(key.toLowerCase(), String(value));
-  }
-
-  delete(key: string) {
-    this.store.delete(key.toLowerCase());
-  }
-
-  forEach(fn: (value: string, key: string) => void) {
-    this.store.forEach((value, key) => fn(value, key));
-  }
-}
+import { MockHeaders } from './mockNext.headers';
+export { MockHeaders } from './mockNext.headers';
+export { makeResponse } from './mockNext.response';
 
 export class MockNextResponse {
   status: number;
@@ -94,36 +72,3 @@ export class MockNextRequest {
     return JSON.parse(raw || '{}');
   }
 }
-
-export { MockHeaders };
-
-export function makeResponse(
-  body: string | null,
-  init: { status: number; headers?: Record<string, string> },
-) {
-  const headers = new MockHeaders(init.headers);
-  const encoder = new TextEncoder();
-  const payload = body !== null ? encoder.encode(body) : null;
-  const reader = (() => {
-    let done = false;
-    return {
-      async read() {
-        if (done || !payload) return { done: true, value: undefined };
-        done = true;
-        return { done: false, value: payload };
-      },
-      async cancel() {
-        done = true;
-      },
-    };
-  })();
-
-  return {
-    status: init.status,
-    ok: init.status >= 200 && init.status < 300,
-    headers,
-    body: payload ? { getReader: () => reader } : null,
-    arrayBuffer: async () => payload?.buffer ?? new ArrayBuffer(0),
-  } as unknown as Response;
-}
-import { TextEncoder } from 'util';

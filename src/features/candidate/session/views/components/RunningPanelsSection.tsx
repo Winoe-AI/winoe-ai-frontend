@@ -2,13 +2,16 @@ import { TaskSection } from './TaskSection';
 import { WorkspaceSection } from '../sections/WorkspaceSection';
 import { ResourceSections } from '../ResourceSections';
 import type { CandidateTask } from '../../CandidateSessionProvider';
-import type { SubmitPayload, SubmitResponse } from '../../task/types';
-import type { PollResult } from '../../task/hooks/runTestsTypes';
+import type {
+  SubmitPayload,
+  SubmitResponse,
+} from '@/features/candidate/tasks/types';
+import type { PollResult } from '@/features/candidate/tasks/hooks/useRunTestsTypes';
 import type { WindowActionGate } from '../../lib/windowState';
 import type {
   CodingWorkspace,
   CodingWorkspaceSnapshot,
-} from '../../task/utils/codingWorkspace';
+} from '@/features/candidate/tasks/utils/codingWorkspaceUtils';
 
 type Props = {
   currentTask: CandidateTask | null;
