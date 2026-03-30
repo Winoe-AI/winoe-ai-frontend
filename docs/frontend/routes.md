@@ -1,6 +1,6 @@
 # Routes and Structure
 
-Route truth source: `src/app/**` and middleware in `middleware.ts` + `src/platform/middleware/**`.
+Route truth source: `src/app/**` and request interception in `src/proxy.ts` + `src/platform/middleware/**`.
 
 ## App Router
 
@@ -59,7 +59,7 @@ Route truth source: `src/app/**` and middleware in `middleware.ts` + `src/platfo
 
 ## Middleware Boundary
 
-- Root middleware entrypoint: `middleware.ts`.
+- Proxy entrypoint: `src/proxy.ts`.
 - Main implementation: `src/platform/middleware/proxy.ts`.
 - Route role gating:
   - Candidate area: `/candidate*`, `/candidate-sessions*`.

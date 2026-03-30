@@ -37,7 +37,7 @@ describe('LoginPage', () => {
     ).toHaveAttribute(
       'href',
       expect.stringContaining(
-        '/auth/login?returnTo=%2Fcandidate%2Fsession%2Fabc',
+        '/auth/start?returnTo=%2Fcandidate%2Fsession%2Fabc',
       ),
     );
   });

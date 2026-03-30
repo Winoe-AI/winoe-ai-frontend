@@ -1,4 +1,4 @@
-import LoginLink from '@/features/auth/LoginLink';
+import AuthStartLink from '@/features/auth/AuthStartLink';
 import { BRAND_NAME } from '@/platform/config/brand';
 import { ActionRow } from '../shared/ActionRow';
 import { primaryCtaClass, secondaryCtaClass } from '../shared/ctaClasses';
@@ -17,21 +17,21 @@ export function MarketingHomeSignedOut() {
       </div>
 
       <ActionRow align="center">
-        <LoginLink
+        <AuthStartLink
           returnTo="/dashboard"
           mode="recruiter"
           className={primaryCtaClass}
         >
           Recruiter login
-        </LoginLink>
+        </AuthStartLink>
 
-        <LoginLink
+        <AuthStartLink
           returnTo="/candidate/dashboard"
           mode="candidate"
           className={secondaryCtaClass}
         >
           Candidate portal
-        </LoginLink>
+        </AuthStartLink>
       </ActionRow>
 
       <p className="mt-4 text-xs text-slate-500">

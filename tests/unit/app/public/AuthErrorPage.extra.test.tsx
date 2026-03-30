@@ -67,7 +67,7 @@ describe('AuthErrorPage additional coverage', () => {
     const retry = screen.getByRole('link', { name: 'Retry sign-in' });
     expect(retry).toHaveAttribute(
       'href',
-      '/auth/login?returnTo=%2Fcandidate%2Fdashboard&mode=candidate',
+      '/auth/start?returnTo=%2Fcandidate%2Fdashboard&mode=candidate',
     );
   });
   it('renders without returnTo or mode', () => {

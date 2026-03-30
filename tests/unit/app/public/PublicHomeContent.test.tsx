@@ -25,13 +25,13 @@ describe('PublicHomeContent', () => {
       screen.getByRole('link', { name: 'Recruiter login' }),
     ).toHaveAttribute(
       'href',
-      '/auth/login?returnTo=%2Fdashboard&mode=recruiter',
+      '/auth/start?returnTo=%2Fdashboard&mode=recruiter',
     );
     expect(
       screen.getByRole('link', { name: 'Candidate portal' }),
     ).toHaveAttribute(
       'href',
-      '/auth/login?returnTo=%2Fcandidate%2Fdashboard&mode=candidate',
+      '/auth/start?returnTo=%2Fcandidate%2Fdashboard&mode=candidate',
     );
   });
 

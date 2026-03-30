@@ -15,7 +15,7 @@ describe('AuthErrorPage', () => {
     const retry = screen.getByRole('link', { name: 'Retry sign-in' });
     expect(retry).toHaveAttribute(
       'href',
-      '/auth/login?returnTo=%2Fdashboard&mode=recruiter',
+      '/auth/start?returnTo=%2Fdashboard&mode=recruiter',
     );
     const clear = screen.getByRole('link', { name: 'Clear auth state' });
     expect(clear).toHaveAttribute(

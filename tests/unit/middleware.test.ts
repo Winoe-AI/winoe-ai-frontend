@@ -75,17 +75,17 @@ jest.mock('@/platform/middleware/auth', () => ({
   redirectSignedInHome: jest.fn(() => null),
   gateByRole: jest.fn(() => null),
 }));
-import middleware, { config as middlewareConfig } from '../../middleware';
+import proxyEntrypoint, { config as proxyEntrypointConfig } from '../../src/proxy';
 import { proxy, config as proxyConfig } from '@/platform/middleware/proxy';
 describe('middleware wiring', () => {
   it('re-exports proxy handler', () => {
-    expect(middleware).toBe(proxy);
+    expect(proxyEntrypoint).toBe(proxy);
   });
   it('mirrors proxy config matcher', () => {
-    expect(middlewareConfig).toEqual(proxyConfig);
+    expect(proxyEntrypointConfig).toEqual(proxyConfig);
   });
   it('matcher skips static/image and includes app paths', () => {
-    const pattern = middlewareConfig.matcher?.[0];
+    const pattern = proxyEntrypointConfig.matcher?.[0];
     expect(typeof pattern).toBe('string');
     const raw = pattern as string;
     const patternStr = raw.startsWith('/') ? raw.slice(1) : raw;

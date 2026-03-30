@@ -20,7 +20,7 @@ test.describe('Auth Flows', () => {
       page.getByRole('link', { name: /continue with auth0/i }).first(),
     ).toHaveAttribute(
       'href',
-      /\/auth\/login\?returnTo=%2Fcandidate%2Fdashboard&mode=candidate&connection=Tenon-Candidates/i,
+      /\/auth\/start\?returnTo=%2Fcandidate%2Fdashboard&mode=candidate&connection=Tenon-Candidates/i,
     );
   });
 
@@ -56,7 +56,7 @@ test.describe('Auth Flows', () => {
         page.getByRole('link', { name: /continue with auth0/i }).first(),
       ).toHaveAttribute(
         'href',
-        /\/auth\/login\?returnTo=%2Fcandidate%2Fdashboard&mode=candidate&connection=Tenon-Candidates/i,
+        /\/auth\/start\?returnTo=%2Fcandidate%2Fdashboard&mode=candidate&connection=Tenon-Candidates/i,
       );
     });
 

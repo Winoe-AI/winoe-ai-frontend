@@ -1,4 +1,4 @@
-import { proxy } from './src/platform/middleware/proxy';
+import { proxy } from './platform/middleware/proxy';
 
 export default proxy;
 

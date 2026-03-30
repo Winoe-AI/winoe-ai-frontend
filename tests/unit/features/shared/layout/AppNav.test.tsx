@@ -34,6 +34,6 @@ describe('auth navigation links', () => {
     render(<MarketingHomeSignedOut />);
     const recruiterLogin = screen.getByText('Recruiter login');
     expect(recruiterLogin.tagName).toBe('A');
-    expect(recruiterLogin.getAttribute('href') || '').toContain('/auth/login');
+    expect(recruiterLogin.getAttribute('href') || '').toContain('/auth/start');
   });
 });

@@ -1,5 +1,5 @@
 import Button from '@/shared/ui/Button';
-import LoginLink from '@/features/auth/LoginLink';
+import AuthStartLink from '@/features/auth/AuthStartLink';
 import { BRAND_NAME } from '@/platform/config/brand';
 import { AuthPageLayout } from './AuthPageLayout';
 import { buildSignupHref, type LoginMode } from './authPaths';
@@ -43,7 +43,7 @@ export default function LoginPage({
         You will be redirected to Auth0 to sign in securely.
       </p>
 
-      <LoginLink
+      <AuthStartLink
         returnTo={returnTo || '/dashboard'}
         mode={mode ?? (isCandidate ? 'candidate' : 'recruiter')}
         className="block"
@@ -54,7 +54,7 @@ export default function LoginPage({
         >
           Continue with Auth0
         </Button>
-      </LoginLink>
+      </AuthStartLink>
 
       {signupHref ? (
         <a
