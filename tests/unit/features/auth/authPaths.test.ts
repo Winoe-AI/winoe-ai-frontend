@@ -1,5 +1,6 @@
 import {
   buildAuthStartHref,
+  buildRecruiterOnboardingHref,
   buildLoginHref,
   buildSignupHref,
   buildLogoutHref,
@@ -49,6 +50,12 @@ describe('authPaths helpers', () => {
     expect(href).toContain('/auth/start?');
     expect(href).toContain('screen_hint=signup');
     expect(href).toContain('connection=recruit-conn');
+  });
+
+  it('builds recruiter onboarding href with sanitized return path', () => {
+    expect(buildRecruiterOnboardingHref('/dashboard/simulations/new')).toBe(
+      '/recruiter-onboarding?returnTo=%2Fdashboard%2Fsimulations%2Fnew',
+    );
   });
 
   it('builds logout href with absolute returnTo and strips hash/query', () => {

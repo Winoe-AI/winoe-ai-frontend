@@ -2,7 +2,11 @@ import Button from '@/shared/ui/Button';
 import AuthStartLink from '@/features/auth/AuthStartLink';
 import { BRAND_NAME } from '@/platform/config/brand';
 import { AuthPageLayout } from './AuthPageLayout';
-import { buildSignupHref, type LoginMode } from './authPaths';
+import {
+  buildRecruiterOnboardingHref,
+  buildSignupHref,
+  type LoginMode,
+} from './authPaths';
 
 export default function LoginPage({
   returnTo,
@@ -29,7 +33,7 @@ export default function LoginPage({
 
   const signupHref = isCandidate
     ? buildSignupHref(returnTo || '/candidate/dashboard', 'candidate')
-    : null;
+    : buildRecruiterOnboardingHref(returnTo || '/dashboard');
 
   return (
     <AuthPageLayout title={title} subtitle={subtitle}>
@@ -61,7 +65,9 @@ export default function LoginPage({
           href={signupHref}
           className="mt-3 block text-center text-sm text-blue-600 hover:underline"
         >
-          New candidate? Create your account
+          {isCandidate
+            ? 'New candidate? Create your account'
+            : 'New recruiter? Create your account'}
         </a>
       ) : null}
     </AuthPageLayout>

@@ -59,6 +59,12 @@ export function buildSignupHref(returnTo?: string, mode?: LoginMode): string {
   return buildAuthStartHref(returnTo, mode, 'signup');
 }
 
+export function buildRecruiterOnboardingHref(returnTo?: string): string {
+  const params = new URLSearchParams();
+  params.set('returnTo', buildReturnTo(returnTo || '/dashboard'));
+  return `/recruiter-onboarding?${params.toString()}`;
+}
+
 export function buildAuthStartHref(
   returnTo?: string,
   mode?: LoginMode,

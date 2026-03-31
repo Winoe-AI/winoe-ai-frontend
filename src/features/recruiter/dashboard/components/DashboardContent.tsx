@@ -38,6 +38,7 @@ export function DashboardContent({
 
       {profile ? (
         <ProfileCard
+          companyName={profile.companyName}
           name={profile.name}
           email={profile.email}
           role={profile.role}

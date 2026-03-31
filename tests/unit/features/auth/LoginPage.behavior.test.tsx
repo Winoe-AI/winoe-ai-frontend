@@ -15,7 +15,12 @@ describe('LoginPage', () => {
       screen.getByText(/Recruiter login/i, { selector: 'h1,h2,h3' }),
     ).toBeInTheDocument();
     expect(screen.getByText(/access your .* dashboard/i)).toBeInTheDocument();
-    expect(screen.queryByText(/Create your account/)).toBeNull();
+    expect(
+      screen.getByText(/New recruiter\? Create your account/i),
+    ).toHaveAttribute(
+      'href',
+      '/recruiter-onboarding?returnTo=%2Fdashboard',
+    );
   });
 
   it('renders candidate mode with signup link and warning when connection missing', () => {

@@ -15,10 +15,17 @@ describe('LoginPage', () => {
     render(<LoginPage returnTo="/dashboard" />);
 
     const authLink = screen.getByRole('link', { name: 'Continue with Auth0' });
+    const signupLink = screen.getByRole('link', {
+      name: /New recruiter\? Create your account/i,
+    });
 
     expect(authLink).toHaveAttribute(
       'href',
       '/auth/start?returnTo=%2Fdashboard&mode=recruiter',
+    );
+    expect(signupLink).toHaveAttribute(
+      'href',
+      '/recruiter-onboarding?returnTo=%2Fdashboard',
     );
   });
 
