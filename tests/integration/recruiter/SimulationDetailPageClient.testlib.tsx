@@ -79,6 +79,7 @@ export const renderPage = () =>
   );
 
 beforeEach(() => {
+  jest.useRealTimers();
   fetchMock.mockReset();
   global.fetch = fetchMock as unknown as typeof fetch;
   params.id = 'sim-1';

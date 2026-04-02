@@ -1,4 +1,10 @@
-import { useEffect, useState, type Dispatch, type SetStateAction } from 'react';
+import {
+  useEffect,
+  useRef,
+  useState,
+  type Dispatch,
+  type SetStateAction,
+} from 'react';
 import type {
   RegenerationPollState,
   ScenarioEditorFieldErrors,
@@ -27,6 +33,7 @@ type StateModel = {
 };
 
 export function useScenarioVersionState(simulationId: string): StateModel {
+  const previousSimulationIdRef = useRef<string | null>(null);
   const [scenarioVersionSnapshots, setScenarioVersionSnapshots] = useState<
     Record<string, ScenarioVersionSnapshot>
   >({});
@@ -43,18 +50,18 @@ export function useScenarioVersionState(simulationId: string): StateModel {
     useState<RegenerationPollState | null>(null);
 
   useEffect(() => {
-    const timerId = window.setTimeout(() => {
-      setScenarioVersionSnapshots({});
-      setScenarioEditorSaving(false);
-      setScenarioEditorSaveError(null);
-      setScenarioEditorFieldErrors({});
-      setScenarioLockBannerMessage(null);
-      setPendingRegeneration(null);
-    }, 0);
-
-    return () => {
-      window.clearTimeout(timerId);
-    };
+    if (previousSimulationIdRef.current == null) {
+      previousSimulationIdRef.current = simulationId;
+      return;
+    }
+    if (previousSimulationIdRef.current === simulationId) return;
+    previousSimulationIdRef.current = simulationId;
+    setScenarioVersionSnapshots({});
+    setScenarioEditorSaving(false);
+    setScenarioEditorSaveError(null);
+    setScenarioEditorFieldErrors({});
+    setScenarioLockBannerMessage(null);
+    setPendingRegeneration(null);
   }, [simulationId]);
 
   return {

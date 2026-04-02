@@ -6,14 +6,12 @@ import {
 type Workspace = {
   repoFullName: string;
   repoName: string;
-  repoUrl: string;
   codespaceUrl: string | null;
 };
 
 const makeWorkspace = (overrides: Partial<Workspace> = {}): Workspace => ({
   repoFullName: 'acme/unified',
   repoName: 'acme/unified',
-  repoUrl: 'https://github.com/acme/unified',
   codespaceUrl: null,
   ...overrides,
 });
@@ -41,7 +39,6 @@ describe('codingWorkspace normalization', () => {
     });
     expect(result.error).toBeNull();
     expect(result.isInitialized).toBe(true);
-    expect(result.repoUrl).toBe('https://github.com/acme/unified');
     expect(result.codespaceUrl).toBe(
       'https://codespaces.new/acme/unified?quickstart=1',
     );
@@ -52,18 +49,15 @@ describe('codingWorkspace normalization', () => {
       day2Workspace: makeWorkspace({
         repoFullName: 'acme/day2',
         repoName: 'acme/day2',
-        repoUrl: 'https://github.com/acme/day2',
         codespaceUrl: 'https://codespaces.new/acme/day2',
       }),
       day3Workspace: makeWorkspace({
         repoFullName: 'acme/day3',
         repoName: 'acme/day3',
-        repoUrl: 'https://github.com/acme/day3',
         codespaceUrl: 'https://codespaces.new/acme/day3',
       }),
     });
     expect(result.isInitialized).toBe(false);
-    expect(result.repoUrl).toBeNull();
     expect(result.codespaceUrl).toBeNull();
     expect(result.error).toMatch(/mismatch/i);
   });

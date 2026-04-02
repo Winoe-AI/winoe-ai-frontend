@@ -1,6 +1,5 @@
 import { TextDecoder, TextEncoder } from 'util';
 import { ReadableStream, WritableStream } from 'stream/web';
-import { MessageChannel, MessagePort } from 'worker_threads';
 
 global.TextDecoder = TextDecoder as unknown as typeof globalThis.TextDecoder;
 global.TextEncoder = TextEncoder as unknown as typeof globalThis.TextEncoder;
@@ -8,9 +7,6 @@ global.ReadableStream =
   ReadableStream as unknown as typeof globalThis.ReadableStream;
 global.WritableStream =
   WritableStream as unknown as typeof globalThis.WritableStream;
-global.MessageChannel =
-  MessageChannel as unknown as typeof globalThis.MessageChannel;
-global.MessagePort = MessagePort as unknown as typeof globalThis.MessagePort;
 
 jest.mock('next/server', () => {
   class LocalResponse {

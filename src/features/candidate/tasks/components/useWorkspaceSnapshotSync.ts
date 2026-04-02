@@ -29,7 +29,6 @@ export function useWorkspaceSnapshotSync({
       dayIndex,
       snapshotWorkspace?.repoFullName ?? '',
       snapshotWorkspace?.repoName ?? '',
-      snapshotWorkspace?.repoUrl ?? '',
       snapshotWorkspace?.codespaceUrl ?? '',
     ].join('|');
     if (lastSnapshotKeyRef.current === snapshotKey) return;

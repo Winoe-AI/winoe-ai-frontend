@@ -34,14 +34,12 @@ describe('CandidateSessionPage shared coding workspace flow', () => {
           return Promise.resolve({
             repoFullName: 'acme/unified-workspace',
             repoName: 'acme/unified-workspace',
-            repoUrl: 'https://github.com/acme/unified-workspace',
             codespaceUrl: 'https://codespaces.new/acme/unified-workspace',
           });
         if (taskId === day3Task.id)
           return Promise.resolve({
             repoFullName: 'acme/unified-workspace',
             repoName: 'acme/unified-workspace',
-            repoUrl: 'https://github.com/acme/unified-workspace',
             codespaceUrl: null,
           });
         return Promise.resolve(null);
@@ -55,10 +53,6 @@ describe('CandidateSessionPage shared coding workspace flow', () => {
     expect(
       await screen.findByText(/Repo: acme\/unified-workspace/i),
     ).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /Repo URL/i })).toHaveAttribute(
-      'href',
-      'https://github.com/acme/unified-workspace',
-    );
     expect(
       screen.getByRole('link', { name: /Open Codespace/i }),
     ).toHaveAttribute('href', 'https://codespaces.new/acme/unified-workspace');
@@ -106,14 +100,12 @@ describe('CandidateSessionPage shared coding workspace flow', () => {
           return Promise.resolve({
             repoFullName: 'acme/day2',
             repoName: 'acme/day2',
-            repoUrl: 'https://github.com/acme/day2',
             codespaceUrl: 'https://codespaces.new/acme/day2',
           });
         if (taskId === day3Task.id)
           return Promise.resolve({
             repoFullName: 'acme/day3',
             repoName: 'acme/day3',
-            repoUrl: 'https://github.com/acme/day3',
             codespaceUrl: 'https://codespaces.new/acme/day3',
           });
         return Promise.resolve(null);
@@ -123,7 +115,7 @@ describe('CandidateSessionPage shared coding workspace flow', () => {
     const sessionContext = buildSessionContext(day2Task);
     useCandidateSessionMock.mockImplementation(() => sessionContext);
     const { rerender } = render(<CandidateSessionPage token="inv" />);
-    await screen.findByRole('link', { name: /Repo URL/i });
+    await screen.findByText(/Repo: acme\/day2/i);
 
     await act(async () => {
       sessionContext.state = {
@@ -138,7 +130,6 @@ describe('CandidateSessionPage shared coding workspace flow', () => {
         /Workspace mismatch detected between Day 2 and Day 3/i,
       ),
     ).toBeInTheDocument();
-    expect(screen.queryByRole('link', { name: /Repo URL/i })).toBeNull();
     expect(screen.queryByRole('link', { name: /Open Codespace/i })).toBeNull();
   });
 });

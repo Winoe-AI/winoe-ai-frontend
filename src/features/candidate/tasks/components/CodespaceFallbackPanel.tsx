@@ -4,17 +4,9 @@ import { useMemo } from 'react';
 import { OFFICIAL_REPO_CUTOFF_COPY } from '@/platform/copy/integrity';
 import { formatDateTime } from '@/shared/formatters';
 import Button from '@/shared/ui/Button';
-import {
-  buildCommandBlock,
-  fallbackSummary,
-  trimOrNull,
-} from './codespaceFallbackPanel.utils';
-import { CodespaceFallbackCommandCard } from './CodespaceFallbackCommandCard';
-import { CodespaceFallbackRepoCard } from './CodespaceFallbackRepoCard';
-import { useClipboardFeedback } from './useClipboardFeedback';
+import { fallbackSummary, trimOrNull } from './codespaceFallbackPanel.utils';
 
 type CodespaceFallbackPanelProps = {
-  repoUrl: string | null;
   repoFullName: string | null;
   errorState?: string | null;
   cutoffAt?: string | null;
@@ -22,21 +14,17 @@ type CodespaceFallbackPanelProps = {
 };
 
 export function CodespaceFallbackPanel({
-  repoUrl,
   repoFullName,
   errorState = null,
   cutoffAt = null,
   onRetry,
 }: CodespaceFallbackPanelProps) {
-  const repoCopy = useClipboardFeedback();
-  const commandsCopy = useClipboardFeedback();
-  const cleanRepoUrl = trimOrNull(repoUrl);
   const cleanRepoFullName = trimOrNull(repoFullName);
   const cutoffAtLabel = formatDateTime(cutoffAt);
   const summary = fallbackSummary(errorState);
-  const commandBlock = useMemo(
-    () => buildCommandBlock(cleanRepoUrl, cleanRepoFullName),
-    [cleanRepoFullName, cleanRepoUrl],
+  const workspaceLabel = useMemo(
+    () => cleanRepoFullName ?? 'shared Day 2/Day 3 workspace',
+    [cleanRepoFullName],
   );
 
   return (
@@ -46,7 +34,7 @@ export function CodespaceFallbackPanel({
     >
       <div className="flex flex-wrap items-start justify-between gap-2">
         <h3 id="codespace-fallback-heading" className="text-sm font-semibold">
-          Continue locally if Codespaces is unavailable
+          Shared Codespace still starting
         </h3>
         {onRetry ? (
           <Button size="sm" variant="secondary" onClick={onRetry}>
@@ -57,31 +45,13 @@ export function CodespaceFallbackPanel({
 
       <p className="mt-2">{summary}</p>
       <p className="mt-2 text-xs">{OFFICIAL_REPO_CUTOFF_COPY}</p>
-
-      <CodespaceFallbackRepoCard
-        repoUrl={cleanRepoUrl}
-        canCopy={repoCopy.canCopy}
-        copied={repoCopy.copied}
-        onCopy={() => {
-          void repoCopy.copyText(cleanRepoUrl);
-        }}
-      />
-
-      <ol className="mt-3 list-decimal space-y-1 pl-5 text-xs">
-        <li>Clone the repo locally.</li>
-        <li>Create a branch for your solution (optional but recommended).</li>
-        <li>Run tests locally before pushing.</li>
-        <li>Push commits to the official repo before cutoff.</li>
-      </ol>
-
-      <CodespaceFallbackCommandCard
-        commandBlock={commandBlock}
-        canCopy={commandsCopy.canCopy}
-        copied={commandsCopy.copied}
-        onCopy={() => {
-          void commandsCopy.copyText(commandBlock);
-        }}
-      />
+      <p className="mt-3 text-xs text-amber-900">
+        Workspace: {workspaceLabel}
+      </p>
+      <p className="mt-2 text-xs text-amber-900">
+        Local clone instructions are intentionally disabled. Retry until the
+        shared Codespace link is available.
+      </p>
 
       {cutoffAtLabel ? (
         <p className="mt-2 text-xs text-amber-900">

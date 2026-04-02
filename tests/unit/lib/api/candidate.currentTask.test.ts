@@ -68,7 +68,7 @@ describe('candidate api current-task helpers', () => {
         type: 'debug',
         title: 'Debug task',
         description: 'Fix failing tests',
-        workspaceStatus: { repoUrl: 'https://github.com/acme/repo' },
+        workspaceStatus: { repoFullName: 'acme/repo' },
         workspace_status: { codespaceUrl: 'https://codespaces.new/acme/repo' },
         workspace: { status: 'ready' },
         integrity: { status: 'ok' },

@@ -32,10 +32,38 @@ export type SimulationRoleLevel =
 
 export type SimulationEvalDayKey = '1' | '2' | '3' | '4' | '5';
 
-export type SimulationAiConfigInput = {
-  noticeVersion: string;
-  evalEnabledByDay: Record<SimulationEvalDayKey, boolean>;
+export type SimulationPromptOverrideKey =
+  | 'prestart'
+  | 'codespace'
+  | 'day1'
+  | 'day23'
+  | 'day4'
+  | 'day5'
+  | 'fitProfile';
+
+export type SimulationPromptOverrideField = 'instructionsMd' | 'rubricMd';
+
+export type SimulationAgentPromptOverride = {
+  instructionsMd?: string | null;
+  rubricMd?: string | null;
 };
+
+export type SimulationPromptOverrides = Partial<
+  Record<SimulationPromptOverrideKey, SimulationAgentPromptOverride | null>
+>;
+
+export type SimulationAiConfig = {
+  noticeVersion: string;
+  noticeText?: string | null;
+  evalEnabledByDay: Record<SimulationEvalDayKey, boolean>;
+  promptOverrides?: SimulationPromptOverrides | null;
+  promptPackVersion?: string | null;
+  changesPendingRegeneration?: boolean | null;
+  activeScenarioSnapshot?: SimulationAiScenarioSnapshot | null;
+  pendingScenarioSnapshot?: SimulationAiScenarioSnapshot | null;
+};
+
+export type SimulationAiConfigInput = SimulationAiConfig;
 
 export type SimulationCompanyContextInput = {
   domain?: string;
@@ -59,6 +87,30 @@ export type CreateSimulationResponse = {
   message?: string;
   details?: unknown;
   id: string;
+};
+
+export type CompanyAiConfig = {
+  companyId: number;
+  companyName: string;
+  promptPackVersion: string;
+  promptOverrides: SimulationPromptOverrides | null;
+};
+
+export type SimulationAiAgentRuntimeSummary = {
+  key: SimulationPromptOverrideKey | string;
+  provider?: string | null;
+  model?: string | null;
+  runtimeMode?: string | null;
+  promptVersion?: string | null;
+  rubricVersion?: string | null;
+};
+
+export type SimulationAiScenarioSnapshot = {
+  scenarioVersionId: number;
+  snapshotDigest?: string | null;
+  promptPackVersion?: string | null;
+  bundleStatus?: string | null;
+  agents?: SimulationAiAgentRuntimeSummary[] | null;
 };
 
 export type ResendInviteResult = {

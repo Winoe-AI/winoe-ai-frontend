@@ -57,9 +57,12 @@ describe('bff upstreamRequest abort/timeout/budget behavior', () => {
   it('throws when maxTotalTimeMs budget is exceeded', async () => {
     jest.useFakeTimers({ advanceTimers: true });
     const bad = new Response('bad', { status: 502 });
-    (bad as unknown as { body?: { cancel?: () => Promise<void> } }).body = {
-      cancel: jest.fn().mockResolvedValue(undefined),
-    };
+    Object.defineProperty(bad, 'body', {
+      configurable: true,
+      value: {
+        cancel: jest.fn().mockResolvedValue(undefined),
+      },
+    });
     global.fetch = jest
       .fn()
       .mockResolvedValue(bad as unknown as Response) as unknown as typeof fetch;
@@ -80,9 +83,12 @@ describe('bff upstreamRequest abort/timeout/budget behavior', () => {
     jest.useFakeTimers({ advanceTimers: true });
     const controller = new AbortController();
     const bad = new Response('bad', { status: 503 });
-    (bad as unknown as { body?: { cancel?: () => Promise<void> } }).body = {
-      cancel: jest.fn().mockResolvedValue(undefined),
-    };
+    Object.defineProperty(bad, 'body', {
+      configurable: true,
+      value: {
+        cancel: jest.fn().mockResolvedValue(undefined),
+      },
+    });
     global.fetch = jest
       .fn()
       .mockResolvedValue(bad as unknown as Response) as unknown as typeof fetch;

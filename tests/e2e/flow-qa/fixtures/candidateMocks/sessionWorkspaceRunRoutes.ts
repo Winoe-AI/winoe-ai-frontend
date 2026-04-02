@@ -15,7 +15,6 @@ export async function handleSessionWorkspaceRunRoute(
 ) {
   if (pathname.endsWith('/codespace/status') && method === 'GET') {
     await fulfillJson(route, {
-      repoUrl: 'https://github.com/tenon-ai/candidate-repo',
       repoName: 'candidate-repo',
       repoFullName: 'tenon-ai/candidate-repo',
       codespaceUrl: 'https://github.com/codespaces/qa-e2e',
@@ -26,7 +25,6 @@ export async function handleSessionWorkspaceRunRoute(
   }
   if (pathname.endsWith('/codespace/init') && method === 'POST') {
     await fulfillJson(route, {
-      repoUrl: 'https://github.com/tenon-ai/candidate-repo',
       repoName: 'candidate-repo',
       repoFullName: 'tenon-ai/candidate-repo',
       codespaceUrl: 'https://github.com/codespaces/qa-e2e',

@@ -1,4 +1,5 @@
 import { useReducer } from 'react';
+import { useOptionalCandidateSession } from '@/features/candidate/session/state/context';
 import type { WindowActionGate } from '@/features/candidate/session/lib/windowState';
 import type { Task } from '../types';
 import { DEFAULT_NOTICE_VERSION } from './panelConstants';
@@ -23,6 +24,8 @@ export function useHandoffUploadController({
   actionGate,
   onTaskWindowClosed,
 }: UseHandoffUploadControllerArgs) {
+  const session = useOptionalCandidateSession();
+  const bootstrap = session?.state.bootstrap ?? null;
   const [state, dispatch] = useReducer(
     handoffUploadReducer,
     initialHandoffUploadState,
@@ -34,7 +37,13 @@ export function useHandoffUploadController({
     state.windowClosedMessage ??
     actionGate.disabledReason ??
     'This day is currently closed outside the scheduled window.';
-  const aiNoticeVersion = state.aiNoticeVersion ?? DEFAULT_NOTICE_VERSION;
+  const aiNoticeVersion =
+    bootstrap?.aiNoticeVersion ??
+    state.aiNoticeVersion ??
+    DEFAULT_NOTICE_VERSION;
+  const aiNoticeEnabledByDay =
+    bootstrap?.evalEnabledByDay?.[String(task.dayIndex)] !== false;
+  const aiNoticeText = bootstrap?.aiNoticeText ?? null;
 
   const { refreshStatus } = useHandoffStatusSync({
     candidateSessionId,
@@ -74,6 +83,9 @@ export function useHandoffUploadController({
     windowClosed,
     windowClosedMessage,
     ...derived,
+    aiNoticeText,
+    aiNoticeVersion,
+    aiNoticeEnabled: aiNoticeEnabledByDay && derived.aiNoticeEnabled,
     refreshStatus,
   };
 }

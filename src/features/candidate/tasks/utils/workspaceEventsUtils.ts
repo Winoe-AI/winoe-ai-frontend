@@ -8,7 +8,7 @@ type CodespaceFallbackShownEvent = {
   taskId: number;
   availability: CodespaceAvailability | null;
   reason: CodespaceFallbackReason | null;
-  hasRepoUrl: boolean;
+  hasWorkspaceIdentity: boolean;
 };
 
 export function logCodespaceFallbackShown(event: CodespaceFallbackShownEvent) {

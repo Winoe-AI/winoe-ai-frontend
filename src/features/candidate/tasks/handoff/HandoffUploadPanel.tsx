@@ -60,6 +60,7 @@ export function HandoffUploadPanel({
         {controller.aiNoticeEnabled ? (
           <AiNoticeCard
             version={controller.aiNoticeVersion}
+            noticeText={controller.aiNoticeText}
             summaryUrl={controller.aiNoticeSummaryUrl}
             compact
           />

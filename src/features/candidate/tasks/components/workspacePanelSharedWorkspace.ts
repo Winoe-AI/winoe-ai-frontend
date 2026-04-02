@@ -14,7 +14,6 @@ export function resolveSharedWorkspace(
   return {
     repoFullName: codingWorkspace.repoFullName,
     repoName: codingWorkspace.repoName,
-    repoUrl: codingWorkspace.repoUrl,
     codespaceUrl: codingWorkspace.codespaceUrl,
   };
 }

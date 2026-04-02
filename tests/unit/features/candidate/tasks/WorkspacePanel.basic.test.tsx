@@ -13,18 +13,14 @@ describe('WorkspacePanel basic states', () => {
     resetWorkspacePanelMocks();
   });
 
-  it('renders ready state with repo and codespace links', async () => {
+  it('renders ready state with repo identity and codespace link', async () => {
     getStatusMock.mockResolvedValue({
-      repoUrl: 'https://github.com/tenon/repo',
       repoName: 'repo',
       codespaceUrl: 'https://codespaces.com/open',
     });
     renderPanel();
     expect(await screen.findByText(/Workspace is ready/i)).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /Repo URL/i })).toHaveAttribute(
-      'href',
-      'https://github.com/tenon/repo',
-    );
+    expect(screen.getByText(/Repo: repo/i)).toBeInTheDocument();
     expect(
       screen.getByRole('link', { name: /Open Codespace/i }),
     ).toHaveAttribute('href', 'https://codespaces.com/open');
@@ -35,7 +31,6 @@ describe('WorkspacePanel basic states', () => {
       Object.assign(new Error('missing'), { status: 404 }),
     );
     initWorkspaceMock.mockResolvedValue({
-      repoUrl: 'http://repo',
       repoName: 'repo',
       codespaceUrl: null,
     });
@@ -75,7 +70,6 @@ describe('WorkspacePanel basic states', () => {
 
   it('refreshes workspace and emits success toast', async () => {
     getStatusMock.mockResolvedValue({
-      repoUrl: 'http://repo',
       repoName: 'repo',
       codespaceUrl: 'http://codespace',
     });

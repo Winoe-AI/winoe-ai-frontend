@@ -34,8 +34,8 @@ describe('RecruiterSimulationDetailPage - plan rendering', () => {
     expect(
       screen.getAllByText(/AI Evaluation: Enabled/i).length,
     ).toBeGreaterThan(0);
-    expect(await screen.findByText(/Day 4/i)).toBeInTheDocument();
-    expect(await screen.findByText(/Day 5/i)).toBeInTheDocument();
+    expect((await screen.findAllByText(/Day 4/i)).length).toBeGreaterThan(0);
+    expect((await screen.findAllByText(/Day 5/i)).length).toBeGreaterThan(0);
     expect(
       (await screen.findAllByText(/Not generated yet/i)).length,
     ).toBeGreaterThanOrEqual(2);

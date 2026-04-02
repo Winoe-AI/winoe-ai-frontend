@@ -1,4 +1,5 @@
 import type { CreateSimulationInput } from '@/features/recruiter/api/typesApi';
+import { buildPromptOverridePayload } from '@/features/recruiter/ai/promptOverrideFormUtils';
 import {
   AI_DAY_FIELD_MAP,
   AI_DAY_KEYS,
@@ -11,6 +12,7 @@ export function buildSimulationCreatePayload(
   const trimmedDomain = values.companyDomain.trim();
   const trimmedProductArea = values.companyProductArea.trim();
   const trimmedFocus = values.focus.trim();
+  const promptOverrides = buildPromptOverridePayload(values.promptOverrides);
   const evalEnabledByDay = AI_DAY_KEYS.reduce<
     NonNullable<CreateSimulationInput['ai']>['evalEnabledByDay']
   >(
@@ -38,6 +40,7 @@ export function buildSimulationCreatePayload(
     ai: {
       noticeVersion: values.noticeVersion.trim(),
       evalEnabledByDay,
+      ...(promptOverrides ? { promptOverrides } : {}),
     },
   };
 }

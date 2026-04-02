@@ -13,7 +13,6 @@ describe('WorkspaceAndTests', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     getStatusMock.mockResolvedValue({
-      repoUrl: 'https://github.com/acme/repo',
       repoName: 'acme/repo',
       codespaceUrl: 'https://codespaces.new/acme/repo',
     });
@@ -60,9 +59,8 @@ describe('WorkspaceAndTests', () => {
     expect(
       screen.getByText(/Evaluation is based on the commit shown below/i),
     ).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /abc123def456/i })).toHaveAttribute(
-      'href',
-      'https://github.com/acme/repo/commit/abc123def456',
+    expect(
+      screen.getByLabelText(/Cutoff commit SHA abc123def456/i),
     );
     expect(
       screen.getAllByText(

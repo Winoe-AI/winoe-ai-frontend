@@ -3,6 +3,7 @@ import type {
   AiEvalDayFieldKey,
   FieldErrors,
   FormValues,
+  PromptOverrideChange,
 } from '../utils/createFormConfigUtils';
 import { SimulationAiConfigSection } from './SimulationAiConfigSection';
 import { SimulationCompanyContextFields } from './SimulationCompanyContextFields';
@@ -16,6 +17,7 @@ type Props = {
   isSubmitting: boolean;
   seniorityOptions: CreateSimulationInput['seniority'][];
   onChange: <K extends keyof FormValues>(key: K, value: FormValues[K]) => void;
+  onPromptOverrideChange: PromptOverrideChange;
 };
 
 export function SimulationCreateOptions({
@@ -24,6 +26,7 @@ export function SimulationCreateOptions({
   isSubmitting,
   seniorityOptions,
   onChange,
+  onPromptOverrideChange,
 }: Props) {
   return (
     <>
@@ -57,6 +60,7 @@ export function SimulationCreateOptions({
         errors={errors}
         isSubmitting={isSubmitting}
         onChange={(key: AiEvalDayFieldKey, value) => onChange(key, value)}
+        onPromptOverrideChange={onPromptOverrideChange}
       />
     </>
   );

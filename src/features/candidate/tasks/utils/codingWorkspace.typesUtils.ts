@@ -10,7 +10,6 @@ export type CodingWorkspaceSnapshot = {
 export type CodingWorkspace = {
   repoFullName: string | null;
   repoName: string | null;
-  repoUrl: string | null;
   codespaceUrl: string | null;
   isInitialized: boolean;
   error: string | null;

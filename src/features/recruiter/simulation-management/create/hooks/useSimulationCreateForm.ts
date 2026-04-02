@@ -1,5 +1,9 @@
 import { useState } from 'react';
 import { createSimulation } from '@/features/recruiter/api';
+import type {
+  SimulationPromptOverrideField,
+  SimulationPromptOverrideKey,
+} from '@/features/recruiter/api';
 import { toUserMessage } from '@/platform/errors/errors';
 import {
   SENIORITY_OPTIONS,
@@ -21,6 +25,23 @@ export function useSimulationCreateForm(onSuccess: (id: string) => void) {
     value: FormValues[K],
   ) => {
     setValues((prev) => ({ ...prev, [key]: value }));
+  };
+
+  const setPromptOverride = (
+    key: SimulationPromptOverrideKey,
+    field: SimulationPromptOverrideField,
+    value: string,
+  ) => {
+    setValues((prev) => ({
+      ...prev,
+      promptOverrides: {
+        ...prev.promptOverrides,
+        [key]: {
+          ...prev.promptOverrides[key],
+          [field]: value,
+        },
+      },
+    }));
   };
 
   const handleSubmit = async (e?: React.FormEvent<HTMLFormElement>) => {
@@ -63,6 +84,7 @@ export function useSimulationCreateForm(onSuccess: (id: string) => void) {
     errors,
     isSubmitting,
     setField,
+    setPromptOverride,
     handleSubmit,
     seniorityOptions: SENIORITY_OPTIONS,
   };

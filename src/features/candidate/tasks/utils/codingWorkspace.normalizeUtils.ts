@@ -6,23 +6,6 @@ export function trimOrNull(value: unknown): string | null {
   return trimmed.length > 0 ? trimmed : null;
 }
 
-function normalizeRepoFromUrl(url: string | null): string | null {
-  if (!url) return null;
-  try {
-    const parsed = new URL(url);
-    const host = parsed.hostname.toLowerCase();
-    if (host !== 'github.com' && host !== 'www.github.com') return null;
-    const parts = parsed.pathname
-      .split('/')
-      .map((part) => part.trim())
-      .filter(Boolean);
-    if (parts.length < 2) return null;
-    return `${parts[0]}/${parts[1]}`.toLowerCase();
-  } catch {
-    return null;
-  }
-}
-
 export function normalizeRepoName(
   workspace: CandidateWorkspaceStatus | null,
 ): string | null {
@@ -30,8 +13,6 @@ export function normalizeRepoName(
   const fromFullName = trimOrNull(workspace.repoFullName);
   if (fromFullName && fromFullName.includes('/'))
     return fromFullName.toLowerCase();
-  const fromRepoUrl = normalizeRepoFromUrl(trimOrNull(workspace.repoUrl));
-  if (fromRepoUrl) return fromRepoUrl;
   const fromRepoName = trimOrNull(workspace.repoName);
   if (fromRepoName && fromRepoName.includes('/'))
     return fromRepoName.toLowerCase();

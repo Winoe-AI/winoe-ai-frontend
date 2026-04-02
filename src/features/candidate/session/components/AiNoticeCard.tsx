@@ -2,6 +2,7 @@ type AiNoticeCardProps = {
   className?: string;
   version?: string | null;
   summaryUrl?: string | null;
+  noticeText?: string | null;
   headline?: string;
   bullets?: string[];
   compact?: boolean;
@@ -20,12 +21,21 @@ export function AiNoticeCard({
   className,
   version,
   summaryUrl,
+  noticeText,
   headline = DEFAULT_HEADLINE,
   bullets = DEFAULT_BULLETS,
   compact = false,
 }: AiNoticeCardProps) {
   const href = (summaryUrl ?? '').trim() || DEFAULT_SUMMARY_URL;
   const noticeVersion = (version ?? '').trim() || DEFAULT_VERSION;
+  const textLines = (noticeText ?? '')
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean);
+  const contentItems =
+    textLines.length > 0
+      ? textLines.slice(0, compact ? 2 : 4)
+      : bullets.slice(0, compact ? 2 : 4);
 
   return (
     <div
@@ -42,11 +52,19 @@ export function AiNoticeCard({
           Notice {noticeVersion}
         </span>
       </div>
-      <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-700">
-        {bullets.slice(0, compact ? 2 : 4).map((item, idx) => (
-          <li key={`${item}-${String(idx)}`}>{item}</li>
-        ))}
-      </ul>
+      {textLines.length > 0 ? (
+        <div className="mt-2 space-y-1 text-sm text-slate-700">
+          {contentItems.map((item, idx) => (
+            <p key={`${item}-${String(idx)}`}>{item}</p>
+          ))}
+        </div>
+      ) : (
+        <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-700">
+          {contentItems.map((item, idx) => (
+            <li key={`${item}-${String(idx)}`}>{item}</li>
+          ))}
+        </ul>
+      )}
       <a
         className="mt-2 inline-block text-sm text-blue-700 underline"
         href={href}

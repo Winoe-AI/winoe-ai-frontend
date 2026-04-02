@@ -1,4 +1,5 @@
 import type { ScenarioPatchPayload } from '@/features/recruiter/api/simulationLifecycleApi';
+import type { SimulationAiConfig } from '@/features/recruiter/api';
 import type { CandidateSession } from '@/features/recruiter/types';
 import type { RowState } from '../hooks/useTypes';
 import type { ScenarioEditorDraft } from '../scenario';
@@ -63,6 +64,7 @@ export type SimulationDetailViewProps = {
   levelLabel: string;
   focusLabel: string;
   companyContextLabel: string;
+  aiConfig: SimulationAiConfig | null;
   scenarioLabel: string | null;
   rubricSummary: string | null;
   scenarioContentUnavailableMessageForPlan: string | null;

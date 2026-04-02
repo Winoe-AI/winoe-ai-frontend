@@ -8,7 +8,6 @@ export function isWorkspaceInitialized(
   return Boolean(
     trimOrNull(workspace.repoFullName) ||
     trimOrNull(workspace.repoName) ||
-    trimOrNull(workspace.repoUrl) ||
     trimOrNull(workspace.codespaceUrl),
   );
 }
@@ -29,8 +28,6 @@ export function mergeWorkspaceStatus(
       null,
     repoName:
       trimOrNull(primary.repoName) ?? trimOrNull(secondary?.repoName) ?? null,
-    repoUrl:
-      trimOrNull(primary.repoUrl) ?? trimOrNull(secondary?.repoUrl) ?? null,
     codespaceUrl:
       trimOrNull(primary.codespaceUrl) ??
       trimOrNull(secondary?.codespaceUrl) ??
@@ -47,7 +44,6 @@ export function areWorkspaceStatusesEqual(
   return (
     trimOrNull(left.repoFullName) === trimOrNull(right.repoFullName) &&
     trimOrNull(left.repoName) === trimOrNull(right.repoName) &&
-    trimOrNull(left.repoUrl) === trimOrNull(right.repoUrl) &&
     trimOrNull(left.codespaceUrl) === trimOrNull(right.codespaceUrl)
   );
 }

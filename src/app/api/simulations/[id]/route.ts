@@ -23,3 +23,25 @@ export async function GET(
       }),
   );
 }
+
+export async function PUT(
+  req: NextRequest,
+  context: { params: Promise<{ id: string }> },
+) {
+  const { id } = await context.params;
+  const body = await req.json().catch(() => null);
+
+  return withRecruiterAuth(
+    req,
+    { tag: 'simulations-update', requirePermission: 'recruiter:access' },
+    async (auth) =>
+      forwardJson({
+        path: `/api/simulations/${encodeURIComponent(id)}`,
+        method: 'PUT',
+        cache: 'no-store',
+        ...(body === null ? {} : { body }),
+        accessToken: auth.accessToken,
+        requestId: auth.requestId,
+      }),
+  );
+}

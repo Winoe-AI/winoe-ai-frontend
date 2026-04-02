@@ -11,7 +11,7 @@ type UseWorkspaceFallbackLoggingArgs = {
   taskId: number;
   codespaceAvailability: CodespaceAvailability | null;
   codespaceFallbackReason: CodespaceFallbackReason | null;
-  hasRepoUrl: boolean;
+  hasWorkspaceIdentity: boolean;
 };
 
 export function useWorkspaceFallbackLogging({
@@ -20,7 +20,7 @@ export function useWorkspaceFallbackLogging({
   taskId,
   codespaceAvailability,
   codespaceFallbackReason,
-  hasRepoUrl,
+  hasWorkspaceIdentity,
 }: UseWorkspaceFallbackLoggingArgs) {
   const fallbackLoggedRef = useRef(false);
 
@@ -36,13 +36,13 @@ export function useWorkspaceFallbackLogging({
       taskId,
       availability: codespaceAvailability,
       reason: codespaceFallbackReason,
-      hasRepoUrl,
+      hasWorkspaceIdentity,
     });
   }, [
     codespaceAvailability,
     codespaceFallbackReason,
     dayIndex,
-    hasRepoUrl,
+    hasWorkspaceIdentity,
     shouldShowFallback,
     taskId,
   ]);

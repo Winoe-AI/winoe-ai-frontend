@@ -24,6 +24,11 @@ jest.mock('@testing-library/react', () => {
     }: {
       children: React.ReactNode;
     }) {
+      ReactActual.useEffect(() => {
+        return () => {
+          client.clear();
+        };
+      }, []);
       const content = wrapper
         ? ReactActual.createElement(wrapper, null, children)
         : children;

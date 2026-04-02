@@ -14,4 +14,5 @@ export type {
   FieldErrors,
   FormFieldKey,
   FormValues,
+  PromptOverrideChange,
 } from './createFormConfig.typesUtils';

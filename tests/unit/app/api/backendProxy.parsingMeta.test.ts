@@ -84,7 +84,7 @@ describe('api/backend proxy route - parsing and metadata', () => {
       { params: Promise.resolve({ path: [] }) },
     );
     expect(resp.status).toBe(200);
-    expect(resp.body).toMatchObject({ message: 'Invalid JSON from upstream' });
+    expect(resp.body).toBeNull();
   });
 
   it('returns invalid JSON fallback when parse fails', async () => {

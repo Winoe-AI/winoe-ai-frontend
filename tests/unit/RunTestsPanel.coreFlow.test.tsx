@@ -34,7 +34,9 @@ describe('RunTestsPanel - core flow', () => {
     );
     await user.click(getTestsButton());
     expect(onStart).toHaveBeenCalledTimes(1);
-    expect(await screen.findByText(/Preparing test run/i)).toBeInTheDocument();
+    expect(await screen.findByRole('status')).toHaveTextContent(
+      /Tests are running/i,
+    );
     expect(
       (
         await screen.findByRole('button', { name: /Running tests/i })

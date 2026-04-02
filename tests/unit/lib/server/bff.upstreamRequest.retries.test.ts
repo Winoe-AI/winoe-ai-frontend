@@ -15,9 +15,12 @@ describe('bff upstreamRequest retry behavior', () => {
 
   it('retries on retryable status and annotates attempts meta', async () => {
     const bad = new Response('bad', { status: 502 });
-    (bad as unknown as { body?: { cancel?: () => Promise<void> } }).body = {
-      cancel: jest.fn().mockResolvedValue(undefined),
-    };
+    Object.defineProperty(bad, 'body', {
+      configurable: true,
+      value: {
+        cancel: jest.fn().mockResolvedValue(undefined),
+      },
+    });
     const good = new Response(JSON.stringify({ ok: true }), {
       status: 200,
       headers: { 'content-type': 'application/json' },
@@ -79,7 +82,10 @@ describe('bff upstreamRequest retry behavior', () => {
 
   it('falls back to arrayBuffer cleanup when body.cancel is unavailable', async () => {
     const bad = new Response('bad', { status: 503 });
-    (bad as unknown as { body?: unknown }).body = undefined;
+    Object.defineProperty(bad, 'body', {
+      configurable: true,
+      value: undefined,
+    });
     const arrayBufferMock = jest.fn().mockResolvedValue(new ArrayBuffer(0));
     (
       bad as unknown as { arrayBuffer: () => Promise<ArrayBuffer> }

@@ -38,7 +38,6 @@ export type CandidateTaskSubmitResponse = {
 };
 
 export type CandidateWorkspaceStatus = {
-  repoUrl: string | null;
   repoName: string | null;
   repoFullName: string | null;
   codespaceUrl: string | null;

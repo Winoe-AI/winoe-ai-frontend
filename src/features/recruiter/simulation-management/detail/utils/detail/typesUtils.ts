@@ -1,3 +1,4 @@
+import type { SimulationAiConfig } from '@/features/recruiter/api';
 import type { SimulationEvalEnabledByDay } from '@/features/recruiter/api/simulationAiEvalApi';
 import type { SimulationPlan } from '../plan';
 
@@ -45,6 +46,7 @@ export type SimulationDetailPreview = {
   rubricSummary: string | null;
   level: string | null;
   companyContext: string | null;
+  aiConfig: SimulationAiConfig;
   aiEvaluationEnabledByDay: SimulationEvalEnabledByDay;
   generationJob: SimulationGenerationJob | null;
   hasJobFailure: boolean;

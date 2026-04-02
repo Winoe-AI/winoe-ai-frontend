@@ -1,7 +1,9 @@
+import { PromptOverrideEditors } from '@/features/recruiter/ai/PromptOverrideEditors';
 import type {
   AiEvalDayFieldKey,
   FieldErrors,
   FormValues,
+  PromptOverrideChange,
 } from '../utils/createFormConfigUtils';
 import { SimulationFieldError } from './SimulationFieldError';
 
@@ -10,6 +12,7 @@ type Props = {
   errors: FieldErrors;
   isSubmitting: boolean;
   onChange: (key: AiEvalDayFieldKey, value: boolean) => void;
+  onPromptOverrideChange: PromptOverrideChange;
 };
 
 const evalDayToggles: Array<{ day: string; key: AiEvalDayFieldKey }> = [
@@ -25,6 +28,7 @@ export function SimulationAiConfigSection({
   errors,
   isSubmitting,
   onChange,
+  onPromptOverrideChange,
 }: Props) {
   return (
     <section className="rounded border border-gray-200 p-4">
@@ -74,6 +78,35 @@ export function SimulationAiConfigSection({
           />
         ))}
       </fieldset>
+
+      <div className="mt-4">
+        <div>
+          <h3 className="text-xs font-medium uppercase tracking-wide text-gray-500">
+            Prompt and rubric overrides
+          </h3>
+          <p className="mt-1 text-xs text-gray-500">
+            Leave fields blank to inherit the company default or the versioned
+            base prompt pack.
+          </p>
+        </div>
+        <SimulationFieldError
+          id="promptOverrides-error"
+          message={errors.promptOverrides}
+        />
+        <div
+          className="mt-3"
+          aria-invalid={Boolean(errors.promptOverrides)}
+          aria-describedby={
+            errors.promptOverrides ? 'promptOverrides-error' : undefined
+          }
+        >
+          <PromptOverrideEditors
+            values={values.promptOverrides}
+            disabled={isSubmitting}
+            onChange={onPromptOverrideChange}
+          />
+        </div>
+      </div>
     </section>
   );
 }

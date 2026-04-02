@@ -15,17 +15,14 @@ describe('WorkspacePanel refresh and provisioning states', () => {
   it('refreshes workspace status on demand', async () => {
     const user = userEvent.setup();
     statusMock.mockResolvedValueOnce({
-      repoUrl: null,
       repoName: null,
       codespaceUrl: null,
     });
     initMock.mockResolvedValueOnce({
-      repoUrl: 'https://github.com/acme/repo',
       repoName: 'acme/repo',
       codespaceUrl: null,
     });
     statusMock.mockResolvedValueOnce({
-      repoUrl: 'https://github.com/acme/repo',
       repoName: 'acme/repo',
       codespaceUrl: null,
     });
@@ -55,12 +52,10 @@ describe('WorkspacePanel refresh and provisioning states', () => {
 
     resetWorkspacePanelMocks();
     statusMock.mockResolvedValueOnce({
-      repoUrl: null,
       repoName: null,
       codespaceUrl: null,
     });
     initMock.mockResolvedValueOnce({
-      repoUrl: null,
       repoName: null,
       codespaceUrl: null,
     });
@@ -73,7 +68,6 @@ describe('WorkspacePanel refresh and provisioning states', () => {
   it('does not double initialize after a 404 init attempt', async () => {
     statusMock.mockRejectedValueOnce({ status: 404 });
     initMock.mockResolvedValueOnce({
-      repoUrl: 'https://github.com/acme/repo',
       repoName: 'acme/repo',
       codespaceUrl: null,
     });
@@ -91,12 +85,10 @@ describe('WorkspacePanel refresh and provisioning states', () => {
 
   it('shows codespace pending message when no links are available', async () => {
     statusMock.mockResolvedValueOnce({
-      repoUrl: null,
       repoName: null,
       codespaceUrl: null,
     });
     initMock.mockResolvedValueOnce({
-      repoUrl: null,
       repoName: null,
       codespaceUrl: null,
     });

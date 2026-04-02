@@ -1,3 +1,4 @@
+import type { SimulationAiConfig } from '@/features/recruiter/api';
 import type { SimulationDetailViewProps } from '../components/types';
 import type { useSimulationLabels } from '../hooks/useSimulationLabels';
 import type { useSimulationDetailCandidates } from './hooks/useSimulationDetailCandidates';
@@ -22,6 +23,7 @@ type BuildSimulationDetailViewPropsArgs = {
   scenario: ReturnType<typeof useSimulationScenarioVersions>;
   scenarioActions: ReturnType<typeof useSimulationScenarioActions>;
   labels: ReturnType<typeof useSimulationLabels>;
+  aiConfig: SimulationAiConfig | null;
   approveButtonLabel: string;
   planLoading: boolean;
   planStatusCode: number | null;
@@ -48,6 +50,7 @@ export function buildSimulationDetailViewProps({
   scenario,
   scenarioActions,
   labels,
+  aiConfig,
   approveButtonLabel,
   planLoading,
   planStatusCode,
@@ -87,6 +90,7 @@ export function buildSimulationDetailViewProps({
     setTerminateModalOpen,
     onTerminate,
     cleanupJobIds,
+    aiConfig,
     ...scenarioProps,
     ...candidateProps,
   };

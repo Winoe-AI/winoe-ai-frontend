@@ -30,6 +30,7 @@ export default function SimulationCreatePage() {
         isSubmitting={form.isSubmitting}
         seniorityOptions={form.seniorityOptions}
         onChange={form.setField}
+        onPromptOverrideChange={form.setPromptOverride}
         onSubmit={form.handleSubmit}
         onCancel={() => router.push('/dashboard')}
       />

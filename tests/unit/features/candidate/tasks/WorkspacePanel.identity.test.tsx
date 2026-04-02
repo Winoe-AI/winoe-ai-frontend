@@ -13,7 +13,6 @@ describe('WorkspacePanel shared identity behavior', () => {
   it('reports day-specific workspace snapshots for shared normalization', async () => {
     const onCodingWorkspaceSnapshot = jest.fn();
     getStatusMock.mockResolvedValue({
-      repoUrl: 'https://github.com/acme/shared',
       repoName: 'acme/shared',
       repoFullName: 'acme/shared',
       codespaceUrl: 'https://codespaces.new/acme/shared',
@@ -28,14 +27,12 @@ describe('WorkspacePanel shared identity behavior', () => {
 
   it('keeps shared workspace identity across day transitions', async () => {
     getStatusMock.mockResolvedValue({
-      repoUrl: 'https://github.com/local/day2-only',
       repoName: 'day2-only',
       codespaceUrl: null,
     });
     const sharedWorkspace = {
       repoFullName: 'acme/unified-workspace',
       repoName: 'acme/unified-workspace',
-      repoUrl: 'https://github.com/acme/unified-workspace',
       codespaceUrl: 'https://codespaces.new/acme/unified-workspace',
       isInitialized: true,
       error: null,
@@ -57,7 +54,6 @@ describe('WorkspacePanel shared identity behavior', () => {
 
   it('renders explicit inconsistency error when day identities conflict', async () => {
     getStatusMock.mockResolvedValue({
-      repoUrl: 'https://github.com/acme/day3',
       repoName: 'acme/day3',
       codespaceUrl: 'https://codespaces.new/acme/day3',
     });
@@ -66,7 +62,6 @@ describe('WorkspacePanel shared identity behavior', () => {
       codingWorkspace: {
         repoFullName: null,
         repoName: null,
-        repoUrl: null,
         codespaceUrl: null,
         isInitialized: false,
         error:

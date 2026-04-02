@@ -3,7 +3,7 @@ import type { CandidateWorkspaceStatus } from '@/features/candidate/session/api'
 export function buildWorkspaceMessage(
   workspace: CandidateWorkspaceStatus | null,
 ): string {
-  const repoReady = Boolean(workspace?.repoUrl || workspace?.repoName);
+  const repoReady = Boolean(workspace?.repoFullName || workspace?.repoName);
   const codespaceReady = Boolean(workspace?.codespaceUrl);
 
   if (!repoReady && !codespaceReady) {
