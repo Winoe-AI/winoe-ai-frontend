@@ -65,8 +65,8 @@ describe('CandidateSessionPage view - resources and retry banner', () => {
     await act(async () => render(<CandidateSessionPage token="inv" />));
     await waitFor(() =>
       expect(
-        screen.getByTestId('resource-day-5-reflection'),
-      ).toBeInTheDocument(),
+        screen.getAllByTestId('resource-day-5-reflection-essay').length,
+      ).toBeGreaterThan(0),
     );
   });
 

@@ -1,3 +1,5 @@
+import { useMemo } from 'react';
+import { useOptionalCandidateSession } from '../state/context';
 import { AiNoticeCard } from '../components/AiNoticeCard';
 import { SchedulingConfirmStep } from './SchedulingConfirmStep';
 import { SchedulingFormStep } from './SchedulingFormStep';
@@ -12,6 +14,15 @@ export function SchedulingView({
   onScheduleRetry,
   ...rest
 }: SchedulingViewProps) {
+  const bootstrap = useOptionalCandidateSession()?.state.bootstrap ?? null;
+  const showAiNotice = useMemo(
+    () =>
+      bootstrap
+        ? Object.values(bootstrap.evalEnabledByDay ?? {}).some(Boolean)
+        : true,
+    [bootstrap],
+  );
+
   return (
     <div className="mx-auto max-w-3xl space-y-5 p-6">
       <div>
@@ -23,7 +34,13 @@ export function SchedulingView({
         </p>
       </div>
 
-      <AiNoticeCard compact />
+      {showAiNotice ? (
+        <AiNoticeCard
+          compact
+          version={bootstrap?.aiNoticeVersion}
+          noticeText={bootstrap?.aiNoticeText}
+        />
+      ) : null}
       <SchedulingSubmitErrorBanner
         scheduleSubmitError={scheduleSubmitError}
         onScheduleRetry={onScheduleRetry}

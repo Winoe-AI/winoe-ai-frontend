@@ -48,12 +48,11 @@ export function useWorkspacePanelData(props: WorkspacePanelProps) {
     taskId: props.taskId,
     codespaceAvailability: status.codespaceAvailability,
     codespaceFallbackReason: status.codespaceFallbackReason,
-    hasRepoUrl: derived.hasRepoUrl,
+    hasWorkspaceIdentity: derived.hasWorkspaceIdentity,
   });
 
   const integrityCallout = props.integrityCallout ?? (
     <IntegrityCallout
-      repoUrl={derived.effectiveWorkspace?.repoUrl ?? null}
       codespaceUrl={derived.effectiveWorkspace?.codespaceUrl ?? null}
       cutoffCommitSha={derived.effectiveCutoffCommitSha}
       cutoffAt={derived.effectiveCutoffAt}
@@ -69,7 +68,6 @@ export function useWorkspacePanelData(props: WorkspacePanelProps) {
       shouldShowUnavailableFallbackState={
         derived.shouldShowUnavailableFallbackState
       }
-      repoUrl={derived.effectiveWorkspace?.repoUrl ?? null}
       repoFullName={
         derived.effectiveWorkspace?.repoFullName ??
         derived.effectiveWorkspace?.repoName ??

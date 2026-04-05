@@ -3,10 +3,9 @@ import userEvent from '@testing-library/user-event';
 import { CodespaceFallbackPanel } from '@/features/candidate/tasks/components/CodespaceFallbackPanel';
 
 describe('CodespaceFallbackPanel', () => {
-  it('renders repo clone guidance, commands, and integrity copy', () => {
+  it('renders codespace wait guidance and integrity copy', () => {
     render(
       <CodespaceFallbackPanel
-        repoUrl="https://github.com/acme/workspace-repo"
         repoFullName="acme/workspace-repo"
         errorState="unavailable"
         cutoffAt="2026-03-08T17:45:00.000Z"
@@ -15,7 +14,7 @@ describe('CodespaceFallbackPanel', () => {
 
     expect(
       screen.getByRole('heading', {
-        name: /Continue locally if Codespaces is unavailable/i,
+        name: /Shared Codespace still starting/i,
       }),
     ).toBeInTheDocument();
     expect(
@@ -24,28 +23,10 @@ describe('CodespaceFallbackPanel', () => {
       ),
     ).toBeInTheDocument();
     expect(
-      screen.getAllByText(/https:\/\/github\.com\/acme\/workspace-repo/i)
-        .length,
-    ).toBeGreaterThan(0);
-    expect(screen.getByText(/Clone the repo locally/i)).toBeInTheDocument();
-    expect(
-      screen.getByText(/Create a branch for your solution/i),
+      screen.getByText(/Workspace:\s*acme\/workspace-repo/i),
     ).toBeInTheDocument();
     expect(
-      screen.getByText(/Run tests locally before pushing/i),
-    ).toBeInTheDocument();
-    expect(
-      screen.getAllByText(/Push commits to the official repo before cutoff/i)
-        .length,
-    ).toBeGreaterThan(0);
-    expect(
-      screen.getByText(
-        /git clone https:\/\/github\.com\/acme\/workspace-repo/i,
-      ),
-    ).toBeInTheDocument();
-    expect(screen.getByText(/cd workspace-repo/i)).toBeInTheDocument();
-    expect(
-      screen.getByText(/git checkout -b my-solution/i),
+      screen.getByText(/Local clone instructions are intentionally disabled/i),
     ).toBeInTheDocument();
     expect(screen.getByText(/Cutoff time:/i)).toBeInTheDocument();
   });
@@ -56,7 +37,6 @@ describe('CodespaceFallbackPanel', () => {
 
     render(
       <CodespaceFallbackPanel
-        repoUrl="https://github.com/acme/workspace-repo"
         repoFullName="acme/workspace-repo"
         onRetry={onRetry}
       />,

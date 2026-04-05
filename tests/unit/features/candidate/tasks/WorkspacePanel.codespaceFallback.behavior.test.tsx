@@ -30,7 +30,7 @@ describe('WorkspacePanel codespace fallback behavior', () => {
     renderPanel();
     expect(
       await screen.findByRole('heading', {
-        name: /Codespaces unavailable, repo details still loading/i,
+        name: /Shared Codespace still starting/i,
       }),
     ).toBeInTheDocument();
     expect(
@@ -41,13 +41,11 @@ describe('WorkspacePanel codespace fallback behavior', () => {
   it('retries init from fallback and clears fallback once ready', async () => {
     getStatusMock
       .mockResolvedValueOnce({
-        repoUrl: null,
         repoName: null,
         repoFullName: null,
         codespaceUrl: null,
       })
       .mockResolvedValueOnce({
-        repoUrl: null,
         repoName: null,
         repoFullName: null,
         codespaceUrl: null,
@@ -60,7 +58,6 @@ describe('WorkspacePanel codespace fallback behavior', () => {
         }),
       )
       .mockResolvedValueOnce({
-        repoUrl: 'https://github.com/acme/repo',
         repoName: 'acme/repo',
         repoFullName: 'acme/repo',
         codespaceUrl: 'https://codespaces.new/acme/repo',
@@ -68,7 +65,7 @@ describe('WorkspacePanel codespace fallback behavior', () => {
     const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
     renderPanel({ taskId: 2, candidateSessionId: 3 });
     await screen.findByRole('heading', {
-      name: /Codespaces unavailable, repo details still loading/i,
+      name: /Shared Codespace still starting/i,
     });
     await user.click(screen.getByRole('button', { name: /Try again/i }));
     expect(
@@ -78,7 +75,6 @@ describe('WorkspacePanel codespace fallback behavior', () => {
 
   it('shows fallback after not_ready persists through poll threshold', async () => {
     getStatusMock.mockResolvedValue({
-      repoUrl: 'https://github.com/acme/repo',
       repoName: 'acme/repo',
       repoFullName: 'acme/repo',
       codespaceUrl: null,
@@ -88,7 +84,7 @@ describe('WorkspacePanel codespace fallback behavior', () => {
     await advancePollCycles(CODESPACE_NOT_READY_MAX_POLLS - 1);
     expect(
       await screen.findByRole('heading', {
-        name: /Continue locally if Codespaces is unavailable/i,
+        name: /Shared Codespace still starting/i,
       }),
     ).toBeInTheDocument();
   });
@@ -96,13 +92,11 @@ describe('WorkspacePanel codespace fallback behavior', () => {
   it('does not show fallback if ready arrives before threshold', async () => {
     getStatusMock
       .mockResolvedValueOnce({
-        repoUrl: 'https://github.com/acme/repo',
         repoName: 'acme/repo',
         repoFullName: 'acme/repo',
         codespaceUrl: null,
       })
       .mockResolvedValueOnce({
-        repoUrl: 'https://github.com/acme/repo',
         repoName: 'acme/repo',
         repoFullName: 'acme/repo',
         codespaceUrl: 'https://codespaces.new/acme/repo',

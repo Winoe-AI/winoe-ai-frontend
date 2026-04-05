@@ -53,15 +53,15 @@ describe('CandidateTaskView closed/read-only states', () => {
       },
     });
     await waitFor(() =>
-      expect(screen.getByText(/day closed/i)).toBeInTheDocument(),
+      expect(screen.getAllByText(/day closed/i)).toHaveLength(2),
     );
     expect(
-      screen.getByText(/no finalized reflection content is available/i),
+      screen.getByText(/no finalized submission is available for this day\./i),
     ).toBeInTheDocument();
     expect(screen.queryByRole('textbox')).toBeNull();
     expect(
-      screen.queryByRole('button', { name: /submit & continue/i }),
-    ).toBeNull();
+      screen.getByRole('button', { name: /submit & continue/i }),
+    ).toBeDisabled();
     expect(getCandidateTaskDraftMock).not.toHaveBeenCalled();
   });
 

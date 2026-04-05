@@ -28,7 +28,7 @@ describe('RecruiterSimulationDetailPage - candidate state rendering', () => {
       expect(screen.getByText(/No candidates yet/i)).toBeInTheDocument(),
     );
     expect(
-      screen.getByRole('button', { name: /Invite your first candidate/i }),
+      screen.getByRole('button', { name: /Invite candidate/i }),
     ).toBeInTheDocument();
   });
 

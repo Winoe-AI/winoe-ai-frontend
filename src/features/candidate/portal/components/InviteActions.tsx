@@ -17,7 +17,11 @@ export function InviteActions({
   const tokenAvailable = invite.token || fallbackToken;
   const disabled = !tokenAvailable || invite.isExpired;
   const label =
-    invite.status === 'not_started' ? 'Start simulation' : 'Continue';
+    invite.status === 'completed'
+      ? 'Review submissions'
+      : invite.status === 'not_started'
+        ? 'Start simulation'
+        : 'Continue';
 
   return (
     <Button

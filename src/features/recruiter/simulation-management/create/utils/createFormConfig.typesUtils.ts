@@ -1,7 +1,10 @@
 import type {
   CreateSimulationInput,
+  SimulationPromptOverrideField,
+  SimulationPromptOverrideKey,
   SimulationRoleLevel,
 } from '@/features/recruiter/api';
+import type { PromptOverrideFormValues } from '@/features/recruiter/ai/promptOverrideFormUtils';
 
 export type AiEvalDayFieldKey =
   | 'evalDay1'
@@ -20,6 +23,7 @@ export type FormFieldKey =
   | 'companyDomain'
   | 'companyProductArea'
   | 'noticeVersion'
+  | 'promptOverrides'
   | AiEvalDayFieldKey;
 
 export type FieldErrors = Partial<Record<FormFieldKey, string>> & {
@@ -36,9 +40,16 @@ export type FormValues = {
   companyDomain: string;
   companyProductArea: string;
   noticeVersion: string;
+  promptOverrides: PromptOverrideFormValues;
   evalDay1: boolean;
   evalDay2: boolean;
   evalDay3: boolean;
   evalDay4: boolean;
   evalDay5: boolean;
 };
+
+export type PromptOverrideChange = (
+  key: SimulationPromptOverrideKey,
+  field: SimulationPromptOverrideField,
+  value: string,
+) => void;

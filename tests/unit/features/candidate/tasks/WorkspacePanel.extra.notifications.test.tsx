@@ -46,7 +46,7 @@ describe('WorkspacePanel extra notifications and retry', () => {
     await screen.findByRole('button', { name: /Retry/i });
 
     getStatusMock.mockResolvedValueOnce({
-      repoUrl: 'http://repo',
+      repoName: 'repo',
       codespaceUrl: 'http://codespace',
     });
     await userEvent
@@ -60,7 +60,6 @@ describe('WorkspacePanel extra notifications and retry', () => {
       Object.assign(new Error('not found'), { status: 404 }),
     );
     initWorkspaceMock.mockResolvedValueOnce({
-      repoUrl: null,
       repoName: null,
       codespaceUrl: null,
     });
@@ -84,7 +83,7 @@ describe('WorkspacePanel extra notifications and retry', () => {
     await waitFor(() => expect(notifyMock).toHaveBeenCalledTimes(1));
 
     getStatusMock.mockResolvedValueOnce({
-      repoUrl: 'http://repo',
+      repoName: 'repo',
       codespaceUrl: 'http://codespace',
     });
     await userEvent

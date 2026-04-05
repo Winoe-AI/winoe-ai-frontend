@@ -186,7 +186,6 @@ export function makeCodespaceStatusPayload(
   overrides: Record<string, unknown> = {},
 ) {
   return {
-    repoUrl: 'https://github.com/tenon-ai/candidate-repo',
     repoName: 'candidate-repo',
     repoFullName: 'tenon-ai/candidate-repo',
     codespaceUrl: 'https://github.com/codespaces/qa-e2e',

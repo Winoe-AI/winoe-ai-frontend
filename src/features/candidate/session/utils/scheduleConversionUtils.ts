@@ -1,4 +1,5 @@
 import type { CandidateDayWindow } from '@/features/candidate/session/api';
+import { resolveNowMs } from '@/shared/time/now';
 import { getTimeZoneOffsetMs, isValidIanaTimezone } from './scheduleIntlUtils';
 
 const DEFAULT_START_HOUR = 9;
@@ -51,7 +52,7 @@ export function isScheduleDateInPast(params: {
   timezone: string;
   nowMs?: number;
 }) {
-  const { dateInput, timezone, nowMs = Date.now() } = params;
+  const { dateInput, timezone, nowMs = resolveNowMs() } = params;
   const scheduledStartAt = localDateAtHourToUtcIso({
     dateInput,
     timezone,

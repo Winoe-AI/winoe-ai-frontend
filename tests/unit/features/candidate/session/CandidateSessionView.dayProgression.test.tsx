@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { CandidateSessionView } from '@/features/candidate/session/CandidateSessionView';
 import { buildCandidateSessionViewProps } from './CandidateSessionView.windowGating.testProps';
 
@@ -64,8 +64,11 @@ describe('CandidateSessionView day progression checkpoints', () => {
 
     render(<CandidateSessionView {...props} />);
 
-    expect(screen.getByLabelText(/^Challenges$/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/^Decisions$/i)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /^Write$/i }));
+    expect(
+      screen.getByPlaceholderText(/Write your response here/i),
+    ).toBeInTheDocument();
+    expect(screen.getByText(/Markdown is supported/i)).toBeInTheDocument();
     expect(
       screen.getByRole('button', { name: /^Preview$/i }),
     ).toBeInTheDocument();
@@ -101,10 +104,10 @@ describe('CandidateSessionView day progression checkpoints', () => {
 
     expect(screen.getByText(/^Day 5 is not open yet$/i)).toBeInTheDocument();
     expect(
-      screen.getByText(/Day 5 locked until the active window opens\./i),
-    ).toBeInTheDocument();
+      screen.getAllByText(/Day 5 locked until the active window opens\./i),
+    ).toHaveLength(2);
     expect(
-      screen.queryByRole('button', { name: /Submit & Continue/i }),
-    ).not.toBeInTheDocument();
+      screen.getByRole('button', { name: /Submit & Continue/i }),
+    ).toBeDisabled();
   });
 });

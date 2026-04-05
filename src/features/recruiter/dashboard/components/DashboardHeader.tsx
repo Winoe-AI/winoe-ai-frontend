@@ -13,11 +13,18 @@ export function DashboardHeader({ onNewSimulation }: DashboardHeaderProps) {
     <PageHeader
       title="Dashboard"
       actions={
-        <Link href="/dashboard/simulations/new" prefetch={LINK_PREFETCH}>
-          <Button type="button" onClick={onNewSimulation}>
-            New Simulation
-          </Button>
-        </Link>
+        <>
+          <Link href="/dashboard/settings/ai" prefetch={LINK_PREFETCH}>
+            <Button type="button" variant="secondary">
+              AI Settings
+            </Button>
+          </Link>
+          <Link href="/dashboard/simulations/new" prefetch={LINK_PREFETCH}>
+            <Button type="button" onClick={onNewSimulation}>
+              New Simulation
+            </Button>
+          </Link>
+        </>
       }
     />
   );

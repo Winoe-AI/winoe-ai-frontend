@@ -8,7 +8,7 @@ import {
   resetWorkspacePanelMocks,
 } from './WorkspacePanel.testlib';
 
-describe('WorkspacePanel codespace clone guidance', () => {
+describe('WorkspacePanel codespace fallback guidance', () => {
   beforeEach(() => {
     jest.useFakeTimers();
     resetWorkspacePanelMocks();
@@ -19,28 +19,24 @@ describe('WorkspacePanel codespace clone guidance', () => {
     jest.useRealTimers();
   });
 
-  it('renders clone guidance once repoUrl appears after fallback retry', async () => {
+  it('renders codespace wait guidance after fallback retry', async () => {
     getStatusMock
       .mockResolvedValueOnce({
-        repoUrl: null,
         repoName: 'acme/repo',
         repoFullName: 'acme/repo',
         codespaceUrl: null,
       })
       .mockResolvedValueOnce({
-        repoUrl: null,
         repoName: 'acme/repo',
         repoFullName: 'acme/repo',
         codespaceUrl: null,
       })
       .mockResolvedValueOnce({
-        repoUrl: null,
         repoName: 'acme/repo',
         repoFullName: 'acme/repo',
         codespaceUrl: null,
       })
       .mockResolvedValueOnce({
-        repoUrl: 'https://github.com/acme/repo',
         repoName: 'acme/repo',
         repoFullName: 'acme/repo',
         codespaceUrl: null,
@@ -53,30 +49,27 @@ describe('WorkspacePanel codespace clone guidance', () => {
     await user.click(screen.getByRole('button', { name: /Try again/i }));
     expect(
       await screen.findByRole('heading', {
-        name: /Continue locally if Codespaces is unavailable/i,
+        name: /Shared Codespace still starting/i,
       }),
     ).toBeInTheDocument();
     expect(
-      screen.getAllByText(/https:\/\/github\.com\/acme\/repo/i).length,
-    ).toBeGreaterThan(0);
+      screen.getByText(/Local clone instructions are intentionally disabled/i),
+    ).toBeInTheDocument();
   });
 
-  it('keeps clone guidance visible when fallback retry fails again', async () => {
+  it('keeps wait guidance visible when fallback retry fails again', async () => {
     getStatusMock
       .mockResolvedValueOnce({
-        repoUrl: 'https://github.com/acme/repo',
         repoName: 'acme/repo',
         repoFullName: 'acme/repo',
         codespaceUrl: null,
       })
       .mockResolvedValueOnce({
-        repoUrl: 'https://github.com/acme/repo',
         repoName: 'acme/repo',
         repoFullName: 'acme/repo',
         codespaceUrl: null,
       })
       .mockResolvedValueOnce({
-        repoUrl: 'https://github.com/acme/repo',
         repoName: 'acme/repo',
         repoFullName: 'acme/repo',
         codespaceUrl: null,
@@ -91,17 +84,18 @@ describe('WorkspacePanel codespace clone guidance', () => {
     await user.click(screen.getByRole('button', { name: /Try again/i }));
     expect(
       await screen.findByRole('heading', {
-        name: /Continue locally if Codespaces is unavailable/i,
+        name: /Shared Codespace still starting/i,
       }),
     ).toBeInTheDocument();
-    expect(screen.getAllByText(/Clone the repo locally/i).length).toBe(1);
+    expect(
+      screen.getByText(/Local clone instructions are intentionally disabled/i),
+    ).toBeInTheDocument();
   });
 
   it.each([2, 3])(
     'renders integrity sentence for day %s workspace panel',
     async (dayIndex) => {
       getStatusMock.mockResolvedValueOnce({
-        repoUrl: 'https://github.com/acme/repo',
         repoName: 'acme/repo',
         repoFullName: 'acme/repo',
         codespaceUrl: 'https://codespaces.new/acme/repo',

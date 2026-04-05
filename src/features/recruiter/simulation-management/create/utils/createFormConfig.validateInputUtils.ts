@@ -1,7 +1,10 @@
 import type {
   CreateSimulationInput,
+  SimulationPromptOverrideKey,
   SimulationRoleLevel,
 } from '@/features/recruiter/api';
+import { MAX_PROMPT_OVERRIDE_MARKDOWN_CHARS } from '@/features/recruiter/ai/promptOverrideFormUtils';
+import { SIMULATION_PROMPT_OVERRIDE_KEYS } from '@/features/recruiter/api/simulationAiConfigApi';
 import {
   AI_DAY_FIELD_MAP,
   AI_DAY_KEYS,
@@ -14,7 +17,7 @@ import type { FieldErrors } from './createFormConfig.typesUtils';
 
 const SENIORITY_SET = new Set<SimulationRoleLevel>(SENIORITY_OPTIONS);
 
-const trimOrUndefined = (value: string | undefined) => {
+const trimOrUndefined = (value: string | null | undefined) => {
   if (typeof value !== 'string') return undefined;
   const trimmed = value.trim();
   return trimmed.length > 0 ? trimmed : undefined;
@@ -69,5 +72,31 @@ export function validateSimulationInput(
       next[fieldKey] = `Day ${day} toggle must be true or false.`;
     }
   }
+
+  for (const key of SIMULATION_PROMPT_OVERRIDE_KEYS) {
+    const override = input.ai?.promptOverrides?.[key];
+    const instructionsLength = trimOrUndefined(
+      override?.instructionsMd,
+    )?.length;
+    const rubricLength = trimOrUndefined(override?.rubricMd)?.length;
+    if (
+      (instructionsLength ?? 0) > MAX_PROMPT_OVERRIDE_MARKDOWN_CHARS ||
+      (rubricLength ?? 0) > MAX_PROMPT_OVERRIDE_MARKDOWN_CHARS
+    ) {
+      next.promptOverrides = promptOverrideValidationMessage(
+        key,
+        MAX_PROMPT_OVERRIDE_MARKDOWN_CHARS,
+      );
+      break;
+    }
+  }
+
   return next;
+}
+
+function promptOverrideValidationMessage(
+  key: SimulationPromptOverrideKey,
+  maxChars: number,
+) {
+  return `${key} prompt overrides cannot exceed ${maxChars} characters per field.`;
 }

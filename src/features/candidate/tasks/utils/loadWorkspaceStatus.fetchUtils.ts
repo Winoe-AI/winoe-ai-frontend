@@ -17,7 +17,7 @@ export async function fetchOrInitWorkspace(
       candidateSessionId,
     });
     const needsInit =
-      !status?.repoUrl && !status?.repoName && !status?.codespaceUrl;
+      !status?.repoFullName && !status?.repoName && !status?.codespaceUrl;
     if (mode === 'init' && needsInit && !initAttempted) {
       return await initCandidateWorkspace({
         taskId,

@@ -84,7 +84,9 @@ describe('CandidateSubmissionsPage - day 4 handoff evidence', () => {
     });
     render(<CandidateSubmissionsPage />);
     expect(await screen.findByText(/Newest Handoff/i)).toBeInTheDocument();
-    expect(screen.getByText(/Day 4 playback/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Day 4 presentation playback/i),
+    ).toBeInTheDocument();
     const calledUrls = fetchMock.mock.calls.map((call) =>
       getRequestUrl(call[0]),
     );

@@ -75,6 +75,7 @@ export default function SimulationDetailContainer() {
     scenario: scenarioModel.scenario,
     scenarioActions: scenarioModel.scenarioActions,
     labels,
+    aiConfig: detail?.aiConfig ?? null,
     approveButtonLabel: scenarioModel.callbacks.approveButtonLabel,
     planLoading,
     planStatusCode,

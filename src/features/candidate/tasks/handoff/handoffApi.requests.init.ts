@@ -17,7 +17,7 @@ export async function initHandoffUpload(params: {
     params;
   try {
     const { data } = await requestWithMeta<unknown>(
-      `/tasks/${String(taskId)}/handoff/upload/init`,
+      `/tasks/${String(taskId)}/presentation/upload/init`,
       {
         method: 'POST',
         cache: 'no-store',

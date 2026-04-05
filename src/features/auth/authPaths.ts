@@ -49,11 +49,28 @@ function buildAbsoluteReturnTo(returnTo?: string): string | null {
 }
 
 export function buildLoginHref(returnTo?: string, mode?: LoginMode): string {
-  return buildAuthHref({ returnTo, mode });
+  const params = new URLSearchParams();
+  params.set('returnTo', buildReturnTo(returnTo));
+  params.set('mode', mode ?? 'recruiter');
+  return `/auth/login?${params.toString()}`;
 }
 
 export function buildSignupHref(returnTo?: string, mode?: LoginMode): string {
-  return buildAuthHref({ returnTo, mode, screenHint: 'signup' });
+  return buildAuthStartHref(returnTo, mode, 'signup');
+}
+
+export function buildRecruiterOnboardingHref(returnTo?: string): string {
+  const params = new URLSearchParams();
+  params.set('returnTo', buildReturnTo(returnTo || '/dashboard'));
+  return `/recruiter-onboarding?${params.toString()}`;
+}
+
+export function buildAuthStartHref(
+  returnTo?: string,
+  mode?: LoginMode,
+  screenHint?: 'signup',
+): string {
+  return buildAuthHref({ returnTo, mode, screenHint });
 }
 
 function buildAuthHref({
@@ -74,7 +91,7 @@ function buildAuthHref({
   if (screenHint) params.set('screen_hint', screenHint);
 
   const query = params.toString();
-  return `/auth/login${query ? `?${query}` : ''}`;
+  return `/auth/start${query ? `?${query}` : ''}`;
 }
 
 export function buildLogoutHref(returnTo?: string): string {

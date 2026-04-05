@@ -48,7 +48,6 @@ export function useHandoffUploadActions({
     setDeleteConfirmOpen: actionState.setDeleteConfirmOpen,
     setConsentValidation: actionState.setConsentValidation,
     setPendingCompleteRecordingId: actionState.setPendingCompleteRecordingId,
-    setConsentChecked: actionState.setConsentChecked,
   });
   const onCompleteUpload = useHandoffUploadCompleteAction({
     candidateSessionId,

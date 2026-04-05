@@ -11,18 +11,13 @@ describe('CandidateTaskView task-type panel routing', () => {
     primeDraftMocks();
   });
 
-  it('routes day 5 documentation to structured reflection panel', async () => {
+  it('routes day 5 documentation to the markdown reflection editor', async () => {
     getCandidateTaskDraftMock.mockResolvedValue({
       taskId: 5,
       contentText: null,
       contentJson: {
-        reflection: {
-          challenges: 'Recovered challenge notes',
-          decisions: 'Recovered decision notes',
-          tradeoffs: 'Recovered tradeoff notes',
-          communication: 'Recovered communication notes',
-          next: 'Recovered next steps notes',
-        },
+        reflectionMarkdown:
+          '# Reflection\n\nRecovered challenge notes\n\nRecovered tradeoff notes',
       },
       updatedAt: '2026-03-07T09:30:00.000Z',
       finalizedAt: null,
@@ -39,12 +34,16 @@ describe('CandidateTaskView task-type panel routing', () => {
     });
     await waitFor(() =>
       expect(
-        screen.getByDisplayValue('Recovered challenge notes'),
-      ).toBeInTheDocument(),
+        (screen.getByRole('textbox') as HTMLTextAreaElement).value,
+      ).toContain('Recovered challenge notes'),
     );
+    expect(
+      (screen.getByRole('textbox') as HTMLTextAreaElement).value,
+    ).toContain('Recovered tradeoff notes');
     expect(
       screen.queryByRole('button', { name: /preview/i }),
     ).toBeInTheDocument();
+    expect(screen.queryByLabelText(/challenges/i)).toBeNull();
   });
 
   it('keeps non-day5 docs on generic text panel', () => {

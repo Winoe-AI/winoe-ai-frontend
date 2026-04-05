@@ -9,7 +9,7 @@ import {
 import { installRecruiterApiMocks } from './fixtures/recruiterMocks';
 
 test.describe('Navigation Flows', () => {
-  test('marketing navigation reaches auth login and supports keyboard focus', async ({
+  test('marketing auth CTA points to Auth0 start and supports keyboard focus', async ({
     page,
   }) => {
     await page.goto('/');
@@ -21,19 +21,9 @@ test.describe('Navigation Flows', () => {
     const recruiterLoginLink = page.getByRole('link', {
       name: /recruiter login/i,
     });
-    await recruiterLoginLink.click();
-
-    await expect(page).toHaveURL(
-      /\/auth\/login\?returnTo=%2Fdashboard&mode=recruiter&connection=Tenon-Recruiters/i,
-    );
-    await expect(
-      page.getByRole('heading', { name: /recruiter login/i }),
-    ).toBeVisible();
-    await expect(
-      page.getByRole('link', { name: /continue with auth0/i }).first(),
-    ).toHaveAttribute(
+    await expect(recruiterLoginLink).toHaveAttribute(
       'href',
-      /\/auth\/login\?returnTo=%2Fdashboard&mode=recruiter&connection=Tenon-Recruiters/i,
+      /\/auth\/start\?returnTo=%2Fdashboard&mode=recruiter&connection=Tenon-Recruiters/i,
     );
   });
 

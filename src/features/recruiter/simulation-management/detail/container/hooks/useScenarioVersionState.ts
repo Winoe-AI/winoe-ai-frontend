@@ -1,9 +1,46 @@
-import { useEffect, useState, type Dispatch, type SetStateAction } from 'react';
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type Dispatch,
+  type SetStateAction,
+} from 'react';
 import type {
   RegenerationPollState,
   ScenarioEditorFieldErrors,
   ScenarioVersionSnapshot,
 } from '../types';
+
+type ScenarioState = {
+  simulationId: string;
+  scenarioVersionSnapshots: Record<string, ScenarioVersionSnapshot>;
+  scenarioEditorSaving: boolean;
+  scenarioEditorSaveError: string | null;
+  scenarioEditorFieldErrors: ScenarioEditorFieldErrors;
+  scenarioLockBannerMessage: string | null;
+  pendingRegeneration: RegenerationPollState | null;
+};
+
+type ScenarioStateKey = Exclude<keyof ScenarioState, 'simulationId'>;
+
+function createInitialState(simulationId: string): ScenarioState {
+  return {
+    simulationId,
+    scenarioVersionSnapshots: {},
+    scenarioEditorSaving: false,
+    scenarioEditorSaveError: null,
+    scenarioEditorFieldErrors: {},
+    scenarioLockBannerMessage: null,
+    pendingRegeneration: null,
+  };
+}
+
+function resolveStateAction<T>(action: SetStateAction<T>, currentValue: T): T {
+  return typeof action === 'function'
+    ? (action as (previousState: T) => T)(currentValue)
+    : action;
+}
 
 type StateModel = {
   scenarioVersionSnapshots: Record<string, ScenarioVersionSnapshot>;
@@ -27,48 +64,84 @@ type StateModel = {
 };
 
 export function useScenarioVersionState(simulationId: string): StateModel {
-  const [scenarioVersionSnapshots, setScenarioVersionSnapshots] = useState<
-    Record<string, ScenarioVersionSnapshot>
-  >({});
-  const [scenarioEditorSaving, setScenarioEditorSaving] = useState(false);
-  const [scenarioEditorSaveError, setScenarioEditorSaveError] = useState<
-    string | null
-  >(null);
-  const [scenarioEditorFieldErrors, setScenarioEditorFieldErrors] =
-    useState<ScenarioEditorFieldErrors>({});
-  const [scenarioLockBannerMessage, setScenarioLockBannerMessage] = useState<
-    string | null
-  >(null);
-  const [pendingRegeneration, setPendingRegeneration] =
-    useState<RegenerationPollState | null>(null);
+  const latestSimulationIdRef = useRef(simulationId);
+  const [state, setState] = useState<ScenarioState>(() =>
+    createInitialState(simulationId),
+  );
 
   useEffect(() => {
-    const timerId = window.setTimeout(() => {
-      setScenarioVersionSnapshots({});
-      setScenarioEditorSaving(false);
-      setScenarioEditorSaveError(null);
-      setScenarioEditorFieldErrors({});
-      setScenarioLockBannerMessage(null);
-      setPendingRegeneration(null);
-    }, 0);
-
-    return () => {
-      window.clearTimeout(timerId);
-    };
+    latestSimulationIdRef.current = simulationId;
   }, [simulationId]);
 
+  const resolvedState =
+    state.simulationId === simulationId
+      ? state
+      : createInitialState(simulationId);
+
+  const updateField = useCallback(
+    <Key extends ScenarioStateKey>(
+      key: Key,
+      action: SetStateAction<ScenarioState[Key]>,
+    ) => {
+      setState((currentState) => {
+        if (latestSimulationIdRef.current !== simulationId) {
+          return currentState;
+        }
+        const baseState =
+          currentState.simulationId === simulationId
+            ? currentState
+            : createInitialState(simulationId);
+        const nextValue = resolveStateAction(action, baseState[key]);
+        if (Object.is(nextValue, baseState[key])) {
+          return baseState;
+        }
+        return {
+          ...baseState,
+          simulationId,
+          [key]: nextValue,
+        };
+      });
+    },
+    [simulationId],
+  );
+
+  const setScenarioVersionSnapshots = useCallback<
+    Dispatch<SetStateAction<Record<string, ScenarioVersionSnapshot>>>
+  >((action) => updateField('scenarioVersionSnapshots', action), [updateField]);
+  const setScenarioEditorSaving = useCallback<
+    Dispatch<SetStateAction<boolean>>
+  >((action) => updateField('scenarioEditorSaving', action), [updateField]);
+  const setScenarioEditorSaveError = useCallback<
+    Dispatch<SetStateAction<string | null>>
+  >((action) => updateField('scenarioEditorSaveError', action), [updateField]);
+  const setScenarioEditorFieldErrors = useCallback<
+    Dispatch<SetStateAction<ScenarioEditorFieldErrors>>
+  >(
+    (action) => updateField('scenarioEditorFieldErrors', action),
+    [updateField],
+  );
+  const setScenarioLockBannerMessage = useCallback<
+    Dispatch<SetStateAction<string | null>>
+  >(
+    (action) => updateField('scenarioLockBannerMessage', action),
+    [updateField],
+  );
+  const setPendingRegeneration = useCallback<
+    Dispatch<SetStateAction<RegenerationPollState | null>>
+  >((action) => updateField('pendingRegeneration', action), [updateField]);
+
   return {
-    scenarioVersionSnapshots,
+    scenarioVersionSnapshots: resolvedState.scenarioVersionSnapshots,
     setScenarioVersionSnapshots,
-    scenarioEditorSaving,
+    scenarioEditorSaving: resolvedState.scenarioEditorSaving,
     setScenarioEditorSaving,
-    scenarioEditorSaveError,
+    scenarioEditorSaveError: resolvedState.scenarioEditorSaveError,
     setScenarioEditorSaveError,
-    scenarioEditorFieldErrors,
+    scenarioEditorFieldErrors: resolvedState.scenarioEditorFieldErrors,
     setScenarioEditorFieldErrors,
-    scenarioLockBannerMessage,
+    scenarioLockBannerMessage: resolvedState.scenarioLockBannerMessage,
     setScenarioLockBannerMessage,
-    pendingRegeneration,
+    pendingRegeneration: resolvedState.pendingRegeneration,
     setPendingRegeneration,
   };
 }

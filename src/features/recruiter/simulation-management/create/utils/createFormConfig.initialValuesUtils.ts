@@ -1,4 +1,5 @@
 import { DEFAULT_TEMPLATE_KEY } from '@/platform/config/templateCatalog';
+import { createEmptyPromptOverrideFormValues } from '@/features/recruiter/ai/promptOverrideFormUtils';
 import { DEFAULT_EVAL_ENABLED_BY_DAY } from './createFormConfig.constantsUtils';
 import type { FormValues } from './createFormConfig.typesUtils';
 
@@ -12,6 +13,7 @@ export const initialValues: FormValues = {
   companyDomain: '',
   companyProductArea: '',
   noticeVersion: 'mvp1',
+  promptOverrides: createEmptyPromptOverrideFormValues(),
   evalDay1: DEFAULT_EVAL_ENABLED_BY_DAY['1'],
   evalDay2: DEFAULT_EVAL_ENABLED_BY_DAY['2'],
   evalDay3: DEFAULT_EVAL_ENABLED_BY_DAY['3'],

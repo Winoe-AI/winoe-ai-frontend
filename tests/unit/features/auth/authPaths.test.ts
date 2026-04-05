@@ -1,4 +1,6 @@
 import {
+  buildAuthStartHref,
+  buildRecruiterOnboardingHref,
   buildLoginHref,
   buildSignupHref,
   buildLogoutHref,
@@ -22,11 +24,11 @@ describe('authPaths helpers', () => {
     Object.assign(process.env, originalEnv);
   });
 
-  it('builds login href with mode and connection', () => {
+  it('builds login href with mode without the Auth0 connection', () => {
     const href = buildLoginHref('/dest', 'candidate');
     expect(href).toContain('mode=candidate');
     expect(href).toContain('returnTo=%2Fdest');
-    expect(href).toContain('connection=cand-conn');
+    expect(href).not.toContain('connection=');
   });
 
   it('defaults login mode to recruiter and omits connection when unset', () => {
@@ -35,10 +37,25 @@ describe('authPaths helpers', () => {
     expect(href).toBe('/auth/login?returnTo=%2F&mode=recruiter');
   });
 
+  it('builds auth start href with mode and connection', () => {
+    const href = buildAuthStartHref('/dest', 'candidate');
+    expect(href).toContain('/auth/start?');
+    expect(href).toContain('mode=candidate');
+    expect(href).toContain('returnTo=%2Fdest');
+    expect(href).toContain('connection=cand-conn');
+  });
+
   it('builds signup href with screen hint', () => {
     const href = buildSignupHref('/home', 'recruiter');
+    expect(href).toContain('/auth/start?');
     expect(href).toContain('screen_hint=signup');
     expect(href).toContain('connection=recruit-conn');
+  });
+
+  it('builds recruiter onboarding href with sanitized return path', () => {
+    expect(buildRecruiterOnboardingHref('/dashboard/simulations/new')).toBe(
+      '/recruiter-onboarding?returnTo=%2Fdashboard%2Fsimulations%2Fnew',
+    );
   });
 
   it('builds logout href with absolute returnTo and strips hash/query', () => {
@@ -67,8 +84,8 @@ describe('authPaths helpers', () => {
 
   it('omits connection when candidate connection not set', () => {
     delete process.env.NEXT_PUBLIC_TENON_AUTH0_CANDIDATE_CONNECTION;
-    const href = buildLoginHref('/dest', 'candidate');
-    expect(href).toBe('/auth/login?returnTo=%2Fdest&mode=candidate');
+    const href = buildAuthStartHref('/dest', 'candidate');
+    expect(href).toBe('/auth/start?returnTo=%2Fdest&mode=candidate');
   });
 
   it('returns base login when no returnTo provided and recruiter mode default', () => {

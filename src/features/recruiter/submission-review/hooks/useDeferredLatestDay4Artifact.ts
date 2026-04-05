@@ -50,7 +50,9 @@ export function useDeferredLatestDay4Artifact({
           staleTime: 10_000,
         })
         .then(({ results }) =>
-          setArtifacts((prev) => ({ ...prev, ...results })),
+          Object.keys(results).length
+            ? setArtifacts((prev) => ({ ...prev, ...results }))
+            : undefined,
         )
         .catch(() => {})
         .finally(() => setLatestDay4Loading(false));

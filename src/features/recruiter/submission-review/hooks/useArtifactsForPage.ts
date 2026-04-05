@@ -48,6 +48,7 @@ export function useArtifactsForPage({
         staleTime: 10_000,
       })
       .then(({ results }) => {
+        if (!Object.keys(results).length) return;
         setArtifacts((prev) => ({ ...prev, ...results }));
       })
       .catch(() => {});

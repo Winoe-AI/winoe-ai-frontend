@@ -4,7 +4,6 @@ import { CodespaceFallbackPanel } from './CodespaceFallbackPanel';
 type WorkspaceFallbackPanelContentProps = {
   shouldShowActionableFallback: boolean;
   shouldShowUnavailableFallbackState: boolean;
-  repoUrl: string | null;
   repoFullName: string | null;
   codespaceFallbackReason: string | null;
   codespaceAvailability: string | null;
@@ -17,7 +16,6 @@ type WorkspaceFallbackPanelContentProps = {
 export function WorkspaceFallbackPanelContent({
   shouldShowActionableFallback,
   shouldShowUnavailableFallbackState,
-  repoUrl,
   repoFullName,
   codespaceFallbackReason,
   codespaceAvailability,
@@ -29,7 +27,6 @@ export function WorkspaceFallbackPanelContent({
   if (shouldShowActionableFallback) {
     return (
       <CodespaceFallbackPanel
-        repoUrl={repoUrl}
         repoFullName={repoFullName}
         errorState={codespaceFallbackReason ?? codespaceAvailability}
         cutoffAt={cutoffAt}
@@ -50,7 +47,7 @@ export function WorkspaceFallbackPanelContent({
           id="codespace-fallback-unavailable-heading"
           className="text-sm font-semibold"
         >
-          Codespaces unavailable, repo details still loading
+          Codespaces still provisioning
         </h3>
         <Button
           size="sm"
@@ -62,7 +59,8 @@ export function WorkspaceFallbackPanelContent({
         </Button>
       </div>
       <p className="mt-2 text-xs text-amber-900">
-        Retry to fetch repository details before showing local clone steps.
+        Local clone fallback is disabled for this simulation. Retry while the
+        shared Codespace finishes provisioning.
       </p>
     </section>
   );

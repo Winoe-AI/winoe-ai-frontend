@@ -50,7 +50,9 @@ export function useDeferredLatestGithubArtifacts({
           staleTime: 10_000,
         })
         .then(({ results, hadError }) => {
-          setArtifacts((prev) => ({ ...prev, ...results }));
+          if (Object.keys(results).length) {
+            setArtifacts((prev) => ({ ...prev, ...results }));
+          }
           if (!hadError) {
             setArtifactWarning(null);
             return;

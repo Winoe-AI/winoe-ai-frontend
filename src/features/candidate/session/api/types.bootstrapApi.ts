@@ -14,6 +14,9 @@ export type CandidateSessionBootstrapResponse = {
   candidateSessionId: number;
   status: 'not_started' | 'in_progress' | 'completed' | 'expired';
   simulation: SimulationSummary;
+  aiNoticeText: string;
+  aiNoticeVersion: string;
+  evalEnabledByDay: Record<string, boolean>;
   scheduledStartAt?: string | null;
   candidateTimezone?: string | null;
   dayWindows?: CandidateDayWindow[];
@@ -27,6 +30,8 @@ export type CandidateInvite = {
   title: string;
   role: string;
   company: string | null;
+  recruiterName?: string | null;
+  recruiterEmail?: string | null;
   status: CandidateSessionBootstrapResponse['status'] | string;
   progress: { completed: number; total: number } | null;
   expiresAt: string | null;

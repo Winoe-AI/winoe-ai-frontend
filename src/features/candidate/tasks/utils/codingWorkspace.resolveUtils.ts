@@ -35,7 +35,6 @@ export function getCodingWorkspace({
     return {
       repoFullName: null,
       repoName: null,
-      repoUrl: null,
       codespaceUrl: null,
       isInitialized: false,
       error:
@@ -47,7 +46,6 @@ export function getCodingWorkspace({
   return {
     repoFullName: trimOrNull(merged?.repoFullName) ?? null,
     repoName: trimOrNull(merged?.repoName) ?? null,
-    repoUrl: trimOrNull(merged?.repoUrl) ?? null,
     codespaceUrl: trimOrNull(merged?.codespaceUrl) ?? null,
     isInitialized: isWorkspaceInitialized(merged),
     error: null,

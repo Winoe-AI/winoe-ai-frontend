@@ -17,13 +17,13 @@ export const DAY_SUMMARIES = [
     hint: 'Workspace + tests.',
   },
   {
-    title: 'Record walkthrough',
-    detail: 'Share a short handoff recording.',
-    hint: 'Recording link.',
+    title: 'Demo presentation',
+    detail: 'Upload a short walkthrough of your work and decisions.',
+    hint: 'Video demo.',
   },
   {
-    title: 'Write reflection',
-    detail: 'Capture challenges, decisions, and next steps.',
-    hint: 'Reflection prompt.',
+    title: 'Reflection essay',
+    detail: 'Capture your experience in a final markdown reflection.',
+    hint: 'Markdown editor.',
   },
 ];

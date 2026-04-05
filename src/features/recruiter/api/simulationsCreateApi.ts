@@ -21,6 +21,11 @@ export async function createSimulation(
   const safeCompanyDomain = input.companyContext?.domain?.trim();
   const safeProductArea = input.companyContext?.productArea?.trim();
   const safeNoticeVersion = input.ai?.noticeVersion?.trim();
+  const promptOverrides =
+    input.ai?.promptOverrides &&
+    Object.keys(input.ai.promptOverrides).length > 0
+      ? input.ai.promptOverrides
+      : null;
 
   if (!safeTitle || !safeRole || !safeTechStack || !safeTemplateKey) {
     return {
@@ -50,11 +55,12 @@ export async function createSimulation(
           },
         }
       : {}),
-    ...(safeNoticeVersion || evalEnabledByDay
+    ...(safeNoticeVersion || evalEnabledByDay || promptOverrides
       ? {
           ai: {
             ...(safeNoticeVersion ? { noticeVersion: safeNoticeVersion } : {}),
             ...(evalEnabledByDay ? { evalEnabledByDay } : {}),
+            ...(promptOverrides ? { promptOverrides } : {}),
           },
         }
       : {}),

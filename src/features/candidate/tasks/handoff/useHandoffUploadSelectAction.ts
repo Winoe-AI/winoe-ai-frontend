@@ -23,7 +23,6 @@ type Params = {
   setDeleteConfirmOpen: (value: boolean) => void;
   setConsentValidation: (value: string | null) => void;
   setPendingCompleteRecordingId: (value: string | null) => void;
-  setConsentChecked: (value: boolean) => void;
 };
 
 export function useHandoffUploadSelectAction({
@@ -42,7 +41,6 @@ export function useHandoffUploadSelectAction({
   setDeleteConfirmOpen,
   setConsentValidation,
   setPendingCompleteRecordingId,
-  setConsentChecked,
 }: Params) {
   const openFilePicker = useCallback(() => {
     fileInputRef.current?.click();
@@ -66,7 +64,6 @@ export function useHandoffUploadSelectAction({
         setDeleteConfirmOpen,
         setConsentValidation,
         setPendingCompleteRecordingId,
-        setConsentChecked,
       });
     },
     [
@@ -84,7 +81,6 @@ export function useHandoffUploadSelectAction({
       setDeleteConfirmOpen,
       setConsentValidation,
       setPendingCompleteRecordingId,
-      setConsentChecked,
     ],
   );
 

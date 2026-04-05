@@ -26,6 +26,9 @@ export function createAuth0Client() {
     clientId: process.env.TENON_AUTH0_CLIENT_ID,
     clientSecret: process.env.TENON_AUTH0_CLIENT_SECRET,
     secret: process.env.TENON_AUTH0_SECRET,
+    routes: {
+      login: '/auth/start',
+    },
     authorizationParameters: {
       audience: process.env.TENON_AUTH0_AUDIENCE,
       scope: process.env.TENON_AUTH0_SCOPE,

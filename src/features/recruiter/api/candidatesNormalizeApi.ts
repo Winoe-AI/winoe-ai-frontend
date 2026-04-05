@@ -40,7 +40,11 @@ export const normalizeCandidateSession = (raw: unknown): CandidateSession => {
   const completedAt = toStringOrNull(rec.completedAt ?? rec.completed_at);
   if (completedAt) status = 'completed';
   else if (status === 'not_started' && startedAt) status = 'in_progress';
-  const hasReport = rec.hasReport === true || rec.reportReady === true;
+  const hasReport =
+    rec.hasReport === true ||
+    rec.reportReady === true ||
+    rec.hasFitProfile === true ||
+    rec.has_fit_profile === true;
   const reportReady =
     rec.reportReady === true || rec.report_ready === true ? true : undefined;
   const reportId =
@@ -67,6 +71,10 @@ export const normalizeCandidateSession = (raw: unknown): CandidateSession => {
     null) as Record<string, unknown> | number | null;
   const inviteEmailStatus =
     toStringOrNull(rec.inviteEmailStatus ?? rec.invite_email_status) ?? null;
+  const inviteEmailSentAt =
+    toStringOrNull(rec.inviteEmailSentAt ?? rec.invite_email_sent_at) ?? null;
+  const inviteEmailError =
+    toStringOrNull(rec.inviteEmailError ?? rec.invite_email_error) ?? null;
   const inviteToken =
     toStringOrNull(rec.inviteToken ?? rec.invite_token ?? rec.token) ?? null;
   const rawInviteUrl = toStringOrNull(rec.inviteUrl ?? rec.invite_url);
@@ -90,6 +98,9 @@ export const normalizeCandidateSession = (raw: unknown): CandidateSession => {
         ? (normalizeProgress(progressRaw) as CandidateSession['dayProgress'])
         : normalizeProgress(progressRaw as number | null),
     inviteEmailStatus,
+    inviteEmailSentAt,
+    inviteEmailError,
+    inviteToken,
     inviteUrl: inviteUrl ?? undefined,
   };
 };

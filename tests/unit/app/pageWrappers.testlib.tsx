@@ -23,6 +23,8 @@ export const candidateSubmissionsMock = jest.fn(() => (
   <div data-testid="candidate-submissions" />
 ));
 export const getCachedSessionNormalizedMock = jest.fn();
+export const getSessionNormalizedMock = jest.fn(async () => null);
+export const getAccessTokenMock = jest.fn(async () => 'test-access-token');
 export const requireCandidateTokenMock = jest.fn();
 
 jest.mock('@/features/marketing/home/MarketingHomePage', () => ({
@@ -60,6 +62,8 @@ jest.mock(
   }),
 );
 jest.mock('@/platform/auth0', () => ({
+  getAccessToken: getAccessTokenMock,
+  getSessionNormalized: getSessionNormalizedMock,
   getCachedSessionNormalized: getCachedSessionNormalizedMock,
 }));
 jest.mock('@/app/(candidate)/(legacy)/candidate-sessions/token-params', () => {

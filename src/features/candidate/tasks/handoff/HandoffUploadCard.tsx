@@ -1,4 +1,5 @@
 import { StatusPill } from '@/shared/ui/StatusPill';
+import { CONSENT_HELPER_TEXT } from './panelConstants';
 import { HandoffUploadActionButtons } from './HandoffUploadActionButtons';
 import type { HandoffUploadPanelController } from './handoffUploadPanelTypes';
 
@@ -11,7 +12,9 @@ export function HandoffUploadCard({ controller, candidateSessionId }: Props) {
   return (
     <div className="rounded-md border border-gray-200 bg-gray-50 p-4">
       <div className="flex flex-wrap items-center gap-2">
-        <div className="text-sm font-semibold text-gray-900">Video upload</div>
+        <div className="text-sm font-semibold text-gray-900">
+          Demo presentation video
+        </div>
         {controller.showProcessing ? (
           <StatusPill label="Transcript processing..." tone="info" />
         ) : null}
@@ -23,6 +26,31 @@ export function HandoffUploadCard({ controller, candidateSessionId }: Props) {
         ) : null}
       </div>
       <p className="mt-1 text-xs text-gray-600">{controller.uploadHint}</p>
+      <label className="mt-3 flex items-start gap-2 text-sm text-gray-800">
+        <input
+          className="mt-0.5"
+          type="checkbox"
+          checked={controller.consentChecked}
+          onChange={(event) => {
+            const next = event.target.checked;
+            controller.setConsentChecked(next);
+            controller.setConsentValidation(null);
+          }}
+        />
+        <span>
+          I consent to submission and processing of my demo video and transcript
+          for evaluation.
+        </span>
+      </label>
+      {controller.consentValidation ? (
+        <p className="mt-2 text-sm text-red-700">
+          {controller.consentValidation}
+        </p>
+      ) : !controller.consentChecked ? (
+        <p className="mt-2 text-sm text-gray-600">
+          {CONSENT_HELPER_TEXT} Upload is disabled until consent is confirmed.
+        </p>
+      ) : null}
 
       {controller.state.isDeleted ? (
         <div className="mt-3 rounded-md border border-slate-200 bg-white p-3 text-sm text-slate-700">

@@ -1,5 +1,9 @@
 import Button from '@/shared/ui/Button';
-import type { CreateSimulationInput } from '@/features/recruiter/api';
+import type {
+  CreateSimulationInput,
+  SimulationPromptOverrideField,
+  SimulationPromptOverrideKey,
+} from '@/features/recruiter/api';
 import type { FieldErrors, FormValues } from '../utils/createFormConfigUtils';
 import { SimulationCreateTextFields } from './SimulationCreateTextFields';
 import { SimulationCreateOptions } from './SimulationCreateOptions';
@@ -10,6 +14,11 @@ type Props = {
   isSubmitting: boolean;
   seniorityOptions: CreateSimulationInput['seniority'][];
   onChange: <K extends keyof FormValues>(key: K, value: FormValues[K]) => void;
+  onPromptOverrideChange: (
+    key: SimulationPromptOverrideKey,
+    field: SimulationPromptOverrideField,
+    value: string,
+  ) => void;
   onSubmit: (e: React.FormEvent<HTMLFormElement>) => void;
   onCancel: () => void;
 };
@@ -20,6 +29,7 @@ export function SimulationCreateForm({
   isSubmitting,
   seniorityOptions,
   onChange,
+  onPromptOverrideChange,
   onSubmit,
   onCancel,
 }: Props) {
@@ -50,6 +60,7 @@ export function SimulationCreateForm({
         isSubmitting={isSubmitting}
         seniorityOptions={seniorityOptions}
         onChange={onChange}
+        onPromptOverrideChange={onPromptOverrideChange}
       />
 
       <div className="flex justify-end gap-2">

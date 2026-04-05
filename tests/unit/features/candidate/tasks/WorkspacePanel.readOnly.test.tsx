@@ -13,7 +13,6 @@ describe('WorkspacePanel read-only and cutoff', () => {
 
   it('keeps panel read-only while preserving integrity rules', async () => {
     getStatusMock.mockResolvedValue({
-      repoUrl: 'https://github.com/acme/repo',
       repoName: 'acme/repo',
       codespaceUrl: 'https://codespaces.new/acme/repo',
     });
@@ -34,7 +33,6 @@ describe('WorkspacePanel read-only and cutoff', () => {
 
   it('shows cutoff commit and evaluation details when closed', async () => {
     getStatusMock.mockResolvedValue({
-      repoUrl: 'https://github.com/acme/repo',
       repoName: 'acme/repo',
       codespaceUrl: 'https://codespaces.new/acme/repo',
       cutoffCommitSha: 'abc123def456',
@@ -48,16 +46,12 @@ describe('WorkspacePanel read-only and cutoff', () => {
       isClosed: true,
     });
     expect(await screen.findByText(/^Day closed$/i)).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /abc123def456/i })).toHaveAttribute(
-      'href',
-      'https://github.com/acme/repo/commit/abc123def456',
-    );
+    expect(screen.getByLabelText(/Cutoff commit SHA abc123def456/i));
     expect(screen.getByText(/Cutoff time:/i)).toBeInTheDocument();
   });
 
   it('loads cutoff fields from status when cutoff props are omitted', async () => {
     getStatusMock.mockResolvedValue({
-      repoUrl: 'https://github.com/acme/repo',
       repoName: 'acme/repo',
       codespaceUrl: 'https://codespaces.new/acme/repo',
       cutoffCommitSha: 'abc123def456',
@@ -69,9 +63,6 @@ describe('WorkspacePanel read-only and cutoff', () => {
       isClosed: true,
     });
     expect(await screen.findByText(/^Day closed$/i)).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /abc123def456/i })).toHaveAttribute(
-      'href',
-      'https://github.com/acme/repo/commit/abc123def456',
-    );
+    expect(screen.getByLabelText(/Cutoff commit SHA abc123def456/i));
   });
 });

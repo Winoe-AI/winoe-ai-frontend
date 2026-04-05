@@ -1,3 +1,4 @@
+import { normalizeSimulationAiConfig } from '@/features/recruiter/api/simulationAiConfigApi';
 import { normalizeSimulationEvalEnabledByDay } from '@/features/recruiter/api/simulationAiEvalApi';
 import { toStringOrNull } from '../parsingUtils';
 import { normalizeSimulationPlan } from '../plan';
@@ -33,6 +34,7 @@ export function normalizeSimulationDetailPreview(
   const record = asRecord(raw) ?? {};
   const scenario = asRecord(record.scenario);
   const ai = asRecord(record.ai);
+  const aiConfig = normalizeSimulationAiConfig(ai);
   const statusRaw = toStringOrNull(record.status)?.toLowerCase() ?? null;
   const status = parseLifecycleStatus(statusRaw);
   const activeScenarioVersionId =
@@ -99,9 +101,9 @@ export function normalizeSimulationDetailPreview(
     companyContext: readCompanyContext(
       record.companyContext ?? record.company_context,
     ),
+    aiConfig,
     aiEvaluationEnabledByDay: normalizeSimulationEvalEnabledByDay(
-      ai?.evalEnabledByDay ??
-        ai?.eval_enabled_by_day ??
+      aiConfig.evalEnabledByDay ??
         record.evalEnabledByDay ??
         record.eval_enabled_by_day,
     ),

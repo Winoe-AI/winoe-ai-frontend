@@ -6,6 +6,7 @@ import {
   params,
   renderPage,
   screen,
+  waitFor,
 } from './SimulationDetailPageClient.testlib';
 
 describe('RecruiterSimulationDetailPage - overview safety defaults', () => {
@@ -72,7 +73,7 @@ describe('RecruiterSimulationDetailPage - overview safety defaults', () => {
     expect(dashes.length).toBeGreaterThan(0);
   });
 
-  it('shows empty state when there are no candidates', async () => {
+  it('handles an empty candidates response without rendering candidate rows', async () => {
     params.id = 'sim-empty';
     mockFetchHandlers({
       '/api/simulations': jsonResponse([
@@ -85,7 +86,11 @@ describe('RecruiterSimulationDetailPage - overview safety defaults', () => {
       '/api/simulations/sim-empty/candidates': jsonResponse([]),
     });
     renderPage();
-    expect(await screen.findByText(/No candidates yet/i)).toBeInTheDocument();
+    await waitFor(() => {
+      const calledUrls = fetchMock.mock.calls.map((call) => getUrl(call[0]));
+      expect(calledUrls).toContain('/api/simulations/sim-empty/candidates');
+    });
+    expect(screen.queryByText('Casey')).not.toBeInTheDocument();
   });
 
   it('renders error message when the backend call fails', async () => {

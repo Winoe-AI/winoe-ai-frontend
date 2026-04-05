@@ -72,6 +72,7 @@ export type CandidateSessionViewProps = {
   lastSubmissionId: number | null;
   onStart: () => void;
   onDashboard: () => void;
+  onReview: () => void;
   onRetryInit: () => void;
   onGoHome: () => void;
   onRetryTask: () => void;

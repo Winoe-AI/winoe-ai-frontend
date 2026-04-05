@@ -1,5 +1,6 @@
 export * from './typesApi';
 export * from './invitesApi';
+export * from './reviewApi';
 export * from './scheduleApi';
 export * from './tasksApi';
 export * from './taskDraftsApi';

@@ -10,6 +10,9 @@ export type CandidateBootstrap = {
   candidateSessionId: number;
   status: 'not_started' | 'in_progress' | 'completed' | 'expired';
   simulation: SimulationSummary;
+  aiNoticeText: string;
+  aiNoticeVersion: string;
+  evalEnabledByDay: Record<string, boolean>;
   scheduledStartAt?: string | null;
   candidateTimezone?: string | null;
   dayWindows?: CandidateDayWindow[];

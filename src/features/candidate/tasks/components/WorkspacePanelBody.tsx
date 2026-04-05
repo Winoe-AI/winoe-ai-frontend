@@ -34,9 +34,7 @@ export function WorkspacePanelBody({
   const repoLabel = workspace?.repoFullName ?? workspace?.repoName;
   const cta = workspace?.codespaceUrl
     ? { href: workspace.codespaceUrl, label: 'Open Codespace' }
-    : workspace?.repoUrl
-      ? { href: workspace.repoUrl, label: 'Open Repo' }
-      : null;
+    : null;
   if (loading) return <WorkspacePanelLoadingState />;
   if (error) {
     return (
@@ -69,20 +67,6 @@ export function WorkspacePanelBody({
         </div>
       ) : null}
       {repoLabel ? <div>Repo: {repoLabel}</div> : null}
-      {!readOnly && workspace?.repoUrl ? (
-        <div className="break-all text-xs text-gray-600">
-          Repo URL:{' '}
-          <a
-            aria-label="Repo URL"
-            className="text-blue-600 hover:underline"
-            href={workspace.repoUrl}
-            target="_blank"
-            rel="noreferrer noopener"
-          >
-            {workspace.repoUrl}
-          </a>
-        </div>
-      ) : null}
       {!readOnly && cta ? (
         <a
           className="block text-blue-600 hover:underline"

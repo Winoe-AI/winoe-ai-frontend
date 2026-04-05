@@ -12,7 +12,6 @@ describe('candidate api workspace helpers', () => {
 
   it('initializes workspace and normalizes response fields', async () => {
     mockPost.mockResolvedValueOnce({
-      repoUrl: 'https://github.com/acme/repo',
       repoName: 'acme/repo',
       codespaceUrl: 'https://codespaces.new/acme/repo',
     });
@@ -28,7 +27,6 @@ describe('candidate api workspace helpers', () => {
       expect.objectContaining({ basePath: '/api/backend' }),
     );
     expect(result).toEqual({
-      repoUrl: 'https://github.com/acme/repo',
       repoName: 'acme/repo',
       repoFullName: null,
       codespaceUrl: 'https://codespaces.new/acme/repo',
@@ -41,13 +39,11 @@ describe('candidate api workspace helpers', () => {
   it('fetches workspace status and normalizes snake_case + empty payloads', async () => {
     const { getCandidateWorkspaceStatus } = await importCandidateApi();
     mockGet.mockResolvedValueOnce({
-      repoUrl: 'https://github.com/acme/repo2',
       repoName: 'acme/repo2',
     });
     await expect(
       getCandidateWorkspaceStatus({ taskId: 12, candidateSessionId: 88 }),
     ).resolves.toEqual({
-      repoUrl: 'https://github.com/acme/repo2',
       repoName: 'acme/repo2',
       repoFullName: null,
       codespaceUrl: null,
@@ -62,7 +58,6 @@ describe('candidate api workspace helpers', () => {
     );
 
     mockGet.mockResolvedValueOnce({
-      repo_url: 'https://github.com/acme/repo3',
       repo_name: 'acme/repo3',
       repo_full_name: 'acme/repo3',
       codespace_url: 'https://codespaces.new/acme/repo3',
@@ -70,7 +65,6 @@ describe('candidate api workspace helpers', () => {
     await expect(
       getCandidateWorkspaceStatus({ taskId: 14, candidateSessionId: 55 }),
     ).resolves.toEqual({
-      repoUrl: 'https://github.com/acme/repo3',
       repoName: 'acme/repo3',
       repoFullName: 'acme/repo3',
       codespaceUrl: 'https://codespaces.new/acme/repo3',
@@ -83,7 +77,6 @@ describe('candidate api workspace helpers', () => {
     await expect(
       getCandidateWorkspaceStatus({ taskId: 15, candidateSessionId: 66 }),
     ).resolves.toEqual({
-      repoUrl: null,
       repoName: null,
       repoFullName: null,
       codespaceUrl: null,
@@ -95,7 +88,6 @@ describe('candidate api workspace helpers', () => {
 
   it('normalizes cutoff fields from workspace status payloads', async () => {
     mockGet.mockResolvedValueOnce({
-      repoUrl: 'https://github.com/acme/repo4',
       repoName: 'acme/repo4',
       cutoff_commit_sha: 'abc123def456',
       cutoff_at: '2026-03-08T17:45:00.000Z',

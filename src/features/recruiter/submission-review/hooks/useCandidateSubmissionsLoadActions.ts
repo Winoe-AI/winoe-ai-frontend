@@ -28,7 +28,9 @@ export function useCandidateSubmissionsLoadActions({
     (result: Awaited<ReturnType<typeof reloadCandidateSubmissions>>) => {
       setters.setCandidate(result.candidate);
       setters.setItems(result.items);
-      setters.setArtifacts((prev) => ({ ...prev, ...result.artifacts }));
+      if (Object.keys(result.artifacts).length) {
+        setters.setArtifacts((prev) => ({ ...prev, ...result.artifacts }));
+      }
       setters.setArtifactWarning(result.artifactWarning);
       setters.setError(result.error);
     },

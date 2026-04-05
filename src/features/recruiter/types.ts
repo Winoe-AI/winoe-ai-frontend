@@ -8,6 +8,9 @@ export type RecruiterProfile = {
   name: string;
   email: string;
   role: string;
+  companyId?: number | null;
+  companyName?: string | null;
+  onboardingComplete?: boolean;
 };
 
 export type InviteModalState = {

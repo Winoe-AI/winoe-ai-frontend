@@ -23,7 +23,6 @@ type Params = {
   setDeleteConfirmOpen: (value: boolean) => void;
   setConsentValidation: (value: string | null) => void;
   setPendingCompleteRecordingId: (value: string | null) => void;
-  setConsentChecked: (value: boolean) => void;
 };
 
 export async function runHandoffUploadSelection({
@@ -42,7 +41,6 @@ export async function runHandoffUploadSelection({
   setDeleteConfirmOpen,
   setConsentValidation,
   setPendingCompleteRecordingId,
-  setConsentChecked,
 }: Params) {
   dispatch({ type: 'CLEAR_ERROR' });
   setDeleteConfirmOpen(false);
@@ -101,7 +99,6 @@ export async function runHandoffUploadSelection({
       previewUrl,
     });
     setPendingCompleteRecordingId(init.recordingId);
-    setConsentChecked(false);
     setConsentValidation(null);
     void refreshStatus();
   } catch (err) {

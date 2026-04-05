@@ -57,6 +57,9 @@ const mapValidationPathToField = (path: string[]): FormFieldKey | null => {
         return AI_DAY_FIELD_MAP[third as SimulationEvalDayKey];
       }
     }
+    if (second === 'promptOverrides' || second === 'prompt_overrides') {
+      return 'promptOverrides';
+    }
   }
   return null;
 };

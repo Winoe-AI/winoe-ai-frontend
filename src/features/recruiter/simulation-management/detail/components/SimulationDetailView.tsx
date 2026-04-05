@@ -1,6 +1,7 @@
 'use client';
 import { useInviteModalActions } from './InviteModalActions';
 import { CleanupInProgressPanel } from './CleanupInProgressPanel';
+import { SimulationAiOverridesPanel } from './SimulationAiOverridesPanel';
 import { SimulationDetailCandidatesPanel } from './SimulationDetailCandidatesPanel';
 import { SimulationDetailHeaderSection } from './SimulationDetailHeaderSection';
 import { SimulationDetailModals } from './SimulationDetailModals';
@@ -25,6 +26,13 @@ export function SimulationDetailView(props: SimulationDetailViewProps) {
         props={props}
         showScenarioControls={showScenarioControls}
       />
+      {props.aiConfig ? (
+        <SimulationAiOverridesPanel
+          simulationId={props.simulationId}
+          aiConfig={props.aiConfig}
+          onSaved={props.reloadPlan}
+        />
+      ) : null}
       <SimulationDetailPlanPanel props={props} />
       <SimulationDetailCandidatesPanel
         props={props}

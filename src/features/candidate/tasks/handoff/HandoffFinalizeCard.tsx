@@ -1,5 +1,4 @@
 import Button from '@/shared/ui/Button';
-import { CONSENT_HELPER_TEXT } from './panelConstants';
 import type { HandoffUploadPanelController } from './handoffUploadPanelTypes';
 
 type Props = { controller: HandoffUploadPanelController };
@@ -9,33 +8,21 @@ export function HandoffFinalizeCard({ controller }: Props) {
 
   return (
     <div className="rounded-md border border-blue-200 bg-blue-50 p-4">
-      <div className="text-sm font-semibold text-blue-900">Complete upload</div>
+      <div className="text-sm font-semibold text-blue-900">
+        Finalize Day 4 submission
+      </div>
       <p className="mt-1 text-sm text-blue-900">
-        Your video file is uploaded. Consent is required before finalizing Day 4
-        submission.
+        Your demo video is uploaded. Finalize it to lock in the latest attempt
+        for Day 4.
       </p>
-      <label className="mt-3 flex items-start gap-2 text-sm text-blue-900">
-        <input
-          className="mt-0.5"
-          type="checkbox"
-          checked={controller.consentChecked}
-          onChange={(event) => {
-            const next = event.target.checked;
-            controller.setConsentChecked(next);
-            controller.setConsentValidation(null);
-          }}
-        />
-        <span>
-          I understand and consent to submission and processing of my video and
-          transcript for evaluation.
-        </span>
-      </label>
       {controller.consentValidation ? (
         <p className="mt-2 text-sm text-red-700">
           {controller.consentValidation}
         </p>
       ) : !controller.consentChecked ? (
-        <p className="mt-2 text-sm text-blue-900">{CONSENT_HELPER_TEXT}</p>
+        <p className="mt-2 text-sm text-blue-900">
+          Confirm the consent checkbox above to enable final submission.
+        </p>
       ) : null}
       <div className="mt-3">
         <Button
@@ -45,7 +32,7 @@ export function HandoffFinalizeCard({ controller }: Props) {
           loading={controller.completingUpload}
           disabled={controller.finalizeDisabled}
         >
-          Complete upload
+          Finalize demo
         </Button>
       </div>
     </div>

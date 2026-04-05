@@ -86,6 +86,10 @@ export function normalizeCandidateInvite(raw: unknown): CandidateInvite {
     title,
     role,
     company: companyValue && companyValue.trim() ? companyValue : null,
+    recruiterName:
+      toStringOrNull(rec.recruiterName ?? rec.recruiter_name) ?? null,
+    recruiterEmail:
+      toStringOrNull(rec.recruiterEmail ?? rec.recruiter_email) ?? null,
     status,
     progress,
     expiresAt,

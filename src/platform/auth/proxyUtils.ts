@@ -7,6 +7,7 @@ export const PUBLIC_PATHS = new Set([
   '/auth/login',
   '/auth/logout',
   '/not-authorized',
+  '/recruiter-onboarding',
 ]);
 export const PUBLIC_PREFIXES = ['/auth'];
 export const CANDIDATE_PREFIXES = ['/candidate-sessions', '/candidate'];

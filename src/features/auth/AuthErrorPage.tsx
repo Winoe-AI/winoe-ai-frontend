@@ -1,5 +1,5 @@
 import Button from '@/shared/ui/Button';
-import LoginLink from '@/features/auth/LoginLink';
+import AuthStartLink from '@/features/auth/AuthStartLink';
 import { AuthPageLayout } from './AuthPageLayout';
 import { buildClearAuthHref, type LoginMode } from './authPaths';
 
@@ -55,14 +55,14 @@ export default function AuthErrorPage({
         </div>
       ) : null}
       <div className="flex flex-col gap-3">
-        <LoginLink returnTo={returnTo} mode={mode} className="block">
+        <AuthStartLink returnTo={returnTo} mode={mode} className="block">
           <Button
             type="button"
             className="w-full justify-center text-base font-medium"
           >
             Retry sign-in
           </Button>
-        </LoginLink>
+        </AuthStartLink>
         <a href={clearHref} className="block">
           <Button
             type="button"

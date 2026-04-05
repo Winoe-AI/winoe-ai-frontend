@@ -13,12 +13,10 @@ describe('WorkspacePanel extra rendering', () => {
 
   it('initializes workspace when status returns empty workspace', async () => {
     getStatusMock.mockResolvedValueOnce({
-      repoUrl: null,
       repoName: null,
       codespaceUrl: null,
     });
     initWorkspaceMock.mockResolvedValue({
-      repoUrl: 'http://repo',
       repoName: 'test-repo',
       codespaceUrl: null,
     });
@@ -27,37 +25,36 @@ describe('WorkspacePanel extra rendering', () => {
     expect(await screen.findByText(/Repository is ready/i)).toBeInTheDocument();
   });
 
-  it('shows repoName only when repoUrl is missing', async () => {
+  it('shows repoName when no Codespace link is available yet', async () => {
     getStatusMock.mockResolvedValue({
-      repoUrl: null,
       repoName: 'test-repo-name',
       codespaceUrl: null,
     });
     renderPanel();
     expect(await screen.findByText(/test-repo-name/)).toBeInTheDocument();
     expect(
-      screen.queryByRole('link', { name: /Repo URL/i }),
+      screen.queryByRole('link', { name: /Open Codespace/i }),
     ).not.toBeInTheDocument();
     expect(
       screen.getByText(/Codespace link will appear when ready/i),
     ).toBeInTheDocument();
   });
 
-  it('shows Open Repo link when only repoUrl is available', async () => {
+  it('does not render repo CTA when only repo identity is available', async () => {
     getStatusMock.mockResolvedValue({
-      repoUrl: 'http://repo',
+      repoFullName: 'org/repo-only',
       repoName: null,
       codespaceUrl: null,
     });
     renderPanel();
     expect(
-      await screen.findByRole('link', { name: /Open Repo/i }),
+      await screen.findByText(/Repo: org\/repo-only/i),
     ).toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /Open Repo/i })).toBeNull();
   });
 
   it('uses repoFullName when available', async () => {
     getStatusMock.mockResolvedValue({
-      repoUrl: 'http://repo',
       repoName: 'short-name',
       repoFullName: 'org/full-repo-name',
       codespaceUrl: null,
@@ -68,7 +65,6 @@ describe('WorkspacePanel extra rendering', () => {
 
   it('shows workspace status updating message when only codespace is available', async () => {
     getStatusMock.mockResolvedValue({
-      repoUrl: null,
       repoName: null,
       codespaceUrl: 'http://codespace',
     });

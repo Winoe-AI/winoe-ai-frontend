@@ -15,10 +15,17 @@ describe('LoginPage', () => {
     render(<LoginPage returnTo="/dashboard" />);
 
     const authLink = screen.getByRole('link', { name: 'Continue with Auth0' });
+    const signupLink = screen.getByRole('link', {
+      name: /New recruiter\? Create your account/i,
+    });
 
     expect(authLink).toHaveAttribute(
       'href',
-      '/auth/login?returnTo=%2Fdashboard&mode=recruiter',
+      '/auth/start?returnTo=%2Fdashboard&mode=recruiter',
+    );
+    expect(signupLink).toHaveAttribute(
+      'href',
+      '/recruiter-onboarding?returnTo=%2Fdashboard',
     );
   });
 
@@ -31,13 +38,13 @@ describe('LoginPage', () => {
     const authLink = screen.getByRole('link', { name: 'Continue with Auth0' });
     expect(authLink).toHaveAttribute(
       'href',
-      '/auth/login?returnTo=%2Fcandidate%2Fsession%2Ftok_123&mode=candidate',
+      '/auth/start?returnTo=%2Fcandidate%2Fsession%2Ftok_123&mode=candidate',
     );
     expect(
       screen.getByRole('link', { name: /Create your account/i }),
     ).toHaveAttribute(
       'href',
-      '/auth/login?returnTo=%2Fcandidate%2Fsession%2Ftok_123&mode=candidate&screen_hint=signup',
+      '/auth/start?returnTo=%2Fcandidate%2Fsession%2Ftok_123&mode=candidate&screen_hint=signup',
     );
   });
 
@@ -47,7 +54,7 @@ describe('LoginPage', () => {
     const authLink = screen.getByRole('link', { name: 'Continue with Auth0' });
     expect(authLink).toHaveAttribute(
       'href',
-      '/auth/login?returnTo=%2Fcandidate-sessions%2Ftok_legacy&mode=candidate',
+      '/auth/start?returnTo=%2Fcandidate-sessions%2Ftok_legacy&mode=candidate',
     );
   });
 });

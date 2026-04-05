@@ -6,6 +6,14 @@ describe('page wrapper metadata + layouts', () => {
     resetPageWrapperMocks();
   });
 
+  async function renderLayoutElement(
+    component: (props: {
+      children: React.ReactNode;
+    }) => React.ReactNode | Promise<React.ReactNode>,
+  ) {
+    return await component({ children: <div>test</div> });
+  }
+
   it('auth and not-authorized routes expose metadata', async () => {
     const { metadata: authErrorMeta } =
       await import('@/app/(auth)/auth/error/page');
@@ -25,26 +33,26 @@ describe('page wrapper metadata + layouts', () => {
 
   it('imports auth, candidate, recruiter, and marketing layouts', async () => {
     const { default: AuthLayout } = await import('@/app/(auth)/layout');
-    expect(
-      React.isValidElement(AuthLayout({ children: <div>test</div> })),
-    ).toBe(true);
+    expect(React.isValidElement(await renderLayoutElement(AuthLayout))).toBe(
+      true,
+    );
 
     const { default: CandidateLayout } =
       await import('@/app/(candidate)/layout');
     expect(
-      React.isValidElement(CandidateLayout({ children: <div>test</div> })),
+      React.isValidElement(await renderLayoutElement(CandidateLayout)),
     ).toBe(true);
 
     const { default: RecruiterLayout } =
       await import('@/app/(recruiter)/layout');
     expect(
-      React.isValidElement(RecruiterLayout({ children: <div>test</div> })),
+      React.isValidElement(await renderLayoutElement(RecruiterLayout)),
     ).toBe(true);
 
     const { default: MarketingLayout } =
       await import('@/app/(marketing)/layout');
     expect(
-      React.isValidElement(MarketingLayout({ children: <div>test</div> })),
+      React.isValidElement(await renderLayoutElement(MarketingLayout)),
     ).toBe(true);
   });
 });

@@ -2,6 +2,7 @@ import type {
   CandidateCurrentDayWindow,
   CandidateDayWindow,
 } from '@/features/candidate/session/api';
+import { resolveNowMs } from '@/shared/time/now';
 
 export function normalizeDayWindows(
   dayWindows: CandidateDayWindow[] | undefined | null,
@@ -45,7 +46,7 @@ export function hasScheduleConfigured(
 
 export function isScheduleLocked(
   bootstrap: ScheduleFields | null | undefined,
-  nowMs = Date.now(),
+  nowMs = resolveNowMs(),
 ): boolean {
   if (!hasScheduleConfigured(bootstrap)) return false;
   const target = firstWindowStartAt(bootstrap);

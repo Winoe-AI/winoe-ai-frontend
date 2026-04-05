@@ -13,7 +13,6 @@ export function normalizeWorkspaceStatus(
 ): CandidateWorkspaceStatus {
   if (!data || typeof data !== 'object') {
     return {
-      repoUrl: null,
       repoName: null,
       repoFullName: null,
       codespaceUrl: null,
@@ -23,7 +22,6 @@ export function normalizeWorkspaceStatus(
     };
   }
   const rec = data as Record<string, unknown>;
-  const repoUrl = toStringOrNull(rec.repoUrl ?? rec.repo_url) ?? null;
   const repoFullName =
     toStringOrNull(rec.repoFullName ?? rec.repo_full_name) ?? null;
   const repoName =
@@ -48,7 +46,6 @@ export function normalizeWorkspaceStatus(
     toIsoOrNull(rec.cutoffTime) ??
     toIsoOrNull(rec.cutoff_time);
   return {
-    repoUrl,
     repoName,
     repoFullName,
     codespaceUrl,

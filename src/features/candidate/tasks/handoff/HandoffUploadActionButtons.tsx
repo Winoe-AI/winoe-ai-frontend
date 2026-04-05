@@ -22,6 +22,7 @@ export function HandoffUploadActionButtons({
     fileInputRef,
     onInputChange,
   } = controller;
+  const uploadDisabled = replaceDisabled || !controller.consentChecked;
 
   return (
     <>
@@ -30,7 +31,7 @@ export function HandoffUploadActionButtons({
           <Button
             variant="primary"
             onClick={openFilePicker}
-            disabled={replaceDisabled}
+            disabled={uploadDisabled}
           >
             Upload video
           </Button>
@@ -40,7 +41,7 @@ export function HandoffUploadActionButtons({
           <Button
             variant="secondary"
             onClick={openFilePicker}
-            disabled={replaceDisabled}
+            disabled={uploadDisabled}
           >
             Replace upload
           </Button>
@@ -65,7 +66,7 @@ export function HandoffUploadActionButtons({
         type="file"
         accept={ACCEPT_INPUT_VALUE}
         onChange={onInputChange}
-        disabled={replaceDisabled}
+        disabled={uploadDisabled}
       />
     </>
   );

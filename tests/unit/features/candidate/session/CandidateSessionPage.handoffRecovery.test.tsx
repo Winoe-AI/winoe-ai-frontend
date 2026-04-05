@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import {
   buildSessionContext,
   getHandoffStatusMock,
@@ -28,6 +28,15 @@ describe('CandidateSessionPage Day 4 handoff current task', () => {
       candidateSessionId: 99,
     });
     expect(screen.getAllByText(/day 4 handoff/i).length).toBeGreaterThan(0);
+    expect(
+      screen.getByRole('button', { name: /replace upload/i }),
+    ).toBeDisabled();
+    expect(
+      screen.getByText(/Upload is disabled until consent is confirmed\./i),
+    ).toBeInTheDocument();
+    fireEvent.click(
+      screen.getByLabelText(/I consent to submission and processing/i),
+    );
     expect(
       screen.getByRole('button', { name: /replace upload/i }),
     ).toBeEnabled();

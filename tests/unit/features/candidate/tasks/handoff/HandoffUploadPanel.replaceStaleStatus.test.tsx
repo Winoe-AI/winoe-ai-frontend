@@ -76,11 +76,9 @@ describe('HandoffUploadPanel - replace upload ignores stale status', () => {
       'blob://preview-b',
     );
     fireEvent.click(
-      screen.getByLabelText(
-        /I understand and consent to submission and processing/i,
-      ),
+      screen.getByLabelText(/I consent to submission and processing/i),
     );
-    fireEvent.click(screen.getByRole('button', { name: /complete upload/i }));
+    fireEvent.click(screen.getByRole('button', { name: /finalize demo/i }));
     await waitFor(() =>
       expect(completeHandoffUploadMock).toHaveBeenCalledTimes(1),
     );

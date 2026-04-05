@@ -1,4 +1,3 @@
-import { MessageChannel, MessagePort } from 'worker_threads';
 import { ReadableStream } from 'stream/web';
 
 jest.mock('@/platform/auth0', () => ({
@@ -49,8 +48,8 @@ describe('bff testables', () => {
 
   it('creates a shared dispatcher when enabled and globals exist', async () => {
     process.env.TENON_USE_FETCH_DISPATCHER = 'true';
-    globalAny.MessageChannel = MessageChannel;
-    globalAny.MessagePort = MessagePort;
+    globalAny.MessageChannel = originalMessageChannel;
+    globalAny.MessagePort = originalMessagePort;
     globalAny.ReadableStream = ReadableStream;
     const mod = await import('@/platform/server/bff');
     const dispatcher = mod.__testables.getFetchDispatcher();

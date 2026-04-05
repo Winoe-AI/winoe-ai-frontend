@@ -9,7 +9,7 @@ Tenon Frontend is a Next.js App Router application for Tenon simulation workflow
 
 - Framework: Next.js 16 (App Router) + React 19 + TypeScript.
 - Routing: file-system routes in `src/app`.
-- Middleware auth and role gating: root `middleware.ts`, implementation in `src/platform/middleware`.
+- Middleware auth and role gating: `src/proxy.ts`, implementation in `src/platform/middleware`.
 - Candidate API integration: client calls to `/api/backend/*` (proxied to backend `/api/*`).
 - Recruiter API integration: BFF calls to `/api/*` routes in `src/app/api`.
 - Core app layers:

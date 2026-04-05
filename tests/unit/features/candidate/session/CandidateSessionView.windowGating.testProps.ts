@@ -83,6 +83,7 @@ export function buildCandidateSessionViewProps(): CandidateSessionViewProps {
     lastSubmissionId: null,
     onStart: jest.fn(),
     onDashboard: jest.fn(),
+    onReview: jest.fn(),
     onRetryInit: jest.fn(),
     onGoHome: jest.fn(),
     onRetryTask: jest.fn(),

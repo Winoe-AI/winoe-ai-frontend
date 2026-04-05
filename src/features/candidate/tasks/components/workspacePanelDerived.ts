@@ -29,14 +29,17 @@ export function deriveWorkspacePanelState({
     cutoffCommitSha ?? workspace?.cutoffCommitSha ?? null;
   const effectiveCutoffAt = cutoffAt ?? workspace?.cutoffAt ?? null;
   const effectiveError = codingWorkspace?.error ?? error;
-  const hasRepoUrl = Boolean(
-    effectiveWorkspace?.repoUrl && effectiveWorkspace.repoUrl.trim(),
+  const hasWorkspaceIdentity = Boolean(
+    (effectiveWorkspace?.repoFullName &&
+      effectiveWorkspace.repoFullName.trim()) ||
+    (effectiveWorkspace?.repoName && effectiveWorkspace.repoName.trim()),
   );
   const shouldShowFallback = Boolean(
     showCodespaceFallback && isWorkspaceIntegrityDay && !readOnly,
   );
-  const shouldShowActionableFallback = shouldShowFallback && hasRepoUrl;
-  const shouldShowUnavailableFallbackState = shouldShowFallback && !hasRepoUrl;
+  const shouldShowActionableFallback = shouldShowFallback;
+  const shouldShowUnavailableFallbackState =
+    shouldShowFallback && !hasWorkspaceIdentity;
   const workspaceMessage = codingWorkspace?.error
     ? 'Unable to confirm a shared Day 2/Day 3 workspace identity.'
     : buildWorkspaceMessage(effectiveWorkspace);
@@ -47,7 +50,7 @@ export function deriveWorkspacePanelState({
     effectiveCutoffCommitSha,
     effectiveCutoffAt,
     effectiveError,
-    hasRepoUrl,
+    hasWorkspaceIdentity,
     shouldShowFallback,
     shouldShowActionableFallback,
     shouldShowUnavailableFallbackState,

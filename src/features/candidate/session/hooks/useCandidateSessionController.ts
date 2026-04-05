@@ -22,7 +22,7 @@ export function useCandidateSessionController(token: string) {
     currentTask,
     currentTaskId,
   } = useCandidateSessionScopedState(session, token);
-  const { loginHref, redirectToLogin, onDashboard, onGoHome } =
+  const { loginHref, redirectToLogin, onDashboard, onReview, onGoHome } =
     useCandidateSessionControllerNavigation(token);
   const { markStart, markEnd } = usePerfMarks();
   const detectedTimezone = useMemo(() => detectBrowserTimezone(), []);
@@ -102,6 +102,7 @@ export function useCandidateSessionController(token: string) {
     lastSubmissionId: runtime.lastSubmissionId,
     onStart: runtime.handleStart,
     onDashboard,
+    onReview,
     onGoHome,
     token,
     onTaskWindowClosed: handleTaskWindowClosed,

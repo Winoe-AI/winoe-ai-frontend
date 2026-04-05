@@ -13,7 +13,6 @@ describe('WorkspacePanel ready states', () => {
 
   it('renders codespace CTA when available', async () => {
     statusMock.mockResolvedValueOnce({
-      repoUrl: 'https://github.com/acme/repo',
       repoName: 'acme/repo',
       codespaceUrl: 'https://codespaces.new/acme/repo',
     });
@@ -31,29 +30,24 @@ describe('WorkspacePanel ready states', () => {
     expect(screen.queryByRole('link', { name: /open repo/i })).toBeNull();
   });
 
-  it('renders repo CTA when codespace is unavailable', async () => {
+  it('renders repo identity when codespace is unavailable', async () => {
     statusMock.mockResolvedValueOnce({
-      repoUrl: 'https://github.com/acme/repo',
       repoName: 'acme/repo',
       codespaceUrl: null,
     });
     renderWorkspacePanel(13, 14);
     await screen.findByText(/Repository is ready/i);
     expect(initMock).not.toHaveBeenCalled();
-    expect(screen.getByRole('link', { name: /open repo/i })).toHaveAttribute(
-      'href',
-      'https://github.com/acme/repo',
-    );
+    expect(screen.queryByRole('link', { name: /open repo/i })).toBeNull();
+    expect(screen.getByText(/Repo: acme\/repo/i)).toBeInTheDocument();
   });
 
   it('initializes when status is empty or returns 404', async () => {
     statusMock.mockResolvedValueOnce({
-      repoUrl: null,
       repoName: null,
       codespaceUrl: null,
     });
     initMock.mockResolvedValueOnce({
-      repoUrl: 'https://github.com/acme/repo',
       repoName: 'acme/repo',
       codespaceUrl: null,
     });
@@ -64,7 +58,6 @@ describe('WorkspacePanel ready states', () => {
     resetWorkspacePanelMocks();
     statusMock.mockRejectedValueOnce({ status: 404 });
     initMock.mockResolvedValueOnce({
-      repoUrl: 'https://github.com/acme/repo',
       repoName: 'acme/repo',
       codespaceUrl: null,
     });
@@ -75,7 +68,6 @@ describe('WorkspacePanel ready states', () => {
 
   it('renders repoFullName when available', async () => {
     statusMock.mockResolvedValueOnce({
-      repoUrl: 'https://github.com/org/fullname',
       repoName: 'shortname',
       repoFullName: 'org/fullname',
       codespaceUrl: null,
