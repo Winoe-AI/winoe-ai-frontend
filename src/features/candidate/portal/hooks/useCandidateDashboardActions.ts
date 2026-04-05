@@ -1,6 +1,7 @@
 import { useCallback } from 'react';
 import { type QueryClient } from '@tanstack/react-query';
 import {
+  getCandidateCompletedReview,
   getCandidateCurrentTask,
   resolveCandidateInviteToken,
   type CandidateInvite,
@@ -27,6 +28,19 @@ export function useCandidateDashboardActions({
   inviteToken,
   setError,
 }: Params) {
+  const isCompletedInvite = useCallback(
+    (invite: CandidateInvite) => invite.status === 'completed',
+    [],
+  );
+
+  const resolveDestination = useCallback(
+    (invite: CandidateInvite, token: string) =>
+      isCompletedInvite(invite)
+        ? `/candidate/session/${encodeURIComponent(token)}/review`
+        : `/candidate/session/${encodeURIComponent(token)}`,
+    [isCompletedInvite],
+  );
+
   const resolveFallbackToken = useCallback(
     (invite: CandidateInvite) =>
       invite.candidateSessionId === candidateSessionId
@@ -46,9 +60,9 @@ export function useCandidateDashboardActions({
         setError('Invite link unavailable. Please reopen your invite email.');
         return;
       }
-      router.push(`/candidate/session/${encodeURIComponent(token)}`);
+      router.push(resolveDestination(invite, token));
     },
-    [resolveFallbackToken, router, setError],
+    [resolveDestination, resolveFallbackToken, router, setError],
   );
 
   const prefetchContinue = useCallback(
@@ -56,8 +70,18 @@ export function useCandidateDashboardActions({
       if (invite.isExpired) return;
       const token = invite.token ?? resolveFallbackToken(invite);
       if (!token) return;
+      const destination = resolveDestination(invite, token);
 
-      void router.prefetch(`/candidate/session/${encodeURIComponent(token)}`);
+      void router.prefetch(destination);
+      if (isCompletedInvite(invite)) {
+        void queryClient.prefetchQuery({
+          queryKey: queryKeys.candidate.sessionReview(token),
+          queryFn: ({ signal }) =>
+            getCandidateCompletedReview(token, { signal, skipCache: false }),
+          staleTime: 10_000,
+        });
+        return;
+      }
       void queryClient
         .fetchQuery({
           queryKey: queryKeys.candidate.sessionBootstrap(token),
@@ -83,7 +107,13 @@ export function useCandidateDashboardActions({
         })
         .catch(() => {});
     },
-    [queryClient, resolveFallbackToken, router],
+    [
+      isCompletedInvite,
+      queryClient,
+      resolveDestination,
+      resolveFallbackToken,
+      router,
+    ],
   );
 
   return { resolveFallbackToken, handleContinue, prefetchContinue };

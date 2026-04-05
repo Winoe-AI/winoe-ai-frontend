@@ -22,7 +22,9 @@ export default function CompanyAiSettingsPage() {
   const [error, setError] = useState<string | null>(null);
   const [companyName, setCompanyName] = useState<string>('Your company');
   const [promptPackVersion, setPromptPackVersion] = useState<string>('unknown');
-  const [values, setValues] = useState(() => buildPromptOverrideFormValues(null));
+  const [values, setValues] = useState(() =>
+    buildPromptOverrideFormValues(null),
+  );
 
   useEffect(() => {
     let active = true;
@@ -133,7 +135,9 @@ export default function CompanyAiSettingsPage() {
                   );
                   setCompanyName(config.companyName);
                   setPromptPackVersion(config.promptPackVersion);
-                  setValues(buildPromptOverrideFormValues(config.promptOverrides));
+                  setValues(
+                    buildPromptOverrideFormValues(config.promptOverrides),
+                  );
                 } catch (caught: unknown) {
                   setError(
                     caught instanceof Error

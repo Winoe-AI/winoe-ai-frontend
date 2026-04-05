@@ -26,10 +26,10 @@ export function StartView({ title, role, onStart, onDashboard }: Props) {
             Actions).
           </li>
           <li>
-            <b>Day 4:</b> handoff demo & presentation.
+            <b>Day 4:</b> demo presentation.
           </li>
           <li>
-            <b>Day 5:</b> documentation & wrap-up.
+            <b>Day 5:</b> reflection essay.
           </li>
           <li>Schedule: 9:00 AM–5:00 PM local time, for 5 consecutive days.</li>
         </ul>

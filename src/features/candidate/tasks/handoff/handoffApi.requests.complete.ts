@@ -26,7 +26,7 @@ export async function completeHandoffUpload(params: {
       consent,
     });
     const { data } = await requestWithMeta<unknown>(
-      `/tasks/${String(taskId)}/handoff/upload/complete`,
+      `/tasks/${String(taskId)}/presentation/upload/complete`,
       {
         method: 'POST',
         cache: 'no-store',

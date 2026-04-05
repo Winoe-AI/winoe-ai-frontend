@@ -13,11 +13,9 @@ import { selectVideo } from './HandoffUploadPanel.helpers';
 
 async function acceptConsentAndComplete() {
   fireEvent.click(
-    screen.getByLabelText(
-      /I understand and consent to submission and processing/i,
-    ),
+    screen.getByLabelText(/I consent to submission and processing/i),
   );
-  fireEvent.click(screen.getByRole('button', { name: /complete upload/i }));
+  fireEvent.click(screen.getByRole('button', { name: /finalize demo/i }));
   await waitFor(() => {
     expect(completeHandoffUploadMock).toHaveBeenCalledTimes(1);
   });
@@ -30,7 +28,7 @@ describe('HandoffUploadPanel - upload retries', () => {
     selectVideo(container);
     await waitFor(() =>
       expect(
-        screen.getByRole('button', { name: /complete upload/i }),
+        screen.getByRole('button', { name: /finalize demo/i }),
       ).toBeDisabled(),
     );
     expect(
@@ -66,13 +64,13 @@ describe('HandoffUploadPanel - upload retries', () => {
       screen.queryByRole('button', { name: /replace upload/i }),
     ).not.toBeInTheDocument();
     expect(
-      screen.queryByRole('button', { name: /complete upload/i }),
+      screen.queryByRole('button', { name: /finalize demo/i }),
     ).not.toBeInTheDocument();
     selectVideo(container, 'second.mp4');
     await waitFor(() => expect(initHandoffUploadMock).toHaveBeenCalledTimes(2));
     await waitFor(() =>
       expect(
-        screen.getByRole('button', { name: /complete upload/i }),
+        screen.getByRole('button', { name: /finalize demo/i }),
       ).toBeDisabled(),
     );
     expect(uploadFileToSignedUrlMock).toHaveBeenCalledTimes(1);
@@ -103,7 +101,7 @@ describe('HandoffUploadPanel - upload retries', () => {
       expect(screen.getByText(/Signed URL upload failed/i)).toBeInTheDocument(),
     );
     expect(
-      screen.queryByRole('button', { name: /complete upload/i }),
+      screen.queryByRole('button', { name: /finalize demo/i }),
     ).not.toBeInTheDocument();
     expect(completeHandoffUploadMock).not.toHaveBeenCalled();
     selectVideo(container, 'second.mp4');
@@ -111,7 +109,7 @@ describe('HandoffUploadPanel - upload retries', () => {
       expect(uploadFileToSignedUrlMock).toHaveBeenCalledTimes(2),
     );
     expect(
-      screen.getByRole('button', { name: /complete upload/i }),
+      screen.getByRole('button', { name: /finalize demo/i }),
     ).toBeDisabled();
     expect(completeHandoffUploadMock).not.toHaveBeenCalled();
   });

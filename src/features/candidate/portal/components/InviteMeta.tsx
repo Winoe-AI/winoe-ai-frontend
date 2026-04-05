@@ -3,6 +3,8 @@ import type { CandidateInvite } from '@/features/candidate/session/api';
 type Props = { invite: CandidateInvite };
 
 export function InviteMeta({ invite }: Props) {
+  const recruiter = invite.recruiterName ?? invite.recruiterEmail ?? null;
+
   return (
     <div className="space-y-1">
       <div className="text-lg font-semibold text-gray-900">{invite.title}</div>
@@ -10,6 +12,9 @@ export function InviteMeta({ invite }: Props) {
         {invite.role}
         {invite.company ? ` • ${invite.company}` : null}
       </div>
+      {recruiter ? (
+        <div className="text-sm text-gray-600">Invited by {recruiter}</div>
+      ) : null}
     </div>
   );
 }

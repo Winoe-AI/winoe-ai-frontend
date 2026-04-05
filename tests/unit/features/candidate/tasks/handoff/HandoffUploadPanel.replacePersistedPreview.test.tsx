@@ -59,11 +59,9 @@ describe('HandoffUploadPanel - replace upload persisted preview', () => {
     );
     expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob://preview-a');
     fireEvent.click(
-      screen.getByLabelText(
-        /I understand and consent to submission and processing/i,
-      ),
+      screen.getByLabelText(/I consent to submission and processing/i),
     );
-    fireEvent.click(screen.getByRole('button', { name: /complete upload/i }));
+    fireEvent.click(screen.getByRole('button', { name: /finalize demo/i }));
     await waitFor(() => {
       expect(completeHandoffUploadMock).toHaveBeenCalledWith(
         expect.objectContaining({ recordingId: 'rec_b' }),
@@ -76,7 +74,7 @@ describe('HandoffUploadPanel - replace upload persisted preview', () => {
     );
     expect(URL.revokeObjectURL).toHaveBeenCalledWith('blob://preview-b');
     expect(
-      screen.queryByRole('button', { name: /complete upload/i }),
+      screen.queryByRole('button', { name: /finalize demo/i }),
     ).not.toBeInTheDocument();
   });
 });

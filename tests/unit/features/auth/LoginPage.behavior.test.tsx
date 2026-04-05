@@ -17,10 +17,7 @@ describe('LoginPage', () => {
     expect(screen.getByText(/access your .* dashboard/i)).toBeInTheDocument();
     expect(
       screen.getByText(/New recruiter\? Create your account/i),
-    ).toHaveAttribute(
-      'href',
-      '/recruiter-onboarding?returnTo=%2Fdashboard',
-    );
+    ).toHaveAttribute('href', '/recruiter-onboarding?returnTo=%2Fdashboard');
   });
 
   it('renders candidate mode with signup link and warning when connection missing', () => {

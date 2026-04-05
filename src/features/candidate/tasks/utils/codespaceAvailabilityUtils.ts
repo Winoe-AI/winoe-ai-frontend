@@ -60,9 +60,7 @@ function isNotReadySignal(value: string): boolean {
 }
 
 function hasRepoIdentity(result: WorkspaceLoadResult): boolean {
-  return Boolean(
-    result.workspace?.repoName || result.workspace?.repoFullName,
-  );
+  return Boolean(result.workspace?.repoName || result.workspace?.repoFullName);
 }
 
 export function classifyCodespaceAvailability(

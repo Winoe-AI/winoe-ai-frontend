@@ -47,7 +47,9 @@ describe('WorkspacePanel extra rendering', () => {
       codespaceUrl: null,
     });
     renderPanel();
-    expect(await screen.findByText(/Repo: org\/repo-only/i)).toBeInTheDocument();
+    expect(
+      await screen.findByText(/Repo: org\/repo-only/i),
+    ).toBeInTheDocument();
     expect(screen.queryByRole('link', { name: /Open Repo/i })).toBeNull();
   });
 

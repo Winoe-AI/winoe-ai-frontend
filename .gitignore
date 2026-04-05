@@ -56,5 +56,8 @@ ai_flow_boot_script.sh
 # E2E Flow QA generated artifacts
 /qa_verifications/E2E-Flow-QA/e2e_flow_qa_latest
 
+# Contract-live generated artifacts
+/qa_verifications/Contract-Live-QA/contract_live_qa_latest
+
 # Code Quality generated artifacts
 /code-quality

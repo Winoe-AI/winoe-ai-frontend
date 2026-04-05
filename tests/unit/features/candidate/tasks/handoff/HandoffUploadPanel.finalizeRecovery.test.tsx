@@ -23,7 +23,7 @@ describe('HandoffUploadPanel - finalize recovery', () => {
     selectVideo(container, 'staged.mp4');
     await waitFor(() =>
       expect(
-        screen.getByRole('button', { name: /complete upload/i }),
+        screen.getByRole('button', { name: /finalize demo/i }),
       ).toBeDisabled(),
     );
     expect(container.querySelector('video')?.getAttribute('src')).toBe(
@@ -35,7 +35,7 @@ describe('HandoffUploadPanel - finalize recovery', () => {
     );
     await waitFor(() => expect(getHandoffStatusMock).toHaveBeenCalledTimes(3));
     expect(
-      screen.getByRole('button', { name: /complete upload/i }),
+      screen.getByRole('button', { name: /finalize demo/i }),
     ).toBeDisabled();
     expect(container.querySelector('video')?.getAttribute('src')).toBe(
       'blob://staged-preview',
@@ -52,15 +52,13 @@ describe('HandoffUploadPanel - finalize recovery', () => {
     selectVideo(container, 'handoff.mp4');
     await waitFor(() =>
       expect(
-        screen.getByRole('button', { name: /complete upload/i }),
+        screen.getByRole('button', { name: /finalize demo/i }),
       ).toBeDisabled(),
     );
     fireEvent.click(
-      screen.getByLabelText(
-        /I understand and consent to submission and processing/i,
-      ),
+      screen.getByLabelText(/I consent to submission and processing/i),
     );
-    fireEvent.click(screen.getByRole('button', { name: /complete upload/i }));
+    fireEvent.click(screen.getByRole('button', { name: /finalize demo/i }));
     await waitFor(() =>
       expect(completeHandoffUploadMock).toHaveBeenCalledTimes(1),
     );
@@ -69,10 +67,10 @@ describe('HandoffUploadPanel - finalize recovery', () => {
     );
     await waitFor(() =>
       expect(
-        screen.getByRole('button', { name: /complete upload/i }),
+        screen.getByRole('button', { name: /finalize demo/i }),
       ).toBeEnabled(),
     );
-    fireEvent.click(screen.getByRole('button', { name: /complete upload/i }));
+    fireEvent.click(screen.getByRole('button', { name: /finalize demo/i }));
     await waitFor(() =>
       expect(completeHandoffUploadMock).toHaveBeenCalledTimes(2),
     );
@@ -86,7 +84,7 @@ describe('HandoffUploadPanel - finalize recovery', () => {
     );
     await waitFor(() =>
       expect(
-        screen.queryByRole('button', { name: /complete upload/i }),
+        screen.queryByRole('button', { name: /finalize demo/i }),
       ).not.toBeInTheDocument(),
     );
     expect(container.querySelector('video')).toBeInTheDocument();

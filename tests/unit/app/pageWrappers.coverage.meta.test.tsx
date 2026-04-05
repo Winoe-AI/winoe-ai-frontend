@@ -7,7 +7,9 @@ describe('page wrapper metadata + layouts', () => {
   });
 
   async function renderLayoutElement(
-    component: (props: { children: React.ReactNode }) => React.ReactNode | Promise<React.ReactNode>,
+    component: (props: {
+      children: React.ReactNode;
+    }) => React.ReactNode | Promise<React.ReactNode>,
   ) {
     return await component({ children: <div>test</div> });
   }
@@ -31,9 +33,9 @@ describe('page wrapper metadata + layouts', () => {
 
   it('imports auth, candidate, recruiter, and marketing layouts', async () => {
     const { default: AuthLayout } = await import('@/app/(auth)/layout');
-    expect(
-      React.isValidElement(await renderLayoutElement(AuthLayout)),
-    ).toBe(true);
+    expect(React.isValidElement(await renderLayoutElement(AuthLayout))).toBe(
+      true,
+    );
 
     const { default: CandidateLayout } =
       await import('@/app/(candidate)/layout');

@@ -46,9 +46,7 @@ describe('WorkspacePanel read-only and cutoff', () => {
       isClosed: true,
     });
     expect(await screen.findByText(/^Day closed$/i)).toBeInTheDocument();
-    expect(
-      screen.getByLabelText(/Cutoff commit SHA abc123def456/i),
-    );
+    expect(screen.getByLabelText(/Cutoff commit SHA abc123def456/i));
     expect(screen.getByText(/Cutoff time:/i)).toBeInTheDocument();
   });
 
@@ -65,8 +63,6 @@ describe('WorkspacePanel read-only and cutoff', () => {
       isClosed: true,
     });
     expect(await screen.findByText(/^Day closed$/i)).toBeInTheDocument();
-    expect(
-      screen.getByLabelText(/Cutoff commit SHA abc123def456/i),
-    );
+    expect(screen.getByLabelText(/Cutoff commit SHA abc123def456/i));
   });
 });

@@ -32,7 +32,7 @@ export function deriveWorkspacePanelState({
   const hasWorkspaceIdentity = Boolean(
     (effectiveWorkspace?.repoFullName &&
       effectiveWorkspace.repoFullName.trim()) ||
-      (effectiveWorkspace?.repoName && effectiveWorkspace.repoName.trim()),
+    (effectiveWorkspace?.repoName && effectiveWorkspace.repoName.trim()),
   );
   const shouldShowFallback = Boolean(
     showCodespaceFallback && isWorkspaceIntegrityDay && !readOnly,

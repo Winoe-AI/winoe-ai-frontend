@@ -1,3 +1,4 @@
+import { waitFor } from '@testing-library/react';
 import {
   act,
   baseResult,
@@ -35,7 +36,12 @@ describe('RunTestsPanel - core flow', () => {
     await user.click(getTestsButton());
     expect(onStart).toHaveBeenCalledTimes(1);
     expect(await screen.findByRole('status')).toHaveTextContent(
-      /Tests are running/i,
+      /Preparing test run/i,
+    );
+    await waitFor(() =>
+      expect(screen.getByRole('status')).toHaveTextContent(
+        /Tests are running/i,
+      ),
     );
     expect(
       (

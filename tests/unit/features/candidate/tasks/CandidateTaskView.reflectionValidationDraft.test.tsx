@@ -1,7 +1,6 @@
 import { act, fireEvent, screen, waitFor } from '@testing-library/react';
 import {
   baseTask,
-  fillAllReflectionSections,
   getCandidateTaskDraftMock,
   primeDraftMocks,
   putCandidateTaskDraftMock,
@@ -18,14 +17,8 @@ describe('CandidateTaskView reflection validation and editable draft behavior', 
     jest.useRealTimers();
   });
 
-  it('maps backend reflection.communication validation to inline field error', async () => {
-    const onSubmit = jest.fn().mockRejectedValue({
-      status: 422,
-      details: {
-        errorCode: 'VALIDATION_ERROR',
-        details: { fields: { 'reflection.communication': ['too_short'] } },
-      },
-    });
+  it('uses generic markdown validation for day 5 reflection submission', async () => {
+    const onSubmit = jest.fn().mockResolvedValue(undefined);
     renderTaskView({
       task: {
         ...baseTask,
@@ -37,16 +30,26 @@ describe('CandidateTaskView reflection validation and editable draft behavior', 
       },
       onSubmit,
     });
-    fillAllReflectionSections();
+
     fireEvent.click(screen.getByRole('button', { name: /submit & continue/i }));
-    await waitFor(() => {
-      const section = screen
-        .getByLabelText(/communication/i)
-        .closest('section');
-      expect((section?.textContent ?? '').toLowerCase()).toContain(
-        'add at least 20 characters',
-      );
+    await waitFor(() =>
+      expect(
+        screen.getByText(/please enter an answer before submitting\./i),
+      ).toBeInTheDocument(),
+    );
+    fireEvent.change(screen.getByRole('textbox'), {
+      target: {
+        value:
+          '# Reflection\n\nHandled ambiguous requirements by validating assumptions early in the flow.',
+      },
     });
+    fireEvent.click(screen.getByRole('button', { name: /submit & continue/i }));
+    await waitFor(() =>
+      expect(onSubmit).toHaveBeenCalledWith({
+        contentText:
+          '# Reflection\n\nHandled ambiguous requirements by validating assumptions early in the flow.',
+      }),
+    );
     expect(onSubmit).toHaveBeenCalledTimes(1);
   });
 

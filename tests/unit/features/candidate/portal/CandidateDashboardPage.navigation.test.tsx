@@ -39,6 +39,29 @@ describe('CandidateDashboardPage navigation behavior', () => {
     );
   });
 
+  it('routes completed invites to the completed review hub', async () => {
+    listCandidateInvitesMock.mockResolvedValue([
+      {
+        candidateSessionId: 2,
+        title: 'Completed Sim',
+        role: 'Developer',
+        status: 'completed',
+        isExpired: false,
+        token: 'done-token',
+      },
+    ]);
+    await renderDashboardPage();
+    await waitFor(() => {
+      expect(screen.getByText('Completed Sim')).toBeInTheDocument();
+    });
+    fireEvent.click(
+      screen.getByRole('button', { name: /Review submissions/i }),
+    );
+    expect(useRouterMock.push).toHaveBeenCalledWith(
+      '/candidate/session/done-token/review',
+    );
+  });
+
   it('uses fallback token when invite token is missing for same session', async () => {
     setCandidateSessionState({
       candidateSessionId: 999,

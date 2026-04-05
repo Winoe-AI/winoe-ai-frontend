@@ -65,14 +65,15 @@ export function SimulationAiOverridesPanel({
 
       <div className="grid gap-3 lg:grid-cols-2">
         <div className="rounded-md border border-gray-200 bg-white p-3 text-xs text-gray-700">
-          <div className="font-semibold text-gray-900">Active frozen snapshot</div>
+          <div className="font-semibold text-gray-900">
+            Active frozen snapshot
+          </div>
           <div className="mt-2">
             Scenario version:{' '}
             {activeSnapshot?.scenarioVersionId ?? 'Not generated yet'}
           </div>
           <div className="mt-1">
-            Snapshot digest:{' '}
-            {activeSnapshot?.snapshotDigest ?? 'Missing'}
+            Snapshot digest: {activeSnapshot?.snapshotDigest ?? 'Missing'}
           </div>
           <div className="mt-1">
             Bundle status: {activeSnapshot?.bundleStatus ?? 'n/a'}
@@ -85,12 +86,10 @@ export function SimulationAiOverridesPanel({
         <div className="rounded-md border border-gray-200 bg-white p-3 text-xs text-gray-700">
           <div className="font-semibold text-gray-900">Pending snapshot</div>
           <div className="mt-2">
-            Scenario version:{' '}
-            {pendingSnapshot?.scenarioVersionId ?? 'None'}
+            Scenario version: {pendingSnapshot?.scenarioVersionId ?? 'None'}
           </div>
           <div className="mt-1">
-            Snapshot digest:{' '}
-            {pendingSnapshot?.snapshotDigest ?? 'None'}
+            Snapshot digest: {pendingSnapshot?.snapshotDigest ?? 'None'}
           </div>
           <div className="mt-1">
             Bundle status: {pendingSnapshot?.bundleStatus ?? 'n/a'}
@@ -104,7 +103,9 @@ export function SimulationAiOverridesPanel({
 
       {activeSnapshot?.agents?.length ? (
         <div className="rounded-md border border-gray-200 bg-gray-50 p-3 text-xs text-gray-700">
-          <div className="font-semibold text-gray-900">Frozen agent runtime</div>
+          <div className="font-semibold text-gray-900">
+            Frozen agent runtime
+          </div>
           <div className="mt-2 grid gap-2 lg:grid-cols-2">
             {activeSnapshot.agents.map((agent) => (
               <div

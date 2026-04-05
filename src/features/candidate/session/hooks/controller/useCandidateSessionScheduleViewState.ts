@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { resolveNowMs } from '@/shared/time/now';
 import {
   countdownFromUtc,
   firstWindowStartAt,
@@ -21,7 +22,7 @@ export function useCandidateSessionScheduleViewState({
   token,
   scheduleTimezoneValue,
 }: Params) {
-  const [clockNowMs, setClockNowMs] = useState<number>(() => Date.now());
+  const [clockNowMs, setClockNowMs] = useState<number>(() => resolveNowMs());
   const unlockRefreshRef = useRef<string | null>(null);
 
   const scheduleResponseWindows = useMemo(
@@ -51,7 +52,7 @@ export function useCandidateSessionScheduleViewState({
 
   useEffect(() => {
     if (view !== 'locked') return;
-    const timer = window.setInterval(() => setClockNowMs(Date.now()), 1000);
+    const timer = window.setInterval(() => setClockNowMs(resolveNowMs()), 1000);
     return () => window.clearInterval(timer);
   }, [view]);
 

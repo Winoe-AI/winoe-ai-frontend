@@ -59,9 +59,7 @@ describe('WorkspaceAndTests', () => {
     expect(
       screen.getByText(/Evaluation is based on the commit shown below/i),
     ).toBeInTheDocument();
-    expect(
-      screen.getByLabelText(/Cutoff commit SHA abc123def456/i),
-    );
+    expect(screen.getByLabelText(/Cutoff commit SHA abc123def456/i));
     expect(
       screen.getAllByText(
         /Day closed\. Work after cutoff will not be considered\./i,

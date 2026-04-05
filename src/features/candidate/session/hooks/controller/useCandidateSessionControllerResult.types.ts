@@ -29,6 +29,7 @@ export type BuildCandidateSessionControllerResultArgs = {
   lastSubmissionId: number | null;
   onStart: () => void;
   onDashboard: () => void;
+  onReview: () => void;
   onGoHome: () => void;
   token: string;
   onTaskWindowClosed: (err: unknown) => void;

@@ -1,3 +1,5 @@
+import { resolveNowMs } from '@/shared/time/now';
+
 export type CountdownParts = {
   totalMs: number;
   days: number;
@@ -20,7 +22,7 @@ function completedCountdown(): CountdownParts {
 
 export function countdownFromUtc(
   targetUtcIso: string | null | undefined,
-  nowMs = Date.now(),
+  nowMs = resolveNowMs(),
 ): CountdownParts {
   if (!targetUtcIso) return completedCountdown();
   const targetMs = Date.parse(targetUtcIso);

@@ -15,21 +15,21 @@ export function ResourceSections({
     <>
       {showRecording ? (
         <ResourcePanel
-          title="Day 4 recording"
-          description="Record a short walkthrough covering your decisions."
+          title="Day 4 demo"
+          description="Upload or review your demo presentation for this simulation."
           linkUrl={resourceLink}
-          linkLabel="Open recording link"
-          emptyMessage="Look for the recording link in your prompt."
+          linkLabel="Open demo resource"
+          emptyMessage="Use the demo upload panel below to submit your presentation."
         />
       ) : null}
 
       {showDocs ? (
         <ResourcePanel
-          title="Day 5 reflection"
-          description="Use the guided reflection prompt to submit your final notes."
+          title="Day 5 reflection essay"
+          description="Write your final markdown reflection essay in the editor below."
           linkUrl={resourceLink}
-          linkLabel="Open reflection prompt"
-          emptyMessage="Look for the reflection prompt link in your task description."
+          linkLabel="Open reference"
+          emptyMessage="Use the markdown editor below to write your reflection essay."
         />
       ) : null}
     </>

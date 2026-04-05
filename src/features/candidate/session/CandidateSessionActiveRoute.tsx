@@ -13,7 +13,11 @@ export function CandidateSessionActiveRoute({
   props,
   RunningViewComponent,
 }: CandidateSessionActiveRouteProps) {
-  if (props.isComplete) return <CompleteView />;
+  if (props.isComplete) {
+    return (
+      <CompleteView onReview={props.onReview} onDashboard={props.onDashboard} />
+    );
+  }
   if (!props.started) {
     return (
       <StartView

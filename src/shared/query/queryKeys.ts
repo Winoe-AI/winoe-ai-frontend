@@ -67,6 +67,8 @@ export const queryKeys = {
     invites: () => ['candidate', 'invites'] as const,
     sessionBootstrap: (token: string) =>
       ['candidate', 'session', keyPart(token), 'bootstrap'] as const,
+    sessionReview: (token: string) =>
+      ['candidate', 'session', keyPart(token), 'review'] as const,
     currentTask: (candidateSessionId: number) =>
       ['candidate', 'session', candidateSessionId, 'current-task'] as const,
   },

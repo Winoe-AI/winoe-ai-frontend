@@ -3,9 +3,7 @@ import type {
   SimulationPromptOverrideKey,
   SimulationRoleLevel,
 } from '@/features/recruiter/api';
-import {
-  MAX_PROMPT_OVERRIDE_MARKDOWN_CHARS,
-} from '@/features/recruiter/ai/promptOverrideFormUtils';
+import { MAX_PROMPT_OVERRIDE_MARKDOWN_CHARS } from '@/features/recruiter/ai/promptOverrideFormUtils';
 import { SIMULATION_PROMPT_OVERRIDE_KEYS } from '@/features/recruiter/api/simulationAiConfigApi';
 import {
   AI_DAY_FIELD_MAP,
@@ -77,7 +75,9 @@ export function validateSimulationInput(
 
   for (const key of SIMULATION_PROMPT_OVERRIDE_KEYS) {
     const override = input.ai?.promptOverrides?.[key];
-    const instructionsLength = trimOrUndefined(override?.instructionsMd)?.length;
+    const instructionsLength = trimOrUndefined(
+      override?.instructionsMd,
+    )?.length;
     const rubricLength = trimOrUndefined(override?.rubricMd)?.length;
     if (
       (instructionsLength ?? 0) > MAX_PROMPT_OVERRIDE_MARKDOWN_CHARS ||

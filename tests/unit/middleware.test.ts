@@ -75,7 +75,9 @@ jest.mock('@/platform/middleware/auth', () => ({
   redirectSignedInHome: jest.fn(() => null),
   gateByRole: jest.fn(() => null),
 }));
-import proxyEntrypoint, { config as proxyEntrypointConfig } from '../../src/proxy';
+import proxyEntrypoint, {
+  config as proxyEntrypointConfig,
+} from '../../src/proxy';
 import { proxy, config as proxyConfig } from '@/platform/middleware/proxy';
 describe('middleware wiring', () => {
   it('re-exports proxy handler', () => {

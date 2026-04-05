@@ -8,7 +8,7 @@ import { type HandoffUploadState } from './handoffUploadMachine';
 
 export function deriveHandoffNoticeState(state: HandoffUploadState) {
   return {
-    uploadHint: `Accepted: MP4, WebM, MOV. Recommended under ${formatBytes(DEFAULT_RECOMMENDED_VIDEO_BYTES)}; backend enforces the exact upload-size limit.`,
+    uploadHint: `Accepted: MP4, WebM, MOV. Use this video to demo your work, decisions, tradeoffs, and outcomes. Recommended under ${formatBytes(DEFAULT_RECOMMENDED_VIDEO_BYTES)}; backend enforces the exact upload-size limit.`,
     aiNoticeVersion: state.aiNoticeVersion ?? DEFAULT_NOTICE_VERSION,
     aiNoticeEnabled: state.aiNoticeEnabled !== false,
     aiNoticeSummaryUrl:

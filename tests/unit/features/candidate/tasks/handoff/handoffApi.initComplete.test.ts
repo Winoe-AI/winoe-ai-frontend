@@ -38,7 +38,7 @@ describe('handoffApi init and complete', () => {
       expiresInSeconds: 1200,
     });
     expect(fetchMock).toHaveBeenCalledWith(
-      '/api/backend/tasks/9/handoff/upload/init',
+      '/api/backend/tasks/9/presentation/upload/init',
       expect.objectContaining({
         method: 'POST',
         headers: expect.objectContaining({ 'x-candidate-session-id': '44' }),

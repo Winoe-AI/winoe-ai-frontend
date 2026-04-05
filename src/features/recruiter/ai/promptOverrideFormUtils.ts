@@ -15,12 +15,14 @@ export const PROMPT_OVERRIDE_AGENT_DEFINITIONS: Array<{
   {
     key: 'prestart',
     label: 'Prestart creator',
-    description: 'Scenario creation, task framing, and structured rubric output.',
+    description:
+      'Scenario creation, task framing, and structured rubric output.',
   },
   {
     key: 'codespace',
     label: 'Codespace specializer',
-    description: 'Template repo specialization and precommit bundle generation.',
+    description:
+      'Template repo specialization and precommit bundle generation.',
   },
   {
     key: 'day1',
@@ -30,12 +32,14 @@ export const PROMPT_OVERRIDE_AGENT_DEFINITIONS: Array<{
   {
     key: 'day23',
     label: 'Coding workspace reviewer',
-    description: 'Shared coding and debugging evaluator across the workspace days.',
+    description:
+      'Shared coding and debugging evaluator across the workspace days.',
   },
   {
     key: 'day4',
     label: 'Handoff reviewer',
-    description: 'Handoff video and transcript review grounded in transcript evidence.',
+    description:
+      'Handoff video and transcript review grounded in transcript evidence.',
   },
   {
     key: 'day5',
@@ -45,7 +49,8 @@ export const PROMPT_OVERRIDE_AGENT_DEFINITIONS: Array<{
   {
     key: 'fitProfile',
     label: 'Fit Profile aggregator',
-    description: 'Cross-day aggregation, calibration, and final recommendation.',
+    description:
+      'Cross-day aggregation, calibration, and final recommendation.',
   },
 ];
 
@@ -113,12 +118,12 @@ export function buildPromptOverridePayload(
   return Object.keys(next).length > 0 ? next : null;
 }
 
-export function hasPromptOverrideContent(values: PromptOverrideFormValues): boolean {
+export function hasPromptOverrideContent(
+  values: PromptOverrideFormValues,
+): boolean {
   return SIMULATION_PROMPT_OVERRIDE_KEYS.some((key) => {
     const override = values[key];
-    return Boolean(
-      override.instructionsMd.trim() || override.rubricMd.trim(),
-    );
+    return Boolean(override.instructionsMd.trim() || override.rubricMd.trim());
   });
 }
 

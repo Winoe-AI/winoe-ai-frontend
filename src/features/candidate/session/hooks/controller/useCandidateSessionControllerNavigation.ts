@@ -22,9 +22,13 @@ export function useCandidateSessionControllerNavigation(token: string) {
     router.push('/candidate/dashboard');
   }, [router]);
 
+  const onReview = useCallback(() => {
+    router.push(`/candidate/session/${encodeURIComponent(token)}/review`);
+  }, [router, token]);
+
   const onGoHome = useCallback(() => {
     router.push('/');
   }, [router]);
 
-  return { loginHref, redirectToLogin, onDashboard, onGoHome };
+  return { loginHref, redirectToLogin, onDashboard, onReview, onGoHome };
 }

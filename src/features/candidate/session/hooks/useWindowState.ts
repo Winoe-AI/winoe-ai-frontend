@@ -3,6 +3,7 @@ import type {
   CandidateCurrentDayWindow,
   CandidateDayWindow,
 } from '@/features/candidate/session/api';
+import { resolveNowMs } from '@/shared/time/now';
 import {
   deriveWindowState,
   type TaskWindowClosedOverride,
@@ -21,11 +22,11 @@ export function useWindowState({
   currentDayWindow,
   override,
 }: Params) {
-  const [nowMs, setNowMs] = useState(() => Date.now());
+  const [nowMs, setNowMs] = useState(() => resolveNowMs());
 
   useEffect(() => {
     const timer = window.setInterval(() => {
-      setNowMs(Date.now());
+      setNowMs(resolveNowMs());
     }, 1000);
     return () => window.clearInterval(timer);
   }, []);

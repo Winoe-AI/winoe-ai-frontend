@@ -36,23 +36,22 @@ const normalizeScenarioSnapshot = (
   const scenarioVersionId = Number(
     value.scenarioVersionId ?? value.scenario_version_id,
   );
-  if (!Number.isFinite(scenarioVersionId) || scenarioVersionId <= 0) return null;
+  if (!Number.isFinite(scenarioVersionId) || scenarioVersionId <= 0)
+    return null;
   const rawAgents = Array.isArray(value.agents) ? value.agents : [];
-  const agents = rawAgents
-    .filter(isRecord)
-    .map((agent) => ({
-      key:
-        toStringOrNull(agent.key) ??
-        ('unknown' as SimulationPromptOverrideKey | string),
-      provider: toStringOrNull(agent.provider) ?? null,
-      model: toStringOrNull(agent.model) ?? null,
-      runtimeMode:
-        toStringOrNull(agent.runtimeMode ?? agent.runtime_mode) ?? null,
-      promptVersion:
-        toStringOrNull(agent.promptVersion ?? agent.prompt_version) ?? null,
-      rubricVersion:
-        toStringOrNull(agent.rubricVersion ?? agent.rubric_version) ?? null,
-    }));
+  const agents = rawAgents.filter(isRecord).map((agent) => ({
+    key:
+      toStringOrNull(agent.key) ??
+      ('unknown' as SimulationPromptOverrideKey | string),
+    provider: toStringOrNull(agent.provider) ?? null,
+    model: toStringOrNull(agent.model) ?? null,
+    runtimeMode:
+      toStringOrNull(agent.runtimeMode ?? agent.runtime_mode) ?? null,
+    promptVersion:
+      toStringOrNull(agent.promptVersion ?? agent.prompt_version) ?? null,
+    rubricVersion:
+      toStringOrNull(agent.rubricVersion ?? agent.rubric_version) ?? null,
+  }));
 
   return {
     scenarioVersionId,
@@ -81,7 +80,9 @@ export function normalizeSimulationPromptOverrides(
   return Object.keys(next).length > 0 ? next : null;
 }
 
-export function normalizeSimulationAiConfig(value: unknown): SimulationAiConfig {
+export function normalizeSimulationAiConfig(
+  value: unknown,
+): SimulationAiConfig {
   const record = isRecord(value) ? value : {};
 
   return {
@@ -100,11 +101,12 @@ export function normalizeSimulationAiConfig(value: unknown): SimulationAiConfig 
       toStringOrNull(record.promptPackVersion ?? record.prompt_pack_version) ??
       null,
     changesPendingRegeneration:
-      typeof (record.changesPendingRegeneration ??
-        record.changes_pending_regeneration) === 'boolean'
+      typeof (
+        record.changesPendingRegeneration ?? record.changes_pending_regeneration
+      ) === 'boolean'
         ? Boolean(
             record.changesPendingRegeneration ??
-              record.changes_pending_regeneration,
+            record.changes_pending_regeneration,
           )
         : null,
     activeScenarioSnapshot: normalizeScenarioSnapshot(

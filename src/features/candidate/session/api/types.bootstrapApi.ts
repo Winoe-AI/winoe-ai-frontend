@@ -30,6 +30,8 @@ export type CandidateInvite = {
   title: string;
   role: string;
   company: string | null;
+  recruiterName?: string | null;
+  recruiterEmail?: string | null;
   status: CandidateSessionBootstrapResponse['status'] | string;
   progress: { completed: number; total: number } | null;
   expiresAt: string | null;

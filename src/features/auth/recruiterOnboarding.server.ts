@@ -43,7 +43,9 @@ export const getCachedRecruiterSessionProfile = cache(
       if (!response.ok) {
         return { canRecruiter, profile: null, session };
       }
-      const profile = (await parseUpstreamBody(response)) as RecruiterProfile | null;
+      const profile = (await parseUpstreamBody(
+        response,
+      )) as RecruiterProfile | null;
       return { canRecruiter, profile, session };
     } catch {
       return { canRecruiter, profile: null, session };

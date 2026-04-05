@@ -1,10 +1,9 @@
 import '@testing-library/jest-dom';
-
-const { TextDecoder, TextEncoder } =
-  require('node:util') as typeof import('node:util');
-const { Blob, File } = require('node:buffer') as typeof import('node:buffer');
-const { ReadableStream, TransformStream } =
-  require('node:stream/web') as typeof import('node:stream/web');
+import { cleanup } from '@testing-library/react';
+import { Blob, File } from 'node:buffer';
+import { createRequire } from 'node:module';
+import { ReadableStream, TransformStream } from 'node:stream/web';
+import { TextDecoder, TextEncoder } from 'node:util';
 
 class TestMessagePort {
   onmessage: ((event: MessageEvent<unknown>) => void) | null = null;
@@ -37,12 +36,16 @@ class TestMessagePort {
     this.#listeners.add(listener);
   }
 
-  removeEventListener(type: string, listener: EventListenerOrEventListenerObject) {
+  removeEventListener(
+    type: string,
+    listener: EventListenerOrEventListenerObject,
+  ) {
     if (type !== 'message') return;
     this.#listeners.delete(listener);
   }
 
-  dispatchEvent(_event: Event) {
+  dispatchEvent(event: Event) {
+    void event;
     return true;
   }
 
@@ -89,14 +92,18 @@ if (!globalThis.TransformStream) {
     TransformStream as typeof globalThis.TransformStream;
 }
 if (!globalThis.MessagePort) {
-  globalThis.MessagePort = TestMessagePort as unknown as typeof globalThis.MessagePort;
+  globalThis.MessagePort =
+    TestMessagePort as unknown as typeof globalThis.MessagePort;
 }
 if (!globalThis.MessageChannel) {
   globalThis.MessageChannel =
     TestMessageChannel as unknown as typeof globalThis.MessageChannel;
 }
-const { fetch, Headers, Request, Response } =
-  require('undici') as typeof import('undici');
+
+const runtimeRequire = createRequire(import.meta.url);
+const { fetch, Headers, Request, Response } = runtimeRequire(
+  'undici',
+) as typeof import('undici');
 
 if (!globalThis.fetch) {
   globalThis.fetch = fetch as unknown as typeof globalThis.fetch;
@@ -111,13 +118,10 @@ if (!globalThis.Response) {
   globalThis.Response = Response as typeof globalThis.Response;
 }
 
-require('./tests/setup/jest/testingLibraryQueryClientMock');
-require('./tests/setup/jest/consoleSilence');
-require('./tests/setup/jest/reactMarkdownMock');
-require('./tests/setup/jest/candidateApiCompatMocks');
-
-const { cleanup } =
-  require('@testing-library/react') as typeof import('@testing-library/react');
+runtimeRequire('./tests/setup/jest/testingLibraryQueryClientMock');
+runtimeRequire('./tests/setup/jest/consoleSilence');
+runtimeRequire('./tests/setup/jest/reactMarkdownMock');
+runtimeRequire('./tests/setup/jest/candidateApiCompatMocks');
 
 afterEach(() => {
   cleanup();

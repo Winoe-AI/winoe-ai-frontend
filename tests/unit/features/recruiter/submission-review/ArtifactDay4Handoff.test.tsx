@@ -27,7 +27,9 @@ describe('ArtifactDay4Handoff', () => {
       />,
     );
 
-    expect(screen.getByText(/Day 4 playback/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Day 4 presentation playback/i),
+    ).toBeInTheDocument();
     expect(
       screen.getByText(/Video unavailable right now/i),
     ).toBeInTheDocument();
@@ -107,7 +109,9 @@ describe('ArtifactDay4Handoff', () => {
 
   it('does not render handoff playback UI for non-handoff Day 4 artifacts', () => {
     render(<ArtifactCard artifact={buildNonHandoffDay4Artifact()} />);
-    expect(screen.queryByText(/Day 4 playback/i)).not.toBeInTheDocument();
+    expect(
+      screen.queryByText(/Day 4 presentation playback/i),
+    ).not.toBeInTheDocument();
     expect(screen.getByText(/No text answer submitted/i)).toBeInTheDocument();
   });
 });

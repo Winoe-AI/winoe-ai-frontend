@@ -22,8 +22,11 @@ describe('route wrapper metadata', () => {
   });
 
   it('loads auth route metadata and components', async () => {
-    const { metadata: loginMeta, default: LoginRoute } =
+    const { generateMetadata: generateLoginMetadata, default: LoginRoute } =
       await import('@/app/(auth)/auth/login/page');
+    const loginMeta = await generateLoginMetadata({
+      searchParams: Promise.resolve({ returnTo: '/foo', mode: 'candidate' }),
+    });
     expect(loginMeta.title).toBeDefined();
     render(
       await LoginRoute({
