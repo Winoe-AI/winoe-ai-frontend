@@ -23,18 +23,19 @@ describe('app route pages', () => {
     );
   });
 
-  it('renders recruiter dashboard page', async () => {
-    const { default: Page } = await import('@/app/(recruiter)/dashboard/page');
+  it('renders talent partner dashboard page', async () => {
+    const { default: Page } =
+      await import('@/app/(talent-partner)/dashboard/page');
     const el = await Page();
     render(el);
-    expect(screen.getByTestId('recruiter-dashboard')).toBeInTheDocument();
+    expect(screen.getByTestId('talent-partner-dashboard')).toBeInTheDocument();
   });
 
-  it('renders recruiter simulations create page', async () => {
+  it('renders talent_partner trials create page', async () => {
     const { default: Page } =
-      await import('@/app/(recruiter)/dashboard/simulations/new/page');
+      await import('@/app/(talent-partner)/dashboard/trials/new/page');
     const el = await Page();
     render(el);
-    expect(screen.getByTestId('simulation-create')).toBeInTheDocument();
+    expect(screen.getByTestId('trial-create')).toBeInTheDocument();
   });
 });

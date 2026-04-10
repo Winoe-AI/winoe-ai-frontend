@@ -39,9 +39,13 @@ export const parsePermissionsString = (value: unknown): string[] =>
 export const rolesToPermissions = (roles: string[]): string[] => {
   const perms = new Set<string>();
   roles.forEach((role) => {
-    const lower = role.toLowerCase();
-    if (lower.includes('recruiter')) perms.add('recruiter:access');
-    if (lower.includes('candidate')) perms.add('candidate:access');
+    const normalized = role.toLowerCase().replace(/[^a-z0-9]+/g, '');
+    if (normalized.includes('talentpartner')) {
+      perms.add('talent_partner:access');
+    }
+    if (normalized.includes('candidate')) {
+      perms.add('candidate:access');
+    }
   });
   return Array.from(perms);
 };

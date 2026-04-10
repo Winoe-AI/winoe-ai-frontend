@@ -4,12 +4,12 @@ import type {
   CandidateRecordedSubmission,
 } from '@/features/candidate/session/api';
 
-export type SimulationSummary = { title: string; role: string };
+export type TrialSummary = { title: string; role: string };
 
 export type CandidateBootstrap = {
   candidateSessionId: number;
   status: 'not_started' | 'in_progress' | 'completed' | 'expired';
-  simulation: SimulationSummary;
+  trial: TrialSummary;
   aiNoticeText: string;
   aiNoticeVersion: string;
   evalEnabledByDay: Record<string, boolean>;

@@ -5,11 +5,11 @@ jest.mock('next/navigation', () => ({
 }));
 
 describe('NavigationPerfLogger', () => {
-  const originalEnv = process.env.NEXT_PUBLIC_TENON_DEBUG_PERF;
+  const originalEnv = process.env.NEXT_PUBLIC_WINOE_DEBUG_PERF;
   let logSpy: jest.SpyInstance;
 
   beforeAll(() => {
-    process.env.NEXT_PUBLIC_TENON_DEBUG_PERF = 'true';
+    process.env.NEXT_PUBLIC_WINOE_DEBUG_PERF = 'true';
     const perfStub = performance as unknown as {
       getEntriesByType?: (type: string) => PerformanceEntry[];
     };
@@ -17,7 +17,7 @@ describe('NavigationPerfLogger', () => {
   });
 
   afterAll(() => {
-    process.env.NEXT_PUBLIC_TENON_DEBUG_PERF = originalEnv;
+    process.env.NEXT_PUBLIC_WINOE_DEBUG_PERF = originalEnv;
   });
 
   it('logs navigation timing when enabled', async () => {

@@ -32,6 +32,10 @@ const summaryPath = process.env.FLOW_QA_CONTRACT_SUMMARY_PATH?.trim()
 const failRegex =
   /(fail|error|forbidden|unauthorized|validation|timeout|empty|rejected|cooldown)/i;
 
+function writeStderr(message) {
+  process.stderr.write(`${message}\n`);
+}
+
 function hasSpecFile(specName) {
   const abs = path.join(specDir, specName);
   return fs.existsSync(abs) && fs.statSync(abs).isFile();
@@ -40,7 +44,7 @@ function hasSpecFile(specName) {
 function main() {
   const failures = [];
   if (!fs.existsSync(manifestPath)) {
-    console.error(`Missing manifest: ${manifestPath}`);
+    writeStderr(`Missing manifest: ${manifestPath}`);
     process.exit(1);
   }
 
@@ -113,8 +117,8 @@ function main() {
   }
 
   if (failures.length > 0) {
-    console.error('Flow QA contract validation failed:');
-    for (const failure of failures) console.error(`- ${failure}`);
+    writeStderr('Flow QA contract validation failed:');
+    for (const failure of failures) writeStderr(`- ${failure}`);
     process.exit(1);
   }
   console.log(

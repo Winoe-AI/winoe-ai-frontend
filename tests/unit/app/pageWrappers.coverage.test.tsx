@@ -4,11 +4,11 @@ import {
   candidateSubmissionsMock,
   getCachedSessionNormalizedMock,
   marketingMock,
-  recruiterDashboardMock,
+  talentPartnerDashboardMock,
   requireCandidateTokenMock,
   resetPageWrapperMocks,
-  simulationCreateMock,
-  simulationDetailMock,
+  trialCreateMock,
+  trialDetailMock,
 } from './pageWrappers.testlib';
 
 describe('page wrapper coverage tests', () => {
@@ -52,27 +52,27 @@ describe('page wrapper coverage tests', () => {
     expect(metadata).toBeDefined();
   });
 
-  it('recruiter pages render and expose metadata', async () => {
+  it('talent_partner pages render and expose metadata', async () => {
     const { default: DashboardPage, metadata: dashboardMeta } =
-      await import('@/app/(recruiter)/dashboard/page');
+      await import('@/app/(talent-partner)/dashboard/page');
     render(await DashboardPage());
-    expect(recruiterDashboardMock).toHaveBeenCalled();
+    expect(talentPartnerDashboardMock).toHaveBeenCalled();
     expect(dashboardMeta?.title).toBeDefined();
 
-    const { default: SimulationDetailPage, metadata: detailMeta } =
-      await import('@/app/(recruiter)/dashboard/simulations/[id]/page');
-    render(await SimulationDetailPage());
-    expect(simulationDetailMock).toHaveBeenCalled();
+    const { default: TrialDetailPage, metadata: detailMeta } =
+      await import('@/app/(talent-partner)/dashboard/trials/[id]/page');
+    render(await TrialDetailPage());
+    expect(trialDetailMock).toHaveBeenCalled();
     expect(detailMeta?.title).toBeDefined();
 
-    const { default: SimulationCreatePage, metadata: createMeta } =
-      await import('@/app/(recruiter)/dashboard/simulations/new/page');
-    render(await SimulationCreatePage());
-    expect(simulationCreateMock).toHaveBeenCalled();
+    const { default: TrialCreatePage, metadata: createMeta } =
+      await import('@/app/(talent-partner)/dashboard/trials/new/page');
+    render(await TrialCreatePage());
+    expect(trialCreateMock).toHaveBeenCalled();
     expect(createMeta?.title).toBeDefined();
 
     const { default: CandidateSubmissionsPage, metadata: submissionsMeta } =
-      await import('@/app/(recruiter)/dashboard/simulations/[id]/candidates/[candidateSessionId]/page');
+      await import('@/app/(talent-partner)/dashboard/trials/[id]/candidates/[candidateSessionId]/page');
     render(await CandidateSubmissionsPage());
     expect(candidateSubmissionsMock).toHaveBeenCalled();
     expect(submissionsMeta?.title).toBeDefined();

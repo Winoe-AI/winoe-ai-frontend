@@ -15,7 +15,7 @@ export function attachMeta(
   attempts: number,
   startTime: number,
 ) {
-  (upstream as unknown as { _tenonMeta?: unknown })._tenonMeta = {
+  (upstream as unknown as { _winoeMeta?: unknown })._winoeMeta = {
     attempts,
     durationMs: Date.now() - startTime,
   };

@@ -93,10 +93,10 @@ export async function collectRouteMetrics(
 
     return {
       fcpMs: fcpEntry?.startTime ?? 0,
-      lcpMs: perfWindow.__tenonPerf?.lcp ?? 0,
+      lcpMs: perfWindow.__winoePerf?.lcp ?? 0,
       ttiMs: navEntry?.domInteractive ?? 0,
-      cls: perfWindow.__tenonPerf?.cls ?? 0,
-      tbtMs: perfWindow.__tenonPerf?.tbtMs ?? 0,
+      cls: perfWindow.__winoePerf?.cls ?? 0,
+      tbtMs: perfWindow.__winoePerf?.tbtMs ?? 0,
       apiCalls: apiResources.length,
       apiWaitMs,
       bundleKb: bundleBytes / 1024,

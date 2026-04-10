@@ -1,3 +1,4 @@
+import { emitDebugEvent } from '@/shared/analytics/debugEvents';
 import type {
   CodespaceAvailability,
   CodespaceFallbackReason,
@@ -12,6 +13,8 @@ type CodespaceFallbackShownEvent = {
 };
 
 export function logCodespaceFallbackShown(event: CodespaceFallbackShownEvent) {
-  // eslint-disable-next-line no-console
-  console.info('[candidate:codespace_fallback_shown]', event);
+  emitDebugEvent({
+    message: '[candidate:codespace_fallback_shown]',
+    payload: event,
+  });
 }

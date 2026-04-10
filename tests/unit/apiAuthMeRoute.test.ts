@@ -2,9 +2,9 @@ import { markMetadataCovered } from './app/api/coverageHelpers';
 import {
   createRequest,
   mockForwardJson,
-  mockRecruiterAuthSuccess,
-  mockWithRecruiterAuth,
-} from './app/api/withRecruiterAuthRoute.testlib';
+  mockTalentPartnerAuthSuccess,
+  mockWithTalentPartnerAuth,
+} from './app/api/withTalentPartnerAuthRoute.testlib';
 
 describe('/api/auth/me route', () => {
   beforeEach(() => {
@@ -22,17 +22,17 @@ describe('/api/auth/me route', () => {
     expect(mod.fetchCache).toBe('force-no-store');
   });
 
-  it('calls withRecruiterAuth and forwards to backend', async () => {
-    mockRecruiterAuthSuccess('req-123', 'tok');
-    mockForwardJson.mockResolvedValue({ id: 1, name: 'Recruiter' });
+  it('calls withTalentPartnerAuth and forwards to backend', async () => {
+    mockTalentPartnerAuthSuccess('req-123', 'tok');
+    mockForwardJson.mockResolvedValue({ id: 1, name: 'TalentPartner' });
 
     const mod = await import('@/app/api/auth/me/route');
     const req = await createRequest('http://localhost/api/auth/me');
     await mod.GET(req as never);
 
-    expect(mockWithRecruiterAuth).toHaveBeenCalledWith(
+    expect(mockWithTalentPartnerAuth).toHaveBeenCalledWith(
       req,
-      { tag: 'auth-me', requirePermission: 'recruiter:access' },
+      { tag: 'auth-me', requirePermission: 'talent_partner:access' },
       expect.any(Function),
     );
     expect(mockForwardJson).toHaveBeenCalledWith({

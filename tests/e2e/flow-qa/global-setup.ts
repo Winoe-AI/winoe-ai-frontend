@@ -18,10 +18,10 @@ import {
 export default async function globalSetup(config: FullConfig) {
   const repoRoot = path.resolve(__dirname, '..', '..', '..');
   const envMap = await loadEnvMap(repoRoot);
-  const secret = readEnv('TENON_AUTH0_SECRET', envMap);
+  const secret = readEnv('WINOE_AUTH0_SECRET', envMap);
   if (!secret) {
     throw new Error(
-      'TENON_AUTH0_SECRET is required to generate QA Playwright auth storage states.',
+      'WINOE_AUTH0_SECRET is required to generate QA Playwright auth storage states.',
     );
   }
 
@@ -31,13 +31,13 @@ export default async function globalSetup(config: FullConfig) {
   const presets: RolePreset[] = [
     {
       fileName: 'authenticated.json',
-      permissions: ['recruiter:access', 'candidate:access'],
-      roles: ['recruiter', 'candidate'],
+      permissions: ['talent_partner:access', 'candidate:access'],
+      roles: ['talent_partner', 'candidate'],
     },
     {
-      fileName: 'recruiter-only.json',
-      permissions: ['recruiter:access'],
-      roles: ['recruiter'],
+      fileName: 'talent-partner-only.json',
+      permissions: ['talent_partner:access'],
+      roles: ['talent_partner'],
     },
     {
       fileName: 'candidate-only.json',

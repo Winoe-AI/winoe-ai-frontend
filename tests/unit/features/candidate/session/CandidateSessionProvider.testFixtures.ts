@@ -10,7 +10,7 @@ export const buildPersistedSession = (overrides: PersistedOverrides = {}) => ({
   bootstrap: {
     candidateSessionId: overrides.candidateSessionId ?? 9,
     status: 'in_progress',
-    simulation: { title: 'Sim', role: 'Role' },
+    trial: { title: 'Sim', role: 'Role' },
   },
   started: overrides.started ?? true,
   taskState: {

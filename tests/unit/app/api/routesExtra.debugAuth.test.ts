@@ -9,7 +9,7 @@ describe('API routes extra coverage - debug auth roles', () => {
 
   it('returns roles when present on custom claim', async () => {
     mockGetSessionNormalized.mockResolvedValue({
-      user: { 'https://tenon.dev/roles': ['Recruiter'] },
+      user: { 'https://winoe.dev/roles': ['TalentPartner'] },
       accessToken: 'tok',
     });
     const mod = await import('@/app/api/debug/auth/route');

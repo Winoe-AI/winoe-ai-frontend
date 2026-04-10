@@ -1,8 +1,8 @@
-export function makeSimulationCreatePayload(
+export function makeTrialCreatePayload(
   overrides: Record<string, unknown> = {},
 ) {
   return {
-    id: 'sim-created-1',
+    id: 'trial-created-1',
     title: 'Frontend Platform Modernization',
     role: 'Senior Frontend Engineer',
     techStack: 'TypeScript, Next.js',
@@ -11,11 +11,11 @@ export function makeSimulationCreatePayload(
   };
 }
 
-export function makeSimulationDetailPayload(
+export function makeTrialDetailPayload(
   overrides: Record<string, unknown> = {},
 ) {
   return {
-    id: 'sim-1',
+    id: 'trial-1',
     title: 'Frontend Platform Modernization',
     role: 'Senior Frontend Engineer',
     techStack: 'TypeScript, Next.js',
@@ -37,7 +37,7 @@ export function makeSimulationDetailPayload(
   };
 }
 
-export function makeSimulationInvitePayload(
+export function makeTrialInvitePayload(
   overrides: Record<string, unknown> = {},
 ) {
   return {
@@ -49,7 +49,7 @@ export function makeSimulationInvitePayload(
   };
 }
 
-export function makeSimulationsComparePayload(
+export function makeTrialsComparePayload(
   overrides: Record<string, unknown> = {},
 ) {
   return {
@@ -57,8 +57,8 @@ export function makeSimulationsComparePayload(
     candidateName: 'Jane Candidate',
     candidateEmail: 'jane.candidate@example.com',
     status: 'in_progress',
-    fitProfileStatus: 'ready',
-    overallFitScore: 0.82,
+    winoeReportStatus: 'ready',
+    overallWinoeScore: 0.82,
     recommendation: 'strong_hire',
     strengths: ['delivery'],
     risks: [],
@@ -79,7 +79,7 @@ export function makeCandidateSessionResolvePayload(
   return {
     candidateSessionId: 77,
     status: 'in_progress',
-    simulation: {
+    trial: {
       title: 'Frontend Platform Modernization',
       role: 'Senior Frontend Engineer',
     },
@@ -176,7 +176,7 @@ export function makeRunStatusPayload(overrides: Record<string, unknown> = {}) {
     total: 12,
     stdout: 'All tests passed.',
     stderr: null,
-    workflowUrl: 'https://github.com/tenon-ai/candidate-repo/actions/runs/1',
+    workflowUrl: 'https://github.com/winoe-ai/candidate-repo/actions/runs/1',
     commitSha: 'abc1234def5678',
     ...overrides,
   };
@@ -187,7 +187,7 @@ export function makeCodespaceStatusPayload(
 ) {
   return {
     repoName: 'candidate-repo',
-    repoFullName: 'tenon-ai/candidate-repo',
+    repoFullName: 'winoe-ai/candidate-repo',
     codespaceUrl: 'https://github.com/codespaces/qa-e2e',
     codespaceState: 'ready',
     ...overrides,
@@ -210,14 +210,14 @@ export function makeHandoffPayload(overrides: Record<string, unknown> = {}) {
   };
 }
 
-export function makeFitProfileStatusPayload(
+export function makeWinoeReportStatusPayload(
   overrides: Record<string, unknown> = {},
 ) {
   return {
     status: 'ready',
     generatedAt: '2026-03-18T08:00:00Z',
     report: {
-      overallFitScore: 0.82,
+      overallWinoeScore: 0.82,
       recommendation: 'strong_hire',
       confidence: 0.86,
       calibrationText: 'High confidence from artifact quality and consistency.',
@@ -229,7 +229,7 @@ export function makeFitProfileStatusPayload(
   };
 }
 
-export function makeFitProfileGeneratePayload(
+export function makeWinoeReportGeneratePayload(
   overrides: Record<string, unknown> = {},
 ) {
   return {

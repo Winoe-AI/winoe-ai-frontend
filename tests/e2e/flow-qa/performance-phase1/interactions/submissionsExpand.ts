@@ -1,21 +1,21 @@
 import { expect } from '@playwright/test';
-import { installRecruiterApiMocks } from '../../fixtures/recruiterMocks';
+import { installTalentPartnerApiMocks } from '../../fixtures/talent-partnerMocks';
 import { PERF_MODE } from '../config';
 import type { InteractionContext } from './context';
 
 export async function runSubmissionsExpand(context: InteractionContext) {
   try {
-    await context.runWithContext('recruiter', async (page) => {
+    await context.runWithContext('talent_partner', async (page) => {
       if (PERF_MODE === 'mock') {
-        await installRecruiterApiMocks(page, {
-          simulationId: context.ids.simulationId,
-          createSimulationId: context.ids.createdSimulationId,
+        await installTalentPartnerApiMocks(page, {
+          trialId: context.ids.trialId,
+          createTrialId: context.ids.createdTrialId,
           candidateSessionId:
             Number.parseInt(context.ids.candidateSessionId, 10) || 77,
         });
       }
       await page.goto(
-        `/dashboard/simulations/${encodeURIComponent(context.ids.simulationId)}/candidates/${encodeURIComponent(context.ids.candidateSessionId)}`,
+        `/dashboard/trials/${encodeURIComponent(context.ids.trialId)}/candidates/${encodeURIComponent(context.ids.candidateSessionId)}`,
         { waitUntil: 'domcontentloaded' },
       );
       await expect(

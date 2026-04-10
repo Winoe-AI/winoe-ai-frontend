@@ -1,7 +1,7 @@
 import { resetBffTestState, restoreBffEnv } from './bff.testlib';
 
 describe('bff forwardJson edge/perf behavior', () => {
-  const originalDebugPerf = process.env.TENON_DEBUG_PERF;
+  const originalDebugPerf = process.env.WINOE_DEBUG_PERF;
 
   beforeEach(() => {
     resetBffTestState();
@@ -9,8 +9,8 @@ describe('bff forwardJson edge/perf behavior', () => {
 
   afterEach(() => {
     jest.resetModules();
-    if (originalDebugPerf === undefined) delete process.env.TENON_DEBUG_PERF;
-    else process.env.TENON_DEBUG_PERF = originalDebugPerf;
+    if (originalDebugPerf === undefined) delete process.env.WINOE_DEBUG_PERF;
+    else process.env.WINOE_DEBUG_PERF = originalDebugPerf;
   });
 
   afterAll(() => {
@@ -18,7 +18,7 @@ describe('bff forwardJson edge/perf behavior', () => {
   });
 
   it('logs perf output when DEBUG_PERF is enabled', async () => {
-    process.env.TENON_DEBUG_PERF = 'true';
+    process.env.WINOE_DEBUG_PERF = 'true';
     jest.resetModules();
     const logSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
     global.fetch = jest.fn().mockResolvedValue(
@@ -68,7 +68,7 @@ describe('bff forwardJson edge/perf behavior', () => {
   });
 
   it('logs error perf output when request fails', async () => {
-    process.env.TENON_DEBUG_PERF = 'true';
+    process.env.WINOE_DEBUG_PERF = 'true';
     jest.resetModules();
     const logSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
     global.fetch = jest

@@ -1,7 +1,7 @@
 const resolveBaseUrl = () => {
   const candidates = [
-    process.env.TENON_APP_BASE_URL,
-    process.env.NEXT_PUBLIC_TENON_APP_BASE_URL,
+    process.env.WINOE_APP_BASE_URL,
+    process.env.NEXT_PUBLIC_WINOE_APP_BASE_URL,
     process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : null,
     process.env.NEXT_PUBLIC_VERCEL_URL
       ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
@@ -26,7 +26,7 @@ export const buildRedirect = (path: string) => {
       : null);
   if (!base) {
     throw new Error(
-      'TENON_APP_BASE_URL (or VERCEL_URL) must be set in production',
+      'WINOE_APP_BASE_URL (or VERCEL_URL) must be set in production',
     );
   }
   return new URL(path, base);

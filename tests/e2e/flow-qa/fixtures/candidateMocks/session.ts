@@ -13,9 +13,8 @@ export async function installCandidateSessionMocks(
 ): Promise<CandidateSessionMockState> {
   const token = options.token ?? 'test-token';
   const candidateSessionId = options.candidateSessionId ?? 77;
-  const simulationTitle =
-    options.simulationTitle ?? 'Frontend Platform Modernization';
-  const simulationRole = options.simulationRole ?? 'Senior Frontend Engineer';
+  const trialTitle = options.trialTitle ?? 'Frontend Platform Modernization';
+  const trialRole = options.trialRole ?? 'Senior Frontend Engineer';
   const runStatusSequence = options.runStatusSequence ?? [
     {
       status: 'passed',
@@ -23,7 +22,7 @@ export async function installCandidateSessionMocks(
       failed: 0,
       total: 12,
       stdout: 'All tests passed.',
-      workflowUrl: 'https://github.com/tenon-ai/candidate-repo/actions/runs/1',
+      workflowUrl: 'https://github.com/winoe-ai/candidate-repo/actions/runs/1',
       commitSha: 'abc1234def5678',
     },
   ];
@@ -45,8 +44,8 @@ export async function installCandidateSessionMocks(
     const core = await handleSessionCoreRoute(route, method, pathname, {
       token,
       candidateSessionId,
-      simulationTitle,
-      simulationRole,
+      trialTitle,
+      trialRole,
       submitted,
       options,
       state,

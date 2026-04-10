@@ -68,7 +68,7 @@ describe('candidate schedule utilities', () => {
     const bootstrap = {
       candidateSessionId: 9,
       status: 'in_progress' as const,
-      simulation: { title: 'Sim', role: 'Backend' },
+      trial: { title: 'Sim', role: 'Backend' },
       scheduledStartAt: '2026-03-10T13:00:00Z',
       candidateTimezone: 'America/New_York',
       dayWindows: [

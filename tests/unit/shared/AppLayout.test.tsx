@@ -37,7 +37,7 @@ describe('shared layout components', () => {
     expect(screen.queryByText(/Dashboard/i)).toBeNull();
 
     rerender(<AppNav isAuthed />);
-    expect(screen.queryByText(/Recruiter Dashboard/i)).toBeNull();
+    expect(screen.queryByText(/Talent Partner Dashboard/i)).toBeNull();
     expect(screen.queryByText(/Candidate Portal/i)).toBeNull();
     expect(screen.getByText(/Logout/i)).toBeInTheDocument();
   });
@@ -51,36 +51,36 @@ describe('shared layout components', () => {
       />,
     );
     expect(screen.getByText(/Candidate Portal/i)).toBeInTheDocument();
-    expect(screen.queryByText(/Recruiter Dashboard/i)).toBeNull();
+    expect(screen.queryByText(/Talent Partner Dashboard/i)).toBeNull();
 
     rerender(
       <AppNav
         isAuthed
-        navScope="recruiter"
-        permissions={['recruiter:access']}
+        navScope="talent_partner"
+        permissions={['talent_partner:access']}
       />,
     );
-    expect(screen.getByText(/Recruiter Dashboard/i)).toBeInTheDocument();
+    expect(screen.getByText(/Talent Partner Dashboard/i)).toBeInTheDocument();
     expect(screen.queryByText(/Candidate Portal/i)).toBeNull();
   });
 
   it('allows scoped portal links when permissions are empty', () => {
     const { rerender } = render(<AppNav isAuthed navScope="candidate" />);
     expect(screen.getByText(/Candidate Portal/i)).toBeInTheDocument();
-    expect(screen.queryByText(/Recruiter Dashboard/i)).toBeNull();
+    expect(screen.queryByText(/Talent Partner Dashboard/i)).toBeNull();
 
-    rerender(<AppNav isAuthed navScope="recruiter" />);
-    expect(screen.getByText(/Recruiter Dashboard/i)).toBeInTheDocument();
+    rerender(<AppNav isAuthed navScope="talent_partner" />);
+    expect(screen.getByText(/Talent Partner Dashboard/i)).toBeInTheDocument();
     expect(screen.queryByText(/Candidate Portal/i)).toBeNull();
   });
 
   it('hides portal links for auth or marketing scope', () => {
     const { rerender } = render(<AppNav isAuthed navScope="auth" />);
-    expect(screen.queryByText(/Recruiter Dashboard/i)).toBeNull();
+    expect(screen.queryByText(/Talent Partner Dashboard/i)).toBeNull();
     expect(screen.queryByText(/Candidate Portal/i)).toBeNull();
 
     rerender(<AppNav isAuthed navScope="marketing" />);
-    expect(screen.queryByText(/Recruiter Dashboard/i)).toBeNull();
+    expect(screen.queryByText(/Talent Partner Dashboard/i)).toBeNull();
     expect(screen.queryByText(/Candidate Portal/i)).toBeNull();
   });
 });

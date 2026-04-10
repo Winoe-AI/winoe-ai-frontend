@@ -93,7 +93,7 @@ describe('requireBffAuth', () => {
     (extractPermissions as jest.Mock).mockReturnValue(['other']);
     (hasPermission as jest.Mock).mockReturnValue(false);
     const result = await requireBffAuth({} as never, {
-      requirePermission: 'recruiter:access',
+      requirePermission: 'talent_partner:access',
     });
     expect(result.ok).toBe(false);
     if (!result.ok) expect(result.response.status).toBe(403);
@@ -113,18 +113,20 @@ describe('requireBffAuth', () => {
       user: { sub: 'u1' },
       accessToken: 'base',
     });
-    (extractPermissions as jest.Mock).mockReturnValue(['recruiter:access']);
+    (extractPermissions as jest.Mock).mockReturnValue([
+      'talent_partner:access',
+    ]);
     (hasPermission as jest.Mock).mockReturnValue(true);
     (auth0.getAccessToken as jest.Mock).mockResolvedValue({
       accessToken: 'fresh-token',
     });
     const result = await requireBffAuth({} as never, {
-      requirePermission: 'recruiter:access',
+      requirePermission: 'talent_partner:access',
     });
     expect(result.ok).toBe(true);
     if (result.ok) {
       expect(result.accessToken).toBe('fresh-token');
-      expect(result.permissions).toEqual(['recruiter:access']);
+      expect(result.permissions).toEqual(['talent_partner:access']);
       expect(result.cookies).toBeInstanceOf(NextResponse);
     }
   });

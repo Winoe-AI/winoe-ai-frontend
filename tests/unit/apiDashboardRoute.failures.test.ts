@@ -14,7 +14,7 @@ describe('/api/dashboard route failure behavior', () => {
     requireBffAuthMock.mockResolvedValue({
       ok: true,
       accessToken: 'token',
-      permissions: ['recruiter:access'],
+      permissions: ['talent_partner:access'],
       session: {},
       cookies: NextResponse.next(),
     });
@@ -31,12 +31,14 @@ describe('/api/dashboard route failure behavior', () => {
     );
     expect(res.status).toBe(401);
     expect(res.body).toEqual({ message: 'Not authenticated' });
-    expect(res.headers.get('x-tenon-request-id')).toBe('req-123');
+    expect(res.headers.get('x-winoe-request-id')).toBe('req-123');
   });
 
-  it('keeps profile when simulations request fails', async () => {
+  it('keeps profile when trials request fails', async () => {
     upstreamRequestMock
-      .mockResolvedValueOnce(makeUpstreamResponse({ name: 'Recruiter' }, 200))
+      .mockResolvedValueOnce(
+        makeUpstreamResponse({ name: 'TalentPartner' }, 200),
+      )
       .mockResolvedValueOnce(
         makeUpstreamResponse({ message: 'Backend down' }, 502),
       );
@@ -45,12 +47,12 @@ describe('/api/dashboard route failure behavior', () => {
     );
     expect(res.status).toBe(200);
     expect(res.body).toEqual({
-      profile: { name: 'Recruiter' },
-      simulations: [],
+      profile: { name: 'TalentPartner' },
+      trials: [],
       profileError: null,
-      simulationsError: 'Backend down',
+      trialsError: 'Backend down',
     });
-    expect(res.headers.get('x-tenon-upstream-status')).toBe('502');
+    expect(res.headers.get('x-winoe-upstream-status')).toBe('502');
   });
 
   it('returns partial payload when profile request rejects', async () => {
@@ -67,12 +69,10 @@ describe('/api/dashboard route failure behavior', () => {
     expect(res.status).toBe(200);
     expect(res.body).toEqual({
       profile: null,
-      simulations: [
-        { id: '1', title: 'Sim', role: 'Eng', createdAt: '2024-01-01' },
-      ],
+      trials: [{ id: '1', title: 'Sim', role: 'Eng', createdAt: '2024-01-01' }],
       profileError: 'Unable to load your profile right now.',
-      simulationsError: null,
+      trialsError: null,
     });
-    expect(res.headers.get('x-tenon-upstream-status')).toBe('502');
+    expect(res.headers.get('x-winoe-upstream-status')).toBe('502');
   });
 });

@@ -18,7 +18,7 @@ Major route behavior summary from `src/app/**` and feature modules.
 - Route params: query `mode`, `returnTo`.
 - Rendered components: `LoginPage`.
 - Load-time API calls: none on route load.
-- Key interactions: redirects to Auth0 login flow with candidate/recruiter mode.
+- Key interactions: redirects to Auth0 login flow with candidate/talent_partner mode.
 - State:
   - Local: `LoginPage` view logic.
   - Global: middleware auth/session.
@@ -56,7 +56,7 @@ Major route behavior summary from `src/app/**` and feature modules.
 - Route params: query `mode`, `returnTo`.
 - Rendered components: in-route JSX with navigation links.
 - Load-time API calls: none.
-- Key interactions: navigate to candidate dashboard or recruiter dashboard.
+- Key interactions: navigate to candidate dashboard or talent partner dashboard.
 - State: local query-derived routing state.
 - Success/error behavior: static guarded destination links.
 
@@ -114,71 +114,71 @@ Major route behavior summary from `src/app/**` and feature modules.
 ## `/dashboard`
 
 - Route params: none.
-- Rendered components: `RecruiterDashboardPage` -> `RecruiterDashboardView`.
+- Rendered components: `Talent PartnerDashboardPage` -> `Talent PartnerDashboardView`.
 - Load-time API calls:
   - `GET /api/dashboard` (BFF route)
   - BFF fan-out upstream:
     - backend `GET /api/auth/me`
-    - backend `GET /api/simulations`
-- Key interactions: refresh dashboard data; open invite modal from simulation list.
+    - backend `GET /api/trials`
+- Key interactions: refresh dashboard data; open invite modal from trial list.
 - State:
   - Local: dashboard loading/error and modal flow state.
   - Global: React Query cache + notifications.
-- Success/error behavior: partial-error tolerant payload (`profileError`, `simulationsError`) with graceful UI fallbacks.
+- Success/error behavior: partial-error tolerant payload (`profileError`, `trialsError`) with graceful UI fallbacks.
 
-## `/dashboard/simulations/new`
+## `/dashboard/trials/new`
 
 - Route params: none.
-- Rendered components: `SimulationCreatePage`, `SimulationCreateForm`.
+- Rendered components: `TrialCreatePage`, `TrialCreateForm`.
 - Load-time API calls: none required for initial render.
-- Key interactions: submit create form -> `POST /api/simulations`.
+- Key interactions: submit create form -> `POST /api/trials`.
 - State:
   - Local: form values/validation/submission state.
   - Global: navigation and notification side effects.
-- Success/error behavior: success navigates to new simulation detail; backend validation/errors are surfaced on form.
+- Success/error behavior: success navigates to new trial detail; backend validation/errors are surfaced on form.
 
-## `/dashboard/simulations/[id]`
+## `/dashboard/trials/[id]`
 
-- Route params: `id` (simulation id).
-- Rendered components: `SimulationDetailContainer` -> `SimulationDetailView` and section components.
+- Route params: `id` (trial id).
+- Rendered components: `TrialDetailContainer` -> `TrialDetailView` and section components.
 - Load-time API calls:
-  - `GET /api/simulations/{id}`
-  - `GET /api/simulations/{id}/candidates`
-  - `GET /api/simulations/{id}/candidates/compare`
+  - `GET /api/trials/{id}`
+  - `GET /api/trials/{id}/candidates`
+  - `GET /api/trials/{id}/candidates/compare`
 - Key interactions:
-  - invite candidate: `POST /api/simulations/{id}/invite`
-  - resend invite: `POST /api/simulations/{id}/candidates/{candidateSessionId}/invite/resend`
-  - terminate: `POST /api/simulations/{id}/terminate`
-  - scenario lifecycle (current implementation): `/api/backend/simulations/...` + `/api/backend/jobs/{jobId}`
+  - invite candidate: `POST /api/trials/{id}/invite`
+  - resend invite: `POST /api/trials/{id}/candidates/{candidateSessionId}/invite/resend`
+  - terminate: `POST /api/trials/{id}/terminate`
+  - scenario lifecycle (current implementation): `/api/backend/trials/...` + `/api/backend/jobs/{jobId}`
 - State:
   - Local: scenario editor state, invite modal, candidate row action state, terminate modal state.
   - Global: React Query caches for detail/candidates/compare and notifications.
 - Success/error behavior: blocked states for 403/404, generation polling, row-level resend errors, and scenario action error banners.
 
-## `/dashboard/simulations/[id]/candidates/[candidateSessionId]`
+## `/dashboard/trials/[id]/candidates/[candidateSessionId]`
 
 - Route params: `id`, `candidateSessionId`.
 - Rendered components: `CandidateSubmissionsPage` -> `CandidateSubmissionsView` and artifact cards.
 - Load-time API calls:
-  - `GET /api/submissions?candidateSessionId=...&simulationId=...`
+  - `GET /api/submissions?candidateSessionId=...&trialId=...`
   - `GET /api/submissions/{submissionId}` (for selected/latest artifacts)
-  - `GET /api/simulations/{id}/candidates` (candidate verification)
+  - `GET /api/trials/{id}/candidates` (candidate verification)
 - Key interactions: reload, pagination/show-all toggle, artifact fetch refresh.
 - State:
   - Local: submissions loader state, artifact cache state, pagination state.
   - Global: React Query cache + notifications.
 - Success/error behavior: explicit candidate-id validation, candidate verification failures, artifact warning banner when partial artifact fetch fails.
 
-## `/dashboard/simulations/[id]/candidates/[candidateSessionId]/fit-profile`
+## `/dashboard/trials/[id]/candidates/[candidateSessionId]/winoe-report`
 
 - Route params: `id`, `candidateSessionId`.
-- Rendered components: `FitProfilePage`, status/ready sections and toolbar.
+- Rendered components: `WinoeReportPage`, status/ready sections and toolbar.
 - Load-time API calls:
-  - `GET /api/candidate_sessions/{candidateSessionId}/fit_profile` (polls when running)
+  - `GET /api/candidate_sessions/{candidateSessionId}/winoe_report` (polls when running)
 - Key interactions:
-  - generate report: `POST /api/candidate_sessions/{candidateSessionId}/fit_profile/generate`
+  - generate report: `POST /api/candidate_sessions/{candidateSessionId}/winoe_report/generate`
   - reload status.
 - State:
-  - Local: fit-profile derived state (`not_generated`, `running`, `ready`, error states), generate pending state.
-  - Global: React Query fit-profile status cache.
+  - Local: winoe-report derived state (`not_generated`, `running`, `ready`, error states), generate pending state.
+  - Global: React Query winoe-report status cache.
 - Success/error behavior: ready report view when available; running poll state; error/status panels for forbidden/missing/not-generated cases.

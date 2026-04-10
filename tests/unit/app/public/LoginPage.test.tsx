@@ -2,10 +2,10 @@ import { render, screen } from '@testing-library/react';
 import LoginPage from '@/features/auth/LoginPage';
 
 describe('LoginPage', () => {
-  it('renders recruiter login heading and Auth0 button', () => {
+  it('renders talent_partner login heading and Auth0 button', () => {
     render(<LoginPage returnTo="/dashboard" />);
 
-    expect(screen.getByText(/Recruiter login/i)).toBeInTheDocument();
+    expect(screen.getByText(/Talent Partner login/i)).toBeInTheDocument();
     expect(
       screen.getByRole('button', { name: 'Continue with Auth0' }),
     ).toBeInTheDocument();
@@ -16,16 +16,16 @@ describe('LoginPage', () => {
 
     const authLink = screen.getByRole('link', { name: 'Continue with Auth0' });
     const signupLink = screen.getByRole('link', {
-      name: /New recruiter\? Create your account/i,
+      name: /New Talent Partner\? Create your account/i,
     });
 
     expect(authLink).toHaveAttribute(
       'href',
-      '/auth/start?returnTo=%2Fdashboard&mode=recruiter',
+      '/auth/start?returnTo=%2Fdashboard&mode=talent_partner',
     );
     expect(signupLink).toHaveAttribute(
       'href',
-      '/recruiter-onboarding?returnTo=%2Fdashboard',
+      '/talent-partner-onboarding?returnTo=%2Fdashboard',
     );
   });
 
@@ -33,7 +33,7 @@ describe('LoginPage', () => {
     render(<LoginPage returnTo="/candidate/session/tok_123" />);
 
     expect(
-      screen.getByText(/Sign in to continue your simulation/i),
+      screen.getByText(/Sign in to continue your trial/i),
     ).toBeInTheDocument();
     const authLink = screen.getByRole('link', { name: 'Continue with Auth0' });
     expect(authLink).toHaveAttribute(

@@ -1,9 +1,10 @@
 import type { NextResponse } from 'next/server';
+import { envFlagEnabled } from '@/platform/config/envFlags';
 import { mergeResponseCookies } from '@/platform/server/bffAuth';
 import { isNextResponse } from '@/platform/auth/proxyUtils';
 
 export const startPerfTimer = () =>
-  process.env.TENON_DEBUG_PERF ? Date.now() : null;
+  envFlagEnabled(process.env.WINOE_DEBUG_PERF) ? Date.now() : null;
 
 type ResponderArgs = {
   authResponse: unknown;

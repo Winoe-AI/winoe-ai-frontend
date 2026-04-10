@@ -32,16 +32,17 @@ jest.mock('next/server', () => ({
 }));
 
 const mockForwardJson = jest.fn();
-const mockWithRecruiterAuth = jest.fn();
+const mockWithTalentPartnerAuth = jest.fn();
 jest.mock('@/platform/server/bff', () => ({
   forwardJson: (...args: unknown[]) => mockForwardJson(...args),
 }));
 jest.mock('@/app/api/bffRouteHelpers', () => ({
-  withRecruiterAuth: (...args: unknown[]) => mockWithRecruiterAuth(...args),
+  withTalentPartnerAuth: (...args: unknown[]) =>
+    mockWithTalentPartnerAuth(...args),
 }));
 
 const withAuth = (requestId: string) =>
-  mockWithRecruiterAuth.mockImplementation(
+  mockWithTalentPartnerAuth.mockImplementation(
     async (
       _req: unknown,
       _opts: unknown,
@@ -53,12 +54,12 @@ const withAuth = (requestId: string) =>
   );
 
 async function loadRoute() {
-  const mod = await import('@/app/api/simulations/[id]/terminate/route');
-  markMetadataCovered('@/app/api/simulations/[id]/terminate/route');
+  const mod = await import('@/app/api/trials/[id]/terminate/route');
+  markMetadataCovered('@/app/api/trials/[id]/terminate/route');
   return mod;
 }
 
-describe('/api/simulations/[id]/terminate route', () => {
+describe('/api/trials/[id]/terminate route', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     jest.resetModules();
@@ -72,28 +73,30 @@ describe('/api/simulations/[id]/terminate route', () => {
     expect(mod.fetchCache).toBe('force-no-store');
   });
 
-  it('calls withRecruiterAuth and forwards terminate request body', async () => {
+  it('calls withTalentPartnerAuth and forwards terminate request body', async () => {
     withAuth('req-123');
     mockForwardJson.mockResolvedValue({
-      simulationId: 1,
+      trialId: 1,
       status: 'terminated',
     });
     const mod = await loadRoute();
     const { NextRequest } = await import('next/server');
     const req = new NextRequest(
-      'http://localhost/api/simulations/sim-1/terminate',
+      'http://localhost/api/trials/trial-1/terminate',
       { body: { confirm: true } },
     );
 
-    await mod.POST(req as never, { params: Promise.resolve({ id: 'sim-1' }) });
+    await mod.POST(req as never, {
+      params: Promise.resolve({ id: 'trial-1' }),
+    });
 
-    expect(mockWithRecruiterAuth).toHaveBeenCalledWith(
+    expect(mockWithTalentPartnerAuth).toHaveBeenCalledWith(
       req,
-      { tag: 'terminate', requirePermission: 'recruiter:access' },
+      { tag: 'terminate', requirePermission: 'talent_partner:access' },
       expect.any(Function),
     );
     expect(mockForwardJson).toHaveBeenCalledWith({
-      path: '/api/simulations/sim-1/terminate',
+      path: '/api/trials/trial-1/terminate',
       method: 'POST',
       cache: 'no-store',
       body: { confirm: true },
@@ -105,19 +108,21 @@ describe('/api/simulations/[id]/terminate route', () => {
   it('forwards terminate request without body when req.json fails', async () => {
     withAuth('req-456');
     mockForwardJson.mockResolvedValue({
-      simulationId: 1,
+      trialId: 1,
       status: 'terminated',
     });
     const mod = await loadRoute();
     const { NextRequest } = await import('next/server');
     const req = new NextRequest(
-      'http://localhost/api/simulations/sim-1/terminate',
+      'http://localhost/api/trials/trial-1/terminate',
       { throwOnJson: true },
     );
 
-    await mod.POST(req as never, { params: Promise.resolve({ id: 'sim-1' }) });
+    await mod.POST(req as never, {
+      params: Promise.resolve({ id: 'trial-1' }),
+    });
     expect(mockForwardJson).toHaveBeenCalledWith({
-      path: '/api/simulations/sim-1/terminate',
+      path: '/api/trials/trial-1/terminate',
       method: 'POST',
       cache: 'no-store',
       accessToken: 'token',

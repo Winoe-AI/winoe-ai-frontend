@@ -17,8 +17,8 @@ describe('httpClient cache and perf logging edge cases', () => {
 
   it('logs perf data and sanitizes sensitive params when debug is on', async () => {
     jest.resetModules();
-    process.env.NEXT_PUBLIC_TENON_DEBUG_PERF = '1';
-    const infoSpy = jest.spyOn(console, 'info').mockImplementation(() => {});
+    process.env.NEXT_PUBLIC_WINOE_DEBUG_PERF = '1';
+    const dispatchSpy = jest.spyOn(window, 'dispatchEvent');
     const { apiClient: debugApiClient } =
       await import('@/platform/api-client/client');
     (global.fetch as jest.Mock).mockResolvedValueOnce(
@@ -29,9 +29,9 @@ describe('httpClient cache and perf logging edge cases', () => {
       `/very-long-segment/${'a'.repeat(40)}?token=secret&code=${'b'.repeat(60)}`,
       { skipCache: true },
     );
-    expect(infoSpy).toHaveBeenCalled();
-    expect(infoSpy.mock.calls[0][0]).toContain('[api][perf] GET');
-    infoSpy.mockRestore();
+    expect(dispatchSpy).toHaveBeenCalled();
+    const event = dispatchSpy.mock.calls[0][0] as CustomEvent;
+    expect(event.detail.message).toContain('[api][perf] GET');
     jest.resetModules();
   });
 
@@ -63,8 +63,8 @@ describe('httpClient cache and perf logging edge cases', () => {
 
   it('sanitizes path with long segments in fallback debug mode', async () => {
     jest.resetModules();
-    process.env.NEXT_PUBLIC_TENON_DEBUG_PERF = 'true';
-    const infoSpy = jest.spyOn(console, 'info').mockImplementation(() => {});
+    process.env.NEXT_PUBLIC_WINOE_DEBUG_PERF = 'true';
+    const dispatchSpy = jest.spyOn(window, 'dispatchEvent');
     const { apiClient: debugApiClient } =
       await import('@/platform/api-client/client');
     (global.fetch as jest.Mock).mockResolvedValueOnce(
@@ -72,9 +72,9 @@ describe('httpClient cache and perf logging edge cases', () => {
     );
 
     await debugApiClient.get(`/path/${'x'.repeat(40)}`, { skipCache: true });
-    expect(infoSpy).toHaveBeenCalled();
-    expect(infoSpy.mock.calls[0][0]).toContain('[id]');
-    infoSpy.mockRestore();
+    expect(dispatchSpy).toHaveBeenCalled();
+    const event = dispatchSpy.mock.calls[0][0] as CustomEvent;
+    expect(event.detail.message).toContain('[id]');
     jest.resetModules();
   });
 });

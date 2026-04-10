@@ -24,16 +24,17 @@ jest.mock('next/server', () => ({
 }));
 
 const mockForwardJson = jest.fn();
-const mockWithRecruiterAuth = jest.fn();
+const mockWithTalentPartnerAuth = jest.fn();
 jest.mock('@/platform/server/bff', () => ({
   forwardJson: (...args: unknown[]) => mockForwardJson(...args),
 }));
 jest.mock('@/app/api/bffRouteHelpers', () => ({
-  withRecruiterAuth: (...args: unknown[]) => mockWithRecruiterAuth(...args),
+  withTalentPartnerAuth: (...args: unknown[]) =>
+    mockWithTalentPartnerAuth(...args),
 }));
 
 const withAuth = (requestId = 'req-compare') =>
-  mockWithRecruiterAuth.mockImplementation(
+  mockWithTalentPartnerAuth.mockImplementation(
     async (
       _req: unknown,
       _opts: unknown,
@@ -45,13 +46,12 @@ const withAuth = (requestId = 'req-compare') =>
   );
 
 async function loadRoute() {
-  const mod =
-    await import('@/app/api/simulations/[id]/candidates/compare/route');
-  markMetadataCovered('@/app/api/simulations/[id]/candidates/compare/route');
+  const mod = await import('@/app/api/trials/[id]/candidates/compare/route');
+  markMetadataCovered('@/app/api/trials/[id]/candidates/compare/route');
   return mod;
 }
 
-describe('/api/simulations/[id]/candidates/compare route', () => {
+describe('/api/trials/[id]/candidates/compare route', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     jest.resetModules();
@@ -65,46 +65,46 @@ describe('/api/simulations/[id]/candidates/compare route', () => {
     expect(mod.fetchCache).toBe('force-no-store');
   });
 
-  it('calls withRecruiterAuth and forwards compare request', async () => {
+  it('calls withTalentPartnerAuth and forwards compare request', async () => {
     withAuth('req-compare');
     mockForwardJson.mockResolvedValue({ rows: [] });
     const mod = await loadRoute();
     const { NextRequest } = await import('next/server');
     const req = new NextRequest(
-      'http://localhost/api/simulations/sim-1/candidates/compare',
+      'http://localhost/api/trials/trial-1/candidates/compare',
     );
 
-    await mod.GET(req as never, { params: Promise.resolve({ id: 'sim-1' }) });
+    await mod.GET(req as never, { params: Promise.resolve({ id: 'trial-1' }) });
 
-    expect(mockWithRecruiterAuth).toHaveBeenCalledWith(
+    expect(mockWithTalentPartnerAuth).toHaveBeenCalledWith(
       req,
       {
-        tag: 'simulations-candidates-compare',
-        requirePermission: 'recruiter:access',
+        tag: 'trials-candidates-compare',
+        requirePermission: 'talent_partner:access',
       },
       expect.any(Function),
     );
     expect(mockForwardJson).toHaveBeenCalledWith({
-      path: '/api/simulations/sim-1/candidates/compare',
+      path: '/api/trials/trial-1/candidates/compare',
       accessToken: 'token',
       requestId: 'req-compare',
     });
   });
 
-  it('encodes simulation id in compare route path', async () => {
+  it('encodes trial id in compare route path', async () => {
     withAuth('req-encode');
     mockForwardJson.mockResolvedValue({ rows: [] });
     const mod = await loadRoute();
     const { NextRequest } = await import('next/server');
     const req = new NextRequest(
-      'http://localhost/api/simulations/sim%2F1/candidates/compare',
+      'http://localhost/api/trials/sim%2F1/candidates/compare',
     );
 
     await mod.GET(req as never, { params: Promise.resolve({ id: 'sim/1' }) });
 
     expect(mockForwardJson).toHaveBeenCalledWith(
       expect.objectContaining({
-        path: '/api/simulations/sim%2F1/candidates/compare',
+        path: '/api/trials/sim%2F1/candidates/compare',
       }),
     );
   });

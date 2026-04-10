@@ -19,13 +19,14 @@ export function collectSourceFiles(root, sourceDir = 'src') {
 
 export function areaFor(rel) {
   if (rel.includes('/app/(candidate)')) return 'candidate routes';
-  if (rel.includes('/app/(recruiter)')) return 'recruiter routes';
+  if (rel.includes('/app/(talent-partner)')) return 'talent_partner routes';
   if (rel.includes('/app/(auth)')) return 'auth routes';
   if (rel.includes('/app/(marketing)')) return 'marketing';
   if (rel.includes('/app/api/')) return 'api route';
   if (rel.includes('/app/')) return 'app route/layout';
   if (rel.includes('/features/candidate/')) return 'candidate feature';
-  if (rel.includes('/features/recruiter/')) return 'recruiter feature';
+  if (rel.includes('/features/talent-partner/'))
+    return 'talent_partner feature';
   if (rel.includes('/shared/ui/')) return 'ui components';
   if (rel.includes('/shared/')) return 'shared feature';
   if (rel.includes('/features/auth/')) return 'auth feature';

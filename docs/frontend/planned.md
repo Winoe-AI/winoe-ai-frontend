@@ -4,7 +4,7 @@ This file lists currently observed gaps from code review.
 
 ## Integration Gaps
 
-- `fetchCandidateSubmissions` currently sends extra query keys (`candidate_session_id`, `simulationId`, `simulation_id`) while backend submissions list route only defines `candidateSessionId`, `taskId`, `limit`, and `offset`.
+- `fetchCandidateSubmissions` currently sends extra query keys (`candidate_session_id`, `trialId`, `trial_id`) while backend submissions list route only defines `candidateSessionId`, `taskId`, `limit`, and `offset`.
 - This works today because backend ignores unknown query keys, but it is contract drift.
 - See `docs/frontend/api-integration.md` mismatch entry for exact file references.
 

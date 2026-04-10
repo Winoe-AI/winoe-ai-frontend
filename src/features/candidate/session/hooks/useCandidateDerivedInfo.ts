@@ -53,7 +53,7 @@ export function useCandidateDerivedInfo(
     showDocsPanel,
     resourceLink,
     inviteErrorCopy,
-    title: state.bootstrap?.simulation?.title ?? '',
-    role: state.bootstrap?.simulation?.role ?? '',
+    title: state.bootstrap?.trial?.title ?? '',
+    role: state.bootstrap?.trial?.role ?? '',
   };
 }

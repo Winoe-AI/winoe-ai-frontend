@@ -24,18 +24,19 @@ jest.mock('next/server', () => ({
 }));
 
 const mockForwardJson = jest.fn();
-const mockWithRecruiterAuth = jest.fn();
+const mockWithTalentPartnerAuth = jest.fn();
 jest.mock('@/platform/server/bff', () => ({
   forwardJson: (...args: unknown[]) => mockForwardJson(...args),
 }));
 jest.mock('@/app/api/bffRouteHelpers', () => ({
-  withRecruiterAuth: (...args: unknown[]) => mockWithRecruiterAuth(...args),
+  withTalentPartnerAuth: (...args: unknown[]) =>
+    mockWithTalentPartnerAuth(...args),
 }));
 
 const routeImport =
-  '@/app/api/simulations/[id]/candidates/[candidateSessionId]/invite/resend/route';
+  '@/app/api/trials/[id]/candidates/[candidateSessionId]/invite/resend/route';
 const withAuth = (requestId: string) =>
-  mockWithRecruiterAuth.mockImplementation(
+  mockWithTalentPartnerAuth.mockImplementation(
     async (
       _req: unknown,
       _opts: unknown,
@@ -52,7 +53,7 @@ async function loadRoute() {
   return mod;
 }
 
-describe('/api/simulations/[id]/candidates/[candidateSessionId]/invite/resend route', () => {
+describe('/api/trials/[id]/candidates/[candidateSessionId]/invite/resend route', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     jest.resetModules();
@@ -66,26 +67,26 @@ describe('/api/simulations/[id]/candidates/[candidateSessionId]/invite/resend ro
     expect(mod.fetchCache).toBe('force-no-store');
   });
 
-  it('calls withRecruiterAuth with correct options and forwards POST', async () => {
+  it('calls withTalentPartnerAuth with correct options and forwards POST', async () => {
     withAuth('req-123');
     mockForwardJson.mockResolvedValue({ inviteEmailStatus: 'sent' });
     const mod = await loadRoute();
     const { NextRequest } = await import('next/server');
     const req = new NextRequest(
-      'http://localhost/api/simulations/sim-1/candidates/123/invite/resend',
+      'http://localhost/api/trials/trial-1/candidates/123/invite/resend',
     );
 
     await mod.POST(req as never, {
-      params: Promise.resolve({ id: 'sim-1', candidateSessionId: '123' }),
+      params: Promise.resolve({ id: 'trial-1', candidateSessionId: '123' }),
     });
 
-    expect(mockWithRecruiterAuth).toHaveBeenCalledWith(
+    expect(mockWithTalentPartnerAuth).toHaveBeenCalledWith(
       req,
-      { tag: 'invite-resend', requirePermission: 'recruiter:access' },
+      { tag: 'invite-resend', requirePermission: 'talent_partner:access' },
       expect.any(Function),
     );
     expect(mockForwardJson).toHaveBeenCalledWith({
-      path: '/api/simulations/sim-1/candidates/123/invite/resend',
+      path: '/api/trials/trial-1/candidates/123/invite/resend',
       method: 'POST',
       cache: 'no-store',
       accessToken: 'token',
@@ -99,7 +100,7 @@ describe('/api/simulations/[id]/candidates/[candidateSessionId]/invite/resend ro
     const mod = await loadRoute();
     const { NextRequest } = await import('next/server');
     const req = new NextRequest(
-      'http://localhost/api/simulations/sim%2F1/candidates/cand%2F123/invite/resend',
+      'http://localhost/api/trials/sim%2F1/candidates/cand%2F123/invite/resend',
     );
 
     await mod.POST(req as never, {
@@ -107,7 +108,7 @@ describe('/api/simulations/[id]/candidates/[candidateSessionId]/invite/resend ro
     });
     expect(mockForwardJson).toHaveBeenCalledWith(
       expect.objectContaining({
-        path: '/api/simulations/sim%2F1/candidates/cand%2F123/invite/resend',
+        path: '/api/trials/sim%2F1/candidates/cand%2F123/invite/resend',
       }),
     );
   });

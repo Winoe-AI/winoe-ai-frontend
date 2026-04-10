@@ -8,16 +8,16 @@ import {
 } from './bff.testlib';
 
 describe('bff ensureAccessToken', () => {
-  const originalDebugAuth = process.env.TENON_DEBUG_AUTH;
+  const originalDebugAuth = process.env.WINOE_DEBUG_AUTH;
 
   beforeEach(() => {
     resetBffTestState();
-    delete process.env.TENON_DEBUG_AUTH;
+    delete process.env.WINOE_DEBUG_AUTH;
   });
 
   afterEach(() => {
-    if (originalDebugAuth === undefined) delete process.env.TENON_DEBUG_AUTH;
-    else process.env.TENON_DEBUG_AUTH = originalDebugAuth;
+    if (originalDebugAuth === undefined) delete process.env.WINOE_DEBUG_AUTH;
+    else process.env.WINOE_DEBUG_AUTH = originalDebugAuth;
   });
 
   afterAll(() => {
@@ -43,7 +43,7 @@ describe('bff ensureAccessToken', () => {
   });
 
   it('logs debug output when no session and debug auth is enabled', async () => {
-    process.env.TENON_DEBUG_AUTH = 'true';
+    process.env.WINOE_DEBUG_AUTH = 'true';
     const debugSpy = jest
       .spyOn(console, 'debug')
       .mockImplementation(() => undefined);
@@ -55,14 +55,14 @@ describe('bff ensureAccessToken', () => {
   });
 
   it('returns 403 when required permission is missing', async () => {
-    process.env.TENON_DEBUG_AUTH = 'true';
+    process.env.WINOE_DEBUG_AUTH = 'true';
     const debugSpy = jest
       .spyOn(console, 'debug')
       .mockImplementation(() => undefined);
     getSessionNormalized.mockResolvedValue({
       user: { sub: 'x', permissions: [] },
     });
-    const res = await ensureAccessToken('recruiter:access');
+    const res = await ensureAccessToken('talent_partner:access');
     expect(res).toBeInstanceOf(NextResponse);
     if (res instanceof NextResponse) expect(res.status).toBe(403);
     expect(debugSpy).toHaveBeenCalled();

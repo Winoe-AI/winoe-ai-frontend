@@ -15,7 +15,7 @@ export async function httpResult<T>(
   path: string,
   options: Parameters<typeof requestWithMeta<T>>[1] = {},
   clientOptions?: ApiClientOptions,
-  mode: 'recruiter' | 'candidate' = 'recruiter',
+  mode: 'talent_partner' | 'candidate' = 'talent_partner',
 ): Promise<RequestResult<T>> {
   try {
     const { data, headers } = await requestWithMeta<T>(
@@ -23,11 +23,11 @@ export async function httpResult<T>(
       options,
       clientOptions,
     );
-    const requestId = headers?.get?.('x-tenon-request-id') ?? null;
+    const requestId = headers?.get?.('x-winoe-request-id') ?? null;
     return { ok: true, data, headers: headers ?? null, requestId };
   } catch (error) {
     const headers = (error as { headers?: Headers }).headers ?? null;
-    const requestId = headers?.get?.('x-tenon-request-id') ?? null;
+    const requestId = headers?.get?.('x-winoe-request-id') ?? null;
     return {
       ok: false,
       error: mapApiError(error, 'Request failed', mode),

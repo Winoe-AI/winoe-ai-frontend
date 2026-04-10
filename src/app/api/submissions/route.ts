@@ -14,7 +14,7 @@ export async function GET(req: NextRequest) {
     {
       path,
       tag: 'submissions-list',
-      requirePermission: 'recruiter:access',
+      requirePermission: 'talent_partner:access',
     },
     req,
   );

@@ -29,7 +29,7 @@ export default async function AuthErrorRoutePage({
       : undefined;
   const rawMode = resolved?.mode;
   const mode =
-    rawMode === 'candidate' || rawMode === 'recruiter'
+    rawMode === 'candidate' || rawMode === 'talent_partner'
       ? rawMode
       : returnTo
         ? modeForPath(returnTo.split('?')[0] || returnTo)

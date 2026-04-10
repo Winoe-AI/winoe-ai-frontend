@@ -25,7 +25,7 @@ test.describe('Candidate Day 4 Flow', () => {
     const bootstrapResponse = await bootstrapResponsePromise;
     expect(bootstrapResponse.status()).toBe(200);
     await expect(page).toHaveURL(`/candidate/session/${QA_INVITE_TOKEN}`);
-    const startButton = page.getByRole('button', { name: /start simulation/i });
+    const startButton = page.getByRole('button', { name: /start trial/i });
     if ((await startButton.count()) > 0) {
       await startButton.first().click();
     }

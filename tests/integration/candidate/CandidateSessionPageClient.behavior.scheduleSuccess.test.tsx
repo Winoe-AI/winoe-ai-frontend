@@ -51,10 +51,10 @@ describe('CandidateSessionPage auth flow schedule success', () => {
     ).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: /Confirm schedule/i }));
     expect(
-      await screen.findByText(/Simulation locked until start/i),
+      await screen.findByText(/Trial locked until start/i),
     ).toBeInTheDocument();
     expect(screen.getByText(/Day windows/i)).toBeInTheDocument();
-    expect(screen.queryByText(/Start simulation/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Start trial/i)).not.toBeInTheDocument();
     expect(
       fetchMock.mock.calls.find(([url]) =>
         String(url).includes('/current_task'),

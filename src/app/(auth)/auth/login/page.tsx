@@ -8,7 +8,7 @@ type SearchParams = Promise<{ returnTo?: string; mode?: string }>;
 async function resolveMode(searchParams?: SearchParams) {
   const resolved = searchParams ? await searchParams : undefined;
   const rawMode = resolved?.mode;
-  return rawMode === 'candidate' || rawMode === 'recruiter'
+  return rawMode === 'candidate' || rawMode === 'talent_partner'
     ? rawMode
     : undefined;
 }
@@ -19,9 +19,9 @@ export async function generateMetadata({
   searchParams?: SearchParams;
 }): Promise<Metadata> {
   const mode = await resolveMode(searchParams);
-  const actorLabel = mode === 'candidate' ? 'Candidate' : 'Recruiter';
+  const actorLabel = mode === 'candidate' ? 'Candidate' : 'Talent Partner';
   const destination =
-    mode === 'candidate' ? 'candidate portal' : 'recruiter dashboard';
+    mode === 'candidate' ? 'candidate portal' : 'talent partner dashboard';
   return {
     title: `${actorLabel} login | ${BRAND_NAME}`,
     description: `Sign in to access your ${BRAND_NAME} ${destination}.`,

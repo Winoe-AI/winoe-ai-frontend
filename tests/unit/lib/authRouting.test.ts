@@ -7,8 +7,8 @@ import {
 describe('sanitizeReturnTo', () => {
   it('allows safe relative paths', () => {
     expect(sanitizeReturnTo('/candidate/home')).toBe('/candidate/home');
-    expect(sanitizeReturnTo('/recruiter/dashboard?x=1')).toBe(
-      '/recruiter/dashboard?x=1',
+    expect(sanitizeReturnTo('/talent-partner/dashboard?x=1')).toBe(
+      '/talent-partner/dashboard?x=1',
     );
   });
 
@@ -73,11 +73,11 @@ describe('sanitizeReturnTo', () => {
   });
 
   it('sanitizes unsafe returnTo in login redirect builder', () => {
-    const href = buildLoginUrl('recruiter', 'https://evil.com');
+    const href = buildLoginUrl('talent_partner', 'https://evil.com');
     expect(href.startsWith('/auth/login')).toBe(true);
     const url = new URL(href, 'http://test.local');
     expect(url.pathname).toBe('/auth/login');
-    expect(url.searchParams.get('mode')).toBe('recruiter');
+    expect(url.searchParams.get('mode')).toBe('talent_partner');
     expect(url.searchParams.get('returnTo')).toBe('/');
     expect(url.searchParams.get('returnTo')).not.toMatch(/^https?:/i);
   });

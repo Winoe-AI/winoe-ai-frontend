@@ -7,11 +7,11 @@ export const PUBLIC_PATHS = new Set([
   '/auth/login',
   '/auth/logout',
   '/not-authorized',
-  '/recruiter-onboarding',
+  '/talent-partner-onboarding',
 ]);
 export const PUBLIC_PREFIXES = ['/auth'];
 export const CANDIDATE_PREFIXES = ['/candidate-sessions', '/candidate'];
-export const RECRUITER_PREFIXES = ['/dashboard'];
+export const TALENT_PARTNER_PREFIXES = ['/dashboard'];
 
 export const isPublicPath = (pathname: string) =>
   PUBLIC_PATHS.has(pathname) ||
@@ -25,7 +25,7 @@ export const redirect = (to: string, request: NextRequest) =>
 
 export const redirectToLogin = (
   request: NextRequest,
-  mode?: 'candidate' | 'recruiter',
+  mode?: 'candidate' | 'talent_partner',
 ) =>
   redirect(
     buildLoginUrl(mode ?? modeForPath(request.nextUrl.pathname), request),
@@ -34,14 +34,14 @@ export const redirectToLogin = (
 
 export const redirectNotAuthorized = (
   request: NextRequest,
-  mode: 'candidate' | 'recruiter',
+  mode: 'candidate' | 'talent_partner',
 ) => redirect(buildNotAuthorizedUrl(mode, request), request);
 
 export const shouldSkipAuth = (pathname: string) => isPublicPath(pathname);
 export const requiresCandidateAccess = (pathname: string) =>
   CANDIDATE_PREFIXES.some((p) => pathname.startsWith(p));
-export const requiresRecruiterAccess = (pathname: string) =>
-  RECRUITER_PREFIXES.some((p) => pathname.startsWith(p));
+export const requiresTalentPartnerAccess = (pathname: string) =>
+  TALENT_PARTNER_PREFIXES.some((p) => pathname.startsWith(p));
 
 export function normalizeAccessToken(raw: unknown): string | null {
   if (typeof raw === 'string') return raw;

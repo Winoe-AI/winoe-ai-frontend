@@ -25,13 +25,13 @@ function buildCspHeader(isProd: boolean) {
   const connectSrc = new Set<string>(["'self'"]);
   const imgSrc = new Set<string>(["'self'", 'data:', 'blob:', 'https:']);
   const mediaSrc = new Set<string>(["'self'", 'blob:', 'data:']);
-  const apiBase = safeCspOrigin(process.env.NEXT_PUBLIC_TENON_API_BASE_URL);
+  const apiBase = safeCspOrigin(process.env.NEXT_PUBLIC_WINOE_API_BASE_URL);
   if (apiBase) {
     connectSrc.add(apiBase);
     imgSrc.add(apiBase);
     mediaSrc.add(apiBase);
   }
-  const auth0Domain = process.env.TENON_AUTH0_DOMAIN;
+  const auth0Domain = process.env.WINOE_AUTH0_DOMAIN;
   if (auth0Domain) {
     const auth0Origin = safeCspOrigin(
       auth0Domain.startsWith('http') ? auth0Domain : `https://${auth0Domain}`,
@@ -39,7 +39,7 @@ function buildCspHeader(isProd: boolean) {
     if (auth0Origin) connectSrc.add(auth0Origin);
   }
   const mediaOrigins = new Set<string>([
-    ...parseCspOrigins(process.env.NEXT_PUBLIC_TENON_MEDIA_ALLOWED_ORIGINS),
+    ...parseCspOrigins(process.env.NEXT_PUBLIC_WINOE_MEDIA_ALLOWED_ORIGINS),
   ]);
   if (!isProd) {
     mediaOrigins.add('http://127.0.0.1:9000');

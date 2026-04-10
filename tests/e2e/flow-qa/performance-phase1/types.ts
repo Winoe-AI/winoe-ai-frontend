@@ -1,13 +1,17 @@
 import type { Page } from '@playwright/test';
 
 export type PerfMode = 'mock' | 'live';
-export type StorageRole = 'none' | 'recruiter' | 'candidate' | 'authenticated';
+export type StorageRole =
+  | 'none'
+  | 'talent_partner'
+  | 'candidate'
+  | 'authenticated';
 export type RouteGroup =
   | 'public'
   | 'auth'
   | 'candidateDashboard'
   | 'candidateSession'
-  | 'recruiter';
+  | 'talent_partner';
 export type WaterfallType = 'none' | 'sequential' | 'parallel';
 
 export type ApiTimelineEntry = {
@@ -17,8 +21,8 @@ export type ApiTimelineEntry = {
   durationMs: number;
 };
 export type RuntimeIds = {
-  simulationId: string;
-  createdSimulationId: string;
+  trialId: string;
+  createdTrialId: string;
   candidateSessionId: string;
   inviteToken: string;
 };
@@ -29,7 +33,7 @@ export type RouteDefinition = {
   component: string;
   group: RouteGroup;
   storageRole: StorageRole;
-  userType: 'public' | 'candidate' | 'recruiter';
+  userType: 'public' | 'candidate' | 'talent_partner';
   interactionPattern: string;
   complexity: 'low' | 'medium' | 'high';
   resolveRoute: (ids: RuntimeIds) => string;
@@ -92,5 +96,5 @@ export type InteractionSampleMetric = {
 };
 
 export type PerfWindowState = {
-  __tenonPerf?: { lcp?: number; cls?: number; tbtMs?: number };
+  __winoePerf?: { lcp?: number; cls?: number; tbtMs?: number };
 };

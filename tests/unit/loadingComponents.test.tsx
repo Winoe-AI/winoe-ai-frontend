@@ -1,9 +1,9 @@
 import { render } from '@testing-library/react';
 import CandidateDashboardLoading from '@/app/(candidate)/candidate/dashboard/loading';
 import CandidateSessionLoading from '@/app/(candidate)/candidate/session/[token]/loading';
-import RecruiterDashboardLoading from '@/app/(recruiter)/dashboard/loading';
-import RecruiterSimulationLoading from '@/app/(recruiter)/dashboard/simulations/[id]/loading';
-import RecruiterSimulationNewLoading from '@/app/(recruiter)/dashboard/simulations/new/loading';
+import TalentPartnerDashboardLoading from '@/app/(talent-partner)/dashboard/loading';
+import TalentPartnerTrialLoading from '@/app/(talent-partner)/dashboard/trials/[id]/loading';
+import TalentPartnerTrialNewLoading from '@/app/(talent-partner)/dashboard/trials/new/loading';
 
 describe('loading components render safely', () => {
   it('renders candidate dashboard loading skeleton', () => {
@@ -16,18 +16,18 @@ describe('loading components render safely', () => {
     expect(container.firstChild).toBeTruthy();
   });
 
-  it('renders recruiter dashboard loading skeleton', () => {
-    const { container } = render(<RecruiterDashboardLoading />);
+  it('renders talent partner dashboard loading skeleton', () => {
+    const { container } = render(<TalentPartnerDashboardLoading />);
     expect(container.firstChild).toBeTruthy();
   });
 
-  it('renders recruiter simulation detail loading skeleton', () => {
-    const { container } = render(<RecruiterSimulationLoading />);
+  it('renders talent_partner trial detail loading skeleton', () => {
+    const { container } = render(<TalentPartnerTrialLoading />);
     expect(container.firstChild).toBeTruthy();
   });
 
-  it('renders recruiter simulation new loading skeleton', () => {
-    const { container } = render(<RecruiterSimulationNewLoading />);
+  it('renders talent_partner trial new loading skeleton', () => {
+    const { container } = render(<TalentPartnerTrialNewLoading />);
     expect(container.firstChild).toBeTruthy();
   });
 });

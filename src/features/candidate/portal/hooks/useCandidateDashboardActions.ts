@@ -52,7 +52,9 @@ export function useCandidateDashboardActions({
   const handleContinue = useCallback(
     (invite: CandidateInvite) => {
       if (invite.isExpired) {
-        setError('This invite has expired. Please contact your recruiter.');
+        setError(
+          'This invite has expired. Please contact your Talent Partner.',
+        );
         return;
       }
       const token = invite.token ?? resolveFallbackToken(invite);

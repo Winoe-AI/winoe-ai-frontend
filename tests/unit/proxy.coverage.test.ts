@@ -23,12 +23,12 @@ beforeAll(async () => {
   jest.doMock('@/platform/auth0', () => ({
     auth0: { getAccessToken: jest.fn(async () => ({ token: 't' })) },
     getSessionNormalized: jest.fn(async () => ({
-      user: { permissions: ['recruiter:access'] },
+      user: { permissions: ['talent_partner:access'] },
     })),
   }));
 
   jest.doMock('@/platform/auth0/claims', () => ({
-    extractPermissions: jest.fn(() => ['recruiter:access']),
+    extractPermissions: jest.fn(() => ['talent_partner:access']),
     hasPermission: jest.fn(() => true),
   }));
 
@@ -39,7 +39,7 @@ beforeAll(async () => {
   jest.doMock('@/platform/auth/routing', () => ({
     buildLoginUrl: jest.fn(() => '/auth/login'),
     buildNotAuthorizedUrl: jest.fn(() => '/not-authorized'),
-    modeForPath: jest.fn(() => 'recruiter'),
+    modeForPath: jest.fn(() => 'talent_partner'),
   }));
 
   await import('@/platform/middleware/proxy');

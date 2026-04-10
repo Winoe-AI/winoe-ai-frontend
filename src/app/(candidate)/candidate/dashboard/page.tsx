@@ -5,7 +5,7 @@ import { getCachedSessionNormalized } from '@/platform/auth0';
 
 export const metadata: Metadata = {
   title: `Candidate dashboard | ${BRAND_NAME}`,
-  description: `Continue your ${BRAND_NAME} simulations and invites.`,
+  description: `Continue your ${BRAND_NAME} trials and invites.`,
 };
 
 export default async function CandidateDashboardRoute() {

@@ -3,7 +3,7 @@ import AuthStartLink from '@/features/auth/AuthStartLink';
 import { BRAND_NAME } from '@/platform/config/brand';
 import { AuthPageLayout } from './AuthPageLayout';
 import {
-  buildRecruiterOnboardingHref,
+  buildTalentPartnerOnboardingHref,
   buildSignupHref,
   type LoginMode,
 } from './authPaths';
@@ -21,25 +21,25 @@ export default function LoginPage({
     (returnTo ?? '').startsWith('/candidate-sessions') ||
     (returnTo ?? '').startsWith('/candidate/');
   const title = isCandidate
-    ? 'Sign in to continue your simulation'
-    : 'Recruiter login';
+    ? 'Sign in to continue your trial'
+    : 'Talent Partner login';
   const subtitle = isCandidate
     ? 'Sign in to verify your invite and continue.'
     : `Sign in to access your ${BRAND_NAME} dashboard.`;
   const missingCandidateConnection =
     process.env.NODE_ENV !== 'production' &&
     isCandidate &&
-    !(process.env.NEXT_PUBLIC_TENON_AUTH0_CANDIDATE_CONNECTION ?? '').trim();
+    !(process.env.NEXT_PUBLIC_WINOE_AUTH0_CANDIDATE_CONNECTION ?? '').trim();
 
   const signupHref = isCandidate
     ? buildSignupHref(returnTo || '/candidate/dashboard', 'candidate')
-    : buildRecruiterOnboardingHref(returnTo || '/dashboard');
+    : buildTalentPartnerOnboardingHref(returnTo || '/dashboard');
 
   return (
     <AuthPageLayout title={title} subtitle={subtitle}>
       {missingCandidateConnection ? (
         <div className="mb-4 rounded-md border border-yellow-300 bg-yellow-50 px-3 py-2 text-sm text-yellow-900">
-          Dev warning: set NEXT_PUBLIC_TENON_AUTH0_CANDIDATE_CONNECTION so
+          Dev warning: set NEXT_PUBLIC_WINOE_AUTH0_CANDIDATE_CONNECTION so
           candidate logins use the correct Auth0 connection.
         </div>
       ) : null}
@@ -49,7 +49,7 @@ export default function LoginPage({
 
       <AuthStartLink
         returnTo={returnTo || '/dashboard'}
-        mode={mode ?? (isCandidate ? 'candidate' : 'recruiter')}
+        mode={mode ?? (isCandidate ? 'candidate' : 'talent_partner')}
         className="block"
       >
         <Button
@@ -67,7 +67,7 @@ export default function LoginPage({
         >
           {isCandidate
             ? 'New candidate? Create your account'
-            : 'New recruiter? Create your account'}
+            : 'New Talent Partner? Create your account'}
         </a>
       ) : null}
     </AuthPageLayout>

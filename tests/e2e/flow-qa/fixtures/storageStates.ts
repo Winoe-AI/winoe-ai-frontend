@@ -16,6 +16,6 @@ const storageDir = storageDirFromEnv
 
 export const storageStates = {
   authenticated: path.join(storageDir, 'authenticated.json'),
-  recruiterOnly: path.join(storageDir, 'recruiter-only.json'),
+  talentPartnerOnly: path.join(storageDir, 'talent-partner-only.json'),
   candidateOnly: path.join(storageDir, 'candidate-only.json'),
 };

@@ -18,7 +18,7 @@ describe('candidateApi bootstrap and invites', () => {
       jsonRes({
         candidateSessionId: 10,
         status: 'in_progress',
-        simulation: { title: 'Backend Sim', role: 'Backend' },
+        trial: { title: 'Backend Sim', role: 'Backend' },
       }),
     );
     installFetchMock(fetchMock);
@@ -39,7 +39,7 @@ describe('candidateApi bootstrap and invites', () => {
       jsonRes([
         {
           candidate_session_id: 9,
-          simulationTitle: 'Design Sim',
+          trialTitle: 'Design Sim',
           role_name: 'Designer',
           progress: { completed: 1, total: 5 },
           token: 'abc',

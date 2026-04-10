@@ -13,7 +13,7 @@ describe('API routes extra coverage - auth/me route', () => {
 
   afterEach(resetRoutesExtraMocks);
 
-  it('returns recruiter auth failure with request id', async () => {
+  it('returns talent_partner auth failure with request id', async () => {
     mockRequireBffAuth.mockResolvedValue({
       ok: false,
       response: NextResponse.json({ message: 'nope' }, { status: 401 }),
@@ -28,7 +28,7 @@ describe('API routes extra coverage - auth/me route', () => {
     expect(mockMergeResponseCookies).toHaveBeenCalled();
   });
 
-  it('forwards recruiter auth success', async () => {
+  it('forwards talent_partner auth success', async () => {
     mockRequireBffAuth.mockResolvedValue({
       ok: true,
       accessToken: 'tok-me',

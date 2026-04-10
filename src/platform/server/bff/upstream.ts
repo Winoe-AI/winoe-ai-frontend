@@ -1,7 +1,7 @@
 import { stripTrailingApiSegment } from './stripTrailingApi';
 
 export function getBackendBaseUrl(): string {
-  const raw = process.env.TENON_BACKEND_BASE_URL ?? 'http://localhost:8000';
+  const raw = process.env.WINOE_BACKEND_BASE_URL ?? 'http://localhost:8000';
   return stripTrailingApiSegment(raw);
 }
 

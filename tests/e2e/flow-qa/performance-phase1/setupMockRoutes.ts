@@ -4,7 +4,7 @@ import {
   installCandidateSessionMocks,
   makeCandidateTask,
 } from '../fixtures/candidateMocks';
-import { installRecruiterApiMocks } from '../fixtures/recruiterMocks';
+import { installTalentPartnerApiMocks } from '../fixtures/talent-partnerMocks';
 import { PERF_MODE } from './config';
 import type { RouteGroup, RuntimeIds } from './types';
 
@@ -15,10 +15,10 @@ export async function setupMockRoutesForGroup(
 ) {
   if (PERF_MODE !== 'mock') return;
   const candidateSessionId = Number.parseInt(ids.candidateSessionId, 10) || 77;
-  if (group === 'recruiter') {
-    await installRecruiterApiMocks(page, {
-      simulationId: ids.simulationId,
-      createSimulationId: ids.createdSimulationId,
+  if (group === 'talent_partner') {
+    await installTalentPartnerApiMocks(page, {
+      trialId: ids.trialId,
+      createTrialId: ids.createdTrialId,
       candidateSessionId,
       dashboardDelayMs: 550,
     });

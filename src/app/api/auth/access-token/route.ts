@@ -9,8 +9,6 @@ export const fetchCache = 'force-no-store';
 
 export function GET(_req: NextRequest) {
   if (!isLocalEnvironment()) {
-    // eslint-disable-next-line no-console
-    console.warn('[security] /api/auth/access-token is disabled outside local');
     return NextResponse.json({ message: 'Not found' }, { status: 404 });
   }
 

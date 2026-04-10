@@ -76,8 +76,6 @@ describe('CandidateSessionPage unit flow', () => {
     mockResolveInvite.mockRejectedValueOnce({ status: 500 });
 
     render(<CandidateSessionPage token="invite-token" />);
-    expect(
-      await screen.findByText('Unable to load simulation'),
-    ).toBeInTheDocument();
+    expect(await screen.findByText('Unable to load trial')).toBeInTheDocument();
   });
 });

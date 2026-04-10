@@ -51,7 +51,7 @@ export const renderSessionPage = (token: string) =>
 export const baseSession = (overrides: Record<string, unknown> = {}) => ({
   candidateSessionId: 321,
   status: 'in_progress',
-  simulation: { title: 'Infra Simulation', role: 'Backend Engineer' },
+  trial: { title: 'Infra Trial', role: 'Backend Engineer' },
   scheduledStartAt: null,
   candidateTimezone: null,
   dayWindows: [],

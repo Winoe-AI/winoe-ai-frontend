@@ -11,7 +11,7 @@ export function MarketingHomeSignedIn({ name }: { name?: string | null }) {
           Welcome back{typeof name === 'string' && name ? `, ${name}` : ''}.
         </h1>
         <p className="mt-2 max-w-xl text-sm text-slate-600">
-          You’re signed in. Jump into the dashboard or continue a simulation.
+          You’re signed in. Jump into the dashboard or continue a trial.
         </p>
       </div>
 

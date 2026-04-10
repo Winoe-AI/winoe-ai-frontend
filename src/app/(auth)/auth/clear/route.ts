@@ -3,7 +3,7 @@ import { isAuthCookie } from '@/platform/auth/authCookies';
 import { modeForPath, sanitizeReturnTo } from '@/platform/auth/routing';
 
 function resolveCookieDomain(request: NextRequest) {
-  const envDomain = process.env.TENON_AUTH0_COOKIE_DOMAIN;
+  const envDomain = process.env.WINOE_AUTH0_COOKIE_DOMAIN;
   if (envDomain && envDomain.trim()) return envDomain.trim();
   const hostname = request.nextUrl.hostname;
   return hostname && hostname.includes('.') ? hostname : undefined;
@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
   const returnTo = sanitizeReturnTo(req.nextUrl.searchParams.get('returnTo'));
   const rawMode = req.nextUrl.searchParams.get('mode');
   const mode =
-    rawMode === 'candidate' || rawMode === 'recruiter'
+    rawMode === 'candidate' || rawMode === 'talent_partner'
       ? rawMode
       : modeForPath(returnTo.split('?')[0] || returnTo);
 

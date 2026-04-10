@@ -20,7 +20,7 @@ export type MappedError = {
 export function mapApiError(
   error: unknown,
   fallback: string,
-  mode: 'recruiter' | 'candidate' = 'recruiter',
+  mode: 'talent_partner' | 'candidate' = 'talent_partner',
 ): MappedError {
   const status = toStatus(error);
   const message = toUserMessage(error, fallback, { includeDetail: true });
@@ -28,8 +28,8 @@ export function mapApiError(
     error && typeof error === 'object'
       ? ((error as { headers?: Headers }).headers as Headers | undefined)
       : undefined;
-  const requestId = headers?.get?.('x-tenon-request-id') ?? null;
-  const upstream = headers?.get?.('x-tenon-upstream-status');
+  const requestId = headers?.get?.('x-winoe-request-id') ?? null;
+  const upstream = headers?.get?.('x-winoe-upstream-status');
   const upstreamStatus = upstream ? Number(upstream) : null;
   return {
     message,
@@ -43,7 +43,7 @@ export function mapApiError(
 export function toMappedHttpError(
   error: unknown,
   fallback: string,
-  mode: 'recruiter' | 'candidate' = 'recruiter',
+  mode: 'talent_partner' | 'candidate' = 'talent_partner',
 ): HttpError {
   const mapped = mapApiError(error, fallback, mode);
   const err = new HttpError(
@@ -60,7 +60,7 @@ export function toMappedHttpError(
 export function throwMappedApiError(
   error: unknown,
   fallback: string,
-  mode: 'recruiter' | 'candidate' = 'recruiter',
+  mode: 'talent_partner' | 'candidate' = 'talent_partner',
 ): never {
   const mapped = toMappedHttpError(error, fallback, mode);
   const details =

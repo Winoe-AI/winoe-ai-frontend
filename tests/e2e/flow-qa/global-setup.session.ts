@@ -57,7 +57,7 @@ export function buildSession(options: {
       expiresAt: now + 3600,
       token_type: 'Bearer',
       scope: 'openid profile email',
-      audience: 'https://api.tenon.ai',
+      audience: 'https://api.winoe.ai',
     },
     accessToken: options.accessToken,
     internal: {
@@ -68,15 +68,18 @@ export function buildSession(options: {
 }
 
 export function resolveDevIdentity(roles: string[]) {
-  const recruiterEmail =
-    process.env.QA_E2E_RECRUITER_EMAIL?.trim().toLowerCase() ||
-    'recruiter1@local.test';
+  const talentPartnerEmail =
+    process.env.QA_E2E_TALENT_PARTNER_EMAIL?.trim().toLowerCase() ||
+    'talent_partner1@local.test';
   const candidateEmail =
     process.env.QA_E2E_CANDIDATE_EMAIL?.trim().toLowerCase() ||
     'candidate1@local.test';
 
   const normalizedRoles = new Set(roles.map((role) => role.toLowerCase()));
-  if (normalizedRoles.has('candidate') && !normalizedRoles.has('recruiter')) {
+  if (
+    normalizedRoles.has('candidate') &&
+    !normalizedRoles.has('talent_partner')
+  ) {
     return {
       email: candidateEmail,
       accessToken: `candidate:${candidateEmail}`,
@@ -84,8 +87,8 @@ export function resolveDevIdentity(roles: string[]) {
     };
   }
   return {
-    email: recruiterEmail,
-    accessToken: `recruiter:${recruiterEmail}`,
-    sub: `recruiter:${recruiterEmail}`,
+    email: talentPartnerEmail,
+    accessToken: `talent_partner:${talentPartnerEmail}`,
+    sub: `talent_partner:${talentPartnerEmail}`,
   };
 }

@@ -21,7 +21,7 @@ describe('CandidateSessionProvider persistence', () => {
         bootstrap: {
           candidateSessionId: 10,
           status: 'in_progress',
-          simulation: { title: 'Sim', role: 'Backend' },
+          trial: { title: 'Sim', role: 'Backend' },
         },
         started: true,
         taskState: {

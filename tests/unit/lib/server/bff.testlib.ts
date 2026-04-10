@@ -86,13 +86,13 @@ export const { getAccessToken, getSessionNormalized } = jest.requireMock(
   getSessionNormalized: jest.Mock;
 };
 
-const originalBackendBase = process.env.TENON_BACKEND_BASE_URL;
+const originalBackendBase = process.env.WINOE_BACKEND_BASE_URL;
 
 export const resetBffTestState = () => {
   jest.resetAllMocks();
-  process.env.TENON_BACKEND_BASE_URL = 'http://api.test';
+  process.env.WINOE_BACKEND_BASE_URL = 'http://api.test';
 };
 
 export const restoreBffEnv = () => {
-  process.env.TENON_BACKEND_BASE_URL = originalBackendBase;
+  process.env.WINOE_BACKEND_BASE_URL = originalBackendBase;
 };

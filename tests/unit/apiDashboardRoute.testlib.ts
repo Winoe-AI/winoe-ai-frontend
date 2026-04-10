@@ -102,8 +102,8 @@ jest.mock('@/platform/server/bff', () => ({
   upstreamRequest: jest.fn(),
   parseUpstreamBody: jest.fn(parseUpstreamBody),
   getBackendBaseUrl: jest.fn(() => 'https://backend.test'),
-  REQUEST_ID_HEADER: 'x-tenon-request-id',
-  UPSTREAM_HEADER: 'x-tenon-upstream-status',
+  REQUEST_ID_HEADER: 'x-winoe-request-id',
+  UPSTREAM_HEADER: 'x-winoe-upstream-status',
   resolveRequestId: jest.fn(() => 'req-123'),
 }));
 

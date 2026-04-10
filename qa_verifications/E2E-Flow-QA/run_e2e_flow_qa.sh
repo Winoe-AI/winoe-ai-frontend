@@ -22,7 +22,7 @@ Options:
   --skip-integration            Skip live integration suite
   --qa-base-url <url>           Set QA_E2E_BASE_URL for QA suite
   --baseline-base-url <url>     Set E2E_BASE_URL for baseline suite
-  --backend-root <path>         Backend repo root (default: ../tenon-backend)
+  --backend-root <path>         Backend repo root (default: ../winoe-backend)
   --integration-port <port>     Frontend port for integration lane (default: 3300)
   --with-install                Run Playwright browser install step (default is skip)
   --skip-install                Keep install step skipped (default)
@@ -59,8 +59,8 @@ QA_GATE_SUMMARY_JSON="$ARTIFACTS_DIR/qa-quality-gate.json"
 BASELINE_GATE_SUMMARY_JSON="$ARTIFACTS_DIR/baseline-quality-gate.json"
 INTEGRATION_GATE_SUMMARY_JSON="$ARTIFACTS_DIR/integration-quality-gate.json"
 
-BACKEND_ROOT_DEFAULT="$(cd "$REPO_ROOT/.." && pwd)/tenon-backend"
-BACKEND_ROOT="${TENON_BACKEND_REPO_ROOT:-$BACKEND_ROOT_DEFAULT}"
+BACKEND_ROOT_DEFAULT="$(cd "$REPO_ROOT/.." && pwd)/winoe-backend"
+BACKEND_ROOT="${WINOE_BACKEND_REPO_ROOT:-$BACKEND_ROOT_DEFAULT}"
 INTEGRATION_FRONTEND_PORT="${E2E_INTEGRATION_FRONTEND_PORT:-3300}"
 INTEGRATION_FRONTEND_BASE_URL="${E2E_INTEGRATION_BASE_URL:-http://127.0.0.1:${INTEGRATION_FRONTEND_PORT}}"
 INTEGRATION_BACKEND_BASE_URL="${E2E_INTEGRATION_BACKEND_URL:-http://127.0.0.1:8000}"
@@ -453,8 +453,8 @@ if [[ "$RUN_INTEGRATION" -eq 1 && ! -x "$BACKEND_ROOT/runBackend.sh" ]]; then
   echo "Missing executable backend runner: $BACKEND_ROOT/runBackend.sh" | tee -a "$PREFLIGHT_LOG"
   PREFLIGHT_STATUS=1
 fi
-if [[ -z "${TENON_AUTH0_SECRET:-}" ]] && ! has_env_key "TENON_AUTH0_SECRET" "$REPO_ROOT/.env.local"; then
-  echo "TENON_AUTH0_SECRET is required for Playwright global setup (env or .env.local)." | tee -a "$PREFLIGHT_LOG"
+if [[ -z "${WINOE_AUTH0_SECRET:-}" ]] && ! has_env_key "WINOE_AUTH0_SECRET" "$REPO_ROOT/.env.local"; then
+  echo "WINOE_AUTH0_SECRET is required for Playwright global setup (env or .env.local)." | tee -a "$PREFLIGHT_LOG"
   PREFLIGHT_STATUS=1
 fi
 
@@ -494,9 +494,9 @@ if [[ "$PREFLIGHT_STATUS" -eq 0 && ( "$RUN_QA" -eq 1 || "$RUN_BASELINE" -eq 1 ) 
       set +e
       (
         cd "$REPO_ROOT"
-        TENON_BACKEND_BASE_URL="$INTEGRATION_BACKEND_BASE_URL" \
-        TENON_APP_BASE_URL="$INTEGRATION_FRONTEND_BASE_URL" \
-        NEXT_PUBLIC_TENON_APP_BASE_URL="$INTEGRATION_FRONTEND_BASE_URL" \
+        WINOE_BACKEND_BASE_URL="$INTEGRATION_BACKEND_BASE_URL" \
+        WINOE_APP_BASE_URL="$INTEGRATION_FRONTEND_BASE_URL" \
+        NEXT_PUBLIC_WINOE_APP_BASE_URL="$INTEGRATION_FRONTEND_BASE_URL" \
         npm run dev -- -p "$INTEGRATION_FRONTEND_PORT"
       ) > "$frontend_log" 2>&1 &
       FRONTEND_PID="$!"
@@ -626,7 +626,7 @@ if [[ "$RUN_INTEGRATION" -eq 1 && "$PREFLIGHT_STATUS" -eq 0 ]]; then
   else
     if run_with_log \
       "integration-backend-migrate" \
-      bash -lc "cd '$BACKEND_ROOT' && ENV=local TENON_ENV=local DEV_AUTH_BYPASS=1 ./runBackend.sh migrate"; then
+      bash -lc "cd '$BACKEND_ROOT' && ENV=local WINOE_ENV=local DEV_AUTH_BYPASS=1 ./runBackend.sh migrate"; then
       step_key="integration-start-backend"
       backend_log="$ARTIFACTS_DIR/${step_key}.log"
       started="$(date +%s)"
@@ -634,7 +634,7 @@ if [[ "$RUN_INTEGRATION" -eq 1 && "$PREFLIGHT_STATUS" -eq 0 ]]; then
       set +e
       (
         cd "$BACKEND_ROOT"
-        ENV=local TENON_ENV=local DEV_AUTH_BYPASS=1 DISABLE_RELOAD=1 ./runBackend.sh
+        ENV=local WINOE_ENV=local DEV_AUTH_BYPASS=1 DISABLE_RELOAD=1 ./runBackend.sh
       ) > "$backend_log" 2>&1 &
       BACKEND_PID="$!"
       status="$?"
@@ -682,9 +682,9 @@ if [[ "$RUN_INTEGRATION" -eq 1 && "$PREFLIGHT_STATUS" -eq 0 ]]; then
       set +e
       (
         cd "$REPO_ROOT"
-        TENON_BACKEND_BASE_URL="$INTEGRATION_BACKEND_BASE_URL" \
-        TENON_APP_BASE_URL="$INTEGRATION_FRONTEND_BASE_URL" \
-        NEXT_PUBLIC_TENON_APP_BASE_URL="$INTEGRATION_FRONTEND_BASE_URL" \
+        WINOE_BACKEND_BASE_URL="$INTEGRATION_BACKEND_BASE_URL" \
+        WINOE_APP_BASE_URL="$INTEGRATION_FRONTEND_BASE_URL" \
+        NEXT_PUBLIC_WINOE_APP_BASE_URL="$INTEGRATION_FRONTEND_BASE_URL" \
         npm run dev -- -p "$INTEGRATION_FRONTEND_PORT"
       ) > "$frontend_log" 2>&1 &
       FRONTEND_PID="$!"
@@ -722,7 +722,7 @@ if [[ "$RUN_INTEGRATION" -eq 1 && "$PREFLIGHT_STATUS" -eq 0 ]]; then
           E2E_INTEGRATION_BASE_URL="$INTEGRATION_FRONTEND_BASE_URL" \
           E2E_INTEGRATION_ARTIFACTS_DIR="$INTEGRATION_ARTIFACTS_DIR" \
           QA_E2E_STORAGE_DIR="$INTEGRATION_STORAGE_DIR" \
-          QA_E2E_RECRUITER_EMAIL="${QA_E2E_RECRUITER_EMAIL:-recruiter1@local.test}" \
+          QA_E2E_TALENT_PARTNER_EMAIL="${QA_E2E_TALENT_PARTNER_EMAIL:-talent_partner1@local.test}" \
           QA_E2E_CANDIDATE_EMAIL="${QA_E2E_CANDIDATE_EMAIL:-candidate1@local.test}" \
           npx playwright test -c "$INTEGRATION_CONFIG"; then
         INTEGRATION_SUITE_RAN=1

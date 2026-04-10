@@ -107,14 +107,14 @@ describe('api utils helpers', () => {
     expect(resp.headers.get('x-request-id')).toBe('req-utils');
   });
 
-  it('withRecruiterAuth returns auth failure with headers', async () => {
+  it('withTalentPartnerAuth returns auth failure with headers', async () => {
     mockRequireBffAuth.mockResolvedValue({
       ok: false,
       response: NextResponse.json({ message: 'forbidden' }, { status: 403 }),
       cookies: [],
     });
-    const { withRecruiterAuth } = await importUtils();
-    const resp = await withRecruiterAuth(
+    const { withTalentPartnerAuth } = await importUtils();
+    const resp = await withTalentPartnerAuth(
       {} as unknown as NextRequest,
       { tag: 'dash' },
       jest.fn(),
@@ -123,15 +123,15 @@ describe('api utils helpers', () => {
     expect(resp.headers.get('x-request-id')).toBe('req-utils');
   });
 
-  it('withRecruiterAuth merges cookies, tags success, and wraps handler errors', async () => {
+  it('withTalentPartnerAuth merges cookies, tags success, and wraps handler errors', async () => {
     mockRequireBffAuth.mockResolvedValue({
       ok: true,
       accessToken: 'tok',
       cookies: [],
     });
-    const { withRecruiterAuth, BFF_HEADER } = await importUtils();
+    const { withTalentPartnerAuth, BFF_HEADER } = await importUtils();
 
-    const okResp = await withRecruiterAuth(
+    const okResp = await withTalentPartnerAuth(
       {} as unknown as NextRequest,
       { tag: 'sim' },
       async () =>
@@ -140,7 +140,7 @@ describe('api utils helpers', () => {
     expect(okResp.headers.get(BFF_HEADER)).toBe('sim');
     expect(okResp.headers.get('x-request-id')).toBe('req-utils');
 
-    const errResp = await withRecruiterAuth(
+    const errResp = await withTalentPartnerAuth(
       {} as unknown as NextRequest,
       { tag: 'sim' },
       async () => {

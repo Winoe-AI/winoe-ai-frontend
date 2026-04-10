@@ -5,7 +5,7 @@ import { buildSecurityHeaders } from './next.config.csp';
 const isProd = process.env.NODE_ENV === 'production';
 const isDeployProd =
   process.env.VERCEL_ENV === 'production' ||
-  process.env.TENON_DEPLOY_ENV === 'production';
+  process.env.WINOE_DEPLOY_ENV === 'production';
 const securityHeaders = buildSecurityHeaders(isProd, isDeployProd);
 
 const nextConfig: NextConfig = {

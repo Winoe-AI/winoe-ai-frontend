@@ -14,7 +14,7 @@ describe('proxy - auth login', () => {
     getSessionNormalizedMock.mockResolvedValue(null);
     const req = new NextRequest(
       new URL(
-        'http://localhost/auth/login?mode=recruiter&returnTo=%2Fdashboard',
+        'http://localhost/auth/login?mode=talent_partner&returnTo=%2Fdashboard',
       ),
     );
     const res = await proxy(req);
@@ -22,12 +22,12 @@ describe('proxy - auth login', () => {
     expect(res?.headers.get('location')).toBeNull();
   });
 
-  it('redirects logged-in recruiter hitting auth login to dashboard', async () => {
+  it('redirects logged-in talent_partner hitting auth login to dashboard', async () => {
     const authResp = NextResponse.next();
     authResp.cookies.set('edge', 'cookie');
     mockAuth0.middleware.mockResolvedValue(authResp);
     getSessionNormalizedMock.mockResolvedValue({
-      user: { permissions: ['recruiter:access'] },
+      user: { permissions: ['talent_partner:access'] },
       accessToken: 't',
     });
     const res = await proxy(

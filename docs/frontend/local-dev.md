@@ -11,18 +11,18 @@ npm install
 Minimum viable local config:
 
 ```bash
-TENON_BACKEND_BASE_URL=http://localhost:8000
-NEXT_PUBLIC_TENON_API_BASE_URL=/api/backend
+WINOE_BACKEND_BASE_URL=http://localhost:8000
+NEXT_PUBLIC_WINOE_API_BASE_URL=/api/backend
 
-TENON_APP_BASE_URL=http://localhost:3000
-TENON_AUTH0_SECRET=replace-me
-TENON_AUTH0_DOMAIN=replace-me
-TENON_AUTH0_CLIENT_ID=replace-me
-TENON_AUTH0_CLIENT_SECRET=replace-me
+WINOE_APP_BASE_URL=http://localhost:3000
+WINOE_AUTH0_SECRET=replace-me
+WINOE_AUTH0_DOMAIN=replace-me
+WINOE_AUTH0_CLIENT_ID=replace-me
+WINOE_AUTH0_CLIENT_SECRET=replace-me
 
-NEXT_PUBLIC_TENON_AUTH0_CLAIM_NAMESPACE=https://tenon.ai
-NEXT_PUBLIC_TENON_AUTH0_CANDIDATE_CONNECTION=replace-me
-NEXT_PUBLIC_TENON_AUTH0_RECRUITER_CONNECTION=replace-me
+NEXT_PUBLIC_WINOE_AUTH0_CLAIM_NAMESPACE=https://winoe.ai
+NEXT_PUBLIC_WINOE_AUTH0_CANDIDATE_CONNECTION=replace-me
+NEXT_PUBLIC_WINOE_AUTH0_TALENT_PARTNER_CONNECTION=replace-me
 ```
 
 For complete env coverage (test/perf/script vars included), use root `README.md`.

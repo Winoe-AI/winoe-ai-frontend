@@ -42,7 +42,7 @@ describe('API routes extra coverage - dashboard rejections', () => {
     expect(result.headers.get('x-upstream')).toBe('502');
   });
 
-  it('handles rejected simulations request', async () => {
+  it('handles rejected trials request', async () => {
     mockRequireBffAuth.mockResolvedValue({
       ok: true,
       accessToken: 'token-dash',
@@ -57,8 +57,6 @@ describe('API routes extra coverage - dashboard rejections', () => {
     const { GET } = await import(modulePath);
     const result = await GET(new NextRequest('http://localhost/api/dashboard'));
     expect(result.status).toBe(200);
-    expect(result.headers.get('x-tenon-upstream-status-simulations')).toBe(
-      '502',
-    );
+    expect(result.headers.get('x-winoe-upstream-status-trials')).toBe('502');
   });
 });

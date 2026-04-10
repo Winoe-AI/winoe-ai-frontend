@@ -16,7 +16,7 @@ export function ResourceSections({
       {showRecording ? (
         <ResourcePanel
           title="Day 4 demo"
-          description="Upload or review your demo presentation for this simulation."
+          description="Upload or review your demo presentation for this trial."
           linkUrl={resourceLink}
           linkLabel="Open demo resource"
           emptyMessage="Use the demo upload panel below to submit your presentation."

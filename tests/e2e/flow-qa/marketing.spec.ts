@@ -24,7 +24,7 @@ test.describe('Marketing Flows', () => {
   });
 
   test.describe('Signed-in marketing shell', () => {
-    test.use({ storageState: storageStates.recruiterOnly });
+    test.use({ storageState: storageStates.talentPartnerOnly });
 
     test('landing page renders signed-in shell with dashboard entry point', async ({
       page,

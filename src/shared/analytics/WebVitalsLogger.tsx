@@ -3,9 +3,10 @@
 import { useCallback } from 'react';
 import type { NextWebVitalsMetric } from 'next/app';
 import { useReportWebVitals } from 'next/web-vitals';
+import { emitDebugEvent } from './debugEvents';
 
 const debugPerf = ['1', 'true'].includes(
-  (process.env.NEXT_PUBLIC_TENON_DEBUG_PERF ?? '').toLowerCase(),
+  (process.env.NEXT_PUBLIC_WINOE_DEBUG_PERF ?? '').toLowerCase(),
 );
 
 const watchedMetrics = new Set<NextWebVitalsMetric['name']>([
@@ -32,8 +33,7 @@ export function WebVitalsLogger() {
       value: formatValue(metric),
     };
 
-    // eslint-disable-next-line no-console
-    console.info('[perf:web-vitals]', payload);
+    emitDebugEvent({ message: '[perf:web-vitals]', payload });
   }, []);
 
   useReportWebVitals(handleMetric);

@@ -30,8 +30,8 @@ describe('api/backend proxy route - misc branches', () => {
   });
 
   it('logs when debug flags enabled', async () => {
-    process.env.TENON_DEBUG = 'true';
-    process.env.TENON_DEBUG_PERF = '1';
+    process.env.WINOE_DEBUG = 'true';
+    process.env.WINOE_DEBUG_PERF = '1';
     const logSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
     upstreamRequestMock.mockResolvedValue(
       makeResponse(JSON.stringify({ ok: true }), {

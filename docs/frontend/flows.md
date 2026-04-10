@@ -46,41 +46,41 @@
 - Uses structured reflection form UI (`Day5ReflectionPanel` and related hooks/components).
 - Persists through standard task submit + draft endpoints.
 
-## Recruiter Flow (Current Implementation)
+## Talent Partner Flow (Current Implementation)
 
-1. Recruiter opens `/dashboard`.
+1. Talent Partner opens `/dashboard`.
 
 - API: `GET /api/dashboard`.
-- Server-side dashboard handler fans out to backend `/api/auth/me` and `/api/simulations`.
+- Server-side dashboard handler fans out to backend `/api/auth/me` and `/api/trials`.
 
-2. Recruiter creates simulation (`/dashboard/simulations/new`).
+2. Talent Partner creates trial (`/dashboard/trials/new`).
 
-- API: `POST /api/simulations`.
+- API: `POST /api/trials`.
 
-3. Recruiter opens simulation detail (`/dashboard/simulations/[id]`).
+3. Talent Partner opens trial detail (`/dashboard/trials/[id]`).
 
 - APIs:
-  - `GET /api/simulations/{id}`
-  - `GET /api/simulations/{id}/candidates`
-  - `GET /api/simulations/{id}/candidates/compare`
-  - `POST /api/simulations/{id}/invite`
-  - `POST /api/simulations/{id}/candidates/{candidateSessionId}/invite/resend`
-  - `POST /api/simulations/{id}/terminate`
+  - `GET /api/trials/{id}`
+  - `GET /api/trials/{id}/candidates`
+  - `GET /api/trials/{id}/candidates/compare`
+  - `POST /api/trials/{id}/invite`
+  - `POST /api/trials/{id}/candidates/{candidateSessionId}/invite/resend`
+  - `POST /api/trials/{id}/terminate`
 
-4. Recruiter submission review (`/dashboard/simulations/[id]/candidates/[candidateSessionId]`).
+4. Talent Partner submission review (`/dashboard/trials/[id]/candidates/[candidateSessionId]`).
 
 - APIs:
   - `GET /api/submissions?candidateSessionId=...`
   - `GET /api/submissions/{submissionId}`
   - candidate verification via candidates list endpoint
 
-5. Recruiter fit profile (`/dashboard/simulations/[id]/candidates/[candidateSessionId]/fit-profile`).
+5. Talent Partner winoe report (`/dashboard/trials/[id]/candidates/[candidateSessionId]/winoe-report`).
 
 - APIs:
-  - `GET /api/candidate_sessions/{candidateSessionId}/fit_profile`
-  - `POST /api/candidate_sessions/{candidateSessionId}/fit_profile/generate`
+  - `GET /api/candidate_sessions/{candidateSessionId}/winoe_report`
+  - `POST /api/candidate_sessions/{candidateSessionId}/winoe_report/generate`
 
 ## Flow Notes
 
 - `/api/auth/access-token` and `/api/dev/access-token` exist but are currently disabled (`410`) in local-enabled mode and unavailable outside local.
-- Scenario lifecycle actions (`activate`, `scenario regenerate/approve/patch`, `jobs poll`) currently call `/api/backend/*` paths from recruiter client code. Backend-equivalent routes exist under `/api/*`; see mismatch matrix in `docs/frontend/api-integration.md`.
+- Scenario lifecycle actions (`activate`, `scenario regenerate/approve/patch`, `jobs poll`) currently call `/api/backend/*` paths from talent_partner client code. Backend-equivalent routes exist under `/api/*`; see mismatch matrix in `docs/frontend/api-integration.md`.

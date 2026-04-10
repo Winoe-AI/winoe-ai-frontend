@@ -1,0 +1,46 @@
+import { TEMPLATE_OPTIONS } from '@/platform/config/templateCatalog';
+import type { FieldErrors, FormValues } from '../utils/createFormConfigUtils';
+import { TrialFieldError } from './TrialFieldError';
+
+type Props = {
+  values: FormValues;
+  errors: FieldErrors;
+  isSubmitting: boolean;
+  onChange: (key: 'templateKey', value: FormValues['templateKey']) => void;
+};
+
+export function TrialTemplateSelect({
+  values,
+  errors,
+  isSubmitting,
+  onChange,
+}: Props) {
+  return (
+    <div>
+      <label
+        htmlFor="templateKey"
+        className="text-xs font-medium uppercase tracking-wide text-gray-500"
+      >
+        Template
+      </label>
+      <select
+        id="templateKey"
+        className="mt-1 w-full rounded border border-gray-300 px-3 py-2 text-sm"
+        value={values.templateKey}
+        onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+          onChange('templateKey', e.target.value as FormValues['templateKey'])
+        }
+        disabled={isSubmitting}
+        aria-invalid={Boolean(errors.templateKey)}
+        aria-describedby={errors.templateKey ? 'templateKey-error' : undefined}
+      >
+        {TEMPLATE_OPTIONS.map((opt) => (
+          <option key={opt.key} value={opt.key}>
+            {opt.label} ({opt.key})
+          </option>
+        ))}
+      </select>
+      <TrialFieldError id="templateKey-error" message={errors.templateKey} />
+    </div>
+  );
+}

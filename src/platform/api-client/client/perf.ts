@@ -1,7 +1,8 @@
+import { emitDebugEvent } from '@/shared/analytics/debugEvents';
 import type { HttpMethod } from './shapes';
 
 function isDebugPerfEnabled() {
-  const flag = (process.env.NEXT_PUBLIC_TENON_DEBUG_PERF ?? '').toLowerCase();
+  const flag = (process.env.NEXT_PUBLIC_WINOE_DEBUG_PERF ?? '').toLowerCase();
   return flag === '1' || flag === 'true';
 }
 
@@ -68,8 +69,7 @@ export function logRequestPerf(
   const safeUrl = sanitizePath(targetUrl);
   const payload: Record<string, unknown> = { status, durationMs };
   if (cacheMode) payload.cache = cacheMode;
-  // eslint-disable-next-line no-console
-  console.info(`[api][perf] ${method} ${safeUrl}`, payload);
+  emitDebugEvent({ message: `[api][perf] ${method} ${safeUrl}`, payload });
 }
 
 export { isDebugPerfEnabled as DEBUG_PERF, nowMs };

@@ -33,7 +33,7 @@ test('candidate completes Day 1', async ({ page }) => {
   const candidate = new CandidateSessionQaPage(page);
 
   await candidate.gotoWithToken(QA_INVITE_TOKEN);
-  await candidate.startSimulation();
+  await candidate.startTrial();
   await candidate.expectDay(1);
 
   const textInput = page.locator('textarea').first();

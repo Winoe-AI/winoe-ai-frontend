@@ -4,9 +4,9 @@ import { createInteractionContext } from './context';
 import { runDay1Keystroke } from './day1Keystroke';
 import { runDay4Upload } from './day4Upload';
 import { runDay5Keystroke } from './day5Keystroke';
-import { runFitProfileControls } from './fitProfileControls';
-import { runRecruiterNavigation } from './recruiterNavigation';
-import { runSimulationCreate } from './simulationCreate';
+import { runWinoeReportControls } from './winoeReportControls';
+import { runTalentPartnerNavigation } from './talent-partnerNavigation';
+import { runTrialCreate } from './trialCreate';
 import { runSubmissionsExpand } from './submissionsExpand';
 
 export async function runInteractionSample(params: {
@@ -16,12 +16,12 @@ export async function runInteractionSample(params: {
 }): Promise<InteractionSampleMetric[]> {
   const { browser, ids, sample } = params;
   const context = createInteractionContext(browser, ids, sample);
-  await runRecruiterNavigation(context);
-  await runSimulationCreate(context);
+  await runTalentPartnerNavigation(context);
+  await runTrialCreate(context);
   await runDay1Keystroke(context);
   await runDay5Keystroke(context);
   await runDay4Upload(context);
   await runSubmissionsExpand(context);
-  await runFitProfileControls(context);
+  await runWinoeReportControls(context);
   return context.results;
 }

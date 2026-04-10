@@ -90,7 +90,7 @@ describe('CandidateDashboardPage unit flow', () => {
     render(<CandidateDashboardPage signedInEmail="c@example.com" />);
 
     const button = await screen.findByRole('button', {
-      name: /Start simulation/i,
+      name: /Start trial/i,
     });
     fireEvent.click(button);
     expect(routerMock.push).toHaveBeenCalledWith(

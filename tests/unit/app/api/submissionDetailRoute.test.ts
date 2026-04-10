@@ -59,7 +59,7 @@ describe('/api/submissions/[submissionId] route', () => {
       {
         path: '/api/submissions/sub-123',
         tag: 'submission-detail',
-        requirePermission: 'recruiter:access',
+        requirePermission: 'talent_partner:access',
       },
       req,
     );

@@ -56,13 +56,11 @@ function ReviewMetadata({
     <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
       <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
         <div>
-          <div className="text-sm font-medium text-slate-500">Simulation</div>
+          <div className="text-sm font-medium text-slate-500">Trial</div>
           <div className="mt-1 text-xl font-semibold text-slate-900">
-            {review.simulation.title}
+            {review.trial.title}
           </div>
-          <div className="mt-1 text-sm text-slate-600">
-            {review.simulation.role}
-          </div>
+          <div className="mt-1 text-sm text-slate-600">{review.trial.role}</div>
         </div>
         <div className="flex flex-wrap gap-2">
           <Button variant="secondary" onClick={onDashboard}>
@@ -386,7 +384,7 @@ export default function CandidateCompletedReviewPage({ token }: Props) {
     return (
       <ReviewShell
         title="Loading completed review"
-        description="Fetching your completed simulation artifacts."
+        description="Fetching your completed trial artifacts."
       />
     );
   }
@@ -397,7 +395,7 @@ export default function CandidateCompletedReviewPage({ token }: Props) {
         title="Completed review unavailable"
         description={toUserMessage(
           reviewQuery.error,
-          'Unable to load your completed simulation review.',
+          'Unable to load your completed trial review.',
         )}
       >
         <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
@@ -419,8 +417,8 @@ export default function CandidateCompletedReviewPage({ token }: Props) {
 
   return (
     <ReviewShell
-      title="Completed simulation review"
-      description="Review the submitted artifacts and cutoff evidence for each day of your completed simulation."
+      title="Completed trial review"
+      description="Review the submitted artifacts and cutoff evidence for each day of your completed trial."
     >
       <ReviewMetadata
         review={reviewQuery.data}

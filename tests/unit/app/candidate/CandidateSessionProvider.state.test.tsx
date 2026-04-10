@@ -22,7 +22,7 @@ describe('CandidateSessionProvider state helpers', () => {
         bootstrap: {
           candidateSessionId: 99,
           status: 'in_progress',
-          simulation: { title: 'Stale', role: 'Stale' },
+          trial: { title: 'Stale', role: 'Stale' },
         },
         started: true,
         taskState: {

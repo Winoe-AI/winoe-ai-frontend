@@ -1,9 +1,9 @@
 import { renderHook } from '@testing-library/react';
-import { useDashboardData } from '@/features/recruiter/dashboard/hooks/useDashboardData';
+import { useDashboardData } from '@/features/talent-partner/dashboard/hooks/useDashboardData';
 
 export const fetchDashboard = jest.fn();
 
-jest.mock('@/features/recruiter/dashboard/hooks/useDashboardApi', () => ({
+jest.mock('@/features/talent-partner/dashboard/hooks/useDashboardApi', () => ({
   fetchDashboard: (...args: unknown[]) => fetchDashboard(...args),
   isAbortError: (err: unknown) =>
     err instanceof DOMException && err.name === 'AbortError',

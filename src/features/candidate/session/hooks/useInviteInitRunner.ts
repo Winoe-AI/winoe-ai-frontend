@@ -44,7 +44,7 @@ export function createInviteInit(params: InviteInitParams) {
       params.setBootstrap({
         candidateSessionId: resp.candidateSessionId,
         status: resp.status,
-        simulation: resp.simulation,
+        trial: resp.trial,
         aiNoticeText: resp.aiNoticeText,
         aiNoticeVersion: resp.aiNoticeVersion,
         evalEnabledByDay: resp.evalEnabledByDay,

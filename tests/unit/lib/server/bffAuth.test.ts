@@ -61,7 +61,7 @@ jest.mock('@/platform/auth0/claims', () => {
 describe('bffAuth utilities', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    delete process.env.TENON_DEBUG_PERF;
+    delete process.env.WINOE_DEBUG_PERF;
     auth0Mock = jest.requireMock('@/platform/auth0').auth0 as {
       getAccessToken: jest.Mock;
     };
@@ -85,7 +85,7 @@ describe('bffAuth utilities', () => {
   it('returns 403 when permission missing', async () => {
     getSessionNormalizedMock.mockResolvedValue({ user: { email: 'a' } });
     const res = await requireBffAuth(new NextRequest('http://x'), {
-      requirePermission: 'recruiter:access',
+      requirePermission: 'talent_partner:access',
     });
     expect(res.ok).toBe(false);
     if (!res.ok) expect(res.response.status).toBe(403);
@@ -103,7 +103,7 @@ describe('bffAuth utilities', () => {
   });
 
   it('returns success when token present and logs perf when enabled', async () => {
-    process.env.TENON_DEBUG_PERF = 'true';
+    process.env.WINOE_DEBUG_PERF = 'true';
     const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
     getSessionNormalizedMock.mockResolvedValue({
       user: { email: 'a' },

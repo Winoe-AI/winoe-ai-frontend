@@ -14,15 +14,15 @@ describe('auth0-claims extras', () => {
   it('prefers existing user permissions over namespaced replacements', () => {
     const claims = normalizeUserClaims({
       permissions: ['keep'],
-      'https://tenon.dev/perms': ['ns'],
+      'https://winoe.dev/perms': ['ns'],
     });
     expect(claims.permissions).toEqual(['keep']);
   });
 
   it('extracts permissions from token when user lacks them and maps token roles', () => {
-    const token = makeToken({ permissions: ['tok'], roles: ['Recruiter'] });
+    const token = makeToken({ permissions: ['tok'], roles: ['TalentPartner'] });
     expect(extractPermissions({}, token)).toEqual(
-      expect.arrayContaining(['tok', 'recruiter:access']),
+      expect.arrayContaining(['tok', 'talent_partner:access']),
     );
   });
 

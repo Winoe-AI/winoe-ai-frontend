@@ -20,7 +20,7 @@ describe('CandidateDashboardPage invite-specific states', () => {
     listCandidateInvitesMock.mockResolvedValue([
       {
         candidateSessionId: 1,
-        title: 'Expired Simulation',
+        title: 'Expired Trial',
         role: 'Developer',
         status: 'in_progress',
         isExpired: true,
@@ -29,7 +29,7 @@ describe('CandidateDashboardPage invite-specific states', () => {
     ]);
     await renderDashboardPage();
     await waitFor(() => {
-      expect(screen.getByText('Expired Simulation')).toBeInTheDocument();
+      expect(screen.getByText('Expired Trial')).toBeInTheDocument();
     });
     expect(screen.getByText(/This invite has expired/)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Continue/i })).toBeDisabled();
@@ -66,7 +66,7 @@ describe('CandidateDashboardPage invite-specific states', () => {
     await renderDashboardPage();
     await waitFor(() => {
       expect(
-        screen.getByRole('button', { name: /Start simulation/i }),
+        screen.getByRole('button', { name: /Start trial/i }),
       ).toBeInTheDocument();
     });
   });

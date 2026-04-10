@@ -43,6 +43,6 @@ export async function installVitalsObserver(page: Page) {
       });
       longTaskObserver.observe({ type: 'longtask', buffered: true });
     } catch {}
-    (window as unknown as PerfWindowState).__tenonPerf = state;
+    (window as unknown as PerfWindowState).__winoePerf = state;
   });
 }

@@ -27,7 +27,7 @@ describe('api/backend proxy route - request body limits', () => {
   });
 
   it('returns 413 when body exceeds configured limit', async () => {
-    process.env.TENON_PROXY_MAX_BODY_BYTES = '5';
+    process.env.WINOE_PROXY_MAX_BODY_BYTES = '5';
     const { POST } = await importBackendProxyRoute();
     const req = new MockNextRequest('http://localhost/api/backend/tasks/run', {
       method: 'POST',
@@ -42,7 +42,7 @@ describe('api/backend proxy route - request body limits', () => {
   });
 
   it('handles large body after read when content-length absent', async () => {
-    process.env.TENON_PROXY_MAX_BODY_BYTES = '2';
+    process.env.WINOE_PROXY_MAX_BODY_BYTES = '2';
     const { POST } = await importBackendProxyRoute();
     const req = new MockNextRequest('http://localhost/api/backend/submit', {
       method: 'POST',

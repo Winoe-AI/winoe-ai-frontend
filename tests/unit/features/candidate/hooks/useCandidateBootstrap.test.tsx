@@ -49,7 +49,7 @@ describe('useCandidateBootstrap', () => {
     resolveMock.mockResolvedValue({
       candidateSessionId: 9,
       status: 'in_progress',
-      simulation: { title: 'Sim', role: 'Eng' },
+      trial: { title: 'Sim', role: 'Eng' },
     });
 
     render(<Harness inviteToken={inviteToken} onResolved={onResolved} />);
@@ -62,7 +62,7 @@ describe('useCandidateBootstrap', () => {
     expect(onResolved).toHaveBeenCalledWith({
       candidateSessionId: 9,
       status: 'in_progress',
-      simulation: { title: 'Sim', role: 'Eng' },
+      trial: { title: 'Sim', role: 'Eng' },
     });
     expect(screen.getByTestId('state').textContent).toBe('ready');
   });

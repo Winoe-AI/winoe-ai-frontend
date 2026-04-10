@@ -56,7 +56,7 @@ test.describe('Candidate Day 3 Flow', () => {
     const sessionPage = new CandidateSessionQaPage(page);
 
     await sessionPage.gotoWithToken(QA_INVITE_TOKEN);
-    await sessionPage.startSimulation();
+    await sessionPage.startTrial();
 
     await sessionPage.expectDay(3);
 

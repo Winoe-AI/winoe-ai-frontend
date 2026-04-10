@@ -1,0 +1,80 @@
+'use client';
+import type { CandidateSession } from '@/features/talent-partner/types';
+import type { RowState } from '../hooks/useTypes';
+import { useCandidatesTableView } from '../hooks/useCandidatesTableView';
+import { CandidatesTableToolbar } from './CandidatesTableToolbar';
+import { CandidatesTableBody } from './CandidatesTableBody';
+import { CandidatesTableEmpty } from './CandidatesTableEmpty';
+
+type Props = {
+  search: string;
+  setSearch: (value: string) => void;
+  pagedCandidates: CandidateSession[];
+  visibleCount: number;
+  totalCount: number;
+  page: number;
+  pageCount: number;
+  setPage: (page: number) => void;
+  rowStates: Record<string, RowState>;
+  onCopy: (candidate: CandidateSession) => void;
+  onResend: (candidate: CandidateSession) => void;
+  onCloseManual: (id: number) => void;
+  cooldownNow: number;
+  trialId: string;
+  inviteResendEnabled: boolean;
+  inviteResendDisabledReason: string | null;
+};
+
+export function CandidatesTableContent({
+  search,
+  setSearch,
+  pagedCandidates,
+  visibleCount,
+  totalCount,
+  page,
+  pageCount,
+  setPage,
+  rowStates,
+  onCopy,
+  onResend,
+  onCloseManual,
+  cooldownNow,
+  trialId,
+  inviteResendEnabled,
+  inviteResendDisabledReason,
+}: Props) {
+  const { rowStateFor, pageSummary } = useCandidatesTableView({
+    rowStates,
+    pagedCandidates,
+    visibleCount,
+    totalCount,
+  });
+
+  return (
+    <div className="overflow-hidden rounded border border-gray-200 bg-white">
+      <CandidatesTableToolbar
+        search={search}
+        setSearch={setSearch}
+        page={page}
+        pageCount={pageCount}
+        setPage={setPage}
+        pageSummary={pageSummary}
+      />
+      {visibleCount === 0 ? (
+        <CandidatesTableEmpty />
+      ) : (
+        <CandidatesTableBody
+          pagedCandidates={pagedCandidates}
+          rowStateFor={rowStateFor}
+          cooldownNow={cooldownNow}
+          trialId={trialId}
+          inviteResendEnabled={inviteResendEnabled}
+          inviteResendDisabledReason={inviteResendDisabledReason}
+          onCopy={onCopy}
+          onResend={onResend}
+          onCloseManual={onCloseManual}
+        />
+      )}
+    </div>
+  );
+}

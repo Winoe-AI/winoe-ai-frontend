@@ -65,11 +65,11 @@ describe('CandidateSessionPage auth flow remount and token isolation', () => {
     const user = userEvent.setup();
     const firstRender = renderSessionPage('closed-token');
     await user.click(
-      await screen.findByRole('button', { name: /Start simulation/i }),
+      await screen.findByRole('button', { name: /Start trial/i }),
     );
     await screen.findByText(/^Day closed$/i);
     window.localStorage.setItem(
-      'tenon:candidate:recordedSubmission:654:41',
+      'winoe:candidate:recordedSubmission:654:41',
       JSON.stringify({
         submissionId: 901,
         submittedAt: '2026-03-07T07:10:00Z',
@@ -89,14 +89,14 @@ describe('CandidateSessionPage auth flow remount and token isolation', () => {
 
   it('does not hydrate persisted state from a different token route', async () => {
     sessionStorage.setItem(
-      'tenon:candidate_session_v1',
+      'winoe:candidate_session_v1',
       JSON.stringify({
         inviteToken: 'token-a',
         candidateSessionId: 111,
         bootstrap: {
           candidateSessionId: 111,
           status: 'in_progress',
-          simulation: { title: 'Token A Simulation', role: 'Token A Role' },
+          trial: { title: 'Token A Trial', role: 'Token A Role' },
           scheduledStartAt: '2099-01-01T14:00:00Z',
           candidateTimezone: 'UTC',
           dayWindows: [
@@ -134,7 +134,7 @@ describe('CandidateSessionPage auth flow remount and token isolation', () => {
         return jsonResponse(
           baseSession({
             candidateSessionId: 222,
-            simulation: { title: 'Token B Simulation', role: 'Token B Role' },
+            trial: { title: 'Token B Trial', role: 'Token B Role' },
           }),
         );
       if (path.endsWith('/candidate/session/222/current_task'))
@@ -147,7 +147,7 @@ describe('CandidateSessionPage auth flow remount and token isolation', () => {
     });
     renderSessionPage('token-b');
     expect(screen.queryByText('Token A Task')).not.toBeInTheDocument();
-    expect(screen.queryByText('Token A Simulation')).not.toBeInTheDocument();
+    expect(screen.queryByText('Token A Trial')).not.toBeInTheDocument();
     await screen.findByText(/Pick your start date/i);
     expect(
       fetchMock.mock.calls.some(([url]) =>
@@ -155,7 +155,7 @@ describe('CandidateSessionPage auth flow remount and token isolation', () => {
       ),
     ).toBe(false);
     const persisted = JSON.parse(
-      sessionStorage.getItem('tenon:candidate_session_v1') ?? '{}',
+      sessionStorage.getItem('winoe:candidate_session_v1') ?? '{}',
     );
     expect(persisted.inviteToken).not.toBe('token-a');
   });

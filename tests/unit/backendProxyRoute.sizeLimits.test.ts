@@ -33,7 +33,7 @@ describe('/api/backend proxy - size limits', () => {
     );
 
     expect(res.status).toBe(502);
-    expect(res.headers.get('x-tenon-request-id')).toBe('req-test');
+    expect(res.headers.get('x-winoe-request-id')).toBe('req-test');
     expect(arrayBufferSpy).not.toHaveBeenCalled();
   });
 
@@ -67,7 +67,7 @@ describe('/api/backend proxy - size limits', () => {
     );
 
     expect(res.status).toBe(502);
-    expect(res.headers.get('x-tenon-request-id')).toBe('req-test');
+    expect(res.headers.get('x-winoe-request-id')).toBe('req-test');
     expect(cancel).toHaveBeenCalled();
   });
 
@@ -85,7 +85,7 @@ describe('/api/backend proxy - size limits', () => {
 
     expect(fetchMock).not.toHaveBeenCalled();
     expect(res.status).toBe(413);
-    expect(res.headers.get('x-tenon-request-id')).toBe('req-test');
+    expect(res.headers.get('x-winoe-request-id')).toBe('req-test');
     expect(textSpy).not.toHaveBeenCalled();
   });
 });

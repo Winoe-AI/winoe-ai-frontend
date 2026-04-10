@@ -27,8 +27,8 @@ export type PollStatusMock = {
 export type CandidateSessionMockOptions = {
   token?: string;
   candidateSessionId?: number;
-  simulationTitle?: string;
-  simulationRole?: string;
+  trialTitle?: string;
+  trialRole?: string;
   initialTask: CandidateTaskMock | null;
   nextTaskAfterSubmit?: CandidateTaskMock | null;
   completedTaskIds?: number[];

@@ -2,7 +2,7 @@ export type {
   CandidateBootstrap,
   CandidateSessionState,
   CandidateTask,
-  SimulationSummary,
+  TrialSummary,
   TaskState,
   TaskType,
 } from './types.model';

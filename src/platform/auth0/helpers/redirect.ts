@@ -9,7 +9,7 @@ import {
 
 export const resolveModeForReturnTo = (
   returnTo: string,
-): 'candidate' | 'recruiter' =>
+): 'candidate' | 'talent_partner' =>
   modeForPath(returnTo.split(/[?#]/)[0] || returnTo);
 
 export const wrapCallbackErrorRedirect = (
@@ -21,11 +21,6 @@ export const wrapCallbackErrorRedirect = (
   const safeReturnTo = ctx.returnTo;
   const mode = resolveModeForReturnTo(safeReturnTo);
   const errorCode = toSafeErrorCode(error);
-  const errorMessage = toSafeErrorMessage(error);
-  // eslint-disable-next-line no-console
-  console.warn(
-    `[auth0] callback error id=${errorId} code=${errorCode}${errorMessage ? ` msg=${errorMessage}` : ''}`,
-  );
 
   const params = new URLSearchParams();
   params.set('mode', mode);

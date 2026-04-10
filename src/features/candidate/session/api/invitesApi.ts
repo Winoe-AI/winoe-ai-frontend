@@ -88,9 +88,9 @@ export async function resolveCandidateInviteToken(
         typeof status === 'number' ? status : fallbackStatus(err, 500);
       throw new HttpError(
         safeStatus,
-        fallbackMsg.trim() || 'Something went wrong loading your simulation.',
+        fallbackMsg.trim() || 'Something went wrong loading your trial.',
       );
     }
-    mapCandidateApiError(err, 'Something went wrong loading your simulation.');
+    mapCandidateApiError(err, 'Something went wrong loading your trial.');
   }
 }

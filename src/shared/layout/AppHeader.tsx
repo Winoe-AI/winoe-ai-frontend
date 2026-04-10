@@ -6,7 +6,7 @@ import { contentContainer } from './layoutStyles';
 type AppHeaderProps = {
   isAuthed: boolean;
   permissions?: string[];
-  navScope?: 'candidate' | 'recruiter' | 'marketing' | 'auth';
+  navScope?: 'candidate' | 'talent_partner' | 'marketing' | 'auth';
 };
 
 export function AppHeader({
@@ -17,7 +17,7 @@ export function AppHeader({
   return (
     <header
       className="border-b bg-white"
-      data-fit-profile-no-print="true"
+      data-winoe-report-no-print="true"
       data-app-header="true"
     >
       <div

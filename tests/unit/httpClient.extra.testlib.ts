@@ -5,7 +5,7 @@ import {
 import { responseHelpers } from '../setup';
 
 const realFetch = global.fetch;
-const originalDebug = process.env.NEXT_PUBLIC_TENON_DEBUG_PERF;
+const originalDebug = process.env.NEXT_PUBLIC_WINOE_DEBUG_PERF;
 
 export {
   apiClient,
@@ -22,5 +22,5 @@ export function resetHttpClientExtraMocks() {
 
 export function restoreHttpClientExtraEnv() {
   (global.fetch as jest.Mock).mockReset?.();
-  process.env.NEXT_PUBLIC_TENON_DEBUG_PERF = originalDebug;
+  process.env.NEXT_PUBLIC_WINOE_DEBUG_PERF = originalDebug;
 }

@@ -12,9 +12,9 @@ describe('API Routes Coverage - invite/resend', () => {
 
   it('covers route metadata and POST', async () => {
     const mod =
-      await import('@/app/api/simulations/[id]/candidates/[candidateSessionId]/invite/resend/route');
+      await import('@/app/api/trials/[id]/candidates/[candidateSessionId]/invite/resend/route');
     markMetadataCovered(
-      '@/app/api/simulations/[id]/candidates/[candidateSessionId]/invite/resend/route',
+      '@/app/api/trials/[id]/candidates/[candidateSessionId]/invite/resend/route',
     );
 
     expect(mod.dynamic).toBe('force-dynamic');
@@ -23,7 +23,7 @@ describe('API Routes Coverage - invite/resend', () => {
 
     const res = await mod.POST(
       new NextRequest(
-        'http://localhost/api/simulations/s1/candidates/c1/invite/resend',
+        'http://localhost/api/trials/s1/candidates/c1/invite/resend',
         { method: 'POST' },
       ),
       { params: Promise.resolve({ id: 's1', candidateSessionId: 'c1' }) },

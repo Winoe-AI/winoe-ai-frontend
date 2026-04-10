@@ -9,12 +9,12 @@ exports[`CandidateSessionView scheduling states renders locked state with countd
       <h1
         class="text-lg font-semibold"
       >
-        Simulation locked until start
+        Trial locked until start
       </h1>
       <p
         class="mt-1 text-sm text-gray-600"
       >
-        Infra Simulation (Backend Engineer) opens when Day 1 starts.
+        Infra Trial (Backend Engineer) opens when Day 1 starts.
       </p>
     </div>
     <div
@@ -115,7 +115,7 @@ exports[`CandidateSessionView scheduling states renders scheduling confirm state
       <p
         class="mt-1 text-sm text-gray-600"
       >
-        Confirm your local schedule before starting Infra Simulation (Backend Engineer).
+        Confirm your local schedule before starting Infra Trial (Backend Engineer).
       </p>
     </div>
     <div
@@ -256,7 +256,7 @@ exports[`CandidateSessionView scheduling states renders scheduling form state 1`
       <p
         class="mt-1 text-sm text-gray-600"
       >
-        Confirm your local schedule before starting Infra Simulation (Backend Engineer).
+        Confirm your local schedule before starting Infra Trial (Backend Engineer).
       </p>
     </div>
     <div

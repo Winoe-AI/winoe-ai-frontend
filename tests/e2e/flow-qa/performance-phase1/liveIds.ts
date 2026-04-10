@@ -3,16 +3,16 @@ import { BASE_URL, DEFAULT_IDS } from './config';
 import { storagePath } from './helpers';
 import type { RuntimeIds } from './types';
 
-async function discoverRecruiterIds(
+async function discoverTalentPartnerIds(
   browser: Browser,
   next: RuntimeIds,
-  envSimulationId?: string,
+  envTrialId?: string,
   envCandidateSessionId?: string,
 ) {
-  if (envSimulationId && envCandidateSessionId) return;
+  if (envTrialId && envCandidateSessionId) return;
   const context = await browser.newContext({
     baseURL: BASE_URL,
-    storageState: storagePath('recruiter'),
+    storageState: storagePath('talent_partner'),
   });
   const page = await context.newPage();
   try {
@@ -20,24 +20,22 @@ async function discoverRecruiterIds(
     await expect(
       page.getByRole('heading', { name: /^dashboard$/i }),
     ).toBeVisible({ timeout: 12_000 });
-    const discoveredSimulationId = await page.evaluate(() => {
+    const discoveredTrialId = await page.evaluate(() => {
       const anchors = Array.from(document.querySelectorAll('a[href]'));
       for (const anchor of anchors) {
         const href = anchor.getAttribute('href');
-        const match = href?.match(/^\/dashboard\/simulations\/([^/]+)$/);
+        const match = href?.match(/^\/dashboard\/trials\/([^/]+)$/);
         if (match?.[1] && match[1] !== 'new')
           return decodeURIComponent(match[1]);
       }
       return null;
     });
-    if (discoveredSimulationId && !envSimulationId)
-      next.simulationId = discoveredSimulationId;
-    if (!next.simulationId) return;
-    await page.goto(
-      `/dashboard/simulations/${encodeURIComponent(next.simulationId)}`,
-      { waitUntil: 'domcontentloaded' },
-    );
-    await expect(page.getByText(/5-day simulation plan/i)).toBeVisible({
+    if (discoveredTrialId && !envTrialId) next.trialId = discoveredTrialId;
+    if (!next.trialId) return;
+    await page.goto(`/dashboard/trials/${encodeURIComponent(next.trialId)}`, {
+      waitUntil: 'domcontentloaded',
+    });
+    await expect(page.getByText(/5-day trial plan/i)).toBeVisible({
       timeout: 12_000,
     });
     const discoveredCandidateSessionId = await page.evaluate(() => {
@@ -75,7 +73,7 @@ async function discoverInviteToken(
       page.getByRole('heading', { name: /candidate dashboard/i }),
     ).toBeVisible({ timeout: 12_000 });
     const continueButton = page
-      .getByRole('button', { name: /start simulation|continue/i })
+      .getByRole('button', { name: /start trial|continue/i })
       .first();
     if ((await continueButton.count()) === 0) return;
     await Promise.all([
@@ -95,17 +93,17 @@ async function discoverInviteToken(
 
 export async function discoverLiveIds(browser: Browser): Promise<RuntimeIds> {
   const next: RuntimeIds = { ...DEFAULT_IDS };
-  const envSimulationId = process.env.TENON_PERF_SIMULATION_ID?.trim();
+  const envTrialId = process.env.WINOE_PERF_TRIAL_ID?.trim();
   const envCandidateSessionId =
-    process.env.TENON_PERF_CANDIDATE_SESSION_ID?.trim();
-  const envInviteToken = process.env.TENON_PERF_INVITE_TOKEN?.trim();
-  if (envSimulationId) next.simulationId = envSimulationId;
+    process.env.WINOE_PERF_CANDIDATE_SESSION_ID?.trim();
+  const envInviteToken = process.env.WINOE_PERF_INVITE_TOKEN?.trim();
+  if (envTrialId) next.trialId = envTrialId;
   if (envCandidateSessionId) next.candidateSessionId = envCandidateSessionId;
   if (envInviteToken) next.inviteToken = envInviteToken;
-  await discoverRecruiterIds(
+  await discoverTalentPartnerIds(
     browser,
     next,
-    envSimulationId,
+    envTrialId,
     envCandidateSessionId,
   );
   await discoverInviteToken(browser, next, envInviteToken);

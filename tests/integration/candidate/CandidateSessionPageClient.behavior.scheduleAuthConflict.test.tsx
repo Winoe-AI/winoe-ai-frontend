@@ -85,7 +85,7 @@ describe('CandidateSessionPage auth flow schedule auth/conflict handling', () =>
     await fillScheduleAndContinue(user);
     await user.click(screen.getByRole('button', { name: /Confirm schedule/i }));
     expect(
-      await screen.findByText(/Simulation locked until start/i),
+      await screen.findByText(/Trial locked until start/i),
     ).toBeInTheDocument();
     expect(screen.queryByText(/Schedule already set/i)).not.toBeInTheDocument();
     await waitFor(() =>

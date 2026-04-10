@@ -85,13 +85,13 @@ describe('lib/auth0 callback handling', () => {
   });
 
   it('supports mode detection for callback return paths', async () => {
-    modeForPathMock.mockReturnValueOnce('recruiter');
+    modeForPathMock.mockReturnValueOnce('talent_partner');
     await importAuth0();
     const resp = await getAuth0Config().onCallback(
       { code: 'err' },
-      { returnTo: '/dashboard/simulations' },
+      { returnTo: '/dashboard/trials' },
     );
     expect(resp.status).toBe(307);
-    expect(resp.headers.get('location')).toContain('mode=recruiter');
+    expect(resp.headers.get('location')).toContain('mode=talent_partner');
   });
 });

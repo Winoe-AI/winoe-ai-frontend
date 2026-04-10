@@ -59,7 +59,7 @@ describe('CandidateSessionPage error states - view state coverage', () => {
     resolveInviteMock.mockResolvedValue({
       candidateSessionId: 99,
       status: 'in_progress',
-      simulation: { title: 'Sim', role: 'Role' },
+      trial: { title: 'Sim', role: 'Role' },
     });
     useCandidateSessionMock.mockReturnValue(buildState());
     await act(async () => render(<CandidateSessionPage token="inv" />));

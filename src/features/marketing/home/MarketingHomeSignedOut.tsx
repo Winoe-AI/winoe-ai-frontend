@@ -11,7 +11,7 @@ export function MarketingHomeSignedOut() {
           Welcome to {BRAND_NAME}
         </h1>
         <p className="mt-2 max-w-xl text-sm text-slate-600">
-          Run multi-day work simulations that replace traditional interviews for
+          Run multi-day work trials that replace traditional interviews for
           backend engineers.
         </p>
       </div>
@@ -19,10 +19,10 @@ export function MarketingHomeSignedOut() {
       <ActionRow align="center">
         <AuthStartLink
           returnTo="/dashboard"
-          mode="recruiter"
+          mode="talent_partner"
           className={primaryCtaClass}
         >
-          Recruiter login
+          Talent Partner login
         </AuthStartLink>
 
         <AuthStartLink
@@ -35,7 +35,7 @@ export function MarketingHomeSignedOut() {
       </ActionRow>
 
       <p className="mt-4 text-xs text-slate-500">
-        In production, candidates will receive a unique simulation link like{' '}
+        In production, candidates will receive a unique trial link like{' '}
         <code className="rounded bg-slate-100 px-1 py-0.5 text-[0.7rem]">
           /candidate/session/&lt;invite-token&gt;
         </code>

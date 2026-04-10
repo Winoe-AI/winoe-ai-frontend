@@ -1,7 +1,7 @@
 import type {
   CandidateDayWindow,
   CandidateSessionBootstrapResponse,
-  SimulationSummary,
+  TrialSummary,
 } from './types.bootstrapApi';
 
 export type CandidateReviewTestResults = {
@@ -95,7 +95,7 @@ export type CandidateCompletedReviewResponse = {
   candidateSessionId: number;
   status: CandidateSessionBootstrapResponse['status'];
   completedAt: string;
-  simulation: SimulationSummary & { id?: number };
+  trial: TrialSummary & { id?: number };
   candidateTimezone?: string | null;
   dayWindows?: CandidateDayWindow[];
   artifacts: CandidateReviewDayArtifact[];

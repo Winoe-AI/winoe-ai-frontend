@@ -7,8 +7,8 @@ import {
 } from '../../../(legacy)/candidate-sessions/token-params';
 
 export const metadata: Metadata = {
-  title: `Candidate simulation | ${BRAND_NAME}`,
-  description: `Work through your ${BRAND_NAME} day-by-day simulation.`,
+  title: `Candidate trial | ${BRAND_NAME}`,
+  description: `Work through your ${BRAND_NAME} day-by-day trial.`,
 };
 
 export default async function CandidateSessionRoute({

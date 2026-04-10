@@ -15,24 +15,24 @@ describe('useDashboardData', () => {
     restoreLocation();
   });
 
-  it('fetches profile and simulations and surfaces results', async () => {
+  it('fetches profile and trials and surfaces results', async () => {
     fetchDashboard.mockResolvedValueOnce({
-      profile: { name: 'Recruiter', email: 'r@test.com', role: 'Hiring' },
-      simulations: [
-        { id: '1', title: 'Sim', role: 'Eng', createdAt: '2024-01-01' },
-      ],
+      profile: { name: 'TalentPartner', email: 'r@test.com', role: 'Hiring' },
+      trials: [{ id: '1', title: 'Sim', role: 'Eng', createdAt: '2024-01-01' }],
       profileError: null,
-      simulationsError: null,
+      trialsError: null,
     });
 
     const { result } = setupDashboardHook();
     expect(result.current.loadingProfile).toBe(true);
-    expect(result.current.loadingSimulations).toBe(true);
+    expect(result.current.loadingTrials).toBe(true);
 
-    await waitFor(() => expect(result.current.profile?.name).toBe('Recruiter'));
-    expect(result.current.simulations).toHaveLength(1);
+    await waitFor(() =>
+      expect(result.current.profile?.name).toBe('TalentPartner'),
+    );
+    expect(result.current.trials).toHaveLength(1);
     expect(result.current.loadingProfile).toBe(false);
-    expect(result.current.loadingSimulations).toBe(false);
+    expect(result.current.loadingTrials).toBe(false);
     expect(result.current.profileError).toBeNull();
     expect(result.current.simError).toBeNull();
   });
@@ -50,17 +50,17 @@ describe('useDashboardData', () => {
 
     pending.resolve({
       profile: { name: 'R', email: 'r@test.com' },
-      simulations: [
+      trials: [
         { id: '1', title: 'Sim', role: 'Eng', createdAt: '2024-01-01' },
         { id: '2', title: 'Sim 2', role: 'Eng', createdAt: '2024-01-02' },
       ],
       profileError: null,
-      simulationsError: null,
+      trialsError: null,
     });
 
-    await waitFor(() => expect(result.current.simulations).toHaveLength(2));
+    await waitFor(() => expect(result.current.trials).toHaveLength(2));
     expect(result.current.loadingProfile).toBe(false);
-    expect(result.current.loadingSimulations).toBe(false);
+    expect(result.current.loadingTrials).toBe(false);
   });
 
   it('surfaces errors for non-auth failures', async () => {

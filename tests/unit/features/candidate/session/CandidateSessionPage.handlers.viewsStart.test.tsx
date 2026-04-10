@@ -95,7 +95,7 @@ describe('CandidateSessionPage handlers - view and start flows', () => {
       },
     });
     await act(async () => render(<CandidateSessionPage token="inv" />));
-    fireEvent.click(screen.getByRole('button', { name: /Start simulation/i }));
+    fireEvent.click(screen.getByRole('button', { name: /Start trial/i }));
     expect(setStarted).toHaveBeenCalledWith(true);
   });
 });

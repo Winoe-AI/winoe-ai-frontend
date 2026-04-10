@@ -28,7 +28,7 @@ describe('/api/dashboard route auth + success', () => {
     const req = new NextRequest('http://localhost/api/dashboard');
     const res = await GET(req as never);
     expect(res.status).toBe(401);
-    expect(res.headers.get('x-tenon-request-id')).toBe('req-123');
+    expect(res.headers.get('x-winoe-request-id')).toBe('req-123');
   });
 
   it('returns combined payload and sets headers', async () => {
@@ -37,12 +37,14 @@ describe('/api/dashboard route auth + success', () => {
     requireBffAuthMock.mockResolvedValue({
       ok: true,
       accessToken: 'token-abc',
-      permissions: ['recruiter:access'],
+      permissions: ['talent_partner:access'],
       session: {},
       cookies,
     });
     upstreamRequestMock
-      .mockResolvedValueOnce(makeUpstreamResponse({ name: 'Recruiter' }, 200))
+      .mockResolvedValueOnce(
+        makeUpstreamResponse({ name: 'TalentPartner' }, 200),
+      )
       .mockResolvedValueOnce(
         makeUpstreamResponse(
           [{ id: '1', title: 'Sim', role: 'Eng', createdAt: '2024-01-01' }],
@@ -54,7 +56,7 @@ describe('/api/dashboard route auth + success', () => {
     );
 
     const req = new NextRequest('http://localhost/api/dashboard', {
-      headers: { 'x-tenon-request-id': 'incoming-id' },
+      headers: { 'x-winoe-request-id': 'incoming-id' },
     });
     const res = await GET(req as never);
 
@@ -66,21 +68,19 @@ describe('/api/dashboard route auth + success', () => {
     );
     expect(upstreamRequestMock).toHaveBeenCalledWith(
       expect.objectContaining({
-        url: 'https://backend.test/api/simulations',
+        url: 'https://backend.test/api/trials',
         requestId: 'req-123',
       }),
     );
     expect(res.status).toBe(200);
     expect(res.body).toEqual({
-      profile: { name: 'Recruiter' },
-      simulations: [
-        { id: '1', title: 'Sim', role: 'Eng', createdAt: '2024-01-01' },
-      ],
+      profile: { name: 'TalentPartner' },
+      trials: [{ id: '1', title: 'Sim', role: 'Eng', createdAt: '2024-01-01' }],
       profileError: null,
-      simulationsError: null,
+      trialsError: null,
     });
     expect(res.headers.get(BFF_HEADER)).toBe('dashboard');
-    expect(res.headers.get('x-tenon-upstream-status')).toBe('200');
+    expect(res.headers.get('x-winoe-upstream-status')).toBe('200');
     expect(res.cookies.get('edge')?.value).toBe('refresh');
   });
 
@@ -88,7 +88,7 @@ describe('/api/dashboard route auth + success', () => {
     requireBffAuthMock.mockResolvedValue({
       ok: true,
       accessToken: 'token',
-      permissions: ['recruiter:access'],
+      permissions: ['talent_partner:access'],
       session: {},
       cookies: NextResponse.next(),
     });

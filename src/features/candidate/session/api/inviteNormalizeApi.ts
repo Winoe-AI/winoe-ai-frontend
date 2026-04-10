@@ -30,8 +30,8 @@ export function normalizeCandidateInvite(raw: unknown): CandidateInvite {
   );
   const title =
     toStringOrNull(rec.title) ??
-    toStringOrNull(rec.simulationTitle) ??
-    'Simulation invite';
+    toStringOrNull(rec.trialTitle) ??
+    'Trial invite';
 
   const role =
     toStringOrNull(rec.role) ??
@@ -86,10 +86,11 @@ export function normalizeCandidateInvite(raw: unknown): CandidateInvite {
     title,
     role,
     company: companyValue && companyValue.trim() ? companyValue : null,
-    recruiterName:
-      toStringOrNull(rec.recruiterName ?? rec.recruiter_name) ?? null,
-    recruiterEmail:
-      toStringOrNull(rec.recruiterEmail ?? rec.recruiter_email) ?? null,
+    talentPartnerName:
+      toStringOrNull(rec.talentPartnerName ?? rec.talent_partner_name) ?? null,
+    talentPartnerEmail:
+      toStringOrNull(rec.talentPartnerEmail ?? rec.talent_partner_email) ??
+      null,
     status,
     progress,
     expiresAt,

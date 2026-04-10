@@ -54,7 +54,7 @@ export function WorkspaceAndTests({
       <RunTestsPanel
         onStart={onStartTests}
         onPoll={onPollTests}
-        storageKey={`tenon:taskRun:${task.id}`}
+        storageKey={`winoe:taskRun:${task.id}`}
         disabled={workspaceReadOnly}
         disabledReason={disabledReason}
       />

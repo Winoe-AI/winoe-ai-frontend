@@ -9,7 +9,8 @@ export function InviteWarnings({ invite, tokenAvailable }: Props) {
   if (invite.isExpired) {
     return (
       <div className="mt-3 text-xs text-amber-700">
-        This invite has expired. Please contact your recruiter for a new link.
+        This invite has expired. Please contact your Talent Partner for a new
+        link.
       </div>
     );
   }

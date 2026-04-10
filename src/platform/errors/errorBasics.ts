@@ -1,7 +1,7 @@
 type MaybeErrorLike = { message?: unknown; detail?: unknown; status?: unknown };
 
 export function errorDetailEnabled(): boolean {
-  const flag = (process.env.NEXT_PUBLIC_TENON_DEBUG_ERRORS ?? '').toLowerCase();
+  const flag = (process.env.NEXT_PUBLIC_WINOE_DEBUG_ERRORS ?? '').toLowerCase();
   return flag === '1' || flag === 'true';
 }
 

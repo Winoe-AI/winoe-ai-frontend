@@ -16,7 +16,7 @@ export async function handleSessionWorkspaceRunRoute(
   if (pathname.endsWith('/codespace/status') && method === 'GET') {
     await fulfillJson(route, {
       repoName: 'candidate-repo',
-      repoFullName: 'tenon-ai/candidate-repo',
+      repoFullName: 'winoe-ai/candidate-repo',
       codespaceUrl: 'https://github.com/codespaces/qa-e2e',
       codespaceState: 'ready',
       ...(params.workspaceStatus ?? {}),
@@ -26,7 +26,7 @@ export async function handleSessionWorkspaceRunRoute(
   if (pathname.endsWith('/codespace/init') && method === 'POST') {
     await fulfillJson(route, {
       repoName: 'candidate-repo',
-      repoFullName: 'tenon-ai/candidate-repo',
+      repoFullName: 'winoe-ai/candidate-repo',
       codespaceUrl: 'https://github.com/codespaces/qa-e2e',
       codespaceState: 'provisioning',
       ...(params.workspaceStatus ?? {}),

@@ -4,7 +4,7 @@ import { storageStates } from '../flow-qa/fixtures/storageStates';
 test.describe('Contract-Live: Candidate Access', () => {
   test.use({ storageState: storageStates.candidateOnly });
 
-  test('candidate dashboard loads against the live stack and recruiter routes stay blocked', async ({
+  test('candidate dashboard loads against the live stack and talent_partner routes stay blocked', async ({
     page,
   }) => {
     await page.goto('/candidate/dashboard');
@@ -17,7 +17,7 @@ test.describe('Contract-Live: Candidate Access', () => {
     ).toBeVisible();
 
     await page.goto('/dashboard');
-    await expect(page).toHaveURL(/\/not-authorized\?mode=recruiter/);
+    await expect(page).toHaveURL(/\/not-authorized\?mode=talent_partner/);
     await expect(
       page.getByRole('heading', { name: /not authorized/i }),
     ).toBeVisible();

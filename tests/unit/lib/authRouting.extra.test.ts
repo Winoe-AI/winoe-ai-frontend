@@ -17,16 +17,18 @@ describe('auth/routing extra coverage', () => {
       expect(modeForPath('/candidate/dashboard')).toBe('candidate');
       expect(modeForPath('/candidate')).toBe('candidate');
     });
-    it('returns recruiter for other paths', () => {
-      expect(modeForPath('/dashboard')).toBe('recruiter');
-      expect(modeForPath('/simulations')).toBe('recruiter');
-      expect(modeForPath('/')).toBe('recruiter');
+    it('returns talent_partner for other paths', () => {
+      expect(modeForPath('/dashboard')).toBe('talent_partner');
+      expect(modeForPath('/trials')).toBe('talent_partner');
+      expect(modeForPath('/')).toBe('talent_partner');
     });
   });
   describe('buildNotAuthorizedUrl', () => {
     it('builds URL with mode and returnTo', () => {
-      const url = buildNotAuthorizedUrl('recruiter', '/dashboard');
-      expect(url).toBe('/not-authorized?mode=recruiter&returnTo=%2Fdashboard');
+      const url = buildNotAuthorizedUrl('talent_partner', '/dashboard');
+      expect(url).toBe(
+        '/not-authorized?mode=talent_partner&returnTo=%2Fdashboard',
+      );
     });
     it('builds URL for candidate mode', () => {
       const url = buildNotAuthorizedUrl('candidate', '/candidate/home');
@@ -35,8 +37,8 @@ describe('auth/routing extra coverage', () => {
       );
     });
     it('builds URL without returnTo', () => {
-      const url = buildNotAuthorizedUrl('recruiter');
-      expect(url).toBe('/not-authorized?mode=recruiter&returnTo=%2F');
+      const url = buildNotAuthorizedUrl('talent_partner');
+      expect(url).toBe('/not-authorized?mode=talent_partner&returnTo=%2F');
     });
   });
   describe('buildLoginUrl edge cases', () => {
@@ -53,8 +55,8 @@ describe('auth/routing extra coverage', () => {
           search: '?page=1',
         },
       };
-      const result = buildLoginUrl('recruiter', req as never);
-      expect(result).toContain('mode=recruiter');
+      const result = buildLoginUrl('talent_partner', req as never);
+      expect(result).toContain('mode=talent_partner');
       expect(result).toContain('returnTo=%2Fdashboard%3Fpage%3D1');
     });
   });

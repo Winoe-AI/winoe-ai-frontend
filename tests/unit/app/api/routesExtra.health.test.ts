@@ -11,7 +11,7 @@ describe('API routes extra coverage - health route', () => {
   });
 
   it('logs perf timing when debug enabled', async () => {
-    process.env.TENON_DEBUG_PERF = '1';
+    process.env.WINOE_DEBUG_PERF = '1';
     const logSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
     global.fetch = jest.fn().mockResolvedValue(
       new (class {

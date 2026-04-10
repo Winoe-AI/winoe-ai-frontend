@@ -1,0 +1,91 @@
+import { responseHelpers } from '../../../../setup';
+const makeJsonResponse = (payload: unknown) =>
+  responseHelpers.jsonResponse(payload) as unknown as Response;
+describe('runTalentPartnerFallback', () => {
+  const realFetch = global.fetch;
+  beforeEach(() => {
+    jest.resetModules();
+    global.fetch = jest.fn() as unknown as typeof fetch;
+  });
+  afterEach(() => {
+    (global.fetch as jest.Mock).mockReset?.();
+    global.fetch = realFetch;
+    jest.dontMock('@/platform/api-client/client');
+  });
+  it('prefers httpRequest when available', async () => {
+    const httpRequestMock = jest.fn().mockResolvedValue({ ok: true });
+    const bffFetchMock = jest.fn();
+    jest.doMock('@/platform/api-client/client', () => {
+      const actual = jest.requireActual('@/platform/api-client/client');
+      return {
+        ...actual,
+        httpRequest: httpRequestMock,
+        bffFetch: bffFetchMock,
+      };
+    });
+    const { runTalentPartnerFallback } =
+      await import('@/features/talent-partner/api/talent-partnerRequestFallbackApi');
+    const result = await runTalentPartnerFallback(
+      '/backend/trials',
+      { headers: { 'x-test': '1' } },
+      'POST',
+    );
+    expect(result).toEqual({ ok: true });
+    expect(httpRequestMock).toHaveBeenCalledWith(
+      '/backend/trials',
+      { headers: { 'x-test': '1' }, method: 'POST' },
+      { basePath: '/api', skipAuth: true },
+    );
+    expect(bffFetchMock).not.toHaveBeenCalled();
+  });
+  it('normalizes /backend paths via bffFetch fallback with basePath /api', async () => {
+    (global.fetch as jest.Mock).mockResolvedValueOnce(
+      makeJsonResponse({ ok: true }),
+    );
+    jest.doMock('@/platform/api-client/client', () => {
+      const actual = jest.requireActual('@/platform/api-client/client');
+      return {
+        ...actual,
+        httpRequest: undefined,
+        bffFetch: actual.bffFetch,
+      };
+    });
+    const { runTalentPartnerFallback } =
+      await import('@/features/talent-partner/api/talent-partnerRequestFallbackApi');
+    const result = await runTalentPartnerFallback('/backend/trials', {}, 'GET');
+    expect(result).toEqual({ ok: true });
+    expect(global.fetch).toHaveBeenCalledWith(
+      '/api/backend/trials',
+      expect.objectContaining({
+        method: 'GET',
+        credentials: 'same-origin',
+      }),
+    );
+  });
+  it('does not double-prefix /api paths in bffFetch fallback', async () => {
+    (global.fetch as jest.Mock).mockResolvedValueOnce(
+      makeJsonResponse({ ok: true }),
+    );
+    jest.doMock('@/platform/api-client/client', () => {
+      const actual = jest.requireActual('@/platform/api-client/client');
+      return {
+        ...actual,
+        httpRequest: undefined,
+        bffFetch: actual.bffFetch,
+      };
+    });
+    const { runTalentPartnerFallback } =
+      await import('@/features/talent-partner/api/talent-partnerRequestFallbackApi');
+    await runTalentPartnerFallback('/api/backend/trials', {}, 'GET');
+    expect(global.fetch).toHaveBeenCalledWith(
+      '/api/backend/trials',
+      expect.objectContaining({
+        method: 'GET',
+        credentials: 'same-origin',
+      }),
+    );
+    expect((global.fetch as jest.Mock).mock.calls[0][0]).not.toBe(
+      '/api/api/backend/trials',
+    );
+  });
+});

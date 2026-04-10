@@ -10,19 +10,25 @@ jest.mock('@/features/candidate/portal/CandidateDashboardPage', () => ({
   ),
 }));
 
-jest.mock('@/features/recruiter/dashboard/RecruiterDashboardView', () => ({
-  __esModule: true,
-  default: () => <div data-testid="recruiter-dashboard" />,
-}));
-jest.mock('@/features/recruiter/dashboard/RecruiterDashboardPage', () => ({
-  __esModule: true,
-  default: () => <div data-testid="recruiter-dashboard" />,
-}));
 jest.mock(
-  '@/features/recruiter/simulation-management/create/SimulationCreatePage',
+  '@/features/talent-partner/dashboard/TalentPartnerDashboardView',
   () => ({
     __esModule: true,
-    default: () => <div data-testid="simulation-create" />,
+    default: () => <div data-testid="talent-partner-dashboard" />,
+  }),
+);
+jest.mock(
+  '@/features/talent-partner/dashboard/TalentPartnerDashboardPage',
+  () => ({
+    __esModule: true,
+    default: () => <div data-testid="talent-partner-dashboard" />,
+  }),
+);
+jest.mock(
+  '@/features/talent-partner/trial-management/create/TrialCreatePage',
+  () => ({
+    __esModule: true,
+    default: () => <div data-testid="trial-create" />,
   }),
 );
 jest.mock('@/features/auth/LoginPage', () => ({
@@ -44,7 +50,7 @@ jest.mock('@/features/candidate/session/CandidateSessionPage', () => ({
   ),
 }));
 jest.mock(
-  '@/features/recruiter/submission-review/CandidateSubmissionsPage',
+  '@/features/talent-partner/submission-review/CandidateSubmissionsPage',
   () => ({
     __esModule: true,
     default: () => <div data-testid="candidate-submissions-page" />,

@@ -2,11 +2,10 @@
 
 import { useEffect } from 'react';
 import { usePathname } from 'next/navigation';
+import { envFlagEnabled } from '@/platform/config/envFlags';
 
 const isDebugPerf = () =>
-  ['1', 'true'].includes(
-    (process.env.NEXT_PUBLIC_TENON_DEBUG_PERF ?? '').toLowerCase(),
-  );
+  envFlagEnabled(process.env.NEXT_PUBLIC_WINOE_DEBUG_PERF);
 
 export function NavigationPerfLogger() {
   const pathname = usePathname();

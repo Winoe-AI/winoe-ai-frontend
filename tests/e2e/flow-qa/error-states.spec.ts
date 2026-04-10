@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 import { storageStates } from './fixtures/storageStates';
 
 test.describe('Error and Edge State Flows', () => {
-  test.use({ storageState: storageStates.recruiterOnly });
+  test.use({ storageState: storageStates.talentPartnerOnly });
 
   test('unknown route renders not-found state for authenticated user', async ({
     page,
@@ -13,8 +13,8 @@ test.describe('Error and Edge State Flows', () => {
     await expect(page.getByText(/this page could not be found/i)).toBeVisible();
   });
 
-  test.describe('Recruiter dashboard failures', () => {
-    test.use({ storageState: storageStates.recruiterOnly });
+  test.describe('TalentPartner dashboard failures', () => {
+    test.use({ storageState: storageStates.talentPartnerOnly });
 
     test('dashboard shows recoverable error when /api/dashboard fails', async ({
       page,
@@ -35,7 +35,7 @@ test.describe('Error and Edge State Flows', () => {
       await expect(
         page.getByRole('heading', { name: /dashboard/i }),
       ).toBeVisible();
-      await expect(page.getByText(/couldn.?t load simulations/i)).toBeVisible();
+      await expect(page.getByText(/couldn.?t load trials/i)).toBeVisible();
 
       await page.getByRole('button', { name: /^retry$/i }).click();
       await expect

@@ -1,5 +1,6 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { cache } from 'react';
+import { envFlagEnabled } from '@/platform/config/envFlags';
 import { normalizeUserClaims } from '@/platform/auth0/claims';
 import { auth0Available, createAuth0Client } from './client';
 
@@ -37,7 +38,9 @@ export const getSessionNormalized = async (
     })
   | null
 > => {
-  const start = process.env.TENON_DEBUG_PERF ? Date.now() : null;
+  const start = envFlagEnabled(process.env.WINOE_DEBUG_PERF)
+    ? Date.now()
+    : null;
   const session = request
     ? await auth0.getSession(request)
     : await auth0.getSession();

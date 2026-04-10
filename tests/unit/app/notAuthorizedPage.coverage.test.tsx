@@ -21,7 +21,10 @@ describe('not-authorized/page.tsx coverage completion', () => {
   it('renders not authorized page', () => {
     render(
       <NotAuthorizedPage
-        searchParams={Promise.resolve({ returnTo: '/', mode: 'recruiter' })}
+        searchParams={Promise.resolve({
+          returnTo: '/',
+          mode: 'talent_partner',
+        })}
       />,
     );
     expect(document.body).toBeInTheDocument();

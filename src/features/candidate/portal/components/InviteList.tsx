@@ -29,7 +29,7 @@ export function InviteList({
             Your invitations
           </h2>
           <p className="text-sm text-gray-600">
-            Pick up where you left off across simulations.
+            Pick up where you left off across trials.
           </p>
         </div>
         <div className="flex gap-2">
@@ -62,7 +62,7 @@ export function InviteList({
             No invites yet
           </div>
           <p className="mt-1 text-sm text-gray-600">
-            You’ll see your simulation invites here once a recruiter sends them.
+            You’ll see your trial invites here once a Talent Partner sends them.
             Check your email for invite links.
           </p>
         </div>

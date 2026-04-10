@@ -46,10 +46,10 @@ describe('crud client helpers', () => {
     });
 
     const client = buildScopedClient({ basePath: '/api', skipAuth: true });
-    await client.post('/simulations', { title: 'Test' });
+    await client.post('/trials', { title: 'Test' });
 
     expect(authedRequestMock).toHaveBeenCalledWith(
-      '/simulations',
+      '/trials',
       {
         headers: { 'x-id': '1' },
         method: 'POST',

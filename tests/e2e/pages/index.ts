@@ -1,2 +1,2 @@
 export { CandidatePage } from './CandidatePage';
-export { RecruiterPage } from './RecruiterPage';
+export { TalentPartnerPage } from './TalentPartnerPage';

@@ -7,7 +7,7 @@ export async function ensureAccessToken(
 ): Promise<NextResponse | { accessToken: string }> {
   const session = await getSessionNormalized();
   if (!session) {
-    if (process.env.TENON_DEBUG_AUTH) {
+    if (process.env.WINOE_DEBUG_AUTH) {
       // eslint-disable-next-line no-console
       console.debug('[auth] no session available');
     }
@@ -20,7 +20,7 @@ export async function ensureAccessToken(
       (session as { accessToken?: string | null }).accessToken ?? null,
     );
     if (!hasPermission(permissions, requiredPermission)) {
-      if (process.env.TENON_DEBUG_AUTH) {
+      if (process.env.WINOE_DEBUG_AUTH) {
         // eslint-disable-next-line no-console
         console.debug('[auth] missing permission', requiredPermission, {
           perms: permissions,

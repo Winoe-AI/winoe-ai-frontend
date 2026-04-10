@@ -5,7 +5,7 @@ export function DashboardHeader({ email }: { email: string | null }) {
         Candidate Dashboard
       </h1>
       <p className="text-sm text-gray-600">
-        {email ? `Signed in as ${email}` : 'Sign in to see your simulations.'}
+        {email ? `Signed in as ${email}` : 'Sign in to see your trials.'}
       </p>
     </div>
   );

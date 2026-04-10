@@ -42,9 +42,9 @@ describe('shared layout shell/header', () => {
   it('renders AppHeader with brand and nested nav', () => {
     render(<AppHeader isAuthed />);
     expect(screen.getByText(BRAND_NAME)).toBeInTheDocument();
-    expect(screen.queryByText(/Recruiter Dashboard/)).toBeNull();
+    expect(screen.queryByText(/Talent Partner Dashboard/)).toBeNull();
     expect(screen.getByRole('banner')).toHaveAttribute(
-      'data-fit-profile-no-print',
+      'data-winoe-report-no-print',
       'true',
     );
   });
@@ -55,41 +55,41 @@ describe('shared layout shell/header', () => {
     render(element);
     expect(screen.getByTestId('child')).toBeInTheDocument();
     expect(screen.getByText(BRAND_NAME)).toBeInTheDocument();
-    expect(screen.queryByText(/Recruiter Dashboard/)).toBeNull();
+    expect(screen.queryByText(/Talent Partner Dashboard/)).toBeNull();
     expect(screen.getByRole('main')).toHaveAttribute(
-      'data-fit-profile-main-content',
+      'data-winoe-report-main-content',
       'true',
     );
   });
 
-  it('marks recruiter navigation as no-print chrome', () => {
+  it('marks talent_partner navigation as no-print chrome', () => {
     render(
       <AppNav
         isAuthed
-        navScope="recruiter"
-        permissions={['recruiter:access']}
+        navScope="talent_partner"
+        permissions={['talent_partner:access']}
       />,
     );
     expect(screen.getByRole('navigation')).toHaveAttribute(
-      'data-fit-profile-no-print',
+      'data-winoe-report-no-print',
       'true',
     );
   });
 
-  it('scopes fit-profile print css to shell markers and main content', () => {
+  it('scopes winoe-report print css to shell markers and main content', () => {
     const css = fs.readFileSync(
       path.join(process.cwd(), 'src/app/globals.css'),
       'utf8',
     );
     expect(css).toContain(
-      "body.fit-profile-print-mode [data-fit-profile-no-print='true']",
+      "body.winoe-report-print-mode [data-winoe-report-no-print='true']",
     );
     expect(css).toContain(
-      "body.fit-profile-print-mode [data-fit-profile-main-content='true']",
+      "body.winoe-report-print-mode [data-winoe-report-main-content='true']",
     );
     expect(css).toContain(
-      'body.fit-profile-print-mode .fit-profile-print-root',
+      'body.winoe-report-print-mode .winoe-report-print-root',
     );
-    expect(css).not.toContain('body.fit-profile-print-mode > div > header');
+    expect(css).not.toContain('body.winoe-report-print-mode > div > header');
   });
 });

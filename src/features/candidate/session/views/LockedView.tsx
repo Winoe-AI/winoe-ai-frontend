@@ -34,9 +34,9 @@ export function LockedView({
   return (
     <div className="mx-auto max-w-3xl space-y-4 p-6">
       <div>
-        <h1 className="text-lg font-semibold">Simulation locked until start</h1>
+        <h1 className="text-lg font-semibold">Trial locked until start</h1>
         <p className="mt-1 text-sm text-gray-600">
-          {title || 'Your simulation'}
+          {title || 'Your trial'}
           {role ? ` (${role})` : ''} opens when Day 1 starts.
         </p>
       </div>

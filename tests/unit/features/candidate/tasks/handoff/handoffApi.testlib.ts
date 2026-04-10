@@ -9,17 +9,17 @@ export const jsonRes = (
 
 export type FetchMock = jest.MockedFunction<typeof fetch>;
 
-const originalApiBase = process.env.NEXT_PUBLIC_TENON_API_BASE_URL;
+const originalApiBase = process.env.NEXT_PUBLIC_WINOE_API_BASE_URL;
 const OriginalXmlHttpRequest = global.XMLHttpRequest;
 
 export async function importHandoffApi() {
   jest.resetModules();
-  process.env.NEXT_PUBLIC_TENON_API_BASE_URL = 'http://api.example.com';
+  process.env.NEXT_PUBLIC_WINOE_API_BASE_URL = 'http://api.example.com';
   return import('@/features/candidate/tasks/handoff/handoffApi');
 }
 
 export function restoreHandoffApiEnv() {
-  process.env.NEXT_PUBLIC_TENON_API_BASE_URL = originalApiBase;
+  process.env.NEXT_PUBLIC_WINOE_API_BASE_URL = originalApiBase;
   global.XMLHttpRequest = OriginalXmlHttpRequest;
 }
 

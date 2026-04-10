@@ -43,7 +43,7 @@ export function readEnv(key: string, map: EnvMap): string | null {
 }
 
 export function resolveClaimNamespace(map: EnvMap): string {
-  const raw = readEnv('NEXT_PUBLIC_TENON_AUTH0_CLAIM_NAMESPACE', map);
-  const base = raw ?? 'https://tenon.ai';
+  const raw = readEnv('NEXT_PUBLIC_WINOE_AUTH0_CLAIM_NAMESPACE', map);
+  const base = raw ?? 'https://winoe.ai';
   return base.endsWith('/') ? base : `${base}/`;
 }

@@ -18,7 +18,7 @@ describe('bff base helpers', () => {
   });
 
   it('strips trailing api segment and slashes from backend base URL', () => {
-    process.env.TENON_BACKEND_BASE_URL = 'http://api.test/api///';
+    process.env.WINOE_BACKEND_BASE_URL = 'http://api.test/api///';
     expect(getBackendBaseUrl()).toBe('http://api.test');
   });
 
@@ -43,7 +43,7 @@ describe('bff base helpers', () => {
   });
 
   it('forwards JSON request with auth and returns upstream status/body', async () => {
-    process.env.TENON_BACKEND_BASE_URL = 'http://backend.example.com';
+    process.env.WINOE_BACKEND_BASE_URL = 'http://backend.example.com';
     const fetchMock = jest.fn().mockResolvedValue(
       new Response(JSON.stringify({ ok: true }), {
         status: 201,

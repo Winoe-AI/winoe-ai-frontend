@@ -20,14 +20,16 @@ fs.mkdirSync(storageDir, { recursive: true });
 
 function resolveStorageState(role) {
   const envKey =
-    role === 'recruiter'
-      ? 'CONTRACT_LIVE_RECRUITER_STORAGE_STATE'
+    role === 'talent_partner'
+      ? 'CONTRACT_LIVE_TALENT_PARTNER_STORAGE_STATE'
       : 'CONTRACT_LIVE_CANDIDATE_STORAGE_STATE';
   return (
     process.env[envKey]?.trim() ||
     path.join(
       storageDir,
-      role === 'recruiter' ? 'recruiter-only.json' : 'candidate-only.json',
+      role === 'talent_partner'
+        ? 'talent_partner-only.json'
+        : 'candidate-only.json',
     )
   );
 }
@@ -81,9 +83,8 @@ function resolveLiveContext() {
     trimToNull(process.env.CONTRACT_LIVE_INVITE_TOKEN) ||
     trimToNull(summary.inviteToken) ||
     parseTokenFromInviteUrl(inviteUrl);
-  const simulationId = trimToNull(
-    process.env.CONTRACT_LIVE_SIMULATION_ID ||
-      String(summary.simulationId ?? ''),
+  const trialId = trimToNull(
+    process.env.CONTRACT_LIVE_TRIAL_ID || String(summary.trialId ?? ''),
   );
   const candidateSessionIdRaw =
     trimToNull(process.env.CONTRACT_LIVE_CANDIDATE_SESSION_ID) ||
@@ -94,7 +95,7 @@ function resolveLiveContext() {
     summary,
     inviteUrl,
     inviteToken,
-    simulationId,
+    trialId,
     candidateSessionId: Number.isFinite(parsedCandidateSessionId)
       ? parsedCandidateSessionId
       : null,
@@ -110,13 +111,13 @@ function requireInviteToken(context) {
   return context.inviteToken;
 }
 
-function requireSimulationId(context) {
-  if (!context.simulationId) {
+function requireTrialId(context) {
+  if (!context.trialId) {
     throw new Error(
-      `Simulation id is required. Provide CONTRACT_LIVE_SIMULATION_ID or a summary file at ${context.summaryPath}.`,
+      `Trial id is required. Provide CONTRACT_LIVE_TRIAL_ID or a summary file at ${context.summaryPath}.`,
     );
   }
-  return context.simulationId;
+  return context.trialId;
 }
 
 function requireCandidateSessionId(context) {
@@ -154,7 +155,7 @@ async function withPage(role, work) {
   const page = await context.newPage();
   try {
     await page.goto(
-      role === 'recruiter' ? '/dashboard' : '/candidate/dashboard',
+      role === 'talent_partner' ? '/dashboard' : '/candidate/dashboard',
       {
         waitUntil: 'domcontentloaded',
       },
@@ -259,7 +260,7 @@ function isRetryableInviteNotReady(response) {
 
 async function inviteCandidateWithBundleRetry(
   page,
-  simulationId,
+  trialId,
   { candidateName, candidateEmail },
 ) {
   let lastDetail = null;
@@ -267,7 +268,7 @@ async function inviteCandidateWithBundleRetry(
   for (let attempt = 1; attempt <= 36; attempt += 1) {
     const invite = await browserFetchJson(
       page,
-      `/api/simulations/${simulationId}/invite`,
+      `/api/trials/${trialId}/invite`,
       {
         method: 'POST',
         body: JSON.stringify({
@@ -277,33 +278,23 @@ async function inviteCandidateWithBundleRetry(
       },
     );
     lastInvite = invite;
-    writeJson(
-      `simulation-${simulationId}-invite-attempt-${attempt}.json`,
-      invite,
-    );
+    writeJson(`trial-${trialId}-invite-attempt-${attempt}.json`, invite);
     if (invite.ok) {
-      writeJson(`simulation-${simulationId}-invite.json`, invite);
+      writeJson(`trial-${trialId}-invite.json`, invite);
       return { invite, lastDetail, attempts: attempt };
     }
     if (!isRetryableInviteNotReady(invite)) {
-      writeJson(`simulation-${simulationId}-invite.json`, invite);
+      writeJson(`trial-${trialId}-invite.json`, invite);
       throw new Error(`Invite failed: ${invite.status} ${invite.text}`);
     }
-    lastDetail = await browserFetchJson(
-      page,
-      `/api/simulations/${simulationId}`,
-      {
-        method: 'GET',
-      },
-    );
-    writeJson(
-      `simulation-${simulationId}-detail-invite-retry-${attempt}.json`,
-      {
-        attempt,
-        detail: lastDetail,
-        invite,
-      },
-    );
+    lastDetail = await browserFetchJson(page, `/api/trials/${trialId}`, {
+      method: 'GET',
+    });
+    writeJson(`trial-${trialId}-detail-invite-retry-${attempt}.json`, {
+      attempt,
+      detail: lastDetail,
+      invite,
+    });
     if (attempt >= 36) {
       break;
     }
@@ -393,7 +384,7 @@ function defaultDay1Response() {
     '',
     '- API surface: FastAPI endpoints with explicit request/response contracts.',
     '- Runtime safety: add retryable failure paths, bounded polling, and evidence logging.',
-    '- Delivery plan: fix live blockers first, then prove the recruiter, candidate, and review flows.',
+    '- Delivery plan: fix live blockers first, then prove the talent_partner, candidate, and review flows.',
   ].join('\n');
 }
 
@@ -407,7 +398,7 @@ function defaultDay5Reflection() {
       'I accepted slower end-to-end validation in exchange for using the real stack, real auth, and real worker execution.',
     communication:
       'I left behind concrete logs, repeatable commands, and updated remediation notes so the next handoff can be audited quickly.',
-    next: 'Next I would tighten live diagnostics around task transitions, transcript latency, and fit-profile generation observability.',
+    next: 'Next I would tighten live diagnostics around task transitions, transcript latency, and winoe-report generation observability.',
   };
 }
 
@@ -471,8 +462,8 @@ async function waitForTranscriptReady(page) {
   );
 }
 
-async function runRecruiterFreshFlow() {
-  return await withPage('recruiter', async (page) => {
+async function runTalentPartnerFreshFlow() {
+  return await withPage('talent_partner', async (page) => {
     const title = `Fresh Contract Live ${nowIsoSafe()}`;
     const candidateName =
       process.env.CONTRACT_LIVE_CANDIDATE_NAME?.trim() || 'Robie Candidate';
@@ -503,35 +494,27 @@ async function runRecruiterFreshFlow() {
       },
     };
 
-    const created = await browserFetchJson(page, '/api/simulations', {
+    const created = await browserFetchJson(page, '/api/trials', {
       method: 'POST',
       body: JSON.stringify(createPayload),
     });
-    writeJson('simulation-create.json', created);
+    writeJson('trial-create.json', created);
     if (!created.ok) {
-      throw new Error(
-        `Simulation create failed: ${created.status} ${created.text}`,
-      );
+      throw new Error(`Trial create failed: ${created.status} ${created.text}`);
     }
 
-    const simulationId = String(created.json?.id ?? '').trim();
-    if (!simulationId) {
-      throw new Error(
-        `Simulation create did not return an id: ${created.text}`,
-      );
+    const trialId = String(created.json?.id ?? '').trim();
+    if (!trialId) {
+      throw new Error(`Trial create did not return an id: ${created.text}`);
     }
 
     const readyDetail = await pollUntil(
       page,
-      'simulation ready_for_review',
+      'trial ready_for_review',
       async () => {
-        return await browserFetchJson(
-          page,
-          `/api/simulations/${simulationId}`,
-          {
-            method: 'GET',
-          },
-        );
+        return await browserFetchJson(page, `/api/trials/${trialId}`, {
+          method: 'GET',
+        });
       },
       (response) =>
         response.ok &&
@@ -543,7 +526,7 @@ async function runRecruiterFreshFlow() {
       {
         attempts: 90,
         delayMs: 5000,
-        snapshotName: `simulation-${simulationId}-detail-ready-check.json`,
+        snapshotName: `trial-${trialId}-detail-ready-check.json`,
       },
     );
 
@@ -553,17 +536,15 @@ async function runRecruiterFreshFlow() {
         '',
     ).trim();
     if (!scenarioVersionId) {
-      throw new Error(
-        `Simulation ${simulationId} is missing a scenario version id.`,
-      );
+      throw new Error(`Trial ${trialId} is missing a scenario version id.`);
     }
 
     const approve = await browserFetchJson(
       page,
-      `/api/backend/simulations/${simulationId}/scenario/${scenarioVersionId}/approve`,
+      `/api/backend/trials/${trialId}/scenario/${scenarioVersionId}/approve`,
       { method: 'POST' },
     );
-    writeJson(`simulation-${simulationId}-approve.json`, approve);
+    writeJson(`trial-${trialId}-approve.json`, approve);
     if (!approve.ok) {
       throw new Error(
         `Scenario approve failed: ${approve.status} ${approve.text}`,
@@ -572,36 +553,32 @@ async function runRecruiterFreshFlow() {
 
     const activate = await browserFetchJson(
       page,
-      `/api/backend/simulations/${simulationId}/activate`,
+      `/api/backend/trials/${trialId}/activate`,
       {
         method: 'POST',
         body: JSON.stringify({ confirm: true }),
       },
     );
-    writeJson(`simulation-${simulationId}-activate.json`, activate);
+    writeJson(`trial-${trialId}-activate.json`, activate);
     if (!activate.ok) {
       throw new Error(
-        `Simulation activate failed: ${activate.status} ${activate.text}`,
+        `Trial activate failed: ${activate.status} ${activate.text}`,
       );
     }
 
     const activeDetail = await pollUntil(
       page,
-      'simulation active_inviting',
+      'trial active_inviting',
       async () => {
-        return await browserFetchJson(
-          page,
-          `/api/simulations/${simulationId}`,
-          {
-            method: 'GET',
-          },
-        );
+        return await browserFetchJson(page, `/api/trials/${trialId}`, {
+          method: 'GET',
+        });
       },
       (response) => response.ok && response.json?.status === 'active_inviting',
       {
         attempts: 30,
         delayMs: 2000,
-        snapshotName: `simulation-${simulationId}-detail-active.json`,
+        snapshotName: `trial-${trialId}-detail-active.json`,
       },
     );
 
@@ -609,34 +586,31 @@ async function runRecruiterFreshFlow() {
       invite,
       lastDetail: inviteRetryDetail,
       attempts: inviteAttempts,
-    } = await inviteCandidateWithBundleRetry(page, simulationId, {
+    } = await inviteCandidateWithBundleRetry(page, trialId, {
       candidateName,
       candidateEmail,
     });
 
     const candidates = await browserFetchJson(
       page,
-      `/api/simulations/${simulationId}/candidates`,
+      `/api/trials/${trialId}/candidates`,
       {
         method: 'GET',
       },
     );
-    writeJson(`simulation-${simulationId}-candidates.json`, candidates);
+    writeJson(`trial-${trialId}-candidates.json`, candidates);
 
     const postInviteDetail = await browserFetchJson(
       page,
-      `/api/simulations/${simulationId}`,
+      `/api/trials/${trialId}`,
       {
         method: 'GET',
       },
     );
-    writeJson(
-      `simulation-${simulationId}-detail-post-invite.json`,
-      postInviteDetail,
-    );
+    writeJson(`trial-${trialId}-detail-post-invite.json`, postInviteDetail);
 
     const summary = {
-      simulationId,
+      trialId,
       scenarioVersionId,
       title,
       candidateName,
@@ -694,7 +668,7 @@ async function runCandidateScheduleFlow() {
     });
 
     const startButtonClicked = await clickFirstVisible(
-      page.getByRole('button', { name: /start simulation/i }),
+      page.getByRole('button', { name: /start trial/i }),
     );
     if (startButtonClicked) {
       await page.waitForLoadState('networkidle');
@@ -801,9 +775,7 @@ async function runCandidateDayFlow() {
 
   return await withPage('candidate', async (page) => {
     await gotoCandidateSession(page, inviteToken);
-    await clickFirstVisible(
-      page.getByRole('button', { name: /start simulation/i }),
-    );
+    await clickFirstVisible(page.getByRole('button', { name: /start trial/i }));
     await page.waitForLoadState('networkidle');
     await ensureDayVisible(page, requestedDay);
 
@@ -1047,7 +1019,7 @@ async function runCandidateDayFlow() {
         }
       }
       await page.reload({ waitUntil: 'networkidle' });
-      await waitForText(page, /simulation complete/i, 60000);
+      await waitForText(page, /trial complete/i, 60000);
     }
 
     await page.waitForLoadState('networkidle');
@@ -1083,13 +1055,13 @@ function extractCompareRows(responseJson) {
   return [];
 }
 
-async function runRecruiterReviewFlow() {
+async function runTalentPartnerReviewFlow() {
   const context = resolveLiveContext();
-  const simulationId = requireSimulationId(context);
+  const trialId = requireTrialId(context);
   const candidateSessionId = requireCandidateSessionId(context);
 
-  return await withPage('recruiter', async (page) => {
-    await page.goto(`/dashboard/simulations/${simulationId}`, {
+  return await withPage('talent_partner', async (page) => {
+    await page.goto(`/dashboard/trials/${trialId}`, {
       waitUntil: 'domcontentloaded',
     });
     await page.waitForLoadState('networkidle');
@@ -1097,20 +1069,20 @@ async function runRecruiterReviewFlow() {
       .locator(`[data-testid="candidate-compare-row-${candidateSessionId}"]`)
       .first();
     await compareRow.waitFor({ state: 'visible', timeout: 60000 });
-    await capturePage(page, 'recruiter-simulation-detail.json', {
-      simulationId,
+    await capturePage(page, 'talent_partner-trial-detail.json', {
+      trialId,
       candidateSessionId,
     });
 
     const compareResponse = await browserFetchJson(
       page,
-      `/api/simulations/${simulationId}/candidates/compare`,
+      `/api/trials/${trialId}/candidates/compare`,
       { method: 'GET' },
     );
-    writeJson('recruiter-compare-response.json', compareResponse);
+    writeJson('talent_partner-compare-response.json', compareResponse);
     if (!compareResponse.ok) {
       throw new Error(
-        `Recruiter compare failed: ${compareResponse.status} ${compareResponse.text}`,
+        `TalentPartner compare failed: ${compareResponse.status} ${compareResponse.text}`,
       );
     }
     const compareRows = extractCompareRows(compareResponse.json);
@@ -1121,76 +1093,76 @@ async function runRecruiterReviewFlow() {
           String(candidateSessionId),
       ) ?? null;
 
-    const submissionsPath = `/dashboard/simulations/${simulationId}/candidates/${candidateSessionId}`;
+    const submissionsPath = `/dashboard/trials/${trialId}/candidates/${candidateSessionId}`;
     await page.goto(submissionsPath, { waitUntil: 'domcontentloaded' });
     await page.waitForLoadState('networkidle');
     await waitForText(page, /submissions/i, 60000);
-    await capturePage(page, 'recruiter-submissions-page.json', {
-      simulationId,
+    await capturePage(page, 'talent_partner-submissions-page.json', {
+      trialId,
       candidateSessionId,
     });
 
-    const fitProfilePath = `/dashboard/simulations/${simulationId}/candidates/${candidateSessionId}/fit-profile`;
-    const fitProfileStatusEndpoint = `/api/candidate_sessions/${candidateSessionId}/fit_profile`;
-    const fitProfileGenerateEndpoint = `/api/candidate_sessions/${candidateSessionId}/fit_profile/generate`;
-    const fitProfileStatusBefore = await browserFetchJson(
+    const winoeReportPath = `/dashboard/trials/${trialId}/candidates/${candidateSessionId}/winoe-report`;
+    const winoeReportStatusEndpoint = `/api/candidate_sessions/${candidateSessionId}/winoe_report`;
+    const winoeReportGenerateEndpoint = `/api/candidate_sessions/${candidateSessionId}/winoe_report/generate`;
+    const winoeReportStatusBefore = await browserFetchJson(
       page,
-      fitProfileStatusEndpoint,
+      winoeReportStatusEndpoint,
       {
         method: 'GET',
       },
     );
     writeJson(
-      'recruiter-fit-profile-status-before.json',
-      fitProfileStatusBefore,
+      'talent_partner-winoe-report-status-before.json',
+      winoeReportStatusBefore,
     );
-    await page.goto(fitProfilePath, { waitUntil: 'domcontentloaded' });
+    await page.goto(winoeReportPath, { waitUntil: 'domcontentloaded' });
     await page.waitForLoadState('networkidle');
     const generateButton = page
-      .getByRole('button', { name: /(?:generate fit profile|retry)/i })
+      .getByRole('button', { name: /(?:generate winoe report|retry)/i })
       .first();
     if (await generateButton.isVisible().catch(() => false)) {
       await generateButton.click();
       await page.waitForLoadState('networkidle');
     }
-    const fitProfileStatusAfterClick = await browserFetchJson(
+    const winoeReportStatusAfterClick = await browserFetchJson(
       page,
-      fitProfileStatusEndpoint,
+      winoeReportStatusEndpoint,
       {
         method: 'GET',
       },
     );
     writeJson(
-      'recruiter-fit-profile-status-after-click.json',
-      fitProfileStatusAfterClick,
+      'talent_partner-winoe-report-status-after-click.json',
+      winoeReportStatusAfterClick,
     );
-    const fitProfileStatusValue = String(
-      fitProfileStatusAfterClick.json?.status ??
-        fitProfileStatusBefore.json?.status ??
+    const winoeReportStatusValue = String(
+      winoeReportStatusAfterClick.json?.status ??
+        winoeReportStatusBefore.json?.status ??
         '',
     ).trim();
     if (
-      fitProfileStatusValue === 'not_started' ||
-      fitProfileStatusValue === 'failed'
+      winoeReportStatusValue === 'not_started' ||
+      winoeReportStatusValue === 'failed'
     ) {
       const generateResponse = await browserFetchJson(
         page,
-        fitProfileGenerateEndpoint,
+        winoeReportGenerateEndpoint,
         {
           method: 'POST',
         },
       );
-      writeJson('recruiter-fit-profile-generate.json', generateResponse);
+      writeJson('talent_partner-winoe-report-generate.json', generateResponse);
       if (!generateResponse.ok) {
         throw new Error(
-          `Fit Profile generate failed: ${generateResponse.status} ${generateResponse.text}`,
+          `Winoe Report generate failed: ${generateResponse.status} ${generateResponse.text}`,
         );
       }
     }
 
     await pollUntil(
       page,
-      'fit profile ready',
+      'winoe report ready',
       async () => {
         await page.reload({ waitUntil: 'networkidle' });
         return {
@@ -1199,34 +1171,35 @@ async function runRecruiterReviewFlow() {
         };
       },
       (response) =>
-        /^http/.test(response.url) && /overall fit score/i.test(response.text),
+        /^http/.test(response.url) &&
+        /overall winoe score/i.test(response.text),
       {
         attempts: 72,
         delayMs: 5000,
-        snapshotName: 'recruiter-fit-profile-poll.json',
+        snapshotName: 'talent_partner-winoe-report-poll.json',
       },
     );
-    await capturePage(page, 'recruiter-fit-profile-page.json', {
-      simulationId,
+    await capturePage(page, 'talent_partner-winoe-report-page.json', {
+      trialId,
       candidateSessionId,
     });
 
     const summary = {
-      simulationId,
+      trialId,
       candidateSessionId,
       compareRow: compareRowPayload,
-      fitProfilePath,
+      winoeReportPath,
       submissionsPath,
-      fitProfileReady: true,
+      winoeReportReady: true,
     };
-    writeJson('recruiter-review-summary.json', summary);
+    writeJson('talent_partner-review-summary.json', summary);
     process.stdout.write(`${JSON.stringify(summary, null, 2)}\n`);
   });
 }
 
 switch (command) {
-  case 'recruiter-fresh':
-    await runRecruiterFreshFlow();
+  case 'talent_partner-fresh':
+    await runTalentPartnerFreshFlow();
     break;
   case 'candidate-schedule':
     await runCandidateScheduleFlow();
@@ -1234,8 +1207,8 @@ switch (command) {
   case 'candidate-day':
     await runCandidateDayFlow();
     break;
-  case 'recruiter-review':
-    await runRecruiterReviewFlow();
+  case 'talent_partner-review':
+    await runTalentPartnerReviewFlow();
     break;
   default:
     throw new Error(`Unknown command: ${command || '<empty>'}`);
