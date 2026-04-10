@@ -22,10 +22,10 @@ describe('PublicHomeContent', () => {
 
     expect(screen.getByText(`Welcome to ${BRAND_NAME}`)).toBeInTheDocument();
     expect(
-      screen.getByRole('link', { name: 'Recruiter login' }),
+      screen.getByRole('link', { name: 'Talent Partner login' }),
     ).toHaveAttribute(
       'href',
-      '/auth/start?returnTo=%2Fdashboard&mode=recruiter',
+      '/auth/start?returnTo=%2Fdashboard&mode=talent_partner',
     );
     expect(
       screen.getByRole('link', { name: 'Candidate portal' }),

@@ -15,7 +15,7 @@ export function toFixed(
 }
 
 export function storagePath(role: StorageRole): string | undefined {
-  if (role === 'recruiter') return storageStates.recruiterOnly;
+  if (role === 'talent_partner') return storageStates.talentPartnerOnly;
   if (role === 'candidate') return storageStates.candidateOnly;
   if (role === 'authenticated') return storageStates.authenticated;
   return undefined;

@@ -24,7 +24,7 @@ describe('/api/backend proxy - method and origin guards', () => {
 
     expect(res.status).toBe(405);
     expect(res.headers.get('allow')).toBe('POST');
-    expect(res.headers.get('x-tenon-upstream-status')).toBe('405');
+    expect(res.headers.get('x-winoe-upstream-status')).toBe('405');
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
@@ -43,7 +43,7 @@ describe('/api/backend proxy - method and origin guards', () => {
     );
 
     expect(res.status).toBe(403);
-    expect(res.headers.get('x-tenon-upstream-status')).toBe('403');
+    expect(res.headers.get('x-winoe-upstream-status')).toBe('403');
     expect(fetchMock).not.toHaveBeenCalled();
   });
 

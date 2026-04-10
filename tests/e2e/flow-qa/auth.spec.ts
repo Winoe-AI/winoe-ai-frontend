@@ -13,33 +13,35 @@ test.describe('Auth Flows', () => {
     );
     await expect(
       page.getByRole('heading', {
-        name: /sign in to continue your simulation/i,
+        name: /sign in to continue your trial/i,
       }),
     ).toBeVisible();
     await expect(
       page.getByRole('link', { name: /continue with auth0/i }).first(),
     ).toHaveAttribute(
       'href',
-      /\/auth\/start\?returnTo=%2Fcandidate%2Fdashboard&mode=candidate&connection=Tenon-Candidates/i,
+      /\/auth\/start\?returnTo=%2Fcandidate%2Fdashboard&mode=candidate&connection=Winoe-Candidates/i,
     );
   });
 
   test.describe('Candidate-only Session', () => {
     test.use({ storageState: storageStates.candidateOnly });
 
-    test('recruiter route redirects to not-authorized', async ({ page }) => {
+    test('talent_partner route redirects to not-authorized', async ({
+      page,
+    }) => {
       await page.goto('/dashboard');
 
-      await expect(page).toHaveURL(/\/not-authorized\?mode=recruiter/);
+      await expect(page).toHaveURL(/\/not-authorized\?mode=talent_partner/);
       await expect(
         page.getByRole('heading', { name: /not authorized/i }),
       ).toBeVisible();
-      await expect(page.getByText(/need recruiter access/i)).toBeVisible();
+      await expect(page.getByText(/need talent_partner access/i)).toBeVisible();
     });
   });
 
-  test.describe('Recruiter-only Session', () => {
-    test.use({ storageState: storageStates.recruiterOnly });
+  test.describe('TalentPartner-only Session', () => {
+    test.use({ storageState: storageStates.talentPartnerOnly });
 
     test('candidate route redirects to candidate login', async ({ page }) => {
       await page.goto('/candidate/dashboard');
@@ -49,21 +51,21 @@ test.describe('Auth Flows', () => {
       );
       await expect(
         page.getByRole('heading', {
-          name: /sign in to continue your simulation/i,
+          name: /sign in to continue your trial/i,
         }),
       ).toBeVisible();
       await expect(
         page.getByRole('link', { name: /continue with auth0/i }).first(),
       ).toHaveAttribute(
         'href',
-        /\/auth\/start\?returnTo=%2Fcandidate%2Fdashboard&mode=candidate&connection=Tenon-Candidates/i,
+        /\/auth\/start\?returnTo=%2Fcandidate%2Fdashboard&mode=candidate&connection=Winoe-Candidates/i,
       );
     });
 
     test('auth clear route redirects to auth error with cleared state', async ({
       page,
     }) => {
-      await page.goto('/auth/clear?returnTo=%2Fdashboard&mode=recruiter');
+      await page.goto('/auth/clear?returnTo=%2Fdashboard&mode=talent_partner');
 
       await expect(page).toHaveURL(/\/auth\/error\?.*cleared=1/);
       await expect(
@@ -76,7 +78,7 @@ test.describe('Auth Flows', () => {
     const auth = new AuthPage(page);
 
     await auth.gotoError(
-      'mode=recruiter&returnTo=%2Fdashboard&errorCode=state_invalid&errorId=trace-123',
+      'mode=talent_partner&returnTo=%2Fdashboard&errorCode=state_invalid&errorId=trace-123',
     );
 
     await expect(page).toHaveURL(/\/auth\/error/);

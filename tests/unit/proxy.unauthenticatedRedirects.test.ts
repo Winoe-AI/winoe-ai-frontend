@@ -21,14 +21,14 @@ describe('proxy - unauthenticated redirects', () => {
     expect(getSessionNormalizedMock).toHaveBeenCalled();
   });
 
-  it('redirects unauthenticated recruiter dashboard to login with mode', async () => {
+  it('redirects unauthenticated talent partner dashboard to login with mode', async () => {
     getSessionNormalizedMock.mockResolvedValue(null);
     const res = await proxy(
       new NextRequest(new URL('http://localhost/dashboard')),
     );
     expect(res?.status).toBe(307);
     expect(res?.headers.get('location')).toBe(
-      'http://localhost/auth/login?mode=recruiter&returnTo=%2Fdashboard',
+      'http://localhost/auth/login?mode=talent_partner&returnTo=%2Fdashboard',
     );
   });
 });

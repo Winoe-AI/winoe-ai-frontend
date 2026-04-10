@@ -7,11 +7,15 @@ const connections = Number(process.env.LOADTEST_CONN ?? 20);
 const duration = Number(process.env.LOADTEST_DURATION ?? 20);
 
 const headers = {
-  'x-tenon-request-id': `load-${Date.now()}`,
+  'x-winoe-request-id': `load-${Date.now()}`,
 };
 
 const cookie = process.env.LOADTEST_COOKIE;
 const authHeader = process.env.LOADTEST_AUTH_HEADER;
+
+const writeStderr = (message) => {
+  process.stderr.write(`${message}\n`);
+};
 
 if (cookie) headers.Cookie = cookie;
 if (authHeader) headers.Authorization = authHeader;
@@ -38,12 +42,12 @@ const run = () =>
   });
 
 if (!cookie && !authHeader) {
-  console.warn(
+  writeStderr(
     'Warning: no LOADTEST_COOKIE or LOADTEST_AUTH_HEADER provided; results may just reflect 401/403 responses.',
   );
 }
 
 run().catch((err) => {
-  console.error(err);
+  writeStderr(err instanceof Error ? (err.stack ?? err.message) : String(err));
   process.exit(1);
 });

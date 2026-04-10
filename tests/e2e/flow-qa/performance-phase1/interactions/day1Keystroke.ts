@@ -29,7 +29,7 @@ export async function runDay1Keystroke(context: InteractionContext) {
         { waitUntil: 'domcontentloaded' },
       );
       await page
-        .getByRole('button', { name: /start simulation/i })
+        .getByRole('button', { name: /start trial/i })
         .click({ timeout: 5_000 })
         .catch(() => {});
       const textarea = page.locator('textarea').first();

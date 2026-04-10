@@ -43,7 +43,7 @@ describe('bff upstreamRequest retry behavior', () => {
     });
     expect(resp.status).toBe(200);
     expect(
-      (resp as unknown as { _tenonMeta?: { attempts?: number } })._tenonMeta
+      (resp as unknown as { _winoeMeta?: { attempts?: number } })._winoeMeta
         ?.attempts,
     ).toBe(2);
   });
@@ -75,7 +75,7 @@ describe('bff upstreamRequest retry behavior', () => {
     });
     expect(resp.status).toBe(200);
     expect(
-      (resp as unknown as { _tenonMeta?: { attempts?: number } })._tenonMeta
+      (resp as unknown as { _winoeMeta?: { attempts?: number } })._winoeMeta
         ?.attempts,
     ).toBe(2);
   });

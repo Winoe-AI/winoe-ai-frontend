@@ -1,4 +1,4 @@
-# Tenon Frontend Documentation (Index)
+# Winoe Frontend Documentation (Index)
 
 This document has been split into smaller pages. Use the links below as the new entry points:
 

@@ -20,7 +20,7 @@ describe('proxy - candidate route access', () => {
     expect(mockAuth0.middleware).toHaveBeenCalled();
   });
 
-  it('allows authenticated users without recruiter access to hit candidate routes', async () => {
+  it('allows authenticated users without talent_partner access to hit candidate routes', async () => {
     getSessionNormalizedMock.mockResolvedValue({ user: { permissions: [] } });
     const res = await proxy(
       new NextRequest(new URL('http://localhost/candidate/session/tok_123')),
@@ -30,7 +30,7 @@ describe('proxy - candidate route access', () => {
 
   it('allows dual-permission users to access candidate routes', async () => {
     getSessionNormalizedMock.mockResolvedValue({
-      user: { permissions: ['recruiter:access', 'candidate:access'] },
+      user: { permissions: ['talent_partner:access', 'candidate:access'] },
     });
     const res = await proxy(
       new NextRequest(new URL('http://localhost/candidate/session/tok_123')),

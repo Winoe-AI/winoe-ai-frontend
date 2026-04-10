@@ -31,7 +31,7 @@ jest.mock('@/platform/auth/authCookies', () => ({
 
 jest.mock('@/platform/auth/routing', () => ({
   sanitizeReturnTo: jest.fn((v) => v || '/'),
-  modeForPath: jest.fn(() => 'recruiter'),
+  modeForPath: jest.fn(() => 'talent_partner'),
 }));
 
 describe('auth/clear/route.ts coverage completion', () => {

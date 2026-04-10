@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { envFlagEnabled } from '@/platform/config/envFlags';
 import {
   REQUEST_ID_HEADER,
   UPSTREAM_HEADER,
@@ -20,7 +21,9 @@ export async function proxyToBackend(
   req: NextRequest,
   context: BackendRouteContext,
 ) {
-  const start = process.env.TENON_DEBUG_PERF ? Date.now() : null;
+  const start = envFlagEnabled(process.env.WINOE_DEBUG_PERF)
+    ? Date.now()
+    : null;
   const requestId = resolveRequestId(req.headers);
 
   const { backendPath, pathSegments, targetUrl, method, timeoutMs } =

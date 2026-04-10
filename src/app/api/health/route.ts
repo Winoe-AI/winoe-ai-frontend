@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { envFlagEnabled } from '@/platform/config/envFlags';
 import {
   UPSTREAM_HEADER,
   getBackendBaseUrl,
@@ -11,7 +12,9 @@ export const revalidate = 0;
 export const fetchCache = 'force-no-store';
 
 export async function GET() {
-  const start = process.env.TENON_DEBUG_PERF ? Date.now() : null;
+  const start = envFlagEnabled(process.env.WINOE_DEBUG_PERF)
+    ? Date.now()
+    : null;
   try {
     const upstream = await fetch(`${getBackendBaseUrl()}/health`, {
       cache: 'no-store',

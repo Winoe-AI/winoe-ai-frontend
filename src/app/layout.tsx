@@ -7,7 +7,7 @@ import { QueryProvider } from '@/shared/query';
 
 export const metadata: Metadata = {
   title: BRAND_NAME,
-  description: `${BRAND_NAME} simulation-based hiring platform`,
+  description: `${BRAND_NAME} trial-based hiring platform`,
 };
 
 export const viewport: Viewport = {

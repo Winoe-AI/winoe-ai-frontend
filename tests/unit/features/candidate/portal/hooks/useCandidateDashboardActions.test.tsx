@@ -78,7 +78,7 @@ describe('useCandidateDashboardActions', () => {
 
     result.current.handleContinue({ isExpired: true } as never);
     expect(setError).toHaveBeenCalledWith(
-      'This invite has expired. Please contact your recruiter.',
+      'This invite has expired. Please contact your Talent Partner.',
     );
 
     result.current.handleContinue({ isExpired: false, token: null } as never);

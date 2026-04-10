@@ -28,7 +28,7 @@ describe('lib/auth0 extra coverage (claims)', () => {
 
     const permsStr = Buffer.from(
       JSON.stringify({
-        'https://tenon.ai/permissions_str': '  a , b   c,d,,e  ',
+        'https://winoe.ai/permissions_str': '  a , b   c,d,,e  ',
       }),
     ).toString('base64url');
     const parsed = await config.beforeSessionSaved(
@@ -40,17 +40,17 @@ describe('lib/auth0 extra coverage (claims)', () => {
     );
   });
 
-  it('derives recruiter and candidate permissions from combined role text', async () => {
+  it('derives talent_partner and candidate permissions from combined role text', async () => {
     await import('@/platform/auth0');
     const config = Auth0ClientMock.mock.calls[0][0];
     const payload = Buffer.from(
-      JSON.stringify({ roles: ['RecruiterCandidate'] }),
+      JSON.stringify({ roles: ['TalentPartnerCandidate'] }),
     ).toString('base64url');
     const result = await config.beforeSessionSaved(
       { user: {} },
       `x.${payload}.y`,
     );
-    expect(result.user.permissions).toContain('recruiter:access');
+    expect(result.user.permissions).toContain('talent_partner:access');
     expect(result.user.permissions).toContain('candidate:access');
   });
 
@@ -61,14 +61,14 @@ describe('lib/auth0 extra coverage (claims)', () => {
     const existing = await config.beforeSessionSaved(
       {
         user: {
-          'https://tenon.ai/permissions': ['existing:custom'],
+          'https://winoe.ai/permissions': ['existing:custom'],
           permissions: [],
         },
       },
       'x.e30.y',
     );
     expect(existing.user.permissions).toContain('existing:custom');
-    expect(existing.user['https://tenon.ai/permissions']).toContain(
+    expect(existing.user['https://winoe.ai/permissions']).toContain(
       'existing:custom',
     );
 
@@ -79,7 +79,7 @@ describe('lib/auth0 extra coverage (claims)', () => {
       { user: {} },
       `x.${rolePayload}.y`,
     );
-    expect(mergedRoles.user['https://tenon.ai/roles']).toContain('TokenRole');
+    expect(mergedRoles.user['https://winoe.ai/roles']).toContain('TokenRole');
   });
 
   it('keeps empty permissions array when no permissions are present', async () => {

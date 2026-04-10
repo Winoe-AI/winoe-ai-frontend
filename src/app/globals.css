@@ -26,36 +26,36 @@ body {
 }
 
 @media print {
-  body.fit-profile-print-mode {
+  body.winoe-report-print-mode {
     background: #fff;
     color: #111827;
     font-size: 12pt;
     line-height: 1.4;
   }
 
-  body.fit-profile-print-mode [data-fit-profile-main-content='true'] {
+  body.winoe-report-print-mode [data-winoe-report-main-content='true'] {
     margin: 0 !important;
     max-width: none !important;
     padding: 0 !important;
   }
 
-  body.fit-profile-print-mode [data-fit-profile-no-print='true'] {
+  body.winoe-report-print-mode [data-winoe-report-no-print='true'] {
     display: none !important;
   }
 
-  body.fit-profile-print-mode .fit-profile-print-root {
+  body.winoe-report-print-mode .winoe-report-print-root {
     width: 100% !important;
     max-width: none !important;
     margin: 0 !important;
     padding: 0 !important;
   }
 
-  body.fit-profile-print-mode .fit-profile-print-root * {
+  body.winoe-report-print-mode .winoe-report-print-root * {
     color: #111827 !important;
     box-shadow: none !important;
   }
 
-  body.fit-profile-print-mode .fit-profile-avoid-break {
+  body.winoe-report-print-mode .winoe-report-avoid-break {
     break-inside: avoid;
     page-break-inside: avoid;
   }

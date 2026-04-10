@@ -20,13 +20,13 @@ jest.mock('next/server', () => ({
 }));
 
 describe('bff testables', () => {
-  const originalEnv = process.env.TENON_USE_FETCH_DISPATCHER;
+  const originalEnv = process.env.WINOE_USE_FETCH_DISPATCHER;
   const originalMessageChannel = global.MessageChannel;
   const originalMessagePort = global.MessagePort;
   const originalReadableStream = global.ReadableStream;
   const globalAny = global as Record<string, unknown>;
   afterEach(() => {
-    process.env.TENON_USE_FETCH_DISPATCHER = originalEnv;
+    process.env.WINOE_USE_FETCH_DISPATCHER = originalEnv;
     global.MessageChannel = originalMessageChannel;
     global.MessagePort = originalMessagePort;
     global.ReadableStream = originalReadableStream;
@@ -34,20 +34,20 @@ describe('bff testables', () => {
   });
 
   it('returns undefined when dispatcher is disabled', async () => {
-    process.env.TENON_USE_FETCH_DISPATCHER = 'false';
+    process.env.WINOE_USE_FETCH_DISPATCHER = 'false';
     const mod = await import('@/platform/server/bff');
     expect(mod.__testables.getFetchDispatcher()).toBeUndefined();
   });
 
   it('returns undefined when required globals are missing', async () => {
-    process.env.TENON_USE_FETCH_DISPATCHER = 'true';
+    process.env.WINOE_USE_FETCH_DISPATCHER = 'true';
     globalAny.MessageChannel = undefined;
     const mod = await import('@/platform/server/bff');
     expect(mod.__testables.getFetchDispatcher()).toBeUndefined();
   });
 
   it('creates a shared dispatcher when enabled and globals exist', async () => {
-    process.env.TENON_USE_FETCH_DISPATCHER = 'true';
+    process.env.WINOE_USE_FETCH_DISPATCHER = 'true';
     globalAny.MessageChannel = originalMessageChannel;
     globalAny.MessagePort = originalMessagePort;
     globalAny.ReadableStream = ReadableStream;

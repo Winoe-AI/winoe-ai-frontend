@@ -1,13 +1,13 @@
 import {
   apiClient,
   isSameOriginRequest,
-  recruiterBffClient,
+  talentPartnerBffClient,
 } from '@/platform/api-client/client';
 import { responseHelpers } from '../setup';
 
 describe('httpClient', () => {
   const realFetch = global.fetch;
-  const originalApiBase = process.env.NEXT_PUBLIC_TENON_API_BASE_URL;
+  const originalApiBase = process.env.NEXT_PUBLIC_WINOE_API_BASE_URL;
 
   beforeEach(() => {
     global.fetch = jest.fn() as unknown as typeof fetch;
@@ -15,7 +15,7 @@ describe('httpClient', () => {
 
   afterEach(() => {
     (global.fetch as jest.Mock).mockReset?.();
-    process.env.NEXT_PUBLIC_TENON_API_BASE_URL = originalApiBase;
+    process.env.NEXT_PUBLIC_WINOE_API_BASE_URL = originalApiBase;
   });
 
   afterAll(() => {
@@ -49,10 +49,10 @@ describe('httpClient', () => {
       responseHelpers.jsonResponse({ ok: true }) as unknown as Response,
     );
 
-    await recruiterBffClient.get('/simulations');
+    await talentPartnerBffClient.get('/trials');
 
     expect(global.fetch).toHaveBeenCalledWith(
-      '/api/simulations',
+      '/api/trials',
       expect.objectContaining({
         credentials: 'same-origin',
         cache: 'no-store',

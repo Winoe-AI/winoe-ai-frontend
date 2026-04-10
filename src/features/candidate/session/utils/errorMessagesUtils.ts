@@ -34,7 +34,7 @@ export function friendlyBootstrapError(err: unknown): string {
   const msg = messageFromUnknown(err);
   if (msg && msg.trim().length > 0) return msg;
 
-  return 'Something went wrong loading your simulation.';
+  return 'Something went wrong loading your trial.';
 }
 
 export function friendlyTaskError(err: unknown): string {

@@ -81,12 +81,15 @@ describe('auth route entrypoints', () => {
     );
   });
 
-  it('not-authorized page renders links for recruiter mode', async () => {
+  it('not-authorized page renders links for talent_partner mode', async () => {
     const { default: NotAuthorizedPage } =
       await import('@/app/(auth)/not-authorized/page');
     render(
       await NotAuthorizedPage({
-        searchParams: Promise.resolve({ mode: 'recruiter', returnTo: '/dash' }),
+        searchParams: Promise.resolve({
+          mode: 'talent_partner',
+          returnTo: '/dash',
+        }),
       }),
     );
     const links = screen.getAllByRole('link');
@@ -94,7 +97,7 @@ describe('auth route entrypoints', () => {
     expect(links[1]).toHaveAttribute('href', '/dash');
   });
 
-  it('not-authorized page uses candidate returnTo and recruiter default path', async () => {
+  it('not-authorized page uses candidate returnTo and talent_partner default path', async () => {
     const { default: NotAuthorizedPage } =
       await import('@/app/(auth)/not-authorized/page');
     render(

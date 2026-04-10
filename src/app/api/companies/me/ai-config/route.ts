@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { forwardJson } from '@/platform/server/bff';
-import { withRecruiterAuth } from '@/app/api/bffRouteHelpers';
+import { withTalentPartnerAuth } from '@/app/api/bffRouteHelpers';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -8,9 +8,9 @@ export const revalidate = 0;
 export const fetchCache = 'force-no-store';
 
 export async function GET(req: NextRequest) {
-  return withRecruiterAuth(
+  return withTalentPartnerAuth(
     req,
-    { tag: 'company-ai-config', requirePermission: 'recruiter:access' },
+    { tag: 'company-ai-config', requirePermission: 'talent_partner:access' },
     async (auth) =>
       forwardJson({
         path: '/api/companies/me/ai-config',
@@ -21,11 +21,11 @@ export async function GET(req: NextRequest) {
 }
 
 export async function PUT(req: NextRequest) {
-  return withRecruiterAuth(
+  return withTalentPartnerAuth(
     req,
     {
       tag: 'company-ai-config-update',
-      requirePermission: 'recruiter:access',
+      requirePermission: 'talent_partner:access',
     },
     async (auth) => {
       let body: unknown;

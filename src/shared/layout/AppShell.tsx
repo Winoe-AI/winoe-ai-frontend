@@ -8,7 +8,7 @@ import { contentContainer } from './layoutStyles';
 
 type AppShellProps = {
   children: ReactNode;
-  navScope?: 'candidate' | 'recruiter' | 'marketing' | 'auth';
+  navScope?: 'candidate' | 'talent_partner' | 'marketing' | 'auth';
 };
 
 export default async function AppShell({ children, navScope }: AppShellProps) {
@@ -22,7 +22,7 @@ export default async function AppShell({ children, navScope }: AppShellProps) {
       <WebVitalsLogger />
       <a
         href="#main-content"
-        data-fit-profile-no-print="true"
+        data-winoe-report-no-print="true"
         className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:rounded focus:bg-white focus:px-3 focus:py-2 focus:shadow"
       >
         Skip to main content
@@ -34,7 +34,7 @@ export default async function AppShell({ children, navScope }: AppShellProps) {
       />
       <main
         id="main-content"
-        data-fit-profile-main-content="true"
+        data-winoe-report-main-content="true"
         className={`${contentContainer} py-6`}
       >
         {children}

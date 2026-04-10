@@ -1,1 +1,1 @@
-Hello, this is the Tenon AI Day four demo. I fixed the precommit bundle regression, kept Days two and three Codespaces only, and verified recruiter review and fit profile generation on the live stack.
+Hello, this is the Winoe AI Day four demo. I fixed the precommit bundle regression, kept Days two and three Codespaces only, and verified talent_partner review and winoe report generation on the live stack.

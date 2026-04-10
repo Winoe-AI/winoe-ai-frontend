@@ -24,14 +24,14 @@ describe('lib/auth0 beforeSessionSaved core token handling', () => {
   it('adds permissions and roles from token payload', async () => {
     await importAuth0();
     const payload = Buffer.from(
-      JSON.stringify({ permissions: ['token:perm'], roles: ['Recruiter'] }),
+      JSON.stringify({ permissions: ['token:perm'], roles: ['TalentPartner'] }),
     ).toString('base64url');
     const result = await getAuth0Config().beforeSessionSaved(
       { user: { permissions: [] } },
       `x.${payload}.y`,
     );
     expect(result.user.permissions).toContain('token:perm');
-    expect(result.user.roles).toContain('Recruiter');
+    expect(result.user.roles).toContain('TalentPartner');
   });
 
   it('derives role permissions when explicit permissions are empty', async () => {

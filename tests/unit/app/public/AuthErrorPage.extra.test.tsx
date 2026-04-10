@@ -82,9 +82,9 @@ describe('AuthErrorPage additional coverage', () => {
     expect(retry.getAttribute('href')).toContain('returnTo=%2Ffoo');
   });
   it('renders with only mode', () => {
-    render(<AuthErrorPage mode="recruiter" />);
+    render(<AuthErrorPage mode="talent_partner" />);
     const retry = screen.getByRole('link', { name: 'Retry sign-in' });
-    expect(retry.getAttribute('href')).toContain('mode=recruiter');
+    expect(retry.getAttribute('href')).toContain('mode=talent_partner');
   });
   it('renders title correctly', () => {
     render(<AuthErrorPage />);

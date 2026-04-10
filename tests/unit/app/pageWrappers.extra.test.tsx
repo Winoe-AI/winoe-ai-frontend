@@ -4,11 +4,11 @@ import {
   candidateSubmissionsMock,
   getCachedSessionNormalizedMock,
   marketingMock,
-  recruiterDashboardMock,
+  talentPartnerDashboardMock,
   requireCandidateTokenMock,
   resetPageWrapperMocks,
-  simulationCreateMock,
-  simulationDetailMock,
+  trialCreateMock,
+  trialDetailMock,
 } from './pageWrappers.testlib';
 
 describe('route wrapper pages', () => {
@@ -59,24 +59,24 @@ describe('route wrapper pages', () => {
     expect(requireCandidateTokenMock).toHaveBeenCalled();
   });
 
-  it('renders recruiter pages without extra props', async () => {
+  it('renders talent_partner pages without extra props', async () => {
     const { default: DashboardPage } =
-      await import('@/app/(recruiter)/dashboard/page');
+      await import('@/app/(talent-partner)/dashboard/page');
     render(await DashboardPage());
-    expect(recruiterDashboardMock).toHaveBeenCalled();
+    expect(talentPartnerDashboardMock).toHaveBeenCalled();
 
-    const { default: SimulationDetailPage } =
-      await import('@/app/(recruiter)/dashboard/simulations/[id]/page');
-    render(await SimulationDetailPage());
-    expect(simulationDetailMock).toHaveBeenCalled();
+    const { default: TrialDetailPage } =
+      await import('@/app/(talent-partner)/dashboard/trials/[id]/page');
+    render(await TrialDetailPage());
+    expect(trialDetailMock).toHaveBeenCalled();
 
-    const { default: SimulationCreatePage } =
-      await import('@/app/(recruiter)/dashboard/simulations/new/page');
-    render(await SimulationCreatePage());
-    expect(simulationCreateMock).toHaveBeenCalled();
+    const { default: TrialCreatePage } =
+      await import('@/app/(talent-partner)/dashboard/trials/new/page');
+    render(await TrialCreatePage());
+    expect(trialCreateMock).toHaveBeenCalled();
 
     const { default: CandidateSubmissionsPage } =
-      await import('@/app/(recruiter)/dashboard/simulations/[id]/candidates/[candidateSessionId]/page');
+      await import('@/app/(talent-partner)/dashboard/trials/[id]/candidates/[candidateSessionId]/page');
     render(await CandidateSubmissionsPage());
     expect(candidateSubmissionsMock).toHaveBeenCalled();
   });

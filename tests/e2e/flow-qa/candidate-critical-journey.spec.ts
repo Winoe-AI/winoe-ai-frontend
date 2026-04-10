@@ -38,7 +38,7 @@ test.describe('Candidate Critical Journey (flow-qa mocked)', () => {
     const sessionPage = new CandidateSessionQaPage(page);
 
     await sessionPage.gotoWithToken(QA_INVITE_TOKEN);
-    await sessionPage.startSimulation();
+    await sessionPage.startTrial();
     await sessionPage.expectDay(1);
 
     const textArea = page.locator('textarea').first();
@@ -70,7 +70,7 @@ test.describe('Candidate Critical Journey (flow-qa mocked)', () => {
     });
 
     await page.goto(`/candidate-sessions/${QA_INVITE_TOKEN}`);
-    const startButton = page.getByRole('button', { name: /start simulation/i });
+    const startButton = page.getByRole('button', { name: /start trial/i });
     const day4Heading = page.getByText(/^day 4 • handoff$/i);
     const startVisible = await startButton
       .first()
@@ -118,7 +118,7 @@ test.describe('Candidate Critical Journey (flow-qa mocked)', () => {
 
     const sessionPage = new CandidateSessionQaPage(page);
     await sessionPage.gotoWithToken(QA_INVITE_TOKEN);
-    await sessionPage.startSimulation();
+    await sessionPage.startTrial();
     await sessionPage.expectDay(5);
 
     await page
@@ -156,6 +156,6 @@ test.describe('Candidate Critical Journey (flow-qa mocked)', () => {
     await page.getByRole('button', { name: /submit & continue/i }).click();
     await submitResponsePromise;
 
-    await expect(page.getByText(/simulation complete/i)).toBeVisible();
+    await expect(page.getByText(/trial complete/i)).toBeVisible();
   });
 });

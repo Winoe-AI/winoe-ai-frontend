@@ -1,1 +1,0 @@
-export { SimulationSection } from './SimulationSection';

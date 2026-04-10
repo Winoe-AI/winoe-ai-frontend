@@ -26,9 +26,7 @@ describe('CandidateSessionView scheduling states', () => {
     const props = baseScheduleProps();
     props.view = 'locked';
     const { asFragment } = render(<CandidateSessionView {...props} />);
-    expect(
-      screen.getByText(/Simulation locked until start/i),
-    ).toBeInTheDocument();
+    expect(screen.getByText(/Trial locked until start/i)).toBeInTheDocument();
     expect(screen.getByText(/Starts in/i)).toBeInTheDocument();
     expect(screen.getByText(/Day windows/i)).toBeInTheDocument();
     expect(asFragment()).toMatchSnapshot();

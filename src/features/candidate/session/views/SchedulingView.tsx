@@ -28,8 +28,7 @@ export function SchedulingView({
       <div>
         <h1 className="text-lg font-semibold">Pick your start date</h1>
         <p className="mt-1 text-sm text-gray-600">
-          Confirm your local schedule before starting{' '}
-          {title || 'your simulation'}
+          Confirm your local schedule before starting {title || 'your trial'}
           {role ? ` (${role})` : ''}.
         </p>
       </div>

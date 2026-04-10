@@ -11,8 +11,8 @@ describe('proxy - token normalization and perf logging', () => {
   beforeEach(resetProxyTestMocks);
 
   it('logs perf timing and normalizes nested token object', async () => {
-    const prevEnv = process.env.TENON_DEBUG_PERF;
-    process.env.TENON_DEBUG_PERF = 'true';
+    const prevEnv = process.env.WINOE_DEBUG_PERF;
+    process.env.WINOE_DEBUG_PERF = 'true';
     const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
     getSessionNormalizedMock.mockResolvedValue({
       user: { permissions: ['candidate:access'] },
@@ -25,8 +25,8 @@ describe('proxy - token normalization and perf logging', () => {
     expect(res?.status).toBe(200);
     expect(consoleSpy).toHaveBeenCalled();
     consoleSpy.mockRestore();
-    if (prevEnv === undefined) delete process.env.TENON_DEBUG_PERF;
-    else process.env.TENON_DEBUG_PERF = prevEnv;
+    if (prevEnv === undefined) delete process.env.WINOE_DEBUG_PERF;
+    else process.env.WINOE_DEBUG_PERF = prevEnv;
   });
 
   it('normalizes access token object lacking string token', async () => {
@@ -41,12 +41,12 @@ describe('proxy - token normalization and perf logging', () => {
     expect(res?.status).toBe(200);
   });
 
-  it('redirects root visitors with recruiter access and object access token', async () => {
+  it('redirects root visitors with talent_partner access and object access token', async () => {
     const authResp = NextResponse.next();
     authResp.cookies.set('edge', 'cookie');
     mockAuth0.middleware.mockResolvedValue(authResp);
     getSessionNormalizedMock.mockResolvedValue({
-      user: { permissions: ['recruiter:access'] },
+      user: { permissions: ['talent_partner:access'] },
       accessToken: { accessToken: 'root-token' },
     });
     const res = await proxy(new NextRequest(new URL('http://localhost/')));

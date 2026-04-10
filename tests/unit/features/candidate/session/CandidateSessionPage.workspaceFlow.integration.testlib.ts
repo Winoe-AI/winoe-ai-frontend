@@ -47,7 +47,7 @@ export function buildSessionContext(task: CandidateTask) {
       bootstrap: {
         candidateSessionId: 99,
         status: 'in_progress' as const,
-        simulation: { title: 'Simulation', role: 'Engineer' },
+        trial: { title: 'Trial', role: 'Engineer' },
       },
       started: true,
       taskState: {

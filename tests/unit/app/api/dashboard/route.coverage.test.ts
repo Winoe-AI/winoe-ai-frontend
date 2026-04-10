@@ -20,7 +20,7 @@ jest.mock('@/platform/server/bff', () => ({
 }));
 
 jest.mock('@/app/api/bffRouteHelpers', () => ({
-  withRecruiterAuth: jest.fn((req, opts, handler) =>
+  withTalentPartnerAuth: jest.fn((req, opts, handler) =>
     handler({ accessToken: 'test', requestId: 'req-1' }),
   ),
 }));

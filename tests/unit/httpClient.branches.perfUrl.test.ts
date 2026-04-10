@@ -16,8 +16,8 @@ describe('httpClient branches - perf fallback and URL normalization', () => {
     // @ts-expect-error testing fallback
     delete global.performance;
     jest.resetModules();
-    process.env.NEXT_PUBLIC_TENON_DEBUG_PERF = '1';
-    const infoSpy = jest.spyOn(console, 'info').mockImplementation(() => {});
+    process.env.NEXT_PUBLIC_WINOE_DEBUG_PERF = '1';
+    const dispatchSpy = jest.spyOn(window, 'dispatchEvent');
     const { apiClient: freshClient, __resetHttpClientCache: freshReset } =
       await import('@/platform/api-client/client');
     freshReset();
@@ -27,8 +27,7 @@ describe('httpClient branches - perf fallback and URL normalization', () => {
         responseHelpers.jsonResponse({ ok: true }) as unknown as Response,
       ) as unknown as typeof fetch;
     await freshClient.get('/perf-fallback', { skipCache: true });
-    expect(infoSpy).toHaveBeenCalled();
-    infoSpy.mockRestore();
+    expect(dispatchSpy).toHaveBeenCalled();
     global.performance = originalPerformance;
     jest.resetModules();
   });

@@ -41,7 +41,7 @@ describe('submissionReferenceStorage', () => {
 
   it('returns null for malformed persisted payloads', () => {
     window.localStorage.setItem(
-      'tenon:candidate:recordedSubmission:101:7',
+      'winoe:candidate:recordedSubmission:101:7',
       JSON.stringify({ submissionId: 'bad', submittedAt: 'invalid' }),
     );
 

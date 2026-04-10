@@ -17,8 +17,8 @@ describe('api/backend proxy route - parsing and metadata', () => {
     const upstream = makeResponse(JSON.stringify({ ok: true }), {
       status: 200,
       headers: { 'content-type': 'application/json' },
-    }) as Response & { _tenonMeta?: unknown };
-    upstream._tenonMeta = { attempts: 2, durationMs: 50 };
+    }) as Response & { _winoeMeta?: unknown };
+    upstream._winoeMeta = { attempts: 2, durationMs: 50 };
     upstreamRequestMock.mockResolvedValue(upstream);
     const { GET } = await importBackendProxyRoute();
     const resp = await GET(
@@ -120,8 +120,8 @@ describe('api/backend proxy route - parsing and metadata', () => {
     const upstream = makeResponse('ok', {
       status: 200,
       headers: { 'content-type': 'text/plain' },
-    }) as Response & { _tenonMeta?: unknown };
-    upstream._tenonMeta = {};
+    }) as Response & { _winoeMeta?: unknown };
+    upstream._winoeMeta = {};
     upstreamRequestMock.mockResolvedValue(upstream);
     const { GET } = await importBackendProxyRoute();
     const resp = await GET(

@@ -4,7 +4,7 @@ import LogoutLink from '@/features/auth/LogoutLink';
 type AppNavProps = {
   isAuthed: boolean;
   permissions?: string[];
-  navScope?: 'candidate' | 'recruiter' | 'marketing' | 'auth';
+  navScope?: 'candidate' | 'talent_partner' | 'marketing' | 'auth';
 };
 
 export function AppNav({ isAuthed, permissions = [], navScope }: AppNavProps) {
@@ -12,26 +12,26 @@ export function AppNav({ isAuthed, permissions = [], navScope }: AppNavProps) {
     return null;
   }
 
-  const canRecruiter = permissions.includes('recruiter:access');
+  const canTalentPartner = permissions.includes('talent_partner:access');
   const canCandidate = permissions.includes('candidate:access');
-  const isRecruiterScope = navScope === 'recruiter';
+  const isTalentPartnerScope = navScope === 'talent_partner';
   const isCandidateScope = navScope === 'candidate';
-  const allowRecruiter =
-    isRecruiterScope && (canRecruiter || permissions.length === 0);
+  const allowTalentPartner =
+    isTalentPartnerScope && (canTalentPartner || permissions.length === 0);
   const allowCandidate =
     isCandidateScope && (canCandidate || permissions.length === 0);
-  const showRecruiter = allowRecruiter;
+  const showTalentPartner = allowTalentPartner;
   const showCandidate = allowCandidate;
 
   return (
     <nav
       className="flex items-center gap-4 pr-2 text-sm sm:pr-3"
-      data-fit-profile-no-print="true"
+      data-winoe-report-no-print="true"
       data-app-nav="true"
     >
-      {showRecruiter ? (
+      {showTalentPartner ? (
         <Link href="/dashboard" className="text-gray-700 hover:text-gray-900">
-          Recruiter Dashboard
+          Talent Partner Dashboard
         </Link>
       ) : null}
       {showCandidate ? (

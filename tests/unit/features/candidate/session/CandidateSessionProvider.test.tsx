@@ -46,7 +46,7 @@ describe('CandidateSessionProvider', () => {
     const { result } = renderWithProvider();
     expect(result.current.state.inviteToken).toBe('invite-token');
     expect(result.current.state.candidateSessionId).toBe(9);
-    expect(result.current.state.bootstrap?.simulation.title).toBe('Sim');
+    expect(result.current.state.bootstrap?.trial.title).toBe('Sim');
     expect(result.current.state.started).toBe(true);
     expect(result.current.state.taskState.currentTask?.id).toBe(55);
   });
@@ -59,7 +59,7 @@ describe('CandidateSessionProvider', () => {
       result.current.setBootstrap({
         candidateSessionId: 7,
         status: 'in_progress',
-        simulation: { title: 'T', role: 'R' },
+        trial: { title: 'T', role: 'R' },
       });
       result.current.setStarted(true);
     });

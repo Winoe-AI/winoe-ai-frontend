@@ -21,7 +21,7 @@ describe('CandidateSessionPage debug/perf paths', () => {
   });
 
   afterEach(() => {
-    delete process.env.NEXT_PUBLIC_TENON_DEBUG_PERF;
+    delete process.env.NEXT_PUBLIC_WINOE_DEBUG_PERF;
   });
 
   afterAll(() => {
@@ -29,7 +29,7 @@ describe('CandidateSessionPage debug/perf paths', () => {
     consoleInfoSpy.mockRestore();
   });
 
-  it('does not log debug output when TENON_DEBUG_PERF is not set', async () => {
+  it('does not log debug output when WINOE_DEBUG_PERF is not set', async () => {
     useCandidateSessionMock.mockReturnValue(baseState());
     await act(async () => render(<CandidateSessionPage token="inv" />));
     await waitFor(() =>

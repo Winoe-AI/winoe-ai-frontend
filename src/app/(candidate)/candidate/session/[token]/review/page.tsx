@@ -8,7 +8,7 @@ import {
 
 export const metadata: Metadata = {
   title: `Completed review | ${BRAND_NAME}`,
-  description: `Review your completed ${BRAND_NAME} simulation artifacts.`,
+  description: `Review your completed ${BRAND_NAME} trial artifacts.`,
 };
 
 export default async function CandidateSessionReviewRoute({

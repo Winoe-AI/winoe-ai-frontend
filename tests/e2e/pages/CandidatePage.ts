@@ -11,11 +11,11 @@ export class CandidatePage extends BasePage {
   }
 
   async expectBootstrap() {
-    await this.expectVisibleText(/5-day simulation/i);
+    await this.expectVisibleText(/5-day trial/i);
   }
 
-  async startSimulation() {
-    await this.clickButton(/start simulation/i);
+  async startTrial() {
+    await this.clickButton(/start trial/i);
   }
 
   async fillResponse(text: string) {

@@ -13,7 +13,7 @@ const isJsdom =
 
 export const authRedirect = (
   status: number | null,
-  mode: 'recruiter' | 'candidate',
+  mode: 'talent_partner' | 'candidate',
 ): RedirectFn => {
   if (typeof window === 'undefined' || isJsdom) return undefined;
   if (status !== 401 && status !== 403) return undefined;

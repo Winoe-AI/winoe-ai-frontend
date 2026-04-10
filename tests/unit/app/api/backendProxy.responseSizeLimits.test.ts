@@ -13,7 +13,7 @@ describe('api/backend proxy route - response size limits', () => {
   afterAll(restoreBackendProxyTestEnv);
 
   it('rejects responses with oversized content-length header', async () => {
-    process.env.TENON_PROXY_MAX_RESPONSE_BYTES = '5';
+    process.env.WINOE_PROXY_MAX_RESPONSE_BYTES = '5';
     upstreamRequestMock.mockResolvedValue(
       makeResponse('oversized', {
         status: 200,
@@ -30,7 +30,7 @@ describe('api/backend proxy route - response size limits', () => {
   });
 
   it('terminates when streamed body exceeds limit', async () => {
-    process.env.TENON_PROXY_MAX_RESPONSE_BYTES = '5';
+    process.env.WINOE_PROXY_MAX_RESPONSE_BYTES = '5';
     upstreamRequestMock.mockResolvedValue(
       makeResponse('abcdefg', {
         status: 200,
@@ -46,7 +46,7 @@ describe('api/backend proxy route - response size limits', () => {
   });
 
   it('cancels stream when exceeding limit (readStreamWithLimit)', async () => {
-    process.env.TENON_PROXY_MAX_RESPONSE_BYTES = '2';
+    process.env.WINOE_PROXY_MAX_RESPONSE_BYTES = '2';
     const body = {
       cancel: jest.fn().mockResolvedValue(undefined),
       getReader: () => ({
@@ -76,7 +76,7 @@ describe('api/backend proxy route - response size limits', () => {
   });
 
   it('blocks oversized JSON streams', async () => {
-    process.env.TENON_PROXY_MAX_RESPONSE_BYTES = '2';
+    process.env.WINOE_PROXY_MAX_RESPONSE_BYTES = '2';
     upstreamRequestMock.mockResolvedValue(
       makeResponse(JSON.stringify({ msg: 'way too long' }), {
         status: 200,
@@ -92,7 +92,7 @@ describe('api/backend proxy route - response size limits', () => {
   });
 
   it('uses fallback arrayBuffer limit for non-JSON responses', async () => {
-    process.env.TENON_PROXY_MAX_RESPONSE_BYTES = '3';
+    process.env.WINOE_PROXY_MAX_RESPONSE_BYTES = '3';
     const oversizedBuffer = new TextEncoder().encode('abcdefgh').buffer;
     upstreamRequestMock.mockResolvedValue({
       status: 200,

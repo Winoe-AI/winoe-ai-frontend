@@ -26,7 +26,7 @@ jest.mock('@/platform/auth0/claims', () => ({
 }));
 
 jest.mock('@/platform/config/brand', () => ({
-  CUSTOM_CLAIM_ROLES: 'https://tenon.ai/roles',
+  CUSTOM_CLAIM_ROLES: 'https://winoe.ai/roles',
 }));
 
 export const originalNodeEnv = process.env.NODE_ENV;

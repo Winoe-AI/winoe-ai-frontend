@@ -7,7 +7,7 @@ const LazyRunningView = dynamic<RunningViewProps>(
   () => import('./views/RunningView').then((mod) => mod.RunningView),
   {
     ssr: false,
-    loading: () => <LoadingView message="Loading your simulation workspace." />,
+    loading: () => <LoadingView message="Loading your trial workspace." />,
   },
 );
 

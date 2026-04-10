@@ -39,7 +39,7 @@ test.describe('Candidate Day 2 Flow', () => {
           stdout: null,
           stderr: null,
           workflowUrl:
-            'https://github.com/tenon-ai/candidate-repo/actions/runs/1',
+            'https://github.com/winoe-ai/candidate-repo/actions/runs/1',
           commitSha: 'abc1234def5678',
         },
         {
@@ -51,14 +51,14 @@ test.describe('Candidate Day 2 Flow', () => {
           stdout: 'All tests passed.',
           stderr: null,
           workflowUrl:
-            'https://github.com/tenon-ai/candidate-repo/actions/runs/1',
+            'https://github.com/winoe-ai/candidate-repo/actions/runs/1',
           commitSha: 'abc1234def5678',
         },
       ],
     });
     const sessionPage = new CandidateSessionQaPage(page);
     await sessionPage.gotoWithToken(QA_INVITE_TOKEN);
-    await sessionPage.startSimulation();
+    await sessionPage.startTrial();
     await sessionPage.expectDay(2);
     await expect(page.getByText(/coding workspace/i)).toBeVisible();
     await expect(

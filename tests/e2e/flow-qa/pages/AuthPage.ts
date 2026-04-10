@@ -20,7 +20,7 @@ export class AuthPage extends BasePage {
 
   async expectLoginHeading() {
     await this.expectHeading(
-      /sign in to continue your simulation|recruiter login/i,
+      /sign in to continue your trial|talent_partner login/i,
     );
   }
 

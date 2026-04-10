@@ -67,12 +67,12 @@ describe('CandidateSessionPage handlers - submit and error flows', () => {
     await act(async () => render(<CandidateSessionPage token="inv" />));
     await act(async () => {
       fireEvent.click(
-        await screen.findByRole('button', { name: /Start simulation/i }),
+        await screen.findByRole('button', { name: /Start trial/i }),
       );
       await Promise.resolve();
     });
     expect(await screen.findByTestId('state-message')).toHaveTextContent(
-      /Unable to load simulation/i,
+      /Unable to load trial/i,
     );
   });
 

@@ -5,7 +5,7 @@ import {
   installCandidateSessionMocks,
   makeCandidateTask,
 } from './fixtures/candidateMocks';
-import { installRecruiterApiMocks } from './fixtures/recruiterMocks';
+import { installTalentPartnerApiMocks } from './fixtures/talent-partnerMocks';
 function ensureMobileProject() {
   test.skip(
     test.info().project.name !== 'mobile-chrome',
@@ -20,19 +20,19 @@ test.describe('Responsive Mobile Flows', () => {
       page.getByRole('heading', { name: /welcome to/i }),
     ).toBeVisible();
     await expect(
-      page.getByRole('link', { name: /recruiter login/i }),
+      page.getByRole('link', { name: /talent-partner login/i }),
     ).toBeVisible();
     const viewport = page.viewportSize();
     expect(viewport).not.toBeNull();
     expect((viewport?.width ?? 0) <= 450).toBeTruthy();
   });
-  test.describe('Recruiter mobile', () => {
-    test.use({ storageState: storageStates.recruiterOnly });
+  test.describe('TalentPartner mobile', () => {
+    test.use({ storageState: storageStates.talentPartnerOnly });
     test('dashboard content and invite modal work on mobile', async ({
       page,
     }) => {
       ensureMobileProject();
-      await installRecruiterApiMocks(page);
+      await installTalentPartnerApiMocks(page);
       await page.goto('/dashboard');
       await expect(
         page.getByRole('heading', { name: /dashboard/i }),
@@ -77,7 +77,7 @@ test.describe('Responsive Mobile Flows', () => {
         }),
       });
       await page.goto(`/candidate/session/${QA_INVITE_TOKEN}`);
-      await page.getByRole('button', { name: /start simulation/i }).click();
+      await page.getByRole('button', { name: /start trial/i }).click();
       await expect(page.getByText(/^day 1 •/i)).toBeVisible();
       const textArea = page.locator('textarea').first();
       await expect(textArea).toBeVisible();

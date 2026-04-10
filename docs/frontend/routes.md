@@ -20,13 +20,13 @@ Route truth source: `src/app/**` and request interception in `src/proxy.ts` + `s
 - `/candidate/what-we-evaluate`
 - `/candidate-sessions/[token]` (legacy route that redirects to `/candidate/session/[token]`)
 
-### Recruiter
+### Talent Partner
 
 - `/dashboard`
-- `/dashboard/simulations/new`
-- `/dashboard/simulations/[id]`
-- `/dashboard/simulations/[id]/candidates/[candidateSessionId]`
-- `/dashboard/simulations/[id]/candidates/[candidateSessionId]/fit-profile`
+- `/dashboard/trials/new`
+- `/dashboard/trials/[id]`
+- `/dashboard/trials/[id]/candidates/[candidateSessionId]`
+- `/dashboard/trials/[id]/candidates/[candidateSessionId]/winoe-report`
 
 ## API Routes (`src/app/api`)
 
@@ -42,20 +42,20 @@ Route truth source: `src/app/**` and request interception in `src/proxy.ts` + `s
 - `/api/dev/access-token` (local-only endpoint, currently returns `410` when enabled locally)
 - `/api/debug/auth` (non-production debug route)
 
-### Recruiter BFF
+### Talent Partner BFF
 
 - `/api/dashboard`
-- `/api/simulations`
-- `/api/simulations/[id]`
-- `/api/simulations/[id]/invite`
-- `/api/simulations/[id]/terminate`
-- `/api/simulations/[id]/candidates`
-- `/api/simulations/[id]/candidates/compare`
-- `/api/simulations/[id]/candidates/[candidateSessionId]/invite/resend`
+- `/api/trials`
+- `/api/trials/[id]`
+- `/api/trials/[id]/invite`
+- `/api/trials/[id]/terminate`
+- `/api/trials/[id]/candidates`
+- `/api/trials/[id]/candidates/compare`
+- `/api/trials/[id]/candidates/[candidateSessionId]/invite/resend`
 - `/api/submissions`
 - `/api/submissions/[submissionId]`
-- `/api/candidate_sessions/[candidateSessionId]/fit_profile`
-- `/api/candidate_sessions/[candidateSessionId]/fit_profile/generate`
+- `/api/candidate_sessions/[candidateSessionId]/winoe_report`
+- `/api/candidate_sessions/[candidateSessionId]/winoe_report/generate`
 
 ## Middleware Boundary
 
@@ -63,7 +63,7 @@ Route truth source: `src/app/**` and request interception in `src/proxy.ts` + `s
 - Main implementation: `src/platform/middleware/proxy.ts`.
 - Route role gating:
   - Candidate area: `/candidate*`, `/candidate-sessions*`.
-  - Recruiter area: `/dashboard*`.
+  - Talent Partner area: `/dashboard*`.
 - Public routes include `/`, `/auth/*`, `/not-authorized`, and API pass-through handling.
 
 ## Key Source Directories

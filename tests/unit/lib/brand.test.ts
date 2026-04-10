@@ -1,13 +1,13 @@
 describe('brand config', () => {
-  const originalNamespace = process.env.NEXT_PUBLIC_TENON_AUTH0_CLAIM_NAMESPACE;
+  const originalNamespace = process.env.NEXT_PUBLIC_WINOE_AUTH0_CLAIM_NAMESPACE;
 
   afterEach(() => {
-    process.env.NEXT_PUBLIC_TENON_AUTH0_CLAIM_NAMESPACE = originalNamespace;
+    process.env.NEXT_PUBLIC_WINOE_AUTH0_CLAIM_NAMESPACE = originalNamespace;
     jest.resetModules();
   });
 
   it('adds trailing slash when missing', async () => {
-    process.env.NEXT_PUBLIC_TENON_AUTH0_CLAIM_NAMESPACE =
+    process.env.NEXT_PUBLIC_WINOE_AUTH0_CLAIM_NAMESPACE =
       'https://custom.example';
 
     const { CUSTOM_CLAIM_NAMESPACE } = await import('@/platform/config/brand');
@@ -15,7 +15,7 @@ describe('brand config', () => {
   });
 
   it('keeps provided trailing slash intact', async () => {
-    process.env.NEXT_PUBLIC_TENON_AUTH0_CLAIM_NAMESPACE =
+    process.env.NEXT_PUBLIC_WINOE_AUTH0_CLAIM_NAMESPACE =
       'https://namespaced.example/';
 
     const { CUSTOM_CLAIM_NAMESPACE } = await import('@/platform/config/brand');
@@ -23,7 +23,7 @@ describe('brand config', () => {
   });
 
   it('falls back to brand domain when env missing', async () => {
-    delete process.env.NEXT_PUBLIC_TENON_AUTH0_CLAIM_NAMESPACE;
+    delete process.env.NEXT_PUBLIC_WINOE_AUTH0_CLAIM_NAMESPACE;
     const { CUSTOM_CLAIM_NAMESPACE, BRAND_DOMAIN } =
       await import('@/platform/config/brand');
     expect(CUSTOM_CLAIM_NAMESPACE).toBe(`https://${BRAND_DOMAIN}/`);

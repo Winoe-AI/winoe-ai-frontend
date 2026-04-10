@@ -18,7 +18,9 @@ export default async function NotAuthorizedPage({
   const resolved = searchParams ? await searchParams : undefined;
   const rawMode = resolved?.mode;
   const mode =
-    rawMode === 'candidate' || rawMode === 'recruiter' ? rawMode : undefined;
+    rawMode === 'candidate' || rawMode === 'talent_partner'
+      ? rawMode
+      : undefined;
   const returnTo =
     resolved && typeof resolved.returnTo === 'string'
       ? sanitizeReturnTo(resolved.returnTo)
@@ -31,8 +33,8 @@ export default async function NotAuthorizedPage({
         <p className="mt-2 text-sm text-gray-700">
           {mode === 'candidate'
             ? 'You need candidate access to view this page.'
-            : mode === 'recruiter'
-              ? 'You need recruiter access to view this page.'
+            : mode === 'talent_partner'
+              ? 'You need Talent Partner access to view this page.'
               : 'You are signed in, but you do not have permission to view this page.'}
         </p>
       </div>
@@ -47,10 +49,10 @@ export default async function NotAuthorizedPage({
           Go to Candidate Portal
         </Link>
         <Link
-          href={returnTo && mode === 'recruiter' ? returnTo : '/dashboard'}
+          href={returnTo && mode === 'talent_partner' ? returnTo : '/dashboard'}
           className="inline-flex items-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700"
         >
-          Go to Recruiter Dashboard
+          Go to Talent Partner Dashboard
         </Link>
       </div>
     </div>

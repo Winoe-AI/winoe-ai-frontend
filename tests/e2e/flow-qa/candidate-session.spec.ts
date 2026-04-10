@@ -27,7 +27,7 @@ test.describe('Candidate Session Bootstrap Flows', () => {
     // Warm the route once to remove Next.js cold-start overhead from perf gating.
     await sessionPage.gotoWithToken(QA_INVITE_TOKEN);
     await expect(
-      page.getByRole('button', { name: /start simulation/i }),
+      page.getByRole('button', { name: /start trial/i }),
     ).toBeVisible();
     const startMs = Date.now();
     const bootstrapResponsePromise = page.waitForResponse(
@@ -42,12 +42,12 @@ test.describe('Candidate Session Bootstrap Flows', () => {
     expect(bootstrapResponse.status()).toBe(200);
     await expect(page).toHaveURL(`/candidate/session/${QA_INVITE_TOKEN}`);
     await expect(
-      page.getByRole('button', { name: /start simulation/i }),
+      page.getByRole('button', { name: /start trial/i }),
     ).toBeVisible();
     const loadMs = Date.now() - startMs;
     annotatePerf('perf:candidate-session-bootstrap-ms', loadMs);
     assertPerfBudget(loadMs, QA_PAGE_BUDGETS.candidateSessionMs);
-    await sessionPage.startSimulation();
+    await sessionPage.startTrial();
     await sessionPage.expectDay(1);
     await expect(page.getByText(/5-day timeline/i)).toBeVisible();
   });
@@ -68,7 +68,7 @@ test.describe('Candidate Session Bootstrap Flows', () => {
     await page.goto(`/candidate-sessions/${QA_INVITE_TOKEN}`);
     await expect(page).toHaveURL(`/candidate/session/${QA_INVITE_TOKEN}`);
     await expect(
-      page.getByRole('button', { name: /start simulation/i }),
+      page.getByRole('button', { name: /start trial/i }),
     ).toBeVisible();
   });
   test('expired invite renders invite expired state', async ({ page }) => {

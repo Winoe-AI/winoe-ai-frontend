@@ -19,7 +19,7 @@ export async function runDay4Upload(context: InteractionContext) {
         { waitUntil: 'domcontentloaded' },
       );
       await page
-        .getByRole('button', { name: /start simulation/i })
+        .getByRole('button', { name: /start trial/i })
         .click({ timeout: 5_000 })
         .catch(() => {});
       await expect(
@@ -29,7 +29,7 @@ export async function runDay4Upload(context: InteractionContext) {
       await page.locator('input[type="file"]').setInputFiles({
         name: 'qa-sample.mp4',
         mimeType: 'video/mp4',
-        buffer: Buffer.from('tenon-qa-video-content'),
+        buffer: Buffer.from('winoe-qa-video-content'),
       });
       await expect(page.getByText(/complete upload/i).first()).toBeVisible({
         timeout: 12_000,

@@ -78,7 +78,7 @@ const buildClient = (defaults?: ApiClientOptions) => {
 };
 
 export const apiClient = buildClient();
-export const recruiterBffClient = buildClient(BFF_DEFAULTS);
+export const talentPartnerBffClient = buildClient(BFF_DEFAULTS);
 
 export const bffClient = {
   get: <T>(

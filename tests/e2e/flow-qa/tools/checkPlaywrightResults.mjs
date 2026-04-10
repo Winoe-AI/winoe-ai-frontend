@@ -4,6 +4,10 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { parseArgs, readStats } from './checkPlaywrightResults.lib.mjs';
 
+function writeStderr(message) {
+  process.stderr.write(`${message}\n`);
+}
+
 function main() {
   const args = parseArgs(process.argv);
   const absFile = path.resolve(args.file);
@@ -56,8 +60,8 @@ function main() {
     return;
   }
 
-  console.error(`${args.label}: quality gate failed`);
-  for (const failure of failures) console.error(`- ${failure}`);
+  writeStderr(`${args.label}: quality gate failed`);
+  for (const failure of failures) writeStderr(`- ${failure}`);
   process.exit(1);
 }
 

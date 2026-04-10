@@ -40,24 +40,21 @@ describe('/api/debug/auth route', () => {
     const user = {
       sub: 'auth0|123',
       email: 'test@example.com',
-      'https://tenon.ai/roles': ['recruiter'],
+      'https://winoe.ai/roles': ['talent_partner'],
     };
     mockGetSessionNormalized.mockResolvedValue({
       user,
       accessToken: 'test-token',
     });
-    mockExtractPermissions.mockReturnValue([
-      'read:simulations',
-      'create:invites',
-    ]);
+    mockExtractPermissions.mockReturnValue(['read:trials', 'create:invites']);
 
     const mod = await import('@/app/api/debug/auth/route');
     const res = await mod.GET();
     expect(res.status).toBe(200);
     expect(res.body).toEqual({
       userKeys: Object.keys(user),
-      permissions: ['read:simulations', 'create:invites'],
-      roles: ['recruiter'],
+      permissions: ['read:trials', 'create:invites'],
+      roles: ['talent_partner'],
     });
   });
 

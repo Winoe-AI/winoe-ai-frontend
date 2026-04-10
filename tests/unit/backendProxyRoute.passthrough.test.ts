@@ -37,13 +37,13 @@ describe('/api/backend proxy - passthrough responses', () => {
     const headers = init.headers as Headers | Record<string, string>;
     const requestId =
       typeof (headers as Headers).get === 'function'
-        ? (headers as Headers).get('x-tenon-request-id')
-        : (headers as Record<string, string>)['x-tenon-request-id'];
+        ? (headers as Headers).get('x-winoe-request-id')
+        : (headers as Record<string, string>)['x-winoe-request-id'];
     expect(requestId).toBe('req-test');
     expect(res.status).toBe(200);
     expect((res as FakeResponseShape).body).toEqual({ ok: true });
-    expect(res.headers.get('x-tenon-upstream-status')).toBe('200');
-    expect(res.headers.get('x-tenon-request-id')).toBe('req-test');
+    expect(res.headers.get('x-winoe-upstream-status')).toBe('200');
+    expect(res.headers.get('x-winoe-request-id')).toBe('req-test');
   });
 
   it('threads request signal to upstream call', async () => {

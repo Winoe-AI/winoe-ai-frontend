@@ -54,20 +54,20 @@ export async function forwardBffWithAuth(
   }
 }
 
-type RecruiterAuthHandler = (auth: {
+type TalentPartnerAuthHandler = (auth: {
   accessToken: string;
   cookies: NextResponse;
   requestId: string;
 }) => Promise<NextResponse>;
 
-export async function withRecruiterAuth(
+export async function withTalentPartnerAuth(
   req: NextRequest,
   options: { tag: string; requirePermission?: string },
-  handler: RecruiterAuthHandler,
+  handler: TalentPartnerAuthHandler,
 ): Promise<NextResponse> {
   const requestId = resolveRequestId(req.headers);
   const auth = await requireBffAuth(req, {
-    requirePermission: options.requirePermission ?? 'recruiter:access',
+    requirePermission: options.requirePermission ?? 'talent_partner:access',
   });
   if (!auth.ok) {
     mergeResponseCookies(auth.cookies, auth.response);

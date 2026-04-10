@@ -1,7 +1,8 @@
 import { useCallback, useRef } from 'react';
+import { emitDebugEvent } from '@/shared/analytics/debugEvents';
 
 const debugSession = ['1', 'true'].includes(
-  (process.env.NEXT_PUBLIC_TENON_DEBUG_PERF ?? '').toLowerCase(),
+  (process.env.NEXT_PUBLIC_WINOE_DEBUG_PERF ?? '').toLowerCase(),
 );
 
 export function usePerfMarks() {
@@ -33,8 +34,7 @@ export function usePerfMarks() {
         );
       } catch {}
       if (typeof start === 'number') {
-        // eslint-disable-next-line no-console
-        console.info(`[perf:ui] ${label}`, payload);
+        emitDebugEvent({ message: `[perf:ui] ${label}`, payload });
       }
     },
     [],

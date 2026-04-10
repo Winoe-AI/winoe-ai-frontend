@@ -1,43 +1,45 @@
 import {
   createRequest,
   mockForwardJson,
-  mockRecruiterAuthSuccess,
-} from './withRecruiterAuthRoute.testlib';
+  mockTalentPartnerAuthSuccess,
+} from './withTalentPartnerAuthRoute.testlib';
 
-describe('/api/simulations/[id]/invite route extra cases', () => {
+describe('/api/trials/[id]/invite route extra cases', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     jest.resetModules();
   });
 
   it('uses empty object when request body is missing', async () => {
-    mockRecruiterAuthSuccess('req-456');
+    mockTalentPartnerAuthSuccess('req-456');
     mockForwardJson.mockResolvedValue({});
 
-    const mod = await import('@/app/api/simulations/[id]/invite/route');
+    const mod = await import('@/app/api/trials/[id]/invite/route');
     const req = await createRequest(
-      'http://localhost/api/simulations/sim-2/invite',
+      'http://localhost/api/trials/trial-2/invite',
     );
-    await mod.POST(req as never, { params: Promise.resolve({ id: 'sim-2' }) });
+    await mod.POST(req as never, {
+      params: Promise.resolve({ id: 'trial-2' }),
+    });
 
     expect(mockForwardJson).toHaveBeenCalledWith(
       expect.objectContaining({ body: {} }),
     );
   });
 
-  it('encodes simulation id in upstream path', async () => {
-    mockRecruiterAuthSuccess('req-789');
+  it('encodes trial id in upstream path', async () => {
+    mockTalentPartnerAuthSuccess('req-789');
     mockForwardJson.mockResolvedValue({});
 
-    const mod = await import('@/app/api/simulations/[id]/invite/route');
+    const mod = await import('@/app/api/trials/[id]/invite/route');
     const req = await createRequest(
-      'http://localhost/api/simulations/sim%2F1/invite',
+      'http://localhost/api/trials/sim%2F1/invite',
       {},
     );
     await mod.POST(req as never, { params: Promise.resolve({ id: 'sim/1' }) });
 
     expect(mockForwardJson).toHaveBeenCalledWith(
-      expect.objectContaining({ path: '/api/simulations/sim%2F1/invite' }),
+      expect.objectContaining({ path: '/api/trials/sim%2F1/invite' }),
     );
   });
 });

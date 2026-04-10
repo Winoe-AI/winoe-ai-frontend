@@ -10,14 +10,14 @@ export const candidateDashboardMock = jest.fn(
     <div data-testid="candidate-dashboard">{signedInEmail ?? 'none'}</div>
   ),
 );
-export const recruiterDashboardMock = jest.fn(() => (
-  <div data-testid="recruiter-dashboard" />
+export const talentPartnerDashboardMock = jest.fn(() => (
+  <div data-testid="talent-partner-dashboard" />
 ));
-export const simulationDetailMock = jest.fn(() => (
-  <div data-testid="simulation-detail" />
+export const trialDetailMock = jest.fn(() => (
+  <div data-testid="trial-detail" />
 ));
-export const simulationCreateMock = jest.fn(() => (
-  <div data-testid="simulation-create" />
+export const trialCreateMock = jest.fn(() => (
+  <div data-testid="trial-create" />
 ));
 export const candidateSubmissionsMock = jest.fn(() => (
   <div data-testid="candidate-submissions" />
@@ -36,26 +36,29 @@ jest.mock('@/features/candidate/portal/CandidateDashboardPage', () => ({
   default: (props: { signedInEmail: string | null }) =>
     candidateDashboardMock(props),
 }));
-jest.mock('@/features/recruiter/dashboard/RecruiterDashboardPage', () => ({
-  __esModule: true,
-  default: () => recruiterDashboardMock(),
-}));
 jest.mock(
-  '@/features/recruiter/simulation-management/detail/RecruiterSimulationDetailPage',
+  '@/features/talent-partner/dashboard/TalentPartnerDashboardPage',
   () => ({
     __esModule: true,
-    default: () => simulationDetailMock(),
+    default: () => talentPartnerDashboardMock(),
   }),
 );
 jest.mock(
-  '@/features/recruiter/simulation-management/create/SimulationCreatePage',
+  '@/features/talent-partner/trial-management/detail/TalentPartnerTrialDetailPage',
   () => ({
     __esModule: true,
-    default: () => simulationCreateMock(),
+    default: () => trialDetailMock(),
   }),
 );
 jest.mock(
-  '@/features/recruiter/submission-review/CandidateSubmissionsPage',
+  '@/features/talent-partner/trial-management/create/TrialCreatePage',
+  () => ({
+    __esModule: true,
+    default: () => trialCreateMock(),
+  }),
+);
+jest.mock(
+  '@/features/talent-partner/submission-review/CandidateSubmissionsPage',
   () => ({
     __esModule: true,
     default: () => candidateSubmissionsMock(),

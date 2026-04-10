@@ -8,11 +8,11 @@ import {
 } from '@/platform/errors/errors';
 
 describe('lib/errors/errors', () => {
-  const originalDebugErrors = process.env.NEXT_PUBLIC_TENON_DEBUG_ERRORS;
+  const originalDebugErrors = process.env.NEXT_PUBLIC_WINOE_DEBUG_ERRORS;
   afterEach(() => {
     if (originalDebugErrors === undefined)
-      delete process.env.NEXT_PUBLIC_TENON_DEBUG_ERRORS;
-    else process.env.NEXT_PUBLIC_TENON_DEBUG_ERRORS = originalDebugErrors;
+      delete process.env.NEXT_PUBLIC_WINOE_DEBUG_ERRORS;
+    else process.env.NEXT_PUBLIC_WINOE_DEBUG_ERRORS = originalDebugErrors;
   });
 
   it('extracts status and detects not found', () => {
@@ -27,7 +27,7 @@ describe('lib/errors/errors', () => {
     expect(toUserMessage(new Error('boom'), 'fallback')).toBe('boom');
     expect(toUserMessage({ message: '  spaced  ' }, 'fallback')).toBe('spaced');
     expect(toUserMessage({}, 'fallback')).toBe('fallback');
-    process.env.NEXT_PUBLIC_TENON_DEBUG_ERRORS = 'TRUE';
+    process.env.NEXT_PUBLIC_WINOE_DEBUG_ERRORS = 'TRUE';
     expect(errorDetailEnabled()).toBe(true);
     expect(
       toUserMessage({ detail: 'detail msg', message: 'msg' }, 'fallback', {
@@ -42,7 +42,7 @@ describe('lib/errors/errors', () => {
   });
 
   it('redacts secrets in debug message paths', () => {
-    process.env.NEXT_PUBLIC_TENON_DEBUG_ERRORS = 'TRUE';
+    process.env.NEXT_PUBLIC_WINOE_DEBUG_ERRORS = 'TRUE';
     const bearer = new Error(
       'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.payload.signature',
     );
@@ -104,9 +104,9 @@ describe('lib/errors/errors', () => {
         .code,
     ).toBe('DETAILS_CODE');
 
-    delete process.env.NEXT_PUBLIC_TENON_DEBUG_ERRORS;
+    delete process.env.NEXT_PUBLIC_WINOE_DEBUG_ERRORS;
     expect(errorDetailEnabled()).toBe(false);
-    process.env.NEXT_PUBLIC_TENON_DEBUG_ERRORS = '1';
+    process.env.NEXT_PUBLIC_WINOE_DEBUG_ERRORS = '1';
     expect(errorDetailEnabled()).toBe(true);
   });
 });

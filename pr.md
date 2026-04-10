@@ -1,31 +1,31 @@
 ## 1. Title
 
-P2 Recruiter: Candidate comparison table (Fit Score + key subscores) inline on simulation detail candidates surface (#144)
+P2 Talent Partner: Candidate comparison table (Winoe Score + key subscores) inline on trial detail candidates surface (#144)
 
 ## 2. TL;DR
 
-- Added an inline recruiter `Compare candidates` table on the simulation detail candidates section for side-by-side decision support.
-- Added compare API/BFF plumbing for `GET /api/simulations/[id]/candidates/compare` and wired frontend consumption.
-- Rows with missing Fit Profiles show `—` for score/recommendation plus a `Generate Fit Profile` CTA.
+- Added an inline talent_partner `Compare candidates` table on the trial detail candidates section for side-by-side decision support.
+- Added compare API/BFF plumbing for `GET /api/trials/[id]/candidates/compare` and wired frontend consumption.
+- Rows with missing Winoe Reports show `—` for score/recommendation plus a `Generate Winoe Report` CTA.
 - Added explicit compare-state handling for `403`, `404`, and retryable generic failures with visible retry UI.
-- Added sortable table headers and quick links per row to `View Submissions` and `View Fit Profile`.
+- Added sortable table headers and quick links per row to `View Submissions` and `View Winoe Report`.
 
 ## 3. Problem / Why
 
-Recruiters needed a compact, decision-ready view to compare multiple candidate sessions without opening each candidate page. This improves decision speed for MVP/demo flows by surfacing Fit outcomes and next actions in one place.
+Talent Partners needed a compact, decision-ready view to compare multiple candidate sessions without opening each candidate page. This improves decision speed for MVP/demo flows by surfacing Fit outcomes and next actions in one place.
 
 ## 4. What changed
 
 ### UI surface
 
-- Added `CandidateCompareSection` and rendered it inline above the existing candidates table in simulation detail.
-- Added comparison columns for candidate identity, status, Fit Profile status, Fit Score, recommendation, strengths/risks, and actions.
-- Added quick row actions for submissions, Fit Profile, and Fit Profile generation when missing.
+- Added `CandidateCompareSection` and rendered it inline above the existing candidates table in trial detail.
+- Added comparison columns for candidate identity, status, Winoe Report status, Winoe Score, recommendation, strengths/risks, and actions.
+- Added quick row actions for submissions, Winoe Report, and Winoe Report generation when missing.
 
 ### Data/API integration
 
-- Added Next BFF route `src/app/api/simulations/[id]/candidates/compare/route.ts` that forwards to backend compare endpoint.
-- Added recruiter API client call `listSimulationCandidateCompare(...)`.
+- Added Next BFF route `src/app/api/trials/[id]/candidates/compare/route.ts` that forwards to backend compare endpoint.
+- Added talent_partner API client call `listTrialCandidateCompare(...)`.
 - Added typed normalization for compare payloads with resilient support for common backend field variants.
 
 ### State handling
@@ -46,44 +46,44 @@ Recruiters needed a compact, decision-ready view to compare multiple candidate s
 
 ### Tests
 
-- Added and updated unit/integration coverage for compare route forwarding, normalization, compare UI states/actions/sorting, and simulation detail integration flows.
+- Added and updated unit/integration coverage for compare route forwarding, normalization, compare UI states/actions/sorting, and trial detail integration flows.
 
 ## 5. Key implementation details
 
-- Compare section is placed inline in the simulation detail candidates section.
-- Added compare endpoint route: `/api/simulations/[id]/candidates/compare`.
+- Compare section is placed inline in the trial detail candidates section.
+- Added compare endpoint route: `/api/trials/[id]/candidates/compare`.
 - Added typed normalization layer for compare rows (`CandidateCompareRow` + normalization helpers).
-- Row actions include `View Submissions`, `View Fit Profile`, and conditional `Generate Fit Profile`.
-- Table headers are sortable (`Candidate`, `Status`, `Fit Profile`, `Fit Score`).
-- Compare polling runs while Fit Profiles are generating.
+- Row actions include `View Submissions`, `View Winoe Report`, and conditional `Generate Winoe Report`.
+- Table headers are sortable (`Candidate`, `Status`, `Winoe Report`, `Winoe Score`).
+- Compare polling runs while Winoe Reports are generating.
 - Visible compare error states are handled for `403`, `404`, and generic failures.
 
 ## 6. Files changed
 
 ### UI and hooks
 
-- `src/features/recruiter/simulations/detail/components/CandidateCompareSection.tsx`
-- `src/features/recruiter/simulations/detail/components/sections/CandidatesSection.tsx`
-- `src/features/recruiter/simulations/detail/hooks/useSimulationCandidatesCompare.ts`
+- `src/features/talent-partner/trials/detail/components/CandidateCompareSection.tsx`
+- `src/features/talent-partner/trials/detail/components/sections/CandidatesSection.tsx`
+- `src/features/talent-partner/trials/detail/hooks/useTrialCandidatesCompare.ts`
 
 ### API/BFF and normalization
 
-- `src/app/api/simulations/[id]/candidates/compare/route.ts`
-- `src/features/recruiter/api/candidates.ts`
-- `src/features/recruiter/api/candidatesCompare.ts`
-- `src/features/recruiter/api/candidatesCompareNormalize.ts`
+- `src/app/api/trials/[id]/candidates/compare/route.ts`
+- `src/features/talent-partner/api/candidates.ts`
+- `src/features/talent-partner/api/candidatesCompare.ts`
+- `src/features/talent-partner/api/candidatesCompareNormalize.ts`
 - `src/lib/server/backendProxy/requestSecurity.ts`
 
 ### Tests
 
-- `tests/integration/recruiter/SimulationDetailPageClient.test.tsx`
+- `tests/integration/talent-partner/TrialDetailPageClient.test.tsx`
 - `tests/unit/app/api/candidatesCompareRoute.test.ts`
-- `tests/unit/app/api/recruiterRoutes.test.ts`
+- `tests/unit/app/api/talentPartnerRoutes.test.ts`
 - `tests/unit/app/api/routesCoverage.test.ts`
 - `tests/unit/app/api/routesExtra.test.ts`
-- `tests/unit/features/recruiter/simulation-detail/candidatesCompareNormalize.test.ts`
-- `tests/unit/features/recruiter/simulation-detail/components/CandidateCompareSection.test.tsx`
-- `tests/unit/lib/recruiterApi.test.ts`
+- `tests/unit/features/talent-partner/trial-detail/candidatesCompareNormalize.test.ts`
+- `tests/unit/features/talent-partner/trial-detail/components/CandidateCompareSection.test.tsx`
+- `tests/unit/lib/talentPartnerApi.test.ts`
 
 ## 7. Testing
 
@@ -91,7 +91,7 @@ Recruiters needed a compact, decision-ready view to compare multiple candidate s
 
 Passed commands:
 
-- `npm test -- tests/unit/features/recruiter/simulation-detail/components/CandidateCompareSection.test.tsx tests/unit/features/recruiter/simulation-detail/candidatesCompareNormalize.test.ts tests/unit/app/api/candidatesCompareRoute.test.ts tests/unit/lib/recruiterApi.test.ts tests/integration/recruiter/SimulationDetailPageClient.test.tsx`
+- `npm test -- tests/unit/features/talent-partner/trial-detail/components/CandidateCompareSection.test.tsx tests/unit/features/talent-partner/trial-detail/candidatesCompareNormalize.test.ts tests/unit/app/api/candidatesCompareRoute.test.ts tests/unit/lib/talentPartnerApi.test.ts tests/integration/talent-partner/TrialDetailPageClient.test.tsx`
 - `npm run typecheck`
 - `npm run lint`
 - `npm run build`
@@ -121,10 +121,10 @@ Final precommit test totals:
 
 ## 10. Rollout / demo notes
 
-- Open a simulation with 2 candidates.
-- Show one row with `—` plus `Generate Fit Profile`.
+- Open a trial with 2 candidates.
+- Show one row with `—` plus `Generate Winoe Report`.
 - Show one ready row with score/recommendation.
-- Show `View Submissions` and `View Fit Profile` links.
+- Show `View Submissions` and `View Winoe Report` links.
 - Show compare error handling when compare backend is unavailable.
 
 ## 11. Manual QA evidence
@@ -137,10 +137,10 @@ PASS — ready for PR raise
 
 - Compare section presence
 - 2-row rendering
-- Partial row with `—` and `Generate Fit Profile`
-- Ready row with Fit Score and recommendation
+- Partial row with `—` and `Generate Winoe Report`
+- Ready row with Winoe Score and recommendation
 - Submissions navigation
-- Fit Profile navigation
+- Winoe Report navigation
 - Sorting interactions
 - `403` / `404` / generic error UI behavior
 - Retry recovery
@@ -148,7 +148,7 @@ PASS — ready for PR raise
 
 ### Environment used
 
-- Frontend branch: `feature/candidate-comparison-table-for-a-simulation-144`
+- Frontend branch: `feature/candidate-comparison-table-for-a-trial-144`
 - Frontend commit: `83d83bc5d6b46ddc9fcf109689b7c614396edbd3`
 - Backend branch: `main`
 - Backend commit: `97ba5ad1866bd1887f580b3a71a933d4e8dcda97`

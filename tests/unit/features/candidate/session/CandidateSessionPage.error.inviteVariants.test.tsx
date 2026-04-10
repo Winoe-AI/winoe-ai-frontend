@@ -39,14 +39,14 @@ describe('CandidateSessionPage error states - invite error variants', () => {
     await act(async () => render(<CandidateSessionPage token="inv" />));
     await waitFor(() =>
       expect(screen.getByTestId('state-message')).toHaveTextContent(
-        'Unable to load simulation',
+        'Unable to load trial',
       ),
     );
     const retryButton = screen.getByRole('button', { name: /Retry/i });
     resolveInviteMock.mockResolvedValue({
       candidateSessionId: 99,
       status: 'in_progress',
-      simulation: { title: 'Sim', role: 'Role' },
+      trial: { title: 'Sim', role: 'Role' },
     });
     fireEvent.click(retryButton);
     await waitFor(() => expect(resolveInviteMock).toHaveBeenCalledTimes(2));

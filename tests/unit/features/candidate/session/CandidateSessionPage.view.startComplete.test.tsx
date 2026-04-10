@@ -36,7 +36,7 @@ describe('CandidateSessionPage view - completion and start state', () => {
     render(<CandidateSessionPage token="inv" />);
     await waitFor(() =>
       expect(screen.getByTestId('state-message')).toHaveTextContent(
-        'Simulation complete',
+        'Trial complete',
       ),
     );
   });
@@ -59,7 +59,7 @@ describe('CandidateSessionPage view - completion and start state', () => {
       }),
     );
     await act(async () => render(<CandidateSessionPage token="inv" />));
-    fireEvent.click(screen.getByRole('button', { name: /Start simulation/i }));
+    fireEvent.click(screen.getByRole('button', { name: /Start trial/i }));
     await waitFor(() => expect(getCurrentTaskMock).toHaveBeenCalled());
   });
 

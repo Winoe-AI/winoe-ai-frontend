@@ -5,7 +5,7 @@ type CandidateSessionSkeletonProps = {
 };
 
 export function CandidateSessionSkeleton({
-  message = 'Preparing your simulation…',
+  message = 'Preparing your trial…',
 }: CandidateSessionSkeletonProps) {
   return (
     <div className="p-6">

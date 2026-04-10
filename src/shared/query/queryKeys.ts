@@ -10,57 +10,52 @@ function keyPart(value: string | number | null | undefined): QueryKeyPart {
 }
 
 export const queryKeys = {
-  recruiter: {
-    dashboard: () => ['recruiter', 'dashboard'] as const,
-    simulationsList: () => ['recruiter', 'simulations', 'list'] as const,
-    simulationDetail: (simulationId: string | number) =>
-      ['recruiter', 'simulations', keyPart(simulationId), 'detail'] as const,
-    simulationCandidates: (simulationId: string | number) =>
+  talentPartner: {
+    dashboard: () => ['talent_partner', 'dashboard'] as const,
+    trialsList: () => ['talent_partner', 'trials', 'list'] as const,
+    trialDetail: (trialId: string | number) =>
+      ['talent_partner', 'trials', keyPart(trialId), 'detail'] as const,
+    trialCandidates: (trialId: string | number) =>
+      ['talent_partner', 'trials', keyPart(trialId), 'candidates'] as const,
+    trialCompare: (trialId: string | number) =>
       [
-        'recruiter',
-        'simulations',
-        keyPart(simulationId),
-        'candidates',
-      ] as const,
-    simulationCompare: (simulationId: string | number) =>
-      [
-        'recruiter',
-        'simulations',
-        keyPart(simulationId),
+        'talent_partner',
+        'trials',
+        keyPart(trialId),
         'candidates-compare',
       ] as const,
     candidateSubmissions: (
-      simulationId: string | number,
+      trialId: string | number,
       candidateSessionId: string | number,
     ) =>
       [
-        'recruiter',
-        'simulations',
-        keyPart(simulationId),
+        'talent_partner',
+        'trials',
+        keyPart(trialId),
         'candidate-sessions',
         keyPart(candidateSessionId),
         'submissions',
       ] as const,
     candidateSubmissionArtifacts: (
-      simulationId: string | number,
+      trialId: string | number,
       candidateSessionId: string | number,
       submissionIds: number[],
     ) =>
       [
-        'recruiter',
-        'simulations',
-        keyPart(simulationId),
+        'talent_partner',
+        'trials',
+        keyPart(trialId),
         'candidate-sessions',
         keyPart(candidateSessionId),
         'submission-artifacts',
         ...submissionIds,
       ] as const,
-    fitProfileStatus: (candidateSessionId: string | number) =>
+    winoeReportStatus: (candidateSessionId: string | number) =>
       [
-        'recruiter',
+        'talent_partner',
         'candidate-sessions',
         keyPart(candidateSessionId),
-        'fit-profile-status',
+        'winoe-report-status',
       ] as const,
   },
   candidate: {

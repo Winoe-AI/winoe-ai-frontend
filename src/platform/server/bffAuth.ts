@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { envFlagEnabled } from '@/platform/config/envFlags';
 import { auth0, getSessionNormalized } from '@/platform/auth0';
 import { extractPermissions, hasPermission } from '@/platform/auth0/claims';
 import { normalizeAccessToken } from '@/platform/auth0/helpers';
@@ -25,7 +26,9 @@ export async function requireBffAuth(
   options?: { requirePermission?: string },
 ): Promise<AuthResult> {
   const cookieCarrier = NextResponse.next();
-  const start = process.env.TENON_DEBUG_PERF ? Date.now() : null;
+  const start = envFlagEnabled(process.env.WINOE_DEBUG_PERF)
+    ? Date.now()
+    : null;
   const logPerf = (status: string) => {
     if (start === null) return;
     // eslint-disable-next-line no-console

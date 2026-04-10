@@ -26,7 +26,7 @@ export async function submitCandidateSchedule({
   session.setBootstrap({
     candidateSessionId: response.candidateSessionId,
     status: bootstrap?.status ?? 'in_progress',
-    simulation: bootstrap?.simulation ?? { title: '', role: '' },
+    trial: bootstrap?.trial ?? { title: '', role: '' },
     aiNoticeText: bootstrap?.aiNoticeText ?? '',
     aiNoticeVersion: bootstrap?.aiNoticeVersion ?? 'mvp1',
     evalEnabledByDay: bootstrap?.evalEnabledByDay ?? {},

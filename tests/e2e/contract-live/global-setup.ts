@@ -11,7 +11,7 @@ import {
   resolveStorageDir,
 } from '../flow-qa/global-setup.paths';
 
-type LiveRole = 'recruiter' | 'candidate';
+type LiveRole = 'talent_partner' | 'candidate';
 
 type LiveIdentity = {
   connection: string;
@@ -41,10 +41,10 @@ function resolveSupportedEnvPaths(repoRoot: string): string[] {
     path.join(repoRoot, '.env'),
     path.resolve(repoRoot, '..', '.env.local'),
     path.resolve(repoRoot, '..', '.env'),
-    path.resolve(repoRoot, '..', 'Tenon-Envs', '.env.local'),
-    path.resolve(repoRoot, '..', 'Tenon-Envs', '.env'),
-    path.resolve(repoRoot, '..', '..', 'Tenon-Envs', '.env.local'),
-    path.resolve(repoRoot, '..', '..', 'Tenon-Envs', '.env'),
+    path.resolve(repoRoot, '..', 'Winoe-Envs', '.env.local'),
+    path.resolve(repoRoot, '..', 'Winoe-Envs', '.env'),
+    path.resolve(repoRoot, '..', '..', 'Winoe-Envs', '.env.local'),
+    path.resolve(repoRoot, '..', '..', 'Winoe-Envs', '.env'),
   ];
 }
 
@@ -57,22 +57,22 @@ function requireEnv(key: string, envMap: EnvMap): string {
 }
 
 function resolveIdentity(role: LiveRole, envMap: EnvMap): LiveIdentity {
-  if (role === 'recruiter') {
+  if (role === 'talent_partner') {
     return {
       connection: requireEnv(
-        'NEXT_PUBLIC_TENON_AUTH0_RECRUITER_CONNECTION',
+        'NEXT_PUBLIC_WINOE_AUTH0_TALENT_PARTNER_CONNECTION',
         envMap,
       ),
-      email: requireEnv('QA_E2E_RECRUITER_EMAIL', envMap),
-      fileName: 'recruiter-only.json',
-      mode: 'recruiter',
-      password: requireEnv('QA_E2E_RECRUITER_PASSWORD', envMap),
+      email: requireEnv('QA_E2E_TALENT_PARTNER_EMAIL', envMap),
+      fileName: 'talent-partner-only.json',
+      mode: 'talent_partner',
+      password: requireEnv('QA_E2E_TALENT_PARTNER_PASSWORD', envMap),
       returnTo: '/dashboard',
     };
   }
   return {
     connection: requireEnv(
-      'NEXT_PUBLIC_TENON_AUTH0_CANDIDATE_CONNECTION',
+      'NEXT_PUBLIC_WINOE_AUTH0_CANDIDATE_CONNECTION',
       envMap,
     ),
     email: requireEnv('QA_E2E_CANDIDATE_EMAIL', envMap),
@@ -211,7 +211,7 @@ export default async function globalSetup(config: FullConfig) {
 
   await fs.mkdir(storageDir, { recursive: true });
 
-  for (const role of ['recruiter', 'candidate'] as const) {
+  for (const role of ['talent_partner', 'candidate'] as const) {
     const identity = resolveIdentity(role, envMap);
     await createStorageState({
       baseURL,

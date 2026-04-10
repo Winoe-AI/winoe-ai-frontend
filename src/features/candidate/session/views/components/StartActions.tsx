@@ -12,7 +12,7 @@ export function StartActions({ onStart, onDashboard }: Props) {
         Start Day 1 now. You can return anytime to continue where you left off.
       </div>
       <div className="mt-3 flex flex-wrap gap-3">
-        <Button onClick={onStart}>Start simulation</Button>
+        <Button onClick={onStart}>Start trial</Button>
         <Button variant="secondary" onClick={onDashboard}>
           Back to Candidate Dashboard
         </Button>

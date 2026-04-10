@@ -29,12 +29,14 @@ export const publicAuthRoutes: RouteDefinition[] = [
     userType: 'public',
     interactionPattern: 'Auth gateway',
     complexity: 'low',
-    resolveRoute: () => '/auth/login?mode=recruiter',
+    resolveRoute: () => '/auth/login?mode=talent_partner',
     ready: async (page) =>
       waitForAnyVisible([
         () =>
           expect(
-            page.getByRole('heading', { name: /sign in|recruiter login/i }),
+            page.getByRole('heading', {
+              name: /sign in|talent_partner login/i,
+            }),
           ).toBeVisible({ timeout: 10_000 }),
         async () =>
           page.waitForURL(/auth0\.com\/u\/login|\/authorize/i, {
@@ -73,7 +75,7 @@ export const publicAuthRoutes: RouteDefinition[] = [
     userType: 'public',
     interactionPattern: 'Auth failure',
     complexity: 'low',
-    resolveRoute: () => '/auth/error?error=state_mismatch&mode=recruiter',
+    resolveRoute: () => '/auth/error?error=state_mismatch&mode=talent_partner',
     ready: async (page) =>
       expect(
         page.getByRole('heading', { name: /sign-in failed/i }),
@@ -89,7 +91,7 @@ export const publicAuthRoutes: RouteDefinition[] = [
     userType: 'public',
     interactionPattern: 'Access denied state',
     complexity: 'low',
-    resolveRoute: () => '/not-authorized?mode=recruiter',
+    resolveRoute: () => '/not-authorized?mode=talent_partner',
     ready: async (page) =>
       expect(
         page.getByRole('heading', { name: /not authorized/i }),

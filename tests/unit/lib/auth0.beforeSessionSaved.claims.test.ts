@@ -34,7 +34,7 @@ describe('lib/auth0 beforeSessionSaved claim precedence', () => {
     await importAuth0();
     const payload = Buffer.from(
       JSON.stringify({
-        'https://tenon.ai/permissions_str': 'perm1, perm2,perm3  perm4',
+        'https://winoe.ai/permissions_str': 'perm1, perm2,perm3  perm4',
       }),
     ).toString('base64url');
     const result = await getAuth0Config().beforeSessionSaved(
@@ -46,17 +46,17 @@ describe('lib/auth0 beforeSessionSaved claim precedence', () => {
     );
   });
 
-  it('derives recruiter and candidate permissions from role claims', async () => {
+  it('derives talent_partner and candidate permissions from role claims', async () => {
     await importAuth0();
     const payload = Buffer.from(
-      JSON.stringify({ roles: ['SuperRecruiter', 'CandidateAdmin'] }),
+      JSON.stringify({ roles: ['SuperTalentPartner', 'CandidateAdmin'] }),
     ).toString('base64url');
     const result = await getAuth0Config().beforeSessionSaved(
       { user: {} },
       `x.${payload}.y`,
     );
     expect(result.user.permissions).toEqual(
-      expect.arrayContaining(['recruiter:access', 'candidate:access']),
+      expect.arrayContaining(['talent_partner:access', 'candidate:access']),
     );
   });
 
@@ -78,7 +78,7 @@ describe('lib/auth0 beforeSessionSaved claim precedence', () => {
       JSON.stringify({ roles: ['TokenRole'] }),
     ).toString('base64url');
     const rRes = await config.beforeSessionSaved(
-      { user: { 'https://tenon.ai/roles': ['UserRole'] } },
+      { user: { 'https://winoe.ai/roles': ['UserRole'] } },
       `x.${rPayload}.y`,
     );
     expect(rRes.user.roles).toContain('UserRole');

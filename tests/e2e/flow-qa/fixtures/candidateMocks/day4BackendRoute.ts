@@ -21,7 +21,7 @@ export async function handleDay4BackendRoute(
     await fulfillJson(route, {
       candidateSessionId: params.candidateSessionId,
       status: 'in_progress',
-      simulation: {
+      trial: {
         title: 'Frontend Platform Modernization',
         role: 'Senior Frontend Engineer',
       },

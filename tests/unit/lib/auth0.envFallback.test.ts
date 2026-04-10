@@ -22,7 +22,7 @@ describe('lib/auth0 env fallback behavior', () => {
   });
 
   it('falls back to stub auth when required env vars are missing', async () => {
-    delete process.env.TENON_AUTH0_SECRET;
+    delete process.env.WINOE_AUTH0_SECRET;
     const { auth0, getAccessToken } = await importAuth0();
     await expect(auth0.middleware()).resolves.toBeDefined();
     await expect(getAccessToken()).rejects.toThrow(

@@ -53,21 +53,21 @@ describe('bff helpers', () => {
   });
 
   it('getFetchDispatcher returns undefined when flag disabled or env lacks undici', () => {
-    process.env.TENON_USE_FETCH_DISPATCHER = '0';
+    process.env.WINOE_USE_FETCH_DISPATCHER = '0';
     expect(getFetchDispatcher()).toBeUndefined();
-    delete process.env.TENON_USE_FETCH_DISPATCHER;
+    delete process.env.WINOE_USE_FETCH_DISPATCHER;
   });
 
   it('readRequestId and resolveRequestId fall back properly', () => {
-    const headers = new Headers({ 'x-tenon-request-id': 'abc' });
+    const headers = new Headers({ 'x-winoe-request-id': 'abc' });
     expect(readRequestId(headers)).toBe('abc');
     expect(resolveRequestId(headers, 'fallback')).toBe('abc');
     expect(resolveRequestId(undefined, 'fallback')).toBe('fallback');
   });
 
   it('getBackendBaseUrl strips trailing /api', () => {
-    process.env.TENON_BACKEND_BASE_URL = 'http://x/api';
+    process.env.WINOE_BACKEND_BASE_URL = 'http://x/api';
     expect(getBackendBaseUrl()).toBe('http://x');
-    process.env.TENON_BACKEND_BASE_URL = undefined;
+    process.env.WINOE_BACKEND_BASE_URL = undefined;
   });
 });

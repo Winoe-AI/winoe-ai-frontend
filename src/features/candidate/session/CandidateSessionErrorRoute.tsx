@@ -19,10 +19,10 @@ export function CandidateSessionErrorRoute({
   const inviteLinkError = [400, 404, 409, 410].includes(errorStatus ?? 0);
   const errorTitle = inviteLinkError
     ? 'Invite link unavailable'
-    : 'Unable to load simulation';
+    : 'Unable to load trial';
   const errorCopy = inviteLinkError
     ? inviteErrorCopy
-    : (errorMessage ?? 'Something went wrong loading your simulation.');
+    : (errorMessage ?? 'Something went wrong loading your trial.');
 
   return (
     <ErrorView

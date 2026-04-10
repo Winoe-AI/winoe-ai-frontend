@@ -15,7 +15,7 @@ Options:
   --skip-build          Skip build + analyze + perf summaries
   --skip-analyze        Skip analyze step (bundle analyzer build)
   --skip-lighthouse     Skip Lighthouse captures
-  --skip-gap-tests      Skip running gap/a11y tests under tenon-frontend/tests
+  --skip-gap-tests      Skip running gap/a11y tests under winoe-frontend/tests
   --no-cert-gates       Do not enforce certification pass/fail gates
   --refresh-scope-manifest  Regenerate qa scope-manifest.json from current repo state
   --keep-server         Do not stop server if this script started it
@@ -780,7 +780,7 @@ const extractStates = (rawText) => {
   const states = [];
   if (/\bloading\b|isloading|aria-busy/.test(text)) states.push('loading');
   if (
-    /\bempty\b|no\s+results|no\s+data|no\s+simulations|no\s+submissions|empty state/.test(
+    /\bempty\b|no\s+results|no\s+data|no\s+trials|no\s+submissions|empty state/.test(
       text,
     )
   )
@@ -1476,7 +1476,7 @@ ${failures.length === 0
 ### Tests with Real Assertions ✅
 - Backend proxy chain tests assert real request/response/error behavior ('backendProxyRoute.test.ts', 'app/api/backendProxy.test.ts').
 - Candidate workspace/tests flows use interaction-heavy assertions ('WorkspacePanel*', 'RunTestsPanel*', candidate session integration suites).
-- Recruiter detail and submissions paths have scenario/invite/termination behavioral checks.
+- TalentPartner detail and submissions paths have scenario/invite/termination behavioral checks.
 
 ### Tests with Coverage-Only Marking ⚠️ (high coverage, lower signal)
 - Coverage instrumentation pattern appears in **${jest.coverageInstrumentedFiles ?? 'n/a'}** test files ('__coverage__' mutation).
@@ -1651,7 +1651,7 @@ Last run: ${runLocal} (${runUtc})
 ## Per-Component A11y Status
 | Component | Labels | Keyboard | ARIA | Focus | Overall |
 |-----------|--------|----------|------|-------|---------|
-| SimulationCreateForm | ✅ | ✅ | ✅ | N/A | ✅ |
+| TrialCreateForm | ✅ | ✅ | ✅ | N/A | ✅ |
 | InviteCandidateModal | ✅ | ✅ | ⚠️ | ⚠️ | ⚠️ |
 | CandidateTaskView / TaskTextInput | ⚠️ | ✅ | ⚠️ | N/A | ⚠️ |
 | CandidatesTable | ✅ | ✅ | ✅ | N/A | ✅ |

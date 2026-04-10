@@ -34,7 +34,7 @@ test.describe('Candidate empty/error/timeout states', () => {
     );
 
     await page.goto(`/candidate/session/${QA_INVITE_TOKEN}`);
-    await expect(page.getByText(/unable to load simulation/i)).toBeVisible();
+    await expect(page.getByText(/unable to load trial/i)).toBeVisible();
     await expect(page.getByRole('button', { name: /^retry$/i })).toBeVisible();
   });
 
@@ -58,7 +58,7 @@ test.describe('Candidate empty/error/timeout states', () => {
     });
 
     await page.goto(`/candidate/session/${QA_INVITE_TOKEN}`);
-    await page.getByRole('button', { name: /start simulation/i }).click();
+    await page.getByRole('button', { name: /start trial/i }).click();
     await expect(page.getByText(/^day 2 •/i)).toBeVisible();
     await page.getByRole('button', { name: /run tests/i }).click();
     await expect(

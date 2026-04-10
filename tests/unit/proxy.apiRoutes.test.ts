@@ -31,7 +31,7 @@ describe('proxy - public and api routes', () => {
     getSessionNormalizedMock.mockResolvedValue(null);
 
     const res = await proxy(
-      new NextRequest(new URL('http://localhost/api/simulations')),
+      new NextRequest(new URL('http://localhost/api/trials')),
     );
     expect(res?.status).toBe(200);
     expect(res?.headers.get('location')).toBeNull();

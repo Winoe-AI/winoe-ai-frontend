@@ -74,12 +74,12 @@ describe('auth clear route extra coverage', () => {
   });
 
   afterEach(() => {
-    delete process.env.TENON_AUTH0_COOKIE_DOMAIN;
+    delete process.env.WINOE_AUTH0_COOKIE_DOMAIN;
     jest.resetModules();
   });
 
   it('ignores empty cookie domain env', async () => {
-    process.env.TENON_AUTH0_COOKIE_DOMAIN = '   ';
+    process.env.WINOE_AUTH0_COOKIE_DOMAIN = '   ';
     jest.resetModules();
     const { GET } = await import('@/app/(auth)/auth/clear/route');
     const req = new NextRequest('http://test.example.com/auth/clear');

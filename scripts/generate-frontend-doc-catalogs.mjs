@@ -40,10 +40,10 @@ function splitCamel(value) {
 
 function inferAudience(relPath) {
   const candidate = relPath.includes('/candidate/');
-  const recruiter = relPath.includes('/recruiter/');
-  if (candidate && recruiter) return 'both';
+  const talent_partner = relPath.includes('/talent_partner/');
+  if (candidate && talent_partner) return 'both';
   if (candidate) return 'candidate';
-  if (recruiter) return 'recruiter';
+  if (talent - partner) return 'talent_partner';
   if (
     relPath.includes('/auth/') ||
     relPath.includes('/marketing/') ||
@@ -633,7 +633,7 @@ function inferHookSideEffects(body) {
   if (
     body.includes('requestWithMeta') ||
     body.includes('apiClient') ||
-    body.includes('recruiterBffClient') ||
+    body.includes('talentPartnerBffClient') ||
     body.includes('fetch(')
   ) {
     tags.push('network I/O');

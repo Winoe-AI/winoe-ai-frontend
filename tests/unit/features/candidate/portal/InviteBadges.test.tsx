@@ -5,9 +5,9 @@ import type { CandidateInvite } from '@/features/candidate/session/api';
 const baseInvite: CandidateInvite = {
   candidateSessionId: 1,
   token: 't',
-  title: 'Simulation',
+  title: 'Trial',
   role: 'Engineer',
-  company: 'Tenon',
+  company: 'Winoe',
   status: 'in_progress',
   progress: { completed: 1, total: 5 },
   expiresAt: null,

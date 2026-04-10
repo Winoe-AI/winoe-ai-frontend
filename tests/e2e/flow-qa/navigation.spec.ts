@@ -6,7 +6,7 @@ import {
   installCandidateSessionMocks,
   makeCandidateTask,
 } from './fixtures/candidateMocks';
-import { installRecruiterApiMocks } from './fixtures/recruiterMocks';
+import { installTalentPartnerApiMocks } from './fixtures/talent-partnerMocks';
 
 test.describe('Navigation Flows', () => {
   test('marketing auth CTA points to Auth0 start and supports keyboard focus', async ({
@@ -18,20 +18,20 @@ test.describe('Navigation Flows', () => {
     await page.keyboard.press('Tab');
     await expect(skipLink).toBeFocused();
 
-    const recruiterLoginLink = page.getByRole('link', {
-      name: /recruiter login/i,
+    const talentPartnerLoginLink = page.getByRole('link', {
+      name: /talent-partner login/i,
     });
-    await expect(recruiterLoginLink).toHaveAttribute(
+    await expect(talentPartnerLoginLink).toHaveAttribute(
       'href',
-      /\/auth\/start\?returnTo=%2Fdashboard&mode=recruiter&connection=Tenon-Recruiters/i,
+      /\/auth\/start\?returnTo=%2Fdashboard&mode=talent_partner&connection=Winoe-TalentPartners/i,
     );
   });
 
-  test.describe('Recruiter navigation', () => {
-    test.use({ storageState: storageStates.recruiterOnly });
+  test.describe('TalentPartner navigation', () => {
+    test.use({ storageState: storageStates.talentPartnerOnly });
 
-    test('dashboard to create simulation and back', async ({ page }) => {
-      await installRecruiterApiMocks(page);
+    test('dashboard to create trial and back', async ({ page }) => {
+      await installTalentPartnerApiMocks(page);
 
       await page.goto('/dashboard');
       await expect(page).toHaveURL('/dashboard');
@@ -39,10 +39,10 @@ test.describe('Navigation Flows', () => {
         page.getByRole('heading', { name: /dashboard/i }),
       ).toBeVisible();
 
-      await page.getByRole('link', { name: /new simulation/i }).click();
-      await expect(page).toHaveURL('/dashboard/simulations/new');
+      await page.getByRole('link', { name: /new trial/i }).click();
+      await expect(page).toHaveURL('/dashboard/trials/new');
       await expect(
-        page.getByRole('heading', { name: /new simulation/i }),
+        page.getByRole('heading', { name: /new trial/i }),
       ).toBeVisible();
 
       await page.getByRole('button', { name: /^back$/i }).click();

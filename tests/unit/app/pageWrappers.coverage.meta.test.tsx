@@ -31,7 +31,7 @@ describe('page wrapper metadata + layouts', () => {
     expect(React.isValidElement(layout)).toBe(true);
   });
 
-  it('imports auth, candidate, recruiter, and marketing layouts', async () => {
+  it('imports auth, candidate, talent_partner, and marketing layouts', async () => {
     const { default: AuthLayout } = await import('@/app/(auth)/layout');
     expect(React.isValidElement(await renderLayoutElement(AuthLayout))).toBe(
       true,
@@ -43,10 +43,10 @@ describe('page wrapper metadata + layouts', () => {
       React.isValidElement(await renderLayoutElement(CandidateLayout)),
     ).toBe(true);
 
-    const { default: RecruiterLayout } =
-      await import('@/app/(recruiter)/layout');
+    const { default: TalentPartnerLayout } =
+      await import('@/app/(talent-partner)/layout');
     expect(
-      React.isValidElement(await renderLayoutElement(RecruiterLayout)),
+      React.isValidElement(await renderLayoutElement(TalentPartnerLayout)),
     ).toBe(true);
 
     const { default: MarketingLayout } =

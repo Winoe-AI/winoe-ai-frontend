@@ -24,7 +24,7 @@ test('candidate Day 4 handoff upload flow hydrates and reaches transcript ready'
   const bootstrapResponse = await bootstrapResponsePromise;
   expect(bootstrapResponse.status()).toBe(200);
   await expect(page).toHaveURL(`/candidate/session/${QA_INVITE_TOKEN}`);
-  const startButton = page.getByRole('button', { name: /start simulation/i });
+  const startButton = page.getByRole('button', { name: /start trial/i });
   if ((await startButton.count()) > 0) {
     await startButton.first().click();
   }

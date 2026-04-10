@@ -7,6 +7,10 @@ const root = process.cwd();
 const summaryPath = path.join(root, 'coverage/coverage-summary.json');
 const finalPath = path.join(root, 'coverage/coverage-final.json');
 
+function writeStderr(message) {
+  process.stderr.write(`${message}\n`);
+}
+
 function readTotals() {
   if (fs.existsSync(summaryPath)) {
     const data = JSON.parse(fs.readFileSync(summaryPath, 'utf8'));
@@ -45,7 +49,7 @@ function readTotals() {
     return pctTotals;
   }
 
-  console.error(
+  writeStderr(
     'Coverage files not found (coverage-summary.json or coverage-final.json).',
   );
   process.exit(1);
@@ -73,7 +77,7 @@ function main() {
   console.log(`Coverage summary -> ${report}`);
 
   if (primaryPct < target) {
-    console.error(
+    writeStderr(
       `Coverage below required threshold: ${primaryPct.toFixed(2)}% lines (needs >= ${target}%)`,
     );
     process.exit(1);

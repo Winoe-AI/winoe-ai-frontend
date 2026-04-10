@@ -42,7 +42,7 @@ describe('CandidateSessionPage error states - task fetch failures', () => {
     await waitFor(() => expect(getCurrentTaskMock).toHaveBeenCalled());
     await waitFor(() =>
       expect(screen.getByTestId('state-message')).toHaveTextContent(
-        'Unable to load simulation',
+        'Unable to load trial',
       ),
     );
   });
@@ -51,7 +51,7 @@ describe('CandidateSessionPage error states - task fetch failures', () => {
     resolveInviteMock.mockResolvedValue({
       candidateSessionId: 99,
       status: 'in_progress',
-      simulation: { title: 'Sim', role: 'Role' },
+      trial: { title: 'Sim', role: 'Role' },
     });
     getCurrentTaskMock.mockRejectedValue({ status: 500 });
     const state = baseState();
@@ -117,9 +117,7 @@ describe('CandidateSessionPage error states - task fetch failures', () => {
     );
     await act(async () => render(<CandidateSessionPage token="inv" />));
     await waitFor(() =>
-      expect(
-        screen.getByText(/Unable to load simulation/i),
-      ).toBeInTheDocument(),
+      expect(screen.getByText(/Unable to load trial/i)).toBeInTheDocument(),
     );
     const initialCallCount = getCurrentTaskMock.mock.calls.length;
     fireEvent.click(screen.getByRole('button', { name: /Retry/i }));

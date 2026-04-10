@@ -24,13 +24,13 @@ describe('candidate error messages', () => {
       'Network error',
     );
     expect(friendlyBootstrapError(new HttpError(502, ''))).toBe(
-      'Something went wrong loading your simulation.',
+      'Something went wrong loading your trial.',
     );
     expect(
       friendlyBootstrapError({ message: 'Custom bootstrap message' }),
     ).toContain('Network error');
     expect(friendlyBootstrapError(new HttpError(503, '   '))).toBe(
-      'Something went wrong loading your simulation.',
+      'Something went wrong loading your trial.',
     );
   });
 

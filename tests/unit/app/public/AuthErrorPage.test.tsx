@@ -6,7 +6,7 @@ describe('AuthErrorPage', () => {
     render(
       <AuthErrorPage
         returnTo="/dashboard"
-        mode="recruiter"
+        mode="talent_partner"
         errorCode="invalid_state"
         errorId="trace-123"
       />,
@@ -15,12 +15,12 @@ describe('AuthErrorPage', () => {
     const retry = screen.getByRole('link', { name: 'Retry sign-in' });
     expect(retry).toHaveAttribute(
       'href',
-      '/auth/start?returnTo=%2Fdashboard&mode=recruiter',
+      '/auth/start?returnTo=%2Fdashboard&mode=talent_partner',
     );
     const clear = screen.getByRole('link', { name: 'Clear auth state' });
     expect(clear).toHaveAttribute(
       'href',
-      '/auth/clear?returnTo=%2Fdashboard&mode=recruiter',
+      '/auth/clear?returnTo=%2Fdashboard&mode=talent_partner',
     );
     expect(screen.getByText(/Code: invalid_state/i)).toBeInTheDocument();
     expect(screen.getByText(/Trace ID: trace-123/i)).toBeInTheDocument();

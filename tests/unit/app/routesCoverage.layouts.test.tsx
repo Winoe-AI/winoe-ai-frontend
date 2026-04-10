@@ -52,17 +52,19 @@ describe('routes coverage layouts', () => {
     );
   });
 
-  it('renders recruiter and candidate shell layouts', async () => {
+  it('renders talent_partner and candidate shell layouts', async () => {
     const { default: CandidateLayout } =
       await import('@/app/(candidate)/layout');
     expect(
       CandidateLayout({ children: <div data-testid="candidate-child" /> }),
     ).toBeTruthy();
 
-    const { default: RecruiterLayout } =
-      await import('@/app/(recruiter)/layout');
+    const { default: TalentPartnerLayout } =
+      await import('@/app/(talent-partner)/layout');
     expect(
-      RecruiterLayout({ children: <div data-testid="recruiter-child" /> }),
+      TalentPartnerLayout({
+        children: <div data-testid="talent_partner-child" />,
+      }),
     ).toBeTruthy();
   });
 });

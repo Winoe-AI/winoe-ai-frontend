@@ -9,7 +9,7 @@ type CompleteViewProps = {
 export function CompleteView({ onReview, onDashboard }: CompleteViewProps) {
   return (
     <StateMessage
-      title="Simulation complete 🎉"
+      title="Trial complete 🎉"
       description="You’ve submitted all 5 days. Review your completed work any time from the candidate dashboard."
       action={
         <div className="flex flex-wrap gap-2">

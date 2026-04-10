@@ -6,9 +6,9 @@ import type { CandidateInvite } from '@/features/candidate/session/api';
 const baseInvite: CandidateInvite = {
   candidateSessionId: 1,
   token: null,
-  title: 'Backend Simulation',
+  title: 'Backend Trial',
   role: 'Backend Engineer',
-  company: 'Tenon',
+  company: 'Winoe',
   status: 'not_started',
   progress: { completed: 0, total: 5 },
   expiresAt: null,
@@ -27,7 +27,7 @@ describe('InviteCard', () => {
       />,
     );
 
-    const button = screen.getByRole('button', { name: /start simulation/i });
+    const button = screen.getByRole('button', { name: /start trial/i });
     expect(button).toBeDisabled();
     await userEvent.click(button);
     expect(onContinue).not.toHaveBeenCalled();
@@ -43,7 +43,7 @@ describe('InviteCard', () => {
       />,
     );
 
-    const button = screen.getByRole('button', { name: /start simulation/i });
+    const button = screen.getByRole('button', { name: /start trial/i });
     expect(button).toBeEnabled();
     await userEvent.click(button);
     expect(onContinue).toHaveBeenCalled();

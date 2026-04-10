@@ -18,7 +18,7 @@ export async function GET(
     {
       path: `/api/submissions/${encodeURIComponent(submissionId)}`,
       tag: 'submission-detail',
-      requirePermission: 'recruiter:access',
+      requirePermission: 'talent_partner:access',
     },
     _req,
   );

@@ -27,6 +27,6 @@ describe('/api/backend proxy - upstream timeout failures', () => {
     expect((res as FakeResponseShape).body).toEqual(
       expect.objectContaining({ message: 'Upstream request failed' }),
     );
-    expect(res.headers.get('x-tenon-request-id')).toBe('req-test');
+    expect(res.headers.get('x-winoe-request-id')).toBe('req-test');
   });
 });

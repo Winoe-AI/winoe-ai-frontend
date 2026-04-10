@@ -32,14 +32,14 @@ test.describe('Candidate Completion Flow', () => {
 
     expect(bootstrapResponse.status()).toBe(200);
     await expect(page).toHaveURL(`/candidate/session/${QA_INVITE_TOKEN}`);
-    await expect(page.getByText(/simulation complete/i)).toBeVisible();
+    await expect(page.getByText(/trial complete/i)).toBeVisible();
     await expect(
       page.getByText(
         /you.{0,2}ve submitted all 5 days\. you can close this tab now\./i,
       ),
     ).toBeVisible();
     await expect(
-      page.getByRole('button', { name: /start simulation/i }),
+      page.getByRole('button', { name: /start trial/i }),
     ).toHaveCount(0);
 
     const loadMs = Date.now() - startMs;

@@ -6,10 +6,12 @@ import {
 
 function connectionForMode(mode?: LoginMode): string | null {
   if (mode === 'candidate') {
-    return process.env.NEXT_PUBLIC_TENON_AUTH0_CANDIDATE_CONNECTION ?? null;
+    return process.env.NEXT_PUBLIC_WINOE_AUTH0_CANDIDATE_CONNECTION ?? null;
   }
-  if (mode === 'recruiter') {
-    return process.env.NEXT_PUBLIC_TENON_AUTH0_RECRUITER_CONNECTION ?? null;
+  if (mode === 'talent_partner') {
+    return (
+      process.env.NEXT_PUBLIC_WINOE_AUTH0_TALENT_PARTNER_CONNECTION ?? null
+    );
   }
   return null;
 }
@@ -20,7 +22,7 @@ function resolveLogoutOrigin(): string | null {
   }
 
   const candidates = [
-    process.env.NEXT_PUBLIC_TENON_APP_BASE_URL,
+    process.env.NEXT_PUBLIC_WINOE_APP_BASE_URL,
     process.env.NEXT_PUBLIC_VERCEL_URL
       ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
       : null,
@@ -51,7 +53,7 @@ function buildAbsoluteReturnTo(returnTo?: string): string | null {
 export function buildLoginHref(returnTo?: string, mode?: LoginMode): string {
   const params = new URLSearchParams();
   params.set('returnTo', buildReturnTo(returnTo));
-  params.set('mode', mode ?? 'recruiter');
+  params.set('mode', mode ?? 'talent_partner');
   return `/auth/login?${params.toString()}`;
 }
 
@@ -59,10 +61,10 @@ export function buildSignupHref(returnTo?: string, mode?: LoginMode): string {
   return buildAuthStartHref(returnTo, mode, 'signup');
 }
 
-export function buildRecruiterOnboardingHref(returnTo?: string): string {
+export function buildTalentPartnerOnboardingHref(returnTo?: string): string {
   const params = new URLSearchParams();
   params.set('returnTo', buildReturnTo(returnTo || '/dashboard'));
-  return `/recruiter-onboarding?${params.toString()}`;
+  return `/talent-partner-onboarding?${params.toString()}`;
 }
 
 export function buildAuthStartHref(
@@ -84,7 +86,7 @@ function buildAuthHref({
 }): string {
   const params = new URLSearchParams();
   params.set('returnTo', buildReturnTo(returnTo));
-  const resolvedMode = mode ?? 'recruiter';
+  const resolvedMode = mode ?? 'talent_partner';
   params.set('mode', resolvedMode);
   const connection = connectionForMode(resolvedMode);
   if (connection) params.set('connection', connection);

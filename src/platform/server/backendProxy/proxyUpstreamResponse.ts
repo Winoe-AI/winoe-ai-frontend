@@ -32,7 +32,7 @@ export async function buildBackendProxySuccessResponse({
   response.headers.delete('location');
   response.headers.set(REQUEST_ID_HEADER, requestId);
 
-  const meta = (upstream as unknown as { _tenonMeta?: unknown })._tenonMeta as
+  const meta = (upstream as unknown as { _winoeMeta?: unknown })._winoeMeta as
     | { attempts?: number; durationMs?: number }
     | undefined;
   if (meta) {

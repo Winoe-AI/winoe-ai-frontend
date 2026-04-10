@@ -31,7 +31,7 @@ export function sanitizeMarkdownUrl(url: string): string {
   }
 
   try {
-    const parsed = new URL(candidate, 'https://tenon.ai');
+    const parsed = new URL(candidate, 'https://winoe.ai');
     if (!SAFE_PROTOCOLS.has(parsed.protocol.toLowerCase())) return '';
     return candidate;
   } catch {

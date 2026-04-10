@@ -3,13 +3,13 @@ import {
   safeRequest,
   login,
   isSameOriginRequest,
-  recruiterBffClient,
+  talentPartnerBffClient,
   __resetHttpClientCache,
 } from '@/platform/api-client/client';
 import { responseHelpers } from '../setup';
 
 const realFetch = global.fetch;
-const originalDebug = process.env.NEXT_PUBLIC_TENON_DEBUG_PERF;
+const originalDebug = process.env.NEXT_PUBLIC_WINOE_DEBUG_PERF;
 
 export const setupHttpClientBranchTest = () => {
   __resetHttpClientCache();
@@ -18,7 +18,7 @@ export const setupHttpClientBranchTest = () => {
 
 export const teardownHttpClientBranchTest = () => {
   (global.fetch as jest.Mock).mockReset?.();
-  process.env.NEXT_PUBLIC_TENON_DEBUG_PERF = originalDebug;
+  process.env.NEXT_PUBLIC_WINOE_DEBUG_PERF = originalDebug;
 };
 
 export const restoreHttpClientBranchTest = () => {
@@ -30,6 +30,6 @@ export {
   safeRequest,
   login,
   isSameOriginRequest,
-  recruiterBffClient,
+  talentPartnerBffClient,
   responseHelpers,
 };

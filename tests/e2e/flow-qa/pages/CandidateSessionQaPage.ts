@@ -10,8 +10,8 @@ export class CandidateSessionQaPage extends BasePage {
     await this.goto(`/candidate/session/${token}`);
   }
 
-  async startSimulation() {
-    await this.clickButton(/start simulation/i);
+  async startTrial() {
+    await this.clickButton(/start trial/i);
   }
 
   async expectDay(day: number) {

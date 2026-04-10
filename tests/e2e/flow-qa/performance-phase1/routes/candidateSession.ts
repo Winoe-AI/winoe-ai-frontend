@@ -19,7 +19,7 @@ export const candidateSessionRoutes: RouteDefinition[] = [
       waitForAnyVisible([
         () =>
           expect(
-            page.getByRole('button', { name: /start simulation/i }),
+            page.getByRole('button', { name: /start trial/i }),
           ).toBeVisible({ timeout: 15_000 }),
         () =>
           expect(
@@ -51,7 +51,7 @@ export const candidateSessionRoutes: RouteDefinition[] = [
       await waitForAnyVisible([
         () =>
           expect(
-            page.getByRole('button', { name: /start simulation/i }),
+            page.getByRole('button', { name: /start trial/i }),
           ).toBeVisible({ timeout: 15_000 }),
         () =>
           expect(page.locator('textarea').first()).toBeVisible({

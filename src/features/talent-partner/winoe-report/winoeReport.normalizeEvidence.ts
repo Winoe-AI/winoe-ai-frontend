@@ -1,0 +1,23 @@
+import type { WinoeReportEvidence } from './winoeReport.types';
+import {
+  asRecord,
+  toNullableString,
+  toNumberOrNull,
+} from './winoeReport.normalize.base';
+
+export function normalizeEvidence(value: unknown): WinoeReportEvidence | null {
+  const record = asRecord(value);
+  if (!record) return null;
+  const kind = toNullableString(record.kind);
+  if (!kind) return null;
+  const startMs = toNumberOrNull(record.startMs ?? record.start_ms);
+  const endMs = toNumberOrNull(record.endMs ?? record.end_ms);
+  return {
+    kind,
+    ref: toNullableString(record.ref),
+    url: toNullableString(record.url),
+    excerpt: toNullableString(record.excerpt),
+    startMs: startMs === null ? null : Math.max(0, Math.round(startMs)),
+    endMs: endMs === null ? null : Math.max(0, Math.round(endMs)),
+  };
+}

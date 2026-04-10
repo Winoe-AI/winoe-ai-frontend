@@ -29,7 +29,7 @@ test.describe('Candidate Day 5 Flow', () => {
     });
     const sessionPage = new CandidateSessionQaPage(page);
     await sessionPage.gotoWithToken(QA_INVITE_TOKEN);
-    await sessionPage.startSimulation();
+    await sessionPage.startTrial();
     await sessionPage.expectDay(5);
     await expect(page.getByText(/^day 5 • documentation$/i)).toBeVisible();
     const submitButton = page.getByRole('button', {
@@ -86,7 +86,7 @@ test.describe('Candidate Day 5 Flow', () => {
     await submitButton.click();
     const submitResponse = await submitResponsePromise;
     expect(submitResponse.status()).toBe(200);
-    await expect(page.getByText(/simulation complete/i)).toBeVisible({
+    await expect(page.getByText(/trial complete/i)).toBeVisible({
       timeout: 8000,
     });
   });

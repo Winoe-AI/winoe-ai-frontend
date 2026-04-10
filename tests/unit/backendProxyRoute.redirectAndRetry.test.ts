@@ -32,9 +32,9 @@ describe('/api/backend proxy - redirect and retry behavior', () => {
       message: 'Upstream redirect blocked',
       upstreamStatus: 302,
     });
-    expect(res.headers.get('x-tenon-upstream-status')).toBe('302');
+    expect(res.headers.get('x-winoe-upstream-status')).toBe('302');
     expect(res.headers.get('location')).toBeNull();
-    expect(res.headers.get('x-tenon-request-id')).toBe('req-test');
+    expect(res.headers.get('x-winoe-request-id')).toBe('req-test');
   });
 
   it('retries GET on transient errors', async () => {
@@ -54,6 +54,6 @@ describe('/api/backend proxy - redirect and retry behavior', () => {
 
     expect(fetchMock).toHaveBeenCalledTimes(2);
     expect(res.status).toBe(200);
-    expect(res.headers.get('x-tenon-upstream-status')).toBe('200');
+    expect(res.headers.get('x-winoe-upstream-status')).toBe('200');
   });
 });

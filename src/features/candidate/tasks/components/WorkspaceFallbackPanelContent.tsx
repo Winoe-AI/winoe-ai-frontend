@@ -59,8 +59,8 @@ export function WorkspaceFallbackPanelContent({
         </Button>
       </div>
       <p className="mt-2 text-xs text-amber-900">
-        Local clone fallback is disabled for this simulation. Retry while the
-        shared Codespace finishes provisioning.
+        Local clone fallback is disabled for this trial. Retry while the shared
+        Codespace finishes provisioning.
       </p>
     </section>
   );

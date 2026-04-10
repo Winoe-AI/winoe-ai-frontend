@@ -4,7 +4,7 @@ import {
   redirect,
   redirectNotAuthorized,
   requiresCandidateAccess,
-  requiresRecruiterAccess,
+  requiresTalentPartnerAccess,
 } from '@/platform/auth/proxyUtils';
 import { extractPermissions, hasPermission } from '@/platform/auth0/claims';
 import type { Claims } from '@/platform/auth/claimsDecode';
@@ -22,7 +22,7 @@ export const redirectSignedInHome = (
     (session as { user?: unknown }).user as Claims | null | undefined,
     accessToken,
   );
-  if (hasPermission(permissions, 'recruiter:access'))
+  if (hasPermission(permissions, 'talent_partner:access'))
     return redirect('/dashboard', request);
   if (hasPermission(permissions, 'candidate:access'))
     return redirect('/candidate/dashboard', request);
@@ -34,15 +34,15 @@ export const gateByRole = (
   permissions: string[],
   request: NextRequest,
 ) => {
-  const wantsRecruiter = requiresRecruiterAccess(pathname);
+  const wantsTalentPartner = requiresTalentPartnerAccess(pathname);
   const wantsCandidate = requiresCandidateAccess(pathname);
-  const hasRecruiter = hasPermission(permissions, 'recruiter:access');
+  const hasTalentPartner = hasPermission(permissions, 'talent_partner:access');
   const hasCandidate = hasPermission(permissions, 'candidate:access');
 
-  if (wantsRecruiter && !hasRecruiter) {
-    return redirectNotAuthorized(request, 'recruiter');
+  if (wantsTalentPartner && !hasTalentPartner) {
+    return redirectNotAuthorized(request, 'talent_partner');
   }
-  if (wantsCandidate && hasRecruiter && !hasCandidate) {
+  if (wantsCandidate && hasTalentPartner && !hasCandidate) {
     return redirectNotAuthorized(request, 'candidate');
   }
   return null;

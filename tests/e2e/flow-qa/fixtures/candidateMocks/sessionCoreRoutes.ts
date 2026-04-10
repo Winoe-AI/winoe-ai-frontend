@@ -17,8 +17,8 @@ export async function handleSessionCoreRoute(
   params: {
     token: string;
     candidateSessionId: number;
-    simulationTitle: string;
-    simulationRole: string;
+    trialTitle: string;
+    trialRole: string;
     submitted: boolean;
     options: CandidateSessionMockOptions;
     state: CandidateSessionMockState;
@@ -35,9 +35,9 @@ export async function handleSessionCoreRoute(
         status: params.options.isCompleteInitially
           ? 'completed'
           : 'in_progress',
-        simulation: {
-          title: params.simulationTitle,
-          role: params.simulationRole,
+        trial: {
+          title: params.trialTitle,
+          role: params.trialRole,
         },
       }),
     );

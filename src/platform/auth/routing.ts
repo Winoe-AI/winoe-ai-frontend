@@ -1,6 +1,6 @@
 import type { NextRequest } from 'next/server';
 
-export type LoginMode = 'candidate' | 'recruiter';
+export type LoginMode = 'candidate' | 'talent_partner';
 
 const CANDIDATE_PREFIXES = ['/candidate-sessions', '/candidate'];
 const AUTH_PREFIXES = ['/auth', '/api/auth'];
@@ -57,7 +57,7 @@ export function sanitizeReturnTo(value: string | null | undefined): string {
 export function modeForPath(pathname: string): LoginMode {
   return CANDIDATE_PREFIXES.some((prefix) => pathname.startsWith(prefix))
     ? 'candidate'
-    : 'recruiter';
+    : 'talent_partner';
 }
 
 type ReturnToInput = NextRequest | Location | URL | string | null | undefined;

@@ -7,13 +7,13 @@ jest.mock('next/navigation', () => ({
 }));
 
 describe('NavigationPerfLogger', () => {
-  const originalEnv = process.env.NEXT_PUBLIC_TENON_DEBUG_PERF;
+  const originalEnv = process.env.NEXT_PUBLIC_WINOE_DEBUG_PERF;
   const consoleLogSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
 
   beforeEach(() => {
     jest.clearAllMocks();
     usePathnameMock.mockReturnValue('/dashboard');
-    process.env.NEXT_PUBLIC_TENON_DEBUG_PERF = 'true';
+    process.env.NEXT_PUBLIC_WINOE_DEBUG_PERF = 'true';
     Object.defineProperty(globalThis, 'performance', {
       configurable: true,
       value: {
@@ -24,7 +24,7 @@ describe('NavigationPerfLogger', () => {
   });
 
   afterAll(() => {
-    process.env.NEXT_PUBLIC_TENON_DEBUG_PERF = originalEnv;
+    process.env.NEXT_PUBLIC_WINOE_DEBUG_PERF = originalEnv;
     consoleLogSpy.mockRestore();
     const globalWithPerf = globalThis as { performance?: Performance };
     delete globalWithPerf.performance;
@@ -40,7 +40,7 @@ describe('NavigationPerfLogger', () => {
   });
 
   it('skips logging when debug flag disabled', async () => {
-    process.env.NEXT_PUBLIC_TENON_DEBUG_PERF = '0';
+    process.env.NEXT_PUBLIC_WINOE_DEBUG_PERF = '0';
     const { NavigationPerfLogger } =
       await import('@/shared/analytics/NavigationPerfLogger');
     render(<NavigationPerfLogger />);

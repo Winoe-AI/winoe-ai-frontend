@@ -1,6 +1,6 @@
 export {
   apiClient,
-  recruiterBffClient,
+  talentPartnerBffClient,
   bffClient,
   httpRequest,
   httpRequestWithMeta,

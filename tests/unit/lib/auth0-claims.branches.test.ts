@@ -14,7 +14,7 @@ describe('auth0-claims branch coverage', () => {
   it('retains user permissions when already present', () => {
     const claims = normalizeUserClaims({
       permissions: ['keep'],
-      'https://tenon.dev/perms': ['ns'],
+      'https://winoe.dev/perms': ['ns'],
     });
     expect(claims.permissions).toEqual(['keep']);
   });

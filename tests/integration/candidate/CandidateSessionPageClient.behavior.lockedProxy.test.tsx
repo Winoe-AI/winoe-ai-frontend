@@ -42,12 +42,10 @@ describe('CandidateSessionPage auth flow locked bootstrap and backend proxy', ()
     });
     renderSessionPage('locked-token');
     expect(
-      await screen.findByText(/Simulation locked until start/i),
+      await screen.findByText(/Trial locked until start/i),
     ).toBeInTheDocument();
     expect(screen.getByText(/Day windows/i)).toBeInTheDocument();
-    expect(
-      screen.queryByRole('button', { name: /Start simulation/i }),
-    ).toBeNull();
+    expect(screen.queryByRole('button', { name: /Start trial/i })).toBeNull();
     expect(
       fetchMock.mock.calls.find(([url]) =>
         String(url).includes('/current_task'),
@@ -55,7 +53,7 @@ describe('CandidateSessionPage auth flow locked bootstrap and backend proxy', ()
     ).toBeUndefined();
   });
 
-  it('loads simulation through /api/backend proxy and then loads current task', async () => {
+  it('loads trial through /api/backend proxy and then loads current task', async () => {
     fetchMock.mockImplementation(async (url: RequestInfo | URL) => {
       if (String(url).endsWith('/candidate/session/valid-token')) {
         return jsonResponse(
@@ -102,7 +100,7 @@ describe('CandidateSessionPage auth flow locked bootstrap and backend proxy', ()
       expect.objectContaining({ method: 'GET' }),
     );
     await user.click(
-      await screen.findByRole('button', { name: /Start simulation/i }),
+      await screen.findByRole('button', { name: /Start trial/i }),
     );
     await waitFor(() =>
       expect(fetchMock).toHaveBeenCalledWith(

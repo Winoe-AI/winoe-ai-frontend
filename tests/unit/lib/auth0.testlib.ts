@@ -104,11 +104,11 @@ export function resetAuth0TestEnv() {
   jest.resetModules();
   jest.clearAllMocks();
   Object.assign(process.env, originalEnv, {
-    TENON_AUTH0_SECRET: 's',
-    TENON_AUTH0_DOMAIN: 'd',
-    TENON_AUTH0_CLIENT_ID: 'cid',
-    TENON_AUTH0_CLIENT_SECRET: 'cs',
-    TENON_APP_BASE_URL: 'http://localhost:3000',
+    WINOE_AUTH0_SECRET: 's',
+    WINOE_AUTH0_DOMAIN: 'd',
+    WINOE_AUTH0_CLIENT_ID: 'cid',
+    WINOE_AUTH0_CLIENT_SECRET: 'cs',
+    WINOE_APP_BASE_URL: 'http://localhost:3000',
   });
 }
 

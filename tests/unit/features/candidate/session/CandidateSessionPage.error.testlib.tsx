@@ -91,7 +91,7 @@ export const baseState = () => ({
     bootstrap: {
       candidateSessionId: 99,
       status: 'in_progress' as const,
-      simulation: { title: 'Sim', role: 'Role' },
+      trial: { title: 'Sim', role: 'Role' },
     },
     started: true,
     taskState: {
@@ -130,7 +130,7 @@ export const primeErrorApiMocks = () => {
   resolveInviteMock.mockResolvedValue({
     candidateSessionId: 99,
     status: 'in_progress',
-    simulation: { title: 'Sim', role: 'Role' },
+    trial: { title: 'Sim', role: 'Role' },
   });
   getCurrentTaskMock.mockResolvedValue({
     isComplete: false,

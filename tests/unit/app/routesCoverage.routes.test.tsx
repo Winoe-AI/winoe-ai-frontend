@@ -6,21 +6,21 @@ describe('routes coverage nested pages', () => {
     resetPageWrapperMocks();
   });
 
-  it('renders recruiter nested pages', async () => {
-    const { default: RecruiterDashboardPage } =
-      await import('@/app/(recruiter)/dashboard/page');
-    expect(await RecruiterDashboardPage()).toBeTruthy();
+  it('renders talent_partner nested pages', async () => {
+    const { default: TalentPartnerDashboardPage } =
+      await import('@/app/(talent-partner)/dashboard/page');
+    expect(await TalentPartnerDashboardPage()).toBeTruthy();
 
     const { default: SimDetailPage } =
-      await import('@/app/(recruiter)/dashboard/simulations/[id]/page');
+      await import('@/app/(talent-partner)/dashboard/trials/[id]/page');
     render(await SimDetailPage());
 
     const { default: CandidatesPage } =
-      await import('@/app/(recruiter)/dashboard/simulations/[id]/candidates/[candidateSessionId]/page');
+      await import('@/app/(talent-partner)/dashboard/trials/[id]/candidates/[candidateSessionId]/page');
     render(await CandidatesPage());
 
     const { default: NewSimPage } =
-      await import('@/app/(recruiter)/dashboard/simulations/new/page');
+      await import('@/app/(talent-partner)/dashboard/trials/new/page');
     render(await NewSimPage());
   });
 

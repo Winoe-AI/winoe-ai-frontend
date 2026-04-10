@@ -21,7 +21,7 @@ const responseWithJson = (status: number, json: unknown) =>
 describe('API routes extra coverage - dashboard unauthorized', () => {
   afterEach(resetRoutesExtraMocks);
 
-  it('returns forbidden when simulations unauthorized', async () => {
+  it('returns forbidden when trials unauthorized', async () => {
     mockRequireBffAuth.mockResolvedValue({
       ok: true,
       accessToken: 'token-dash',

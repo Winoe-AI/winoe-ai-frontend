@@ -12,7 +12,7 @@ export class MarketingPage extends BasePage {
 
   async expectSignedOutHome() {
     await this.expectHeading(/welcome to/i);
-    await this.expectVisibleText(/recruiter login/i);
+    await this.expectVisibleText(/talent-partner login/i);
     await this.expectVisibleText(/candidate portal/i);
   }
 }

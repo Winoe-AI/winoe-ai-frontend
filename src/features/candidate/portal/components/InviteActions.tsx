@@ -20,7 +20,7 @@ export function InviteActions({
     invite.status === 'completed'
       ? 'Review submissions'
       : invite.status === 'not_started'
-        ? 'Start simulation'
+        ? 'Start trial'
         : 'Continue';
 
   return (

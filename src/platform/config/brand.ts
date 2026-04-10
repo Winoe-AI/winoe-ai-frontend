@@ -1,9 +1,9 @@
-export const BRAND_NAME = 'Tenon';
-export const BRAND_SLUG = 'tenon';
-export const BRAND_DOMAIN = 'tenon.ai';
+export const BRAND_NAME = 'Winoe';
+export const BRAND_SLUG = 'winoe';
+export const BRAND_DOMAIN = 'winoe.ai';
 
 const RAW_CLAIM_NAMESPACE =
-  process.env.NEXT_PUBLIC_TENON_AUTH0_CLAIM_NAMESPACE?.trim() ||
+  process.env.NEXT_PUBLIC_WINOE_AUTH0_CLAIM_NAMESPACE?.trim() ||
   `https://${BRAND_DOMAIN}`;
 
 export const CUSTOM_CLAIM_NAMESPACE = RAW_CLAIM_NAMESPACE.endsWith('/')

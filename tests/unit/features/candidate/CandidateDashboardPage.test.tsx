@@ -38,9 +38,9 @@ describe('CandidateDashboardPage', () => {
       {
         candidateSessionId: 1,
         token: 'INV123',
-        title: 'Infra Simulation',
+        title: 'Infra Trial',
         role: 'Backend Engineer',
-        company: 'Tenon',
+        company: 'Winoe',
         status: 'in_progress',
         progress: { completed: 2, total: 5 },
         expiresAt: '2025-01-01',
@@ -49,7 +49,7 @@ describe('CandidateDashboardPage', () => {
       },
     ]);
     renderPage();
-    expect(await screen.findByText(/Infra Simulation/i)).toBeInTheDocument();
+    expect(await screen.findByText(/Infra Trial/i)).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: /Continue/i }));
     expect(routerMock.push).toHaveBeenCalledWith('/candidate/session/INV123');
   });
@@ -65,7 +65,7 @@ describe('CandidateDashboardPage', () => {
       {
         candidateSessionId: 1,
         token: 'INV999',
-        title: 'Old Simulation',
+        title: 'Old Trial',
         role: 'Backend',
         company: null,
         status: 'expired',
@@ -76,9 +76,9 @@ describe('CandidateDashboardPage', () => {
       },
     ]);
     renderPage();
-    expect(await screen.findByText(/Old Simulation/i)).toBeInTheDocument();
+    expect(await screen.findByText(/Old Trial/i)).toBeInTheDocument();
     const cta = screen.getByRole('button', {
-      name: /Start simulation|Continue/i,
+      name: /Start trial|Continue/i,
     });
     expect(cta).toBeDisabled();
   });

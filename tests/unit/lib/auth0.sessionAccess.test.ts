@@ -27,7 +27,7 @@ describe('lib/auth0 session and access-token helpers', () => {
     const { getSessionNormalized } = await importAuth0();
     expect(Auth0ClientMock).toHaveBeenCalled();
     expect(getAuth0Config().authorizationParameters).toEqual(
-      expect.objectContaining({ scope: process.env.TENON_AUTH0_SCOPE }),
+      expect.objectContaining({ scope: process.env.WINOE_AUTH0_SCOPE }),
     );
 
     mockAuth0Instance.getSession.mockResolvedValue({
@@ -39,7 +39,7 @@ describe('lib/auth0 session and access-token helpers', () => {
   });
 
   it('logs perf timing when debug perf is enabled', async () => {
-    process.env.TENON_DEBUG_PERF = '1';
+    process.env.WINOE_DEBUG_PERF = '1';
     const consoleSpy = jest.spyOn(console, 'log').mockImplementation(() => {});
     mockAuth0Instance.getSession.mockResolvedValue({
       user: { permissions: ['p1'] },
@@ -49,7 +49,7 @@ describe('lib/auth0 session and access-token helpers', () => {
     await getSessionNormalized();
     expect(consoleSpy).toHaveBeenCalled();
     consoleSpy.mockRestore();
-    delete process.env.TENON_DEBUG_PERF;
+    delete process.env.WINOE_DEBUG_PERF;
   });
 
   it('passes request through to getSession and returns raw no-user sessions', async () => {

@@ -5,11 +5,11 @@ import {
 } from '@/platform/errors/errors';
 
 describe('lib/errors/errors extra coverage', () => {
-  const originalDebugErrors = process.env.NEXT_PUBLIC_TENON_DEBUG_ERRORS;
+  const originalDebugErrors = process.env.NEXT_PUBLIC_WINOE_DEBUG_ERRORS;
   afterEach(() => {
     if (originalDebugErrors === undefined)
-      delete process.env.NEXT_PUBLIC_TENON_DEBUG_ERRORS;
-    else process.env.NEXT_PUBLIC_TENON_DEBUG_ERRORS = originalDebugErrors;
+      delete process.env.NEXT_PUBLIC_WINOE_DEBUG_ERRORS;
+    else process.env.NEXT_PUBLIC_WINOE_DEBUG_ERRORS = originalDebugErrors;
   });
 
   it('toStatus returns null for non-object', () => {
@@ -47,7 +47,7 @@ describe('lib/errors/errors extra coverage', () => {
   });
 
   it('uses detail message only when enabled and non-empty', () => {
-    process.env.NEXT_PUBLIC_TENON_DEBUG_ERRORS = '1';
+    process.env.NEXT_PUBLIC_WINOE_DEBUG_ERRORS = '1';
     expect(
       toUserMessage({ detail: 'detail text', message: '' }, 'fallback', {
         includeDetail: true,
@@ -79,7 +79,7 @@ describe('lib/errors/errors extra coverage', () => {
   });
 
   it('redacts token-like values in debug output', () => {
-    process.env.NEXT_PUBLIC_TENON_DEBUG_ERRORS = '1';
+    process.env.NEXT_PUBLIC_WINOE_DEBUG_ERRORS = '1';
     expect(
       toUserMessage(
         { message: 'Failed: ?refresh_token=abc123&auth_token=xyz789' },

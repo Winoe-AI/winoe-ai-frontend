@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import { forwardJson } from '@/platform/server/bff';
-import { withRecruiterAuth } from '@/app/api/bffRouteHelpers';
+import { withTalentPartnerAuth } from '@/app/api/bffRouteHelpers';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -8,9 +8,9 @@ export const revalidate = 0;
 export const fetchCache = 'force-no-store';
 
 export async function GET(req: NextRequest) {
-  return withRecruiterAuth(
+  return withTalentPartnerAuth(
     req,
-    { tag: 'auth-me', requirePermission: 'recruiter:access' },
+    { tag: 'auth-me', requirePermission: 'talent_partner:access' },
     async (auth) =>
       forwardJson({
         path: '/api/auth/me',

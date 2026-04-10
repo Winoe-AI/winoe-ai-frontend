@@ -39,7 +39,7 @@ describe('CandidateSessionPage view - running and closed-day recorded links', ()
 
   it('hydrates recorded submission reference from persisted storage', async () => {
     window.localStorage.setItem(
-      'tenon:candidate:recordedSubmission:99:33',
+      'winoe:candidate:recordedSubmission:99:33',
       JSON.stringify({ submissionId: 77, submittedAt: '2026-03-05T17:10:00Z' }),
     );
     const state = baseState();
@@ -87,7 +87,7 @@ describe('CandidateSessionPage view - running and closed-day recorded links', ()
 
   it('prefers canonical recorded submission over persisted fallback', async () => {
     window.localStorage.setItem(
-      'tenon:candidate:recordedSubmission:99:33',
+      'winoe:candidate:recordedSubmission:99:33',
       JSON.stringify({ submissionId: 77, submittedAt: '2026-03-05T17:10:00Z' }),
     );
     const state = baseState();

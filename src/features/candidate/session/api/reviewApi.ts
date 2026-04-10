@@ -39,7 +39,7 @@ export async function getCandidateCompletedReview(
         );
       }
       if (status === 409) {
-        throw new HttpError(409, 'This simulation is not complete yet.');
+        throw new HttpError(409, 'This trial is not complete yet.');
       }
 
       throw new HttpError(

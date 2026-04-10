@@ -69,7 +69,10 @@ describe('routes coverage auth + global errors', () => {
       await import('@/app/(auth)/not-authorized/page');
     render(
       await NotAuthorizedPage({
-        searchParams: Promise.resolve({ mode: 'recruiter', returnTo: '/dest' }),
+        searchParams: Promise.resolve({
+          mode: 'talent_partner',
+          returnTo: '/dest',
+        }),
       }),
     );
     expect(screen.getAllByTestId('link')[1]).toHaveAttribute('href', '/dest');

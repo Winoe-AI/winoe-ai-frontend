@@ -72,8 +72,8 @@ export async function forwardJson(options: ForwardOptions) {
         [REQUEST_ID_HEADER]: requestId,
       },
     });
-    const meta = (upstream as unknown as { _tenonMeta?: unknown })
-      ._tenonMeta as { attempts?: number; durationMs?: number } | undefined;
+    const meta = (upstream as unknown as { _winoeMeta?: unknown })
+      ._winoeMeta as { attempts?: number; durationMs?: number } | undefined;
     if (meta) {
       const retryCount = Math.max(0, (meta.attempts ?? 1) - 1);
       response.headers.set(

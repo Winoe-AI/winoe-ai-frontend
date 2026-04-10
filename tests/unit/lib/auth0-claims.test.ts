@@ -22,11 +22,11 @@ describe('auth0-claims helpers', () => {
   it('normalizes namespaced permissions, roles, and email', () => {
     const claims = normalizeUserClaims({
       [CUSTOM_CLAIM_PERMISSIONS]: ['a'],
-      [CUSTOM_CLAIM_ROLES]: ['Recruiter'],
+      [CUSTOM_CLAIM_ROLES]: ['TalentPartner'],
       [CUSTOM_CLAIM_EMAIL]: '  user@test.com ',
     });
     expect(claims.permissions).toEqual(['a']);
-    expect(claims.roles).toEqual(['Recruiter']);
+    expect(claims.roles).toEqual(['TalentPartner']);
     expect(claims.email).toBe('user@test.com');
   });
 
@@ -42,11 +42,11 @@ describe('auth0-claims helpers', () => {
 
     const token = makeJwt({
       [CUSTOM_CLAIM_PERMISSIONS]: ['p2'],
-      [CUSTOM_CLAIM_ROLES]: ['Recruiter'],
+      [CUSTOM_CLAIM_ROLES]: ['TalentPartner'],
     });
     const permsFromToken = extractPermissions({}, token);
     expect(permsFromToken).toEqual(
-      expect.arrayContaining(['p2', 'recruiter:access']),
+      expect.arrayContaining(['p2', 'talent_partner:access']),
     );
   });
 

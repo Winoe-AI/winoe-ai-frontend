@@ -8,7 +8,7 @@ import {
 test.describe('Live Integration Lane: Candidate', () => {
   test.use({ storageState: storageStates.candidateOnly });
 
-  test('candidate dashboard loads and recruiter routes are blocked', async ({
+  test('candidate dashboard loads and talent_partner routes are blocked', async ({
     page,
   }) => {
     // Untimed warm-up pass so cold compile does not skew perf assertions.
@@ -44,7 +44,7 @@ test.describe('Live Integration Lane: Candidate', () => {
     expect(dashboardMs).toBeLessThan(CANDIDATE_DASHBOARD_BUDGET_MS);
 
     await page.goto('/dashboard');
-    await expect(page).toHaveURL(/\/not-authorized\?mode=recruiter/);
+    await expect(page).toHaveURL(/\/not-authorized\?mode=talent_partner/);
     await expect(
       page.getByRole('heading', { name: /not authorized/i }),
     ).toBeVisible();

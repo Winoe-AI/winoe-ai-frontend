@@ -4,9 +4,9 @@ import { BRAND_NAME } from '@/platform/config/brand';
 import MarketingHomePage from '@/features/marketing/home/MarketingHomePage';
 
 export const metadata: Metadata = {
-  title: `${BRAND_NAME} | 5-day work simulations for hiring`,
+  title: `${BRAND_NAME} | 5-day work trials for hiring`,
   description:
-    'Create realistic 5-day work simulations for candidates. Evaluate real execution, not just resumes.',
+    'Create realistic 5-day work trials for candidates. Evaluate real execution, not just resumes.',
 };
 
 export default async function HomePage() {

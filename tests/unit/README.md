@@ -4,9 +4,9 @@ Layout is feature-first to mirror the app:
 
 - `app/` – Next.js page/content components.
 - `components/` – reusable UI blocks.
-- `features/` – feature-specific units (e.g., recruiter).
+- `features/` – feature-specific units (e.g., talent_partner).
 - `lib/` – API clients and utilities.
-- `recruiter/` – helper units specific to recruiter features.
+- `talent_partner/` – helper units specific to talent_partner features.
 - Root files like `candidateApi.test.ts` cover cross-cutting modules.
 
 Shared helpers:

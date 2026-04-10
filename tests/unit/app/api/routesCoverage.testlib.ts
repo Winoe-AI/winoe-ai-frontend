@@ -74,8 +74,8 @@ export const mockResolveRequestId = jest.fn(() => 'req-cov');
 jest.mock('@/platform/server/bff', () => ({
   forwardJson: (...args: unknown[]) => mockForwardJson(...args),
   resolveRequestId: () => mockResolveRequestId(),
-  REQUEST_ID_HEADER: 'x-tenon-request-id',
-  UPSTREAM_HEADER: 'x-tenon-upstream-status',
+  REQUEST_ID_HEADER: 'x-winoe-request-id',
+  UPSTREAM_HEADER: 'x-winoe-upstream-status',
   getBackendBaseUrl: () => 'http://backend',
 }));
 
@@ -83,7 +83,7 @@ export const mockBffAuthSuccess = () =>
   mockRequireBffAuth.mockResolvedValue({
     ok: true,
     accessToken: 'tok',
-    permissions: ['recruiter:access'],
+    permissions: ['talent_partner:access'],
     cookies: NextResponse.next(),
   });
 

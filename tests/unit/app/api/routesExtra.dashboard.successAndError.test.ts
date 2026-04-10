@@ -21,11 +21,11 @@ const responseWithJson = (
     async arrayBuffer() {
       return new TextEncoder().encode(JSON.stringify(json)).buffer;
     },
-    _tenonMeta: attempts
+    _winoeMeta: attempts
       ? { attempts, durationMs: durationMs ?? 0 }
       : undefined,
   }) as unknown as Response & {
-    _tenonMeta?: { attempts: number; durationMs: number };
+    _winoeMeta?: { attempts: number; durationMs: number };
   };
 
 describe('API routes extra coverage - dashboard success paths', () => {
@@ -49,13 +49,11 @@ describe('API routes extra coverage - dashboard success paths', () => {
     markMetadataCovered(modulePath);
     const result = await GET(new NextRequest('http://localhost/api/dashboard'));
     expect(result.status).toBe(200);
-    expect(result.headers.get('x-tenon-upstream-status-profile')).toBe('200');
-    expect(result.headers.get('x-tenon-upstream-status-simulations')).toBe(
-      '200',
-    );
+    expect(result.headers.get('x-winoe-upstream-status-profile')).toBe('200');
+    expect(result.headers.get('x-winoe-upstream-status-trials')).toBe('200');
   });
 
-  it('handles simulations 500 with string message', async () => {
+  it('handles trials 500 with string message', async () => {
     mockRequireBffAuth.mockResolvedValue({
       ok: true,
       accessToken: 'token-dash',
@@ -72,8 +70,6 @@ describe('API routes extra coverage - dashboard success paths', () => {
     const { GET } = await import(modulePath);
     const result = await GET(new NextRequest('http://localhost/api/dashboard'));
     expect(result.status).toBe(200);
-    expect(result.headers.get('x-tenon-upstream-status-simulations')).toBe(
-      '500',
-    );
+    expect(result.headers.get('x-winoe-upstream-status-trials')).toBe('500');
   });
 });

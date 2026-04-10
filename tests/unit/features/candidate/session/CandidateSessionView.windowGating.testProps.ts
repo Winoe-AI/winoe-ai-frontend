@@ -5,7 +5,7 @@ export function buildCandidateSessionViewProps(): CandidateSessionViewProps {
     view: 'running',
     authStatus: 'ready',
     authMessage: null,
-    title: 'Infra Simulation',
+    title: 'Infra Trial',
     role: 'Backend Engineer',
     errorMessage: null,
     errorStatus: null,

@@ -39,7 +39,7 @@ export function CandidateSessionAccessRoute({
         title="Invite expired"
         description={
           errorMessage ??
-          'This invite has expired. Please contact your recruiter for a new link.'
+          'This invite has expired. Please contact your Talent Partner for a new link.'
         }
       />
     );

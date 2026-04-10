@@ -21,17 +21,17 @@ import {
 
 export function createAuth0Client() {
   return new Auth0Client({
-    appBaseUrl: process.env.TENON_APP_BASE_URL,
-    domain: process.env.TENON_AUTH0_DOMAIN,
-    clientId: process.env.TENON_AUTH0_CLIENT_ID,
-    clientSecret: process.env.TENON_AUTH0_CLIENT_SECRET,
-    secret: process.env.TENON_AUTH0_SECRET,
+    appBaseUrl: process.env.WINOE_APP_BASE_URL,
+    domain: process.env.WINOE_AUTH0_DOMAIN,
+    clientId: process.env.WINOE_AUTH0_CLIENT_ID,
+    clientSecret: process.env.WINOE_AUTH0_CLIENT_SECRET,
+    secret: process.env.WINOE_AUTH0_SECRET,
     routes: {
       login: '/auth/start',
     },
     authorizationParameters: {
-      audience: process.env.TENON_AUTH0_AUDIENCE,
-      scope: process.env.TENON_AUTH0_SCOPE,
+      audience: process.env.WINOE_AUTH0_AUDIENCE,
+      scope: process.env.WINOE_AUTH0_SCOPE,
     },
     signInReturnToPath,
     onCallback: async (error, ctx) => {

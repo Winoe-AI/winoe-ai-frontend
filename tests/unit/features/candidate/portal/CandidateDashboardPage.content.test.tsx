@@ -44,7 +44,7 @@ describe('CandidateDashboardPage content states', () => {
     listCandidateInvitesMock.mockResolvedValue([
       {
         candidateSessionId: 1,
-        title: 'Test Simulation',
+        title: 'Test Trial',
         role: 'Developer',
         company: 'TestCo',
         status: 'in_progress',
@@ -57,7 +57,7 @@ describe('CandidateDashboardPage content states', () => {
     ]);
     await renderDashboardPage();
     await waitFor(() => {
-      expect(screen.getByText('Test Simulation')).toBeInTheDocument();
+      expect(screen.getByText('Test Trial')).toBeInTheDocument();
     });
     expect(screen.getByText(/Developer/)).toBeInTheDocument();
     expect(screen.getByText(/TestCo/)).toBeInTheDocument();

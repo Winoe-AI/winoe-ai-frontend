@@ -5,7 +5,7 @@ import { MarketingHomeSignedOut } from '@/features/marketing/home/MarketingHomeS
 
 describe('auth navigation links', () => {
   it('renders logout as an anchor in the app nav', () => {
-    render(<AppNav isAuthed permissions={['recruiter:access']} />);
+    render(<AppNav isAuthed permissions={['talent_partner:access']} />);
     const logout = screen.getByText('Logout');
     expect(logout.tagName).toBe('A');
     expect(logout).toHaveAttribute('href', '/auth/logout');
@@ -32,8 +32,10 @@ describe('auth navigation links', () => {
 
   it('renders login CTA as an anchor in the marketing signed-out view', () => {
     render(<MarketingHomeSignedOut />);
-    const recruiterLogin = screen.getByText('Recruiter login');
-    expect(recruiterLogin.tagName).toBe('A');
-    expect(recruiterLogin.getAttribute('href') || '').toContain('/auth/start');
+    const talentPartnerLogin = screen.getByText('Talent Partner login');
+    expect(talentPartnerLogin.tagName).toBe('A');
+    expect(talentPartnerLogin.getAttribute('href') || '').toContain(
+      '/auth/start',
+    );
   });
 });

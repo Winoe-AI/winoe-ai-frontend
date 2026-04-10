@@ -8,7 +8,7 @@ jest.mock('next/server', () => {
 });
 
 jest.mock('@/platform/server/bff', () => {
-  const REQUEST_ID_HEADER = 'x-tenon-request-id';
+  const REQUEST_ID_HEADER = 'x-winoe-request-id';
   const parseUpstreamBody = jest.fn(async (res: Response) => {
     const contentType = res.headers.get('content-type') ?? '';
     if (contentType.includes('application/json')) {
@@ -87,7 +87,7 @@ jest.mock('@/platform/server/bff', () => {
     getBackendBaseUrl: jest.fn(() => 'https://backend.test'),
     parseUpstreamBody,
     resolveRequestId: jest.fn(() => 'req-test'),
-    UPSTREAM_HEADER: 'x-tenon-upstream-status',
+    UPSTREAM_HEADER: 'x-winoe-upstream-status',
     REQUEST_ID_HEADER,
     upstreamRequest,
   };

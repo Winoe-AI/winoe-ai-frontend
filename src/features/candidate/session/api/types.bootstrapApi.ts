@@ -1,4 +1,4 @@
-export type SimulationSummary = { title: string; role: string };
+export type TrialSummary = { title: string; role: string };
 
 export type CandidateDayWindow = {
   dayIndex: number;
@@ -13,7 +13,7 @@ export type CandidateCurrentDayWindow = CandidateDayWindow & {
 export type CandidateSessionBootstrapResponse = {
   candidateSessionId: number;
   status: 'not_started' | 'in_progress' | 'completed' | 'expired';
-  simulation: SimulationSummary;
+  trial: TrialSummary;
   aiNoticeText: string;
   aiNoticeVersion: string;
   evalEnabledByDay: Record<string, boolean>;
@@ -30,8 +30,8 @@ export type CandidateInvite = {
   title: string;
   role: string;
   company: string | null;
-  recruiterName?: string | null;
-  recruiterEmail?: string | null;
+  talentPartnerName?: string | null;
+  talentPartnerEmail?: string | null;
   status: CandidateSessionBootstrapResponse['status'] | string;
   progress: { completed: number; total: number } | null;
   expiresAt: string | null;

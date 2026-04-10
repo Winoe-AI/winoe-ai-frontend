@@ -3,7 +3,7 @@ export type {
   CandidateDayWindow,
   CandidateInvite,
   CandidateSessionBootstrapResponse,
-  SimulationSummary,
+  TrialSummary,
 } from './types.bootstrapApi';
 export type {
   CandidateCompletedReviewResponse,

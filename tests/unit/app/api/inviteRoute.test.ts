@@ -2,19 +2,19 @@ import { markMetadataCovered } from './coverageHelpers';
 import {
   createRequest,
   mockForwardJson,
-  mockRecruiterAuthSuccess,
-  mockWithRecruiterAuth,
-} from './withRecruiterAuthRoute.testlib';
+  mockTalentPartnerAuthSuccess,
+  mockWithTalentPartnerAuth,
+} from './withTalentPartnerAuthRoute.testlib';
 
-describe('/api/simulations/[id]/invite route', () => {
+describe('/api/trials/[id]/invite route', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     jest.resetModules();
   });
 
   it('covers metadata exports', async () => {
-    const mod = await import('@/app/api/simulations/[id]/invite/route');
-    markMetadataCovered('@/app/api/simulations/[id]/invite/route');
+    const mod = await import('@/app/api/trials/[id]/invite/route');
+    markMetadataCovered('@/app/api/trials/[id]/invite/route');
 
     expect(mod.dynamic).toBe('force-dynamic');
     expect(mod.runtime).toBe('nodejs');
@@ -22,15 +22,15 @@ describe('/api/simulations/[id]/invite route', () => {
     expect(mod.fetchCache).toBe('force-no-store');
   });
 
-  it('calls withRecruiterAuth and forwards invite request', async () => {
-    mockRecruiterAuthSuccess('req-123');
+  it('calls withTalentPartnerAuth and forwards invite request', async () => {
+    mockTalentPartnerAuthSuccess('req-123');
     mockForwardJson.mockResolvedValue({ inviteUrl: 'http://invite-url' });
 
-    const mod = await import('@/app/api/simulations/[id]/invite/route');
-    markMetadataCovered('@/app/api/simulations/[id]/invite/route');
+    const mod = await import('@/app/api/trials/[id]/invite/route');
+    markMetadataCovered('@/app/api/trials/[id]/invite/route');
 
     const req = await createRequest(
-      'http://localhost/api/simulations/sim-1/invite',
+      'http://localhost/api/trials/trial-1/invite',
       {
         email: 'test@example.com',
         name: 'Test User',
@@ -38,17 +38,17 @@ describe('/api/simulations/[id]/invite route', () => {
     );
 
     await mod.POST(req as never, {
-      params: Promise.resolve({ id: 'sim-1' }),
+      params: Promise.resolve({ id: 'trial-1' }),
     });
 
-    expect(mockWithRecruiterAuth).toHaveBeenCalledWith(
+    expect(mockWithTalentPartnerAuth).toHaveBeenCalledWith(
       req,
-      { tag: 'invite', requirePermission: 'recruiter:access' },
+      { tag: 'invite', requirePermission: 'talent_partner:access' },
       expect.any(Function),
     );
 
     expect(mockForwardJson).toHaveBeenCalledWith({
-      path: '/api/simulations/sim-1/invite',
+      path: '/api/trials/trial-1/invite',
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: { email: 'test@example.com', name: 'Test User' },

@@ -63,7 +63,7 @@ describe('authRedirect', () => {
 
     const { authRedirect } = await import('@/platform/api-client/authRedirect');
 
-    expect(authRedirect(401, 'recruiter')).toBeUndefined();
+    expect(authRedirect(401, 'talent_partner')).toBeUndefined();
     expect(authRedirect(403, 'candidate')).toBeUndefined();
   });
 
@@ -73,7 +73,7 @@ describe('authRedirect', () => {
 
     const { authRedirect } = await import('@/platform/api-client/authRedirect');
 
-    expect(authRedirect(500, 'recruiter')).toBeUndefined();
+    expect(authRedirect(500, 'talent_partner')).toBeUndefined();
     expect(authRedirect(null, 'candidate')).toBeUndefined();
   });
 
@@ -84,26 +84,26 @@ describe('authRedirect', () => {
 
     const { authRedirect } = await import('@/platform/api-client/authRedirect');
 
-    expect(authRedirect(401, 'recruiter')).toBeUndefined();
+    expect(authRedirect(401, 'talent_partner')).toBeUndefined();
   });
 
-  it('builds and executes recruiter login redirect for 401', async () => {
+  it('builds and executes talent_partner login redirect for 401', async () => {
     setUserAgent('Mozilla/5.0 Chrome');
     const assign = setWindow();
 
     const { authRedirect } = await import('@/platform/api-client/authRedirect');
 
-    const redirect = authRedirect(401, 'recruiter');
+    const redirect = authRedirect(401, 'talent_partner');
 
     expect(typeof redirect).toBe('function');
     redirect?.();
 
     expect(buildReturnToMock).toHaveBeenCalledTimes(1);
     expect(buildLoginUrlMock).toHaveBeenCalledWith(
-      'recruiter',
+      'talent_partner',
       '/dashboard?view=1',
     );
-    expect(assign).toHaveBeenCalledWith('/auth/login?mode=recruiter');
+    expect(assign).toHaveBeenCalledWith('/auth/login?mode=talent_partner');
   });
 
   it('builds and executes candidate not-authorized redirect for 403', async () => {

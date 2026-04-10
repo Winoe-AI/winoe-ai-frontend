@@ -15,7 +15,7 @@ import {
 } from './CandidateSessionPage.handlers.testlib';
 
 describe('CandidateSessionPage handlers - test runs', () => {
-  const originalEnv = process.env.NEXT_PUBLIC_TENON_DEBUG_PERF;
+  const originalEnv = process.env.NEXT_PUBLIC_WINOE_DEBUG_PERF;
   let consoleSpies: ReturnType<typeof jest.spyOn>[];
 
   beforeAll(() => {
@@ -28,12 +28,12 @@ describe('CandidateSessionPage handlers - test runs', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
-    delete process.env.NEXT_PUBLIC_TENON_DEBUG_PERF;
+    delete process.env.NEXT_PUBLIC_WINOE_DEBUG_PERF;
     primeHandlerApiMocks();
   });
 
   afterEach(() => {
-    process.env.NEXT_PUBLIC_TENON_DEBUG_PERF = originalEnv;
+    process.env.NEXT_PUBLIC_WINOE_DEBUG_PERF = originalEnv;
   });
 
   afterAll(() => {

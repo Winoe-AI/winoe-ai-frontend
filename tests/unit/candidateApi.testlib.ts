@@ -9,11 +9,11 @@ export const jsonRes = (
 
 export type FetchMock = jest.MockedFunction<typeof fetch>;
 
-const originalApiBase = process.env.NEXT_PUBLIC_TENON_API_BASE_URL;
+const originalApiBase = process.env.NEXT_PUBLIC_WINOE_API_BASE_URL;
 
 export async function importCandidateApi() {
   jest.resetModules();
-  process.env.NEXT_PUBLIC_TENON_API_BASE_URL = 'http://api.example.com';
+  process.env.NEXT_PUBLIC_WINOE_API_BASE_URL = 'http://api.example.com';
   return import('@/features/candidate/session/api');
 }
 
@@ -22,5 +22,5 @@ export const installFetchMock = (fetchMock: FetchMock) => {
 };
 
 export const restoreApiBase = () => {
-  process.env.NEXT_PUBLIC_TENON_API_BASE_URL = originalApiBase;
+  process.env.NEXT_PUBLIC_WINOE_API_BASE_URL = originalApiBase;
 };
