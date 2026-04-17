@@ -7,9 +7,8 @@ import {
 const buildValidInput = (): CreateTrialInput => ({
   title: 'Backend Engineer Trial',
   role: 'Backend Engineer',
-  techStack: 'node-fastify',
   seniority: 'mid',
-  templateKey: 'python-fastapi',
+  preferredLanguageFramework: 'node-fastify',
   ai: {
     noticeVersion: 'mvp1',
     evalEnabledByDay: {
@@ -25,11 +24,16 @@ const buildValidInput = (): CreateTrialInput => ({
 describe('createFormConfig', () => {
   it('initializes AI defaults with noticeVersion mvp1 and all days enabled', () => {
     expect(initialValues.noticeVersion).toBe('mvp1');
+    expect(initialValues.preferredLanguageFramework).toBe('');
     expect(initialValues.evalDay1).toBe(true);
     expect(initialValues.evalDay2).toBe(true);
     expect(initialValues.evalDay3).toBe(true);
     expect(initialValues.evalDay4).toBe(true);
     expect(initialValues.evalDay5).toBe(true);
+  });
+
+  it('accepts the optional language/framework field without requiring it', () => {
+    expect(validateTrialInput(buildValidInput())).toEqual({});
   });
 
   it('rejects backend-invalid role level enum values', () => {

@@ -17,7 +17,7 @@ describe('TalentPartnerDashboardPage error/empty/reload interaction', () => {
     mockUseDashboardData.mockReturnValue(
       dashboardState({
         trials: [],
-        simError: 'Unable to load trials right now.',
+        trialsError: 'Unable to load trials right now.',
         refresh,
       }),
     );
@@ -39,7 +39,7 @@ describe('TalentPartnerDashboardPage error/empty/reload interaction', () => {
     mockUseDashboardData.mockReturnValue(
       dashboardState({
         trials: [],
-        simError: null,
+        trialsError: null,
       }),
     );
 

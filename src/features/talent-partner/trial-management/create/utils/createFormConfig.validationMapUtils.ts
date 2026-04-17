@@ -31,7 +31,12 @@ const mapValidationPathToField = (path: string[]): FormFieldKey | null => {
   if (!first) return null;
   if (first === 'title') return 'title';
   if (first === 'role') return 'role';
-  if (first === 'techStack' || first === 'tech_stack') return 'techStack';
+  if (
+    first === 'preferredLanguageFramework' ||
+    first === 'preferred_language_framework'
+  ) {
+    return 'preferredLanguageFramework';
+  }
   if (
     first === 'seniority' ||
     first === 'roleLevel' ||
@@ -39,7 +44,6 @@ const mapValidationPathToField = (path: string[]): FormFieldKey | null => {
   ) {
     return 'seniority';
   }
-  if (first === 'templateKey' || first === 'template_key') return 'templateKey';
   if (first === 'focus' || first === 'focusNotes' || first === 'focus_notes')
     return 'focus';
   if (first === 'companyContext' || first === 'company_context') {

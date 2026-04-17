@@ -73,7 +73,7 @@ export function useDashboardQuery(options?: DashboardOptions) {
   const data = dashboardQuery.data;
   const profileError =
     data?.profileError ?? options?.initialProfileError ?? fallbackError;
-  const simError = data?.trialsError ?? fallbackError;
+  const trialsError = data?.trialsError ?? fallbackError;
   const loading =
     dashboardQuery.isLoading || dashboardQuery.isFetching || manualLoading;
 
@@ -82,7 +82,7 @@ export function useDashboardQuery(options?: DashboardOptions) {
     trials: Array.isArray(data?.trials) ? data.trials : [],
     requestId: data?.requestId ?? null,
     profileError,
-    simError,
+    trialsError,
     loadingProfile: loading,
     loadingTrials: loading,
     refresh,

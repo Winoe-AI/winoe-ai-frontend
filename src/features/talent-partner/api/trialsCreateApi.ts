@@ -12,8 +12,8 @@ export async function createTrial(
 ): Promise<CreateTrialResponse> {
   const safeTitle = input.title.trim();
   const safeRole = input.role.trim();
-  const safeTechStack = input.techStack.trim();
-  const safeTemplateKey = input.templateKey.trim();
+  const safePreferredLanguageFramework =
+    input.preferredLanguageFramework?.trim();
   const safeFocus = input.focus?.trim() ? input.focus.trim() : undefined;
   const safeCompanyDomain = input.companyContext?.domain?.trim();
   const safeProductArea = input.companyContext?.productArea?.trim();
@@ -24,7 +24,7 @@ export async function createTrial(
       ? input.ai.promptOverrides
       : null;
 
-  if (!safeTitle || !safeRole || !safeTechStack || !safeTemplateKey) {
+  if (!safeTitle || !safeRole) {
     return {
       id: '',
       ok: false,
@@ -40,9 +40,10 @@ export async function createTrial(
   const payload = {
     title: safeTitle,
     role: safeRole,
-    techStack: safeTechStack,
     seniority: input.seniority,
-    templateKey: safeTemplateKey,
+    ...(safePreferredLanguageFramework
+      ? { preferredLanguageFramework: safePreferredLanguageFramework }
+      : {}),
     ...(safeFocus ? { focus: safeFocus } : {}),
     ...(safeCompanyDomain || safeProductArea
       ? {

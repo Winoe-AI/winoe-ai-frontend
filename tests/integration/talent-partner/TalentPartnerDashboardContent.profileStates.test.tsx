@@ -63,7 +63,7 @@ describe('TalentPartnerDashboardPage profile/list states', () => {
 
   it('shows inline trial load error', () => {
     mockUseDashboardData.mockReturnValue(
-      dashboardState({ simError: 'Unauthorized' }),
+      dashboardState({ trialsError: 'Unauthorized' }),
     );
     renderDashboard();
     expect(screen.getByText('Couldn’t load trials')).toBeInTheDocument();

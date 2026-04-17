@@ -45,7 +45,7 @@ describe('useDashboardRefresh', () => {
       trials: [],
       requestId: null,
       profileError: null,
-      simError: null,
+      trialsError: null,
       loadingProfile: false,
       loadingTrials: false,
     };
@@ -151,7 +151,7 @@ describe('useDashboardRefresh', () => {
     act(() => {
       capturedOptions?.onSuccess?.({
         profile: { name: 'TalentPartner' },
-        trials: [{ id: 'trial-1' }],
+        trials: [{ id: 'trial-1', candidateCount: 0 }],
         requestId: 'req-1',
         profileError: null,
         trialsError: null,
@@ -159,7 +159,7 @@ describe('useDashboardRefresh', () => {
     });
 
     expect(state.profile).toEqual({ name: 'TalentPartner' });
-    expect(state.trials).toEqual([{ id: 'trial-1' }]);
+    expect(state.trials).toEqual([{ id: 'trial-1', candidateCount: 0 }]);
     expect(state.requestId).toBe('req-1');
     expect(state.loadingProfile).toBe(false);
     expect(state.loadingTrials).toBe(false);
@@ -186,7 +186,7 @@ describe('useDashboardRefresh', () => {
     expect(state.loadingProfile).toBe(false);
     expect(state.loadingTrials).toBe(false);
     expect(state.profileError).toBeNull();
-    expect(state.simError).toBeNull();
+    expect(state.trialsError).toBeNull();
   });
 
   it('handles non-abort errors and sets user-facing error state', () => {
@@ -205,7 +205,7 @@ describe('useDashboardRefresh', () => {
 
     expect(returned).toBe('dashboard failed');
     expect(state.profileError).toBe('dashboard failed');
-    expect(state.simError).toBe('dashboard failed');
+    expect(state.trialsError).toBe('dashboard failed');
     expect(state.loadingProfile).toBe(false);
     expect(state.loadingTrials).toBe(false);
     expect(logPerfMock).toHaveBeenCalledWith('/api/dashboard response', 444, {

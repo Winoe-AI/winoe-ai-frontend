@@ -54,10 +54,10 @@ jest.mock(
       trials: Array<{ id: string; title: string; status: string }>;
       loading: boolean;
       error: string | null;
-      onInvite?: (sim: { id: string; title: string }) => void;
+      onInvite?: (trial: { id: string; title: string }) => void;
     }) => (
       <div data-testid="trial-section">
-        <button onClick={() => onInvite?.({ id: '1', title: 'Sim 1' })}>
+        <button onClick={() => onInvite?.({ id: '1', title: 'Trial 1' })}>
           invite
         </button>
         {JSON.stringify({ trials, loading, error })}
@@ -66,12 +66,19 @@ jest.mock(
   }),
 );
 
-type Trial = { id: string; title: string; status: string };
+type Trial = {
+  id: string;
+  title: string;
+  status: string;
+  candidateCount: number;
+};
 export const baseProps = () => ({
   profile: { name: 'TalentPartner', email: 'r@test.com', role: 'Admin' },
   error: null,
   profileLoading: false,
-  trials: [{ id: '1', title: 'Sim', status: 'Draft' } as Trial],
+  trials: [
+    { id: '1', title: 'Trial', status: 'Draft', candidateCount: 0 } as Trial,
+  ],
   trialsError: null,
   trialsLoading: false,
   onRefresh: jest.fn(),

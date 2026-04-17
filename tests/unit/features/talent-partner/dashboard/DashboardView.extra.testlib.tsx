@@ -59,14 +59,19 @@ jest.mock(
   '@/features/talent-partner/dashboard/components/TrialSection',
   () => ({
     TrialSection: (props: {
-      trials: Array<{ id: string; title: string; status: string }>;
+      trials: Array<{
+        id: string;
+        title: string;
+        status: string;
+        candidateCount: number;
+      }>;
       loading: boolean;
       error: string | null;
-      onInvite?: (sim: { id: string; title: string }) => void;
+      onInvite?: (trial: { id: string; title: string }) => void;
       onRetry?: () => void;
     }) => (
       <div data-testid="trial-section">
-        <button onClick={() => props.onInvite?.({ id: '1', title: 'Sim 1' })}>
+        <button onClick={() => props.onInvite?.({ id: '1', title: 'Trial 1' })}>
           invite
         </button>
         <button onClick={() => props.onRetry?.()}>retry</button>
@@ -80,6 +85,7 @@ type Trial = {
   title: string;
   role: string;
   createdAt: string;
+  candidateCount: number;
 };
 export const baseProps = () => ({
   profile: { id: 1, name: 'TalentPartner', email: 'r@test.com', role: 'Admin' },
@@ -88,9 +94,10 @@ export const baseProps = () => ({
   trials: [
     {
       id: '1',
-      title: 'Sim',
+      title: 'Trial',
       role: 'Engineer',
       createdAt: '2026-01-01T00:00:00Z',
+      candidateCount: 0,
     } as Trial,
   ],
   trialsError: null,

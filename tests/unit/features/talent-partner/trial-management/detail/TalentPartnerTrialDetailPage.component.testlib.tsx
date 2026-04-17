@@ -70,7 +70,12 @@ export const primeDetailMocks = () => {
   jest.clearAllMocks();
   useParamsMock.mockReturnValue({ id: 'trial-1' });
   listTrialsMock.mockResolvedValue([
-    { id: 'trial-1', title: 'Test Trial', templateKey: 'template-1' },
+    {
+      id: 'trial-1',
+      title: 'Test Trial',
+      templateKey: 'template-1',
+      candidateCount: 0,
+    },
   ]);
   listTrialCandidatesMock.mockResolvedValue([]);
   talentPartnerGetMock.mockResolvedValue({

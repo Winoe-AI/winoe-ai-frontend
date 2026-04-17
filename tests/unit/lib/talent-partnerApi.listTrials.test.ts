@@ -36,12 +36,12 @@ describe('talentPartnerApi listTrials', () => {
     mockTalentPartnerRequest.mockResolvedValueOnce({
       data: [
         {
-          id: 'sim_2',
-          title: 'Sim Two',
+          id: 'trial_2',
+          title: 'Trial Two',
           role: 'Backend Engineer',
           created_at: '2025-12-11T10:00:00Z',
           candidate_count: 1,
-          template_key: 'node-express-ts',
+          status: 'active_inviting',
         },
       ],
       requestId: null,
@@ -49,9 +49,9 @@ describe('talentPartnerApi listTrials', () => {
     const result = await listTrials();
     expect(result[0]).toEqual(
       expect.objectContaining({
-        id: 'sim_2',
+        id: 'trial_2',
         candidateCount: 1,
-        templateKey: 'node-express-ts',
+        status: 'active_inviting',
       }),
     );
   });

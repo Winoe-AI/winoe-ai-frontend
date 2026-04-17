@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { parseUpstreamBody, upstreamRequest } from '@/platform/server/bff';
 import type { TrialListItem } from '@/features/talent-partner/types';
+import { normalizeTrial } from '../trialsNormalizeApi';
 import {
   extractMeta,
   forbiddenResponse,
@@ -58,7 +59,7 @@ export async function fetchTrials(args: {
     };
   }
 
-  const trials = Array.isArray(body) ? (body as TrialListItem[]) : [];
+  const trials = Array.isArray(body) ? body.map(normalizeTrial) : [];
   const error = !res.ok
     ? normalizeErrorMessage(body, 'Failed to load trials.')
     : null;

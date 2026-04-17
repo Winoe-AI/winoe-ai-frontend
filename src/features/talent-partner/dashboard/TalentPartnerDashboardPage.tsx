@@ -12,7 +12,7 @@ export default function TalentPartnerDashboardPage() {
     profile,
     profileError,
     trials,
-    simError,
+    trialsError,
     loadingProfile,
     loadingTrials,
     refresh,
@@ -28,7 +28,7 @@ export default function TalentPartnerDashboardPage() {
       error={profileError}
       profileLoading={loadingProfile}
       trials={trials}
-      trialsError={simError}
+      trialsError={trialsError}
       trialsLoading={loadingTrials}
       onRefresh={() => void refresh()}
     />

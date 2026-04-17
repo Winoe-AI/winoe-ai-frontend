@@ -18,12 +18,10 @@ describe('TrialCreatePage happy path + validation', () => {
 
     await user.clear(screen.getByLabelText(/Title/i));
     await user.clear(screen.getByLabelText(/^Role$/i));
-    await user.clear(screen.getByLabelText(/Tech stack/i));
     await user.click(screen.getByRole('button', { name: /Create trial/i }));
 
     expect(await screen.findByText(/Title is required/i)).toBeInTheDocument();
     expect(screen.getByText(/Role is required/i)).toBeInTheDocument();
-    expect(screen.getByText(/Tech stack is required/i)).toBeInTheDocument();
     expect(createTrialMock).not.toHaveBeenCalled();
   });
 
@@ -40,13 +38,12 @@ describe('TrialCreatePage happy path + validation', () => {
     await user.type(screen.getByLabelText(/Title/i), ' Backend Payments ');
     await user.clear(screen.getByLabelText(/^Role$/i));
     await user.type(screen.getByLabelText(/^Role$/i), ' Backend Engineer ');
-    await user.clear(screen.getByLabelText(/Tech stack/i));
-    await user.type(screen.getByLabelText(/Tech stack/i), ' Node + Postgres ');
-    await user.selectOptions(screen.getByLabelText(/Role level/i), 'senior');
-    await user.selectOptions(
-      screen.getByLabelText(/Template/i),
-      'node-express-ts',
+    await user.clear(screen.getByLabelText(/Preferred language\/framework/i));
+    await user.type(
+      screen.getByLabelText(/Preferred language\/framework/i),
+      ' Node + Postgres ',
     );
+    await user.selectOptions(screen.getByLabelText(/Role level/i), 'senior');
     await user.type(screen.getByLabelText(/Company domain/i), ' fintech ');
     await user.type(screen.getByLabelText(/Product area/i), ' payments ');
     await user.type(screen.getByLabelText(/Focus /i), 'Messaging focus');
@@ -57,9 +54,8 @@ describe('TrialCreatePage happy path + validation', () => {
     expect(createTrialMock).toHaveBeenCalledWith({
       title: 'Backend Payments',
       role: 'Backend Engineer',
-      techStack: 'Node + Postgres',
       seniority: 'senior',
-      templateKey: 'node-express-ts',
+      preferredLanguageFramework: 'Node + Postgres',
       focus: 'Messaging focus',
       companyContext: { domain: 'fintech', productArea: 'payments' },
       ai: {

@@ -18,7 +18,15 @@ describe('useDashboardData', () => {
   it('fetches profile and trials and surfaces results', async () => {
     fetchDashboard.mockResolvedValueOnce({
       profile: { name: 'TalentPartner', email: 'r@test.com', role: 'Hiring' },
-      trials: [{ id: '1', title: 'Sim', role: 'Eng', createdAt: '2024-01-01' }],
+      trials: [
+        {
+          id: '1',
+          title: 'Trial 1',
+          role: 'Eng',
+          createdAt: '2024-01-01',
+          candidateCount: 0,
+        },
+      ],
       profileError: null,
       trialsError: null,
     });
@@ -34,7 +42,7 @@ describe('useDashboardData', () => {
     expect(result.current.loadingProfile).toBe(false);
     expect(result.current.loadingTrials).toBe(false);
     expect(result.current.profileError).toBeNull();
-    expect(result.current.simError).toBeNull();
+    expect(result.current.trialsError).toBeNull();
   });
 
   it('dedupes concurrent refresh calls and preserves loading transitions', async () => {
@@ -51,8 +59,20 @@ describe('useDashboardData', () => {
     pending.resolve({
       profile: { name: 'R', email: 'r@test.com' },
       trials: [
-        { id: '1', title: 'Sim', role: 'Eng', createdAt: '2024-01-01' },
-        { id: '2', title: 'Sim 2', role: 'Eng', createdAt: '2024-01-02' },
+        {
+          id: '1',
+          title: 'Trial 1',
+          role: 'Eng',
+          createdAt: '2024-01-01',
+          candidateCount: 0,
+        },
+        {
+          id: '2',
+          title: 'Trial 2',
+          role: 'Eng',
+          createdAt: '2024-01-02',
+          candidateCount: 0,
+        },
       ],
       profileError: null,
       trialsError: null,
@@ -68,7 +88,7 @@ describe('useDashboardData', () => {
     const { result } = setupDashboardHook();
 
     await waitFor(() => expect(result.current.profileError).toBe('fail'));
-    expect(result.current.simError).toBe('fail');
+    expect(result.current.trialsError).toBe('fail');
   });
 
   it('ignores abort errors without setting error state', async () => {
@@ -79,6 +99,6 @@ describe('useDashboardData', () => {
 
     await waitFor(() => expect(result.current.loadingProfile).toBe(false));
     expect(result.current.profileError).toBeNull();
-    expect(result.current.simError).toBeNull();
+    expect(result.current.trialsError).toBeNull();
   });
 });

@@ -1,4 +1,3 @@
-import { DEFAULT_TEMPLATE_KEY } from '@/platform/config/templateCatalog';
 import { createEmptyPromptOverrideFormValues } from '@/features/talent-partner/ai/promptOverrideFormUtils';
 import { DEFAULT_EVAL_ENABLED_BY_DAY } from './createFormConfig.constantsUtils';
 import type { FormValues } from './createFormConfig.typesUtils';
@@ -6,9 +5,8 @@ import type { FormValues } from './createFormConfig.typesUtils';
 export const initialValues: FormValues = {
   title: '',
   role: 'Backend Engineer',
-  techStack: 'Node.js + Postgres',
+  preferredLanguageFramework: '',
   seniority: 'mid',
-  templateKey: DEFAULT_TEMPLATE_KEY,
   focus: '',
   companyDomain: '',
   companyProductArea: '',

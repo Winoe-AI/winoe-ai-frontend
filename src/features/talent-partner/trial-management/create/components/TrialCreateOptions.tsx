@@ -9,7 +9,6 @@ import { TrialAiConfigSection } from './TrialAiConfigSection';
 import { TrialCompanyContextFields } from './TrialCompanyContextFields';
 import { TrialFocusField } from './TrialFocusField';
 import { TrialSenioritySelect } from './TrialSenioritySelect';
-import { TrialTemplateSelect } from './TrialTemplateSelect';
 
 type Props = {
   values: FormValues;
@@ -35,12 +34,6 @@ export function TrialCreateOptions({
         errors={errors}
         isSubmitting={isSubmitting}
         options={seniorityOptions}
-        onChange={(key, value) => onChange(key, value)}
-      />
-      <TrialTemplateSelect
-        values={values}
-        errors={errors}
-        isSubmitting={isSubmitting}
         onChange={(key, value) => onChange(key, value)}
       />
       <TrialFocusField
