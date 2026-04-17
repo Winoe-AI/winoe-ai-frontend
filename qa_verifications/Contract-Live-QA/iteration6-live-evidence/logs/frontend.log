@@ -1,0 +1,53 @@
+
+> frontend@0.1.0 dev
+> next dev --hostname 127.0.0.1 --port 3000
+
+▲ Next.js 16.2.1 (Turbopack)
+- Local:         http://127.0.0.1:3000
+- Network:       http://127.0.0.1:3000
+- Environments: .env.local
+✓ Ready in 1238ms
+
+ GET /api/health 200 in 1479ms (next.js: 1184ms, proxy.ts: 225ms, application-code: 70ms)
+○ Compiling /auth/error ...
+ GET /auth/error?mode=talent_partner&returnTo=%2Fdashboard&error=callback_failed&errorCode=authorization_error&errorId=0cb0c1c2-10d3-4d66-99b5-e737b4c0649d 200 in 5.1s (next.js: 4.7s, proxy.ts: 5ms, application-code: 401ms)
+ GET /auth/login?mode=talent_partner&returnTo=%2Fdashboard%2Ftrials%2Fnew 200 in 950ms (next.js: 801ms, proxy.ts: 5ms, application-code: 144ms)
+ GET /auth/login?mode=talent_partner&returnTo=%2Fdashboard%2Ftrials%2Fnew 200 in 77ms (next.js: 8ms, proxy.ts: 7ms, application-code: 62ms)
+ GET /auth/error?mode=talent_partner&returnTo=&error=callback_failed&errorCode=invalid_state&errorId=b4811b7c-8a0c-4e34-9a45-54819c632ab1 200 in 156ms (next.js: 35ms, proxy.ts: 6ms, application-code: 115ms)
+ GET /dashboard/trials/new 200 in 3.0s (next.js: 2.2s, proxy.ts: 10ms, application-code: 776ms)
+ GET /dashboard/trials/new 200 in 360ms (next.js: 10ms, proxy.ts: 14ms, application-code: 336ms)
+ POST /api/trials 201 in 1139ms (next.js: 940ms, proxy.ts: 15ms, application-code: 184ms)
+○ Compiling /dashboard/trials/[id] ...
+ GET /dashboard/trials/41 200 in 5.0s (proxy.ts: 15ms)
+ GET /dashboard/trials/new 200 in 348ms (next.js: 14ms, proxy.ts: 11ms, application-code: 323ms)
+ POST /api/trials 201 in 68ms (next.js: 6ms, proxy.ts: 14ms, application-code: 49ms)
+ GET /dashboard/trials/42 200 in 196ms (next.js: 33ms, proxy.ts: 80ms, application-code: 83ms)
+ GET /dashboard 200 in 2.2s (next.js: 1595ms, proxy.ts: 107ms, application-code: 473ms)
+○ Compiling /dashboard ...
+ GET /api/dashboard 200 in 3.0s (next.js: 2.2s, proxy.ts: 13ms, application-code: 767ms)
+ GET /api/trials/42 200 in 146ms (next.js: 69ms, proxy.ts: 27ms, application-code: 50ms)
+ GET /api/trials/42/candidates 200 in 3.3s (next.js: 3.2s, proxy.ts: 29ms, application-code: 72ms)
+ GET /api/trials/42/candidates/compare 200 in 3.3s (next.js: 3.1s, proxy.ts: 33ms, application-code: 226ms)
+ GET /dashboard/trials/new 200 in 210ms (next.js: 9ms, proxy.ts: 9ms, application-code: 192ms)
+ POST /api/trials 201 in 73ms (next.js: 4ms, proxy.ts: 13ms, application-code: 56ms)
+ GET /dashboard/trials/43 200 in 90ms (next.js: 17ms, proxy.ts: 15ms, application-code: 58ms)
+ GET /api/trials/43 200 in 56ms (next.js: 12ms, proxy.ts: 8ms, application-code: 35ms)
+ GET /api/trials/43/candidates 200 in 107ms (next.js: 20ms, proxy.ts: 25ms, application-code: 62ms)
+ GET /api/trials/43 200 in 51ms (next.js: 13ms, proxy.ts: 11ms, application-code: 27ms)
+ GET /dashboard/trials/new 200 in 285ms (next.js: 15ms, proxy.ts: 10ms, application-code: 261ms)
+ POST /api/trials 201 in 61ms (next.js: 4ms, proxy.ts: 15ms, application-code: 42ms)
+ GET /dashboard/trials/44 200 in 228ms (next.js: 18ms, proxy.ts: 13ms, application-code: 197ms)
+ GET /dashboard 200 in 508ms (next.js: 23ms, proxy.ts: 74ms, application-code: 411ms)
+ GET /api/dashboard 200 in 76ms (next.js: 5ms, proxy.ts: 15ms, application-code: 57ms)
+ GET /api/trials/44/candidates 200 in 382ms (next.js: 84ms, proxy.ts: 28ms, application-code: 269ms)
+ GET /api/trials/44 200 in 389ms (next.js: 68ms, proxy.ts: 34ms, application-code: 286ms)
+ GET /api/trials/44/candidates/compare 200 in 515ms (next.js: 91ms, proxy.ts: 34ms, application-code: 389ms)
+ GET /dashboard/trials/new 200 in 724ms (next.js: 18ms, proxy.ts: 129ms, application-code: 577ms)
+ POST /api/trials 201 in 187ms (next.js: 9ms, proxy.ts: 28ms, application-code: 151ms)
+ GET /dashboard/trials/45 200 in 99ms (next.js: 20ms, proxy.ts: 16ms, application-code: 63ms)
+ GET /dashboard 200 in 654ms (next.js: 23ms, proxy.ts: 16ms, application-code: 615ms)
+ GET /api/dashboard 200 in 153ms (next.js: 12ms, proxy.ts: 85ms, application-code: 57ms)
+ GET /api/trials/45/candidates 200 in 189ms (next.js: 41ms, proxy.ts: 41ms, application-code: 107ms)
+ GET /api/trials/45 200 in 201ms (next.js: 30ms, proxy.ts: 39ms, application-code: 131ms)
+ GET /api/trials/45/candidates/compare 200 in 207ms (next.js: 51ms, proxy.ts: 44ms, application-code: 112ms)
+[?25h

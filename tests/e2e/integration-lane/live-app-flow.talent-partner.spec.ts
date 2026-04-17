@@ -53,10 +53,10 @@ test.describe('Live Integration Lane: TalentPartner', () => {
     ).toBeVisible();
 
     const uniqueTitle = `E2E Integration ${Date.now()}`;
-    await page.getByLabel(/^title$/i).fill(uniqueTitle);
-    await page.getByLabel(/^role$/i).fill('Senior Frontend Engineer');
+    await page.getByLabel(/role title/i).fill(uniqueTitle);
+    await page.getByLabel(/role description/i).fill('Senior Frontend Engineer');
     await page
-      .getByLabel(/tech stack/i)
+      .getByLabel(/preferred language\/framework/i)
       .fill('TypeScript, Next.js, Playwright');
     await page
       .getByLabel(/focus/i)

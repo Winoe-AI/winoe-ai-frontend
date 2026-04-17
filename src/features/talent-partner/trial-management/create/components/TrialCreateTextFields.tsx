@@ -18,15 +18,20 @@ const textFields: Array<{
 }> = [
   {
     key: 'title',
-    label: 'Title',
-    placeholder: 'Backend Engineer — Payments API',
+    label: 'Role title',
+    placeholder: 'Backend Engineer',
   },
-  { key: 'role', label: 'Role', placeholder: 'Backend Engineer' },
+  {
+    key: 'role',
+    label: 'Role description',
+    placeholder: 'Lead the payments API and define the project brief.',
+  },
   {
     key: 'preferredLanguageFramework',
     label: 'Preferred language/framework',
     placeholder: 'Optional example: Node.js, Python, Rust',
-    helperText: 'Optional. Candidates may use any stack.',
+    helperText:
+      'This is optional and helps Winoe generate a relevant project brief. The candidate may ultimately use any language or framework they choose.',
   },
 ];
 
@@ -53,24 +58,46 @@ export function TrialCreateTextFields({
           >
             {label}
           </label>
-          <Input
-            id={key}
-            className="mt-1 w-full"
-            value={values[key] as string}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              onChange(key, e.target.value)
-            }
-            placeholder={placeholder}
-            aria-invalid={Boolean(errors[key])}
-            aria-describedby={
-              errors[key]
-                ? `${key}-error`
-                : helperText
-                  ? `${key}-help`
-                  : undefined
-            }
-            disabled={isSubmitting}
-          />
+          {key === 'role' ? (
+            <textarea
+              id={key}
+              className="mt-1 w-full rounded border border-gray-300 px-3 py-2 text-sm"
+              value={values[key]}
+              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                onChange(key, e.target.value)
+              }
+              placeholder={placeholder}
+              rows={4}
+              aria-invalid={Boolean(errors[key])}
+              aria-describedby={
+                errors[key]
+                  ? `${key}-error`
+                  : helperText
+                    ? `${key}-help`
+                    : undefined
+              }
+              disabled={isSubmitting}
+            />
+          ) : (
+            <Input
+              id={key}
+              className="mt-1 w-full"
+              value={values[key]}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                onChange(key, e.target.value)
+              }
+              placeholder={placeholder}
+              aria-invalid={Boolean(errors[key])}
+              aria-describedby={
+                errors[key]
+                  ? `${key}-error`
+                  : helperText
+                    ? `${key}-help`
+                    : undefined
+              }
+              disabled={isSubmitting}
+            />
+          )}
           {helperText ? (
             <p id={`${key}-help`} className="mt-1 text-xs text-gray-500">
               {helperText}

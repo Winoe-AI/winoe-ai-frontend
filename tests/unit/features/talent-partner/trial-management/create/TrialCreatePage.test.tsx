@@ -39,10 +39,10 @@ describe('TrialCreatePage', () => {
     Object.defineProperty(window, 'location', { value: originalLocation });
   });
   const fillForm = () => {
-    fireEvent.change(screen.getByLabelText(/Title/i), {
+    fireEvent.change(screen.getByLabelText(/Role title/i), {
       target: { value: 'Title' },
     });
-    fireEvent.change(screen.getByLabelText(/^Role$/i), {
+    fireEvent.change(screen.getByLabelText(/Role description/i), {
       target: { value: 'Role' },
     });
     fireEvent.change(screen.getByLabelText(/Preferred language\/framework/i), {
@@ -52,7 +52,9 @@ describe('TrialCreatePage', () => {
   it('validates required fields', async () => {
     render(<TrialCreatePage />);
     fireEvent.click(screen.getByRole('button', { name: /Create trial/i }));
-    expect(await screen.findByText(/Title is required/i)).toBeInTheDocument();
+    expect(
+      await screen.findByText(/Role title is required/i),
+    ).toBeInTheDocument();
   });
   it('handles backend auth redirects and 403', async () => {
     render(<TrialCreatePage />);

@@ -7,6 +7,8 @@ import {
 } from '../utils/createFormConfigUtils';
 
 export function buildTrialCreatePayload(values: FormValues): CreateTrialInput {
+  const roleTitle = values.title.trim();
+  const roleDescription = values.role.trim();
   const trimmedDomain = values.companyDomain.trim();
   const trimmedProductArea = values.companyProductArea.trim();
   const trimmedFocus = values.focus.trim();
@@ -22,8 +24,8 @@ export function buildTrialCreatePayload(values: FormValues): CreateTrialInput {
   );
 
   return {
-    title: values.title.trim(),
-    role: values.role.trim(),
+    title: roleTitle,
+    role: roleDescription,
     seniority: values.seniority,
     ...(values.preferredLanguageFramework.trim()
       ? {

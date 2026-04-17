@@ -37,7 +37,9 @@ export function TrialListRow({ trial, onInvite, onPrefetch }: Props) {
         </div>
 
         <div className="col-span-3">
-          <p className="text-sm text-gray-700">{trial.role}</p>
+          <p className="text-sm text-gray-700 whitespace-pre-wrap break-words">
+            {trial.role}
+          </p>
         </div>
 
         <div className="col-span-3">
