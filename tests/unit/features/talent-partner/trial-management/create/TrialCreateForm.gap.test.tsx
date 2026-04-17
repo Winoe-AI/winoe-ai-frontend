@@ -51,24 +51,31 @@ describe('TrialCreateForm gap coverage', () => {
     const { onChange } = renderForm({
       errors: {
         title: 'Title is required.',
-        techStack: 'Tech stack is required.',
       },
     });
     const titleInput = screen.getByLabelText('Title');
     const roleInput = screen.getByLabelText('Role');
-    const stackInput = screen.getByLabelText('Tech stack');
+    const stackInput = screen.getByLabelText('Preferred language/framework');
     expect(titleInput).toHaveAttribute('aria-invalid', 'true');
     expect(titleInput).toHaveAttribute('aria-describedby', 'title-error');
     expect(screen.getByText('Title is required.')).toHaveAttribute(
       'id',
       'title-error',
     );
-    expect(stackInput).toHaveAttribute('aria-invalid', 'true');
-    expect(stackInput).toHaveAttribute('aria-describedby', 'techStack-error');
-    expect(screen.getByText('Tech stack is required.')).toHaveAttribute(
-      'id',
-      'techStack-error',
+    expect(
+      screen.getByText('Optional. Candidates may use any stack.'),
+    ).toBeInTheDocument();
+    expect(stackInput).toHaveAttribute(
+      'aria-describedby',
+      'preferredLanguageFramework-help',
     );
+    await user.clear(stackInput);
+    await user.type(stackInput, 'Node.js');
+    const preferredCalls = onChange.mock.calls.filter(
+      ([key]) => key === 'preferredLanguageFramework',
+    );
+    expect(preferredCalls.length).toBeGreaterThan(0);
+    expect(preferredCalls.at(-1)?.[1]).toEqual(expect.any(String));
     await user.clear(roleInput);
     await user.type(roleInput, 'Principal Engineer');
     const roleCalls = onChange.mock.calls.filter(([key]) => key === 'role');

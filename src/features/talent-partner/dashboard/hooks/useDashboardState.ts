@@ -5,7 +5,7 @@ export type DashboardState = {
   trials: DashboardPayload['trials'];
   requestId: string | null;
   profileError: string | null;
-  simError: string | null;
+  trialsError: string | null;
   loadingProfile: boolean;
   loadingTrials: boolean;
 };
@@ -17,7 +17,7 @@ export const makeInitialDashboardState = (
   trials: [],
   requestId: null,
   profileError: options?.initialProfileError ?? null,
-  simError: null,
+  trialsError: null,
   loadingProfile: options?.fetchOnMount !== false,
   loadingTrials: options?.fetchOnMount !== false,
 });

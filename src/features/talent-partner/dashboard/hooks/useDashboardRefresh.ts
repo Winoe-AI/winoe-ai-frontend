@@ -31,7 +31,7 @@ export function useDashboardRefresh(
         trials: Array.isArray(data?.trials) ? data.trials : [],
         requestId: data?.requestId ?? null,
         profileError: data?.profileError ?? null,
-        simError: data?.trialsError ?? null,
+        trialsError: data?.trialsError ?? null,
         loadingProfile: false,
         loadingTrials: false,
       }));
@@ -54,7 +54,7 @@ export function useDashboardRefresh(
       setState((prev) => ({
         ...prev,
         profileError: message,
-        simError: message,
+        trialsError: message,
         loadingProfile: false,
         loadingTrials: false,
       }));
@@ -73,7 +73,7 @@ export function useDashboardRefresh(
       setState((prev) => ({
         ...prev,
         profileError: null,
-        simError: null,
+        trialsError: null,
         loadingProfile: true,
         loadingTrials: true,
       }));

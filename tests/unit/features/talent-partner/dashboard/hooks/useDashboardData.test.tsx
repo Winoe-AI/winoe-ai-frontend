@@ -76,7 +76,7 @@ describe('useDashboardData', () => {
       expect(result.current.profileError).toBe(
         'Unable to load your dashboard.',
       );
-      expect(result.current.simError).toBe('Unable to load your dashboard.');
+      expect(result.current.trialsError).toBe('Unable to load your dashboard.');
     });
   });
 });

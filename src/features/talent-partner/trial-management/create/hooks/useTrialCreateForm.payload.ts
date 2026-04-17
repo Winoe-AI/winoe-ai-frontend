@@ -24,9 +24,12 @@ export function buildTrialCreatePayload(values: FormValues): CreateTrialInput {
   return {
     title: values.title.trim(),
     role: values.role.trim(),
-    techStack: values.techStack.trim(),
     seniority: values.seniority,
-    templateKey: values.templateKey,
+    ...(values.preferredLanguageFramework.trim()
+      ? {
+          preferredLanguageFramework: values.preferredLanguageFramework.trim(),
+        }
+      : {}),
     focus: trimmedFocus ? trimmedFocus : undefined,
     companyContext:
       trimmedDomain || trimmedProductArea

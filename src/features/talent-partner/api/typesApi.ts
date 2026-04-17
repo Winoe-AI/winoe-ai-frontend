@@ -1,12 +1,10 @@
-import type { TemplateKey } from '@/platform/config/templateCatalog';
-
 export type TrialListItem = {
   id: string;
   title: string;
   role: string;
   createdAt: string;
-  candidateCount?: number;
-  templateKey?: string | null;
+  candidateCount: number;
+  status?: TrialLifecycleStatus | string | null;
 };
 
 export type TrialLifecycleStatus =
@@ -73,9 +71,8 @@ export type TrialCompanyContextInput = {
 export type CreateTrialInput = {
   title: string;
   role: string;
-  techStack: string;
   seniority: TrialRoleLevel;
-  templateKey: TemplateKey;
+  preferredLanguageFramework?: string;
   focus?: string;
   companyContext?: TrialCompanyContextInput;
   ai?: TrialAiConfigInput;

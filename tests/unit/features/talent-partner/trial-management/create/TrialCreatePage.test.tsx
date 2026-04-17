@@ -45,7 +45,7 @@ describe('TrialCreatePage', () => {
     fireEvent.change(screen.getByLabelText(/^Role$/i), {
       target: { value: 'Role' },
     });
-    fireEvent.change(screen.getByLabelText(/Tech stack/i), {
+    fireEvent.change(screen.getByLabelText(/Preferred language\/framework/i), {
       target: { value: 'Stack' },
     });
   };

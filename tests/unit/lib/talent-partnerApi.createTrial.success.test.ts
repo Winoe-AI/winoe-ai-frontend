@@ -18,9 +18,7 @@ describe('talentPartnerApi createTrial success/validation', () => {
     const result = await createTrial({
       title: '',
       role: ' ',
-      techStack: '',
       seniority: 'mid',
-      templateKey: 'python-fastapi',
     });
     expect(result).toEqual({
       id: '',
@@ -33,15 +31,14 @@ describe('talentPartnerApi createTrial success/validation', () => {
 
   it('posts trimmed payload and normalizes id', async () => {
     mockTalentPartnerRequest.mockResolvedValueOnce({
-      data: { id: 'sim_99' },
+      data: { id: 'trial_99' },
       requestId: null,
     });
     const result = await createTrial({
-      title: '  Backend Sim ',
+      title: '  Backend Trial ',
       role: ' Backend ',
-      techStack: ' Node ',
       seniority: 'senior',
-      templateKey: 'node-express-ts',
+      preferredLanguageFramework: ' Node ',
       focus: '  Focus ',
       companyContext: { domain: ' fintech ', productArea: ' payments ' },
       ai: {
@@ -60,11 +57,10 @@ describe('talentPartnerApi createTrial success/validation', () => {
       expect.objectContaining({
         method: 'POST',
         body: {
-          title: 'Backend Sim',
+          title: 'Backend Trial',
           role: 'Backend',
-          techStack: 'Node',
           seniority: 'senior',
-          templateKey: 'node-express-ts',
+          preferredLanguageFramework: 'Node',
           focus: 'Focus',
           companyContext: { domain: 'fintech', productArea: 'payments' },
           ai: {
@@ -81,7 +77,7 @@ describe('talentPartnerApi createTrial success/validation', () => {
       }),
     );
     expect(result).toEqual({
-      id: 'sim_99',
+      id: 'trial_99',
       ok: true,
       status: 201,
       message: undefined,
@@ -95,29 +91,27 @@ describe('talentPartnerApi createTrial success/validation', () => {
     });
     expect(
       await createTrial({
-        title: 'Sim',
+        title: 'Trial',
         role: 'Backend',
-        techStack: 'Node',
         seniority: 'junior',
-        templateKey: 'python-fastapi',
+        preferredLanguageFramework: 'Node',
       }),
     ).toEqual({ id: '42', ok: true, status: 201, message: undefined });
 
     mockTalentPartnerRequest.mockResolvedValueOnce({
-      data: { id: 'sim_200' },
+      data: { id: 'trial_200' },
       requestId: null,
     });
     const result = await createTrial({
-      title: 'Sim',
+      title: 'Trial',
       role: 'Backend',
-      techStack: 'Node',
       seniority: 'junior',
-      templateKey: 'python-fastapi',
+      preferredLanguageFramework: 'Node',
       focus: '   ',
       companyContext: { domain: '   ', productArea: '' },
     });
     expect(result).toEqual({
-      id: 'sim_200',
+      id: 'trial_200',
       ok: true,
       status: 201,
       message: undefined,
@@ -127,11 +121,10 @@ describe('talentPartnerApi createTrial success/validation', () => {
       expect.objectContaining({
         method: 'POST',
         body: {
-          title: 'Sim',
+          title: 'Trial',
           role: 'Backend',
-          techStack: 'Node',
           seniority: 'junior',
-          templateKey: 'python-fastapi',
+          preferredLanguageFramework: 'Node',
         },
       }),
     );
@@ -141,16 +134,15 @@ describe('talentPartnerApi createTrial success/validation', () => {
     process.env.NEXT_PUBLIC_WINOE_API_BASE_URL =
       'https://backend.example.com/api';
     mockTalentPartnerRequest.mockResolvedValueOnce({
-      data: { id: 'sim_env' },
+      data: { id: 'trial_env' },
       requestId: null,
     });
     const result = await createTrial({
-      title: 'Env Sim',
+      title: 'Env Trial',
       role: 'Backend',
-      techStack: 'Node',
       seniority: 'junior',
-      templateKey: 'python-fastapi',
+      preferredLanguageFramework: 'Node',
     });
-    expect(result.id).toBe('sim_env');
+    expect(result.id).toBe('trial_env');
   });
 });

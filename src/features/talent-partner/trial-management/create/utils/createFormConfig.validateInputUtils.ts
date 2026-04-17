@@ -27,8 +27,6 @@ export function validateTrialInput(input: CreateTrialInput): FieldErrors {
   const next: FieldErrors = {};
   if (!input.title?.trim()) next.title = 'Title is required.';
   if (!input.role?.trim()) next.role = 'Role is required.';
-  if (!input.techStack?.trim()) next.techStack = 'Tech stack is required.';
-  if (!input.templateKey?.trim()) next.templateKey = 'Template is required.';
 
   if (!input.seniority) {
     next.seniority = 'Role level is required.';

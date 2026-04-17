@@ -1,5 +1,4 @@
 import type {
-  CreateTrialInput,
   TrialPromptOverrideField,
   TrialPromptOverrideKey,
   TrialRoleLevel,
@@ -16,9 +15,8 @@ export type AiEvalDayFieldKey =
 export type FormFieldKey =
   | 'title'
   | 'role'
-  | 'techStack'
+  | 'preferredLanguageFramework'
   | 'seniority'
-  | 'templateKey'
   | 'focus'
   | 'companyDomain'
   | 'companyProductArea'
@@ -33,9 +31,8 @@ export type FieldErrors = Partial<Record<FormFieldKey, string>> & {
 export type FormValues = {
   title: string;
   role: string;
-  techStack: string;
+  preferredLanguageFramework: string;
   seniority: TrialRoleLevel;
-  templateKey: CreateTrialInput['templateKey'];
   focus: string;
   companyDomain: string;
   companyProductArea: string;

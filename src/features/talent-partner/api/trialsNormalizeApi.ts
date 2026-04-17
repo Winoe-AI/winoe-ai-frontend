@@ -1,5 +1,5 @@
 import { getId, getNumber, getString, isRecord } from './trialUtilsApi';
-import type { TrialListItem, CreateTrialResponse } from './typesApi';
+import type { CreateTrialResponse, TrialListItem } from './typesApi';
 import { extractBackendMessage } from '@/platform/api-client/errors/errors';
 
 export const normalizeTrial = (raw: unknown): TrialListItem => {
@@ -9,6 +9,7 @@ export const normalizeTrial = (raw: unknown): TrialListItem => {
       title: 'Untitled trial',
       role: 'Unknown role',
       createdAt: new Date().toISOString(),
+      candidateCount: 0,
     };
   }
   const id = getId(raw.id ?? raw.trialId ?? raw.trial_id);
@@ -23,14 +24,23 @@ export const normalizeTrial = (raw: unknown): TrialListItem => {
     getNumber(raw.candidate_count) ??
     getNumber(raw.numCandidates) ??
     getNumber(raw.num_candidates) ??
-    undefined;
-  const templateKey =
-    typeof raw.templateKey === 'string'
-      ? raw.templateKey
-      : typeof raw.template_key === 'string'
-        ? raw.template_key
-        : null;
-  return { id, title, role, createdAt, candidateCount, templateKey };
+    0;
+  const status =
+    typeof raw.status === 'string'
+      ? raw.status
+      : typeof raw.lifecycleStatus === 'string'
+        ? raw.lifecycleStatus
+        : typeof raw.lifecycle_status === 'string'
+          ? raw.lifecycle_status
+          : null;
+  return {
+    id,
+    title,
+    role,
+    createdAt,
+    candidateCount,
+    status,
+  };
 };
 
 export const normalizeCreateTrialResponse = (

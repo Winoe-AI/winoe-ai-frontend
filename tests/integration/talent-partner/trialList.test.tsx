@@ -22,15 +22,15 @@ describe('TalentPartner trials list (integration)', () => {
       profileError: null,
       trials: [
         {
-          id: 'sim_1',
+          id: 'trial_1',
           title: 'Backend Trial',
           role: 'Backend Engineer',
           createdAt: '2025-12-10T10:00:00Z',
           candidateCount: 3,
-          templateKey: 'python-fastapi',
+          status: 'ready_for_review',
         },
       ],
-      simError: null,
+      trialsError: null,
       loadingProfile: false,
       loadingTrials: false,
       refresh: jest.fn(),
@@ -38,10 +38,16 @@ describe('TalentPartner trials list (integration)', () => {
 
     render(<TalentPartnerDashboardPage />);
 
-    expect(screen.getByText('Backend Trial')).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: 'Backend Trial' }),
+    ).toBeInTheDocument();
     expect(screen.getByText('Backend Engineer')).toBeInTheDocument();
+    expect(screen.getByText('2025-12-10')).toBeInTheDocument();
     expect(screen.getByText('3 candidate(s)')).toBeInTheDocument();
-    expect(screen.getByText(/Template: python-fastapi/i)).toBeInTheDocument();
+    expect(screen.getByText('Ready for review')).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /Invite candidate/i }),
+    ).toBeInTheDocument();
   });
 
   it('shows empty state when no trials exist', async () => {
@@ -49,7 +55,7 @@ describe('TalentPartner trials list (integration)', () => {
       profile: null,
       profileError: null,
       trials: [],
-      simError: null,
+      trialsError: null,
       loadingProfile: false,
       loadingTrials: false,
       refresh: jest.fn(),
@@ -61,12 +67,40 @@ describe('TalentPartner trials list (integration)', () => {
     expect(screen.queryByText(/candidate\(s\)/i)).not.toBeInTheDocument();
   });
 
+  it('renders zero candidate counts and the lifecycle status badge', async () => {
+    mockUseDashboardData.mockReturnValue({
+      profile: null,
+      profileError: null,
+      trials: [
+        {
+          id: 'trial_0',
+          title: 'New Trial',
+          role: 'Frontend Engineer',
+          createdAt: '2025-12-10T10:00:00Z',
+          candidateCount: 0,
+          status: 'active_inviting',
+        },
+      ],
+      trialsError: null,
+      loadingProfile: false,
+      loadingTrials: false,
+      refresh: jest.fn(),
+    });
+
+    render(<TalentPartnerDashboardPage />);
+
+    expect(screen.getByText('0 candidate(s)')).toBeInTheDocument();
+    expect(screen.getByText('Frontend Engineer')).toBeInTheDocument();
+    expect(screen.getByText('2025-12-10')).toBeInTheDocument();
+    expect(screen.getByText('Active inviting')).toBeInTheDocument();
+  });
+
   it('shows error message when backend call fails', async () => {
     mockUseDashboardData.mockReturnValue({
       profile: null,
       profileError: null,
       trials: [],
-      simError: 'Unauthorized',
+      trialsError: 'Unauthorized',
       loadingProfile: false,
       loadingTrials: false,
       refresh: jest.fn(),

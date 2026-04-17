@@ -9,7 +9,7 @@ describe('makeInitialDashboardState', () => {
       trials: [],
       requestId: null,
       profileError: null,
-      simError: null,
+      trialsError: null,
       loadingProfile: true,
       loadingTrials: true,
     });
@@ -23,7 +23,7 @@ describe('makeInitialDashboardState', () => {
 
     expect(result.profile).toEqual({ id: 9, name: 'Jordan' });
     expect(result.profileError).toBe('profile unavailable');
-    expect(result.simError).toBeNull();
+    expect(result.trialsError).toBeNull();
   });
 
   it('disables loading states when fetchOnMount=false', () => {

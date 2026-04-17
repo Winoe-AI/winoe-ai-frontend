@@ -1,7 +1,7 @@
 import Input from '@/shared/ui/Input';
 import type { FieldErrors, FormValues } from '../utils/createFormConfigUtils';
 
-type TextFieldKey = 'title' | 'role' | 'techStack';
+type TextFieldKey = 'title' | 'role' | 'preferredLanguageFramework';
 
 type Props = {
   values: FormValues;
@@ -14,6 +14,7 @@ const textFields: Array<{
   key: TextFieldKey;
   label: string;
   placeholder: string;
+  helperText?: string;
 }> = [
   {
     key: 'title',
@@ -21,7 +22,12 @@ const textFields: Array<{
     placeholder: 'Backend Engineer — Payments API',
   },
   { key: 'role', label: 'Role', placeholder: 'Backend Engineer' },
-  { key: 'techStack', label: 'Tech stack', placeholder: 'Node.js + Postgres' },
+  {
+    key: 'preferredLanguageFramework',
+    label: 'Preferred language/framework',
+    placeholder: 'Optional example: Node.js, Python, Rust',
+    helperText: 'Optional. Candidates may use any stack.',
+  },
 ];
 
 const errorText = (id: string, message?: string | null) =>
@@ -39,7 +45,7 @@ export function TrialCreateTextFields({
 }: Props) {
   return (
     <>
-      {textFields.map(({ key, label, placeholder }) => (
+      {textFields.map(({ key, label, placeholder, helperText }) => (
         <div key={key}>
           <label
             htmlFor={key}
@@ -56,9 +62,20 @@ export function TrialCreateTextFields({
             }
             placeholder={placeholder}
             aria-invalid={Boolean(errors[key])}
-            aria-describedby={errors[key] ? `${key}-error` : undefined}
+            aria-describedby={
+              errors[key]
+                ? `${key}-error`
+                : helperText
+                  ? `${key}-help`
+                  : undefined
+            }
             disabled={isSubmitting}
           />
+          {helperText ? (
+            <p id={`${key}-help`} className="mt-1 text-xs text-gray-500">
+              {helperText}
+            </p>
+          ) : null}
           {errorText(`${key}-error`, errors[key] as string | undefined)}
         </div>
       ))}

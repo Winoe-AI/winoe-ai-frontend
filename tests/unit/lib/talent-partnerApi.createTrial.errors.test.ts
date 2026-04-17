@@ -20,11 +20,10 @@ describe('talentPartnerApi createTrial error normalization', () => {
       status: 400,
     });
     const result = await createTrial({
-      title: 'Sim Name',
+      title: 'Trial Name',
       role: 'Backend',
-      techStack: 'Node',
       seniority: 'junior',
-      templateKey: 'python-fastapi',
+      preferredLanguageFramework: 'Node',
     });
     expect(result).toMatchObject({
       ok: false,
@@ -40,11 +39,10 @@ describe('talentPartnerApi createTrial error normalization', () => {
       requestId: null,
     });
     const result = await createTrial({
-      title: 'Sim',
+      title: 'Trial',
       role: 'Backend',
-      techStack: 'Node',
       seniority: 'junior',
-      templateKey: 'python-fastapi',
+      preferredLanguageFramework: 'Node',
     });
     expect(result).toEqual({
       id: '',

@@ -51,7 +51,7 @@ export const dashboardState = (
   profile: null,
   profileError: null,
   trials: [],
-  simError: null,
+  trialsError: null,
   loadingProfile: false,
   loadingTrials: false,
   refresh: jest.fn() as DashboardHookState['refresh'],

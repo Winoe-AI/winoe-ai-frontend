@@ -47,7 +47,7 @@ describe('/api/dashboard route auth + success', () => {
       )
       .mockResolvedValueOnce(
         makeUpstreamResponse(
-          [{ id: '1', title: 'Sim', role: 'Eng', createdAt: '2024-01-01' }],
+          [{ id: '1', title: 'Trial', role: 'Eng', createdAt: '2024-01-01' }],
           200,
         ),
       );
@@ -75,7 +75,16 @@ describe('/api/dashboard route auth + success', () => {
     expect(res.status).toBe(200);
     expect(res.body).toEqual({
       profile: { name: 'TalentPartner' },
-      trials: [{ id: '1', title: 'Sim', role: 'Eng', createdAt: '2024-01-01' }],
+      trials: [
+        {
+          id: '1',
+          title: 'Trial',
+          role: 'Eng',
+          createdAt: '2024-01-01',
+          candidateCount: 0,
+          status: null,
+        },
+      ],
       profileError: null,
       trialsError: null,
     });
