@@ -18,10 +18,15 @@ test.describe('TalentPartner Create Trial Flows', () => {
     await expect(
       page.getByRole('heading', { name: /new trial/i }),
     ).toBeVisible();
+    await expect(page.getByLabel(/role title/i)).toBeVisible();
+    await expect(page.getByLabel(/role description/i)).toBeVisible();
+    await expect(
+      page.getByRole('button', { name: /show advanced settings/i }),
+    ).toHaveAttribute('aria-expanded', 'false');
 
     await createPage.submitCreate();
 
-    await expect(page.getByText(/title is required\./i)).toBeVisible();
+    await expect(page.getByText(/role title is required\./i)).toBeVisible();
     await expect(page).toHaveURL('/dashboard/trials/new');
   });
 
@@ -49,8 +54,8 @@ test.describe('TalentPartner Create Trial Flows', () => {
     );
 
     await createPage.fillTitle('QA Trial: Frontend Platform Flow');
-    await page.getByLabel(/^role$/i).fill('Senior Frontend Engineer');
-    await page.getByLabel(/tech stack/i).fill('TypeScript + Next.js');
+    await createPage.fillDescription('Senior Frontend Engineer');
+    await createPage.fillPreferredLanguageFramework('TypeScript + Next.js');
 
     await createPage.submitCreate();
     const createResponse = await createResponsePromise;

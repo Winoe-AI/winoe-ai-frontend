@@ -16,13 +16,49 @@ describe('TrialCreatePage happy path + validation', () => {
     const user = userEvent.setup();
     render(<TrialCreatePage />);
 
-    await user.clear(screen.getByLabelText(/Title/i));
-    await user.clear(screen.getByLabelText(/^Role$/i));
+    await user.clear(screen.getByLabelText(/Role title/i));
+    await user.clear(screen.getByLabelText(/Role description/i));
     await user.click(screen.getByRole('button', { name: /Create trial/i }));
 
-    expect(await screen.findByText(/Title is required/i)).toBeInTheDocument();
-    expect(screen.getByText(/Role is required/i)).toBeInTheDocument();
+    expect(
+      await screen.findByText(/Role title is required/i),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/Role description is required/i),
+    ).toBeInTheDocument();
     expect(createTrialMock).not.toHaveBeenCalled();
+  });
+
+  it('shows loading state while create submission is in flight', async () => {
+    const user = userEvent.setup();
+    let resolveCreate:
+      | ((value: { id: string; ok: boolean; status: number }) => void)
+      | null = null;
+    createTrialMock.mockReturnValueOnce(
+      new Promise((resolve) => {
+        resolveCreate = resolve;
+      }),
+    );
+
+    render(<TrialCreatePage />);
+
+    await user.type(screen.getByLabelText(/Role title/i), 'Backend Trial');
+    await user.type(
+      screen.getByLabelText(/Role description/i),
+      'Own the payments API',
+    );
+    await user.click(screen.getByRole('button', { name: /Create trial/i }));
+
+    expect(screen.getByRole('button', { name: /Creating…/i })).toBeDisabled();
+    expect(screen.getByRole('button', { name: /Cancel/i })).toBeDisabled();
+    expect(screen.getByLabelText(/Role title/i)).toBeDisabled();
+
+    resolveCreate?.({ id: 'sim_loading', ok: true, status: 201 });
+    await waitFor(() =>
+      expect(routerMock.push).toHaveBeenCalledWith(
+        '/dashboard/trials/sim_loading',
+      ),
+    );
   });
 
   it('creates trial and redirects to detail page', async () => {
@@ -34,10 +70,16 @@ describe('TrialCreatePage happy path + validation', () => {
     });
     render(<TrialCreatePage />);
 
+    await user.click(
+      screen.getByRole('button', { name: /show advanced settings/i }),
+    );
     const day4Toggle = screen.getByLabelText(/^Day 4$/i);
-    await user.type(screen.getByLabelText(/Title/i), ' Backend Payments ');
-    await user.clear(screen.getByLabelText(/^Role$/i));
-    await user.type(screen.getByLabelText(/^Role$/i), ' Backend Engineer ');
+    await user.type(screen.getByLabelText(/Role title/i), ' Backend Payments ');
+    await user.clear(screen.getByLabelText(/Role description/i));
+    await user.type(
+      screen.getByLabelText(/Role description/i),
+      ' Backend Engineer ',
+    );
     await user.clear(screen.getByLabelText(/Preferred language\/framework/i));
     await user.type(
       screen.getByLabelText(/Preferred language\/framework/i),
@@ -81,7 +123,7 @@ describe('TrialCreatePage happy path + validation', () => {
     });
     render(<TrialCreatePage />);
 
-    await user.type(screen.getByLabelText(/Title/i), 'Backend Sim');
+    await user.type(screen.getByLabelText(/Role title/i), 'Backend Sim');
     await user.click(screen.getByRole('button', { name: /Create trial/i }));
     expect(await screen.findByText(/no id was returned/i)).toBeInTheDocument();
   });

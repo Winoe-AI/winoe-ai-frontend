@@ -23,7 +23,7 @@ describe('TrialCreatePage errors + navigation', () => {
     });
     render(<TrialCreatePage />);
 
-    await user.type(screen.getByLabelText(/Title/i), 'Backend Sim');
+    await user.type(screen.getByLabelText(/Role title/i), 'Backend Sim');
     await user.click(screen.getByRole('button', { name: /Create trial/i }));
 
     await waitFor(() =>
@@ -43,7 +43,7 @@ describe('TrialCreatePage errors + navigation', () => {
     });
     render(<TrialCreatePage />);
 
-    await user.type(screen.getByLabelText(/Title/i), 'Backend Sim');
+    await user.type(screen.getByLabelText(/Role title/i), 'Backend Sim');
     await user.click(screen.getByRole('button', { name: /Create trial/i }));
     expect(await screen.findByText(/Server exploded/i)).toBeInTheDocument();
     expect(routerMock.refresh).not.toHaveBeenCalled();
@@ -68,11 +68,47 @@ describe('TrialCreatePage errors + navigation', () => {
     });
     render(<TrialCreatePage />);
 
-    await user.type(screen.getByLabelText(/Title/i), 'Backend Sim');
+    await user.type(screen.getByLabelText(/Role title/i), 'Backend Sim');
+    await user.click(
+      screen.getByRole('button', { name: /show advanced settings/i }),
+    );
     await user.click(screen.getByRole('button', { name: /Create trial/i }));
     expect(await screen.findByText(/Invalid role level/i)).toBeInTheDocument();
     expect(screen.getByText(/Invalid domain/i)).toBeInTheDocument();
     expect(screen.getByText(/Day 4 toggle is invalid/i)).toBeInTheDocument();
+  });
+
+  it('auto-expands advanced settings for backend advanced-field errors', async () => {
+    const user = userEvent.setup();
+    createTrialMock.mockResolvedValueOnce({
+      ok: false,
+      status: 422,
+      id: '',
+      details: {
+        detail: [
+          {
+            loc: ['body', 'ai', 'noticeVersion'],
+            msg: 'Notice version is required',
+          },
+          {
+            loc: ['body', 'ai', 'promptOverrides'],
+            msg: 'Prompt overrides are invalid',
+          },
+        ],
+      },
+    });
+    render(<TrialCreatePage />);
+
+    await user.type(screen.getByLabelText(/Role title/i), 'Backend Sim');
+    await user.click(screen.getByRole('button', { name: /Create trial/i }));
+
+    expect(
+      await screen.findByRole('button', { name: /hide advanced settings/i }),
+    ).toHaveAttribute('aria-expanded', 'true');
+    expect(screen.getByText(/Notice version is required/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Prompt overrides are invalid/i),
+    ).toBeInTheDocument();
   });
 
   it('navigates back to dashboard via Back and Cancel actions', async () => {
@@ -82,7 +118,7 @@ describe('TrialCreatePage errors + navigation', () => {
     await user.click(screen.getByRole('button', { name: /^Back$/i }));
     expectDashboardBackNavigation();
 
-    await user.type(screen.getByLabelText(/Title/i), 'Backend Sim');
+    await user.type(screen.getByLabelText(/Role title/i), 'Backend Sim');
     await user.click(screen.getByRole('button', { name: /^Cancel$/i }));
     expectDashboardBackNavigation();
     expect(createTrialMock).not.toHaveBeenCalled();

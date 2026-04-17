@@ -14,15 +14,14 @@ export const PROMPT_OVERRIDE_AGENT_DEFINITIONS: Array<{
 }> = [
   {
     key: 'prestart',
-    label: 'Prestart creator',
+    label: 'Project brief setup',
     description:
-      'Scenario creation, task framing, and structured rubric output.',
+      'Project framing, task definition, and structured rubric output.',
   },
   {
     key: 'codespace',
-    label: 'Codespace specializer',
-    description:
-      'Template repo specialization and precommit bundle generation.',
+    label: 'Workspace reviewer',
+    description: 'Workspace setup review and deterministic scenario guidance.',
   },
   {
     key: 'day1',

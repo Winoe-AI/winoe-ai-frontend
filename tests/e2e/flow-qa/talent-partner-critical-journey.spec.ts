@@ -31,9 +31,11 @@ test.describe('TalentPartner Critical Journey (flow-qa mocked)', () => {
     await expect(
       page.getByRole('heading', { name: /new trial/i }),
     ).toBeVisible();
-    await page.getByLabel(/title/i).fill('QA Critical Journey Sim');
-    await page.getByLabel(/^role$/i).fill('Senior Frontend Engineer');
-    await page.getByLabel(/tech stack/i).fill('TypeScript + Next.js');
+    await page.getByLabel(/role title/i).fill('QA Critical Journey Sim');
+    await page.getByLabel(/role description/i).fill('Senior Frontend Engineer');
+    await page
+      .getByLabel(/preferred language\/framework/i)
+      .fill('TypeScript + Next.js');
 
     const createButton = page.getByRole('button', {
       name: /create trial/i,

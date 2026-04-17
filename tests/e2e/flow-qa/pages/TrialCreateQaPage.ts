@@ -11,7 +11,15 @@ export class TrialCreateQaPage extends BasePage {
   }
 
   async fillTitle(value: string) {
-    await this.fillByLabel(/title/i, value);
+    await this.fillByLabel(/role title/i, value);
+  }
+
+  async fillDescription(value: string) {
+    await this.fillByLabel(/role description/i, value);
+  }
+
+  async fillPreferredLanguageFramework(value: string) {
+    await this.fillByLabel(/preferred language\/framework/i, value);
   }
 
   async submitCreate() {

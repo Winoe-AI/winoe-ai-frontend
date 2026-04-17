@@ -36,6 +36,17 @@ describe('createFormConfig', () => {
     expect(validateTrialInput(buildValidInput())).toEqual({});
   });
 
+  it('requires role title and role description before submission', () => {
+    const errors = validateTrialInput({
+      ...buildValidInput(),
+      title: '',
+      role: '',
+    });
+
+    expect(errors.title).toBe('Role title is required.');
+    expect(errors.role).toBe('Role description is required.');
+  });
+
   it('rejects backend-invalid role level enum values', () => {
     const payload = buildValidInput();
     const invalid = {

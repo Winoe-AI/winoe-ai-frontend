@@ -50,20 +50,22 @@ describe('TrialCreateForm gap coverage', () => {
     const user = userEvent.setup();
     const { onChange } = renderForm({
       errors: {
-        title: 'Title is required.',
+        title: 'Role title is required.',
       },
     });
-    const titleInput = screen.getByLabelText('Title');
-    const roleInput = screen.getByLabelText('Role');
+    const titleInput = screen.getByLabelText('Role title');
+    const roleInput = screen.getByLabelText('Role description');
     const stackInput = screen.getByLabelText('Preferred language/framework');
     expect(titleInput).toHaveAttribute('aria-invalid', 'true');
     expect(titleInput).toHaveAttribute('aria-describedby', 'title-error');
-    expect(screen.getByText('Title is required.')).toHaveAttribute(
+    expect(screen.getByText('Role title is required.')).toHaveAttribute(
       'id',
       'title-error',
     );
     expect(
-      screen.getByText('Optional. Candidates may use any stack.'),
+      screen.getByText(
+        'This is optional and helps Winoe generate a relevant project brief. The candidate may ultimately use any language or framework they choose.',
+      ),
     ).toBeInTheDocument();
     expect(stackInput).toHaveAttribute(
       'aria-describedby',
@@ -82,6 +84,49 @@ describe('TrialCreateForm gap coverage', () => {
     expect(roleCalls.length).toBeGreaterThan(0);
     expect(roleCalls.at(-1)?.[1]).toEqual(expect.any(String));
   });
+
+  it('collapses advanced settings by default and expands on demand', async () => {
+    const user = userEvent.setup();
+    renderForm();
+
+    const toggle = screen.getByRole('button', {
+      name: /show advanced settings/i,
+    });
+    expect(toggle).toHaveAttribute('aria-expanded', 'false');
+    expect(
+      screen.queryByText(/candidate notice version/i),
+    ).not.toBeInTheDocument();
+
+    await user.click(toggle);
+    expect(toggle).toHaveAttribute('aria-expanded', 'true');
+    expect(screen.getByText(/candidate notice version/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/^day 1$/i)).toBeInTheDocument();
+  });
+
+  it('auto-expands advanced settings when advanced validation errors are present', () => {
+    renderForm({
+      errors: {
+        noticeVersion: 'Notice version is required.',
+        evalDay4: 'Day 4 toggle must be true or false.',
+      },
+    });
+
+    expect(
+      screen.getByRole('button', { name: /hide advanced settings/i }),
+    ).toHaveAttribute('aria-expanded', 'true');
+    expect(screen.getByText(/candidate notice version/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Day 4 toggle must be true or false/i),
+    ).toBeInTheDocument();
+  });
+
+  it('does not render retired template or tech stack selectors', () => {
+    renderForm();
+
+    expect(screen.queryByLabelText(/template repository/i)).toBeNull();
+    expect(screen.queryByLabelText(/tech stack/i)).toBeNull();
+  });
+
   it('submits/cancels when interactive and disables controls while submitting', async () => {
     const user = userEvent.setup();
     const interactive = renderForm();
@@ -91,7 +136,7 @@ describe('TrialCreateForm gap coverage', () => {
     expect(interactive.onCancel).toHaveBeenCalledTimes(1);
     interactive.unmount();
     renderForm({ isSubmitting: true });
-    expect(screen.getByLabelText('Title')).toBeDisabled();
+    expect(screen.getByLabelText('Role title')).toBeDisabled();
     expect(screen.getByRole('button', { name: /Creating…/i })).toBeDisabled();
     expect(screen.getByRole('button', { name: /Cancel/i })).toBeDisabled();
   });

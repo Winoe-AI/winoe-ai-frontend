@@ -1,0 +1,43 @@
+INFO:     Started server process [56193]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+INFO:     127.0.0.1:52520 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52523 - "GET /health HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52632 - "GET /api/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52664 - "GET /api/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52664 - "POST /api/trials HTTP/1.1" 201 Created
+INFO:     127.0.0.1:52693 - "GET /api/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52693 - "POST /api/trials HTTP/1.1" 201 Created
+INFO:     127.0.0.1:52693 - "GET /api/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52693 - "GET /api/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52718 - "GET /api/trials HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52693 - "GET /api/trials/42 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52718 - "GET /api/trials/42 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52718 - "GET /api/trials/42/candidates HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52693 - "GET /api/trials/42/candidates/compare HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52750 - "GET /api/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52750 - "POST /api/trials HTTP/1.1" 201 Created
+INFO:     127.0.0.1:52750 - "GET /api/trials/43 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52750 - "GET /api/trials/43/candidates HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52750 - "GET /api/trials/43 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52792 - "GET /api/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52792 - "POST /api/trials HTTP/1.1" 201 Created
+INFO:     127.0.0.1:52792 - "GET /api/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52792 - "GET /api/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52812 - "GET /api/trials HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52812 - "GET /api/trials/44/candidates HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52792 - "GET /api/trials/44 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52814 - "GET /api/trials/44/candidates/compare HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52837 - "GET /api/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52837 - "POST /api/trials HTTP/1.1" 201 Created
+INFO:     127.0.0.1:52837 - "GET /api/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52837 - "GET /api/auth/me HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52860 - "GET /api/trials HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52860 - "GET /api/trials/45/candidates HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52837 - "GET /api/trials/45 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52862 - "GET /api/trials/45/candidates/compare HTTP/1.1" 200 OK
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [56193]

@@ -34,7 +34,11 @@ export function TrialCreateForm({
   onCancel,
 }: Props) {
   return (
-    <form onSubmit={onSubmit} className="flex max-w-2xl flex-col gap-4">
+    <form
+      onSubmit={onSubmit}
+      className="flex max-w-2xl flex-col gap-4"
+      aria-busy={isSubmitting}
+    >
       {errors.form ? (
         <div
           className="rounded border border-red-200 bg-red-50 p-3"
