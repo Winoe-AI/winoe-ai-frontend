@@ -29,6 +29,6 @@ export async function activateTrialInviting(
       data,
     };
   } catch (error) {
-    return mapActionError(error, 'Unable to approve trial.');
+    return mapActionError(error, 'Unable to activate trial.');
   }
 }

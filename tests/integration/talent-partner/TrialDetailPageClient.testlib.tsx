@@ -20,8 +20,10 @@ const trialDetailResponse = () =>
     templateKey: 'python-fastapi',
     role: 'Backend Engineer',
     techStack: 'Node.js + Postgres',
+    preferredLanguageFramework: 'Node.js + Postgres',
     focus: 'Payments',
     scenario: 'Design a billing service for a SaaS platform.',
+    rubricSummary: 'Judge correctness, clarity, and resilience.',
     tasks: [
       {
         dayIndex: 1,

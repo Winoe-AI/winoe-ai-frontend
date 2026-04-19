@@ -14,13 +14,16 @@ type Props = {
   scenarioLocked: boolean;
   scenarioLockedAt: string | null;
   title: string;
-  templateKey: string;
   inviteEnabled: boolean;
   inviteDisabledReason: string | null;
   canApprove: boolean;
   approveButtonLabel: string;
   approveLoading: boolean;
   onApprove: () => void;
+  canActivate: boolean;
+  activateButtonLabel: string;
+  activateLoading: boolean;
+  onActivate: () => void;
   regenerateLoading: boolean;
   regenerateDisabled: boolean;
   onRegenerate: () => void;
@@ -38,13 +41,16 @@ export function TrialDetailHeaderCore({
   scenarioLocked,
   scenarioLockedAt,
   title,
-  templateKey,
   inviteEnabled,
   inviteDisabledReason,
   canApprove,
   approveButtonLabel,
   approveLoading,
   onApprove,
+  canActivate,
+  activateButtonLabel,
+  activateLoading,
+  onActivate,
   regenerateLoading,
   regenerateDisabled,
   onRegenerate,
@@ -60,15 +66,16 @@ export function TrialDetailHeaderCore({
   return (
     <div className="flex flex-col gap-3">
       <div className="flex flex-wrap items-start justify-between gap-4">
-        <PageHeader
-          title={title}
-          subtitle={`Trial ID: ${trialId} · Template: ${templateKey}`}
-        />
+        <PageHeader title={title} subtitle={`Trial ID: ${trialId}`} />
         <TrialDetailHeaderActions
           canApprove={canApprove}
           approveButtonLabel={approveButtonLabel}
           approveLoading={approveLoading}
           onApprove={onApprove}
+          canActivate={canActivate}
+          activateButtonLabel={activateButtonLabel}
+          activateLoading={activateLoading}
+          onActivate={onActivate}
           regenerateLoading={regenerateLoading}
           regenerateDisabled={regenerateDisabled}
           scenarioVersionLabel={scenarioVersionLabel}

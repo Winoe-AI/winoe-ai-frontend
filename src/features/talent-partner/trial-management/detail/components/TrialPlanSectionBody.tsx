@@ -17,12 +17,12 @@ import { deriveTrialPlanSectionState } from './trialPlanSectionState';
 
 type TrialPlanSectionBodyProps = Pick<
   TrialPlanSectionProps,
-  | 'templateKeyLabel'
   | 'roleLabel'
-  | 'stackLabel'
+  | 'preferredLanguageFrameworkLabel'
   | 'levelLabel'
   | 'focusLabel'
   | 'companyContextLabel'
+  | 'notesLabel'
   | 'scenarioLabel'
   | 'rubricSummary'
   | 'contentUnavailableMessage'
@@ -44,6 +44,7 @@ export function TrialPlanSectionBody(props: TrialPlanSectionBodyProps) {
     planDays: props.planDays,
     scenarioLabel: props.scenarioLabel,
     rubricSummary: props.rubricSummary,
+    notesLabel: props.notesLabel,
   });
   if (props.loading) return <TrialPlanLoadingSkeleton />;
   if (props.statusCode === 404) return <TrialPlanNotFoundState />;
@@ -56,7 +57,9 @@ export function TrialPlanSectionBody(props: TrialPlanSectionBodyProps) {
 
   return (
     <div className="mt-4 flex flex-col gap-4">
-      {props.generating ? <TrialPlanGeneratingBanner /> : null}
+      {props.generating && !props.jobFailureMessage ? (
+        <TrialPlanGeneratingBanner />
+      ) : null}
       {props.actionError ? (
         <div className="rounded border border-red-200 bg-red-50 p-3 text-sm text-red-800">
           {props.actionError}
@@ -70,23 +73,25 @@ export function TrialPlanSectionBody(props: TrialPlanSectionBodyProps) {
           onRetryGenerate={props.onRetryGenerate}
         />
       ) : null}
-      {props.contentUnavailableMessage ? (
+      {!props.jobFailureMessage && props.contentUnavailableMessage ? (
         <TrialPlanContentUnavailable
           message={props.contentUnavailableMessage}
         />
-      ) : sectionState.isEmptyScenario ? (
+      ) : !props.jobFailureMessage && sectionState.isEmptyScenario ? (
         <TrialPlanEmptyState
           loading={props.retryGenerateLoading}
           onRetryGenerate={props.onRetryGenerate}
         />
       ) : (
         <TrialPlanContent
-          templateKeyLabel={props.templateKeyLabel}
           roleLabel={props.roleLabel}
-          stackLabel={props.stackLabel}
+          preferredLanguageFrameworkLabel={
+            props.preferredLanguageFrameworkLabel
+          }
           levelLabel={props.levelLabel}
           focusLabel={props.focusLabel}
           companyContextLabel={props.companyContextLabel}
+          notesLabel={props.notesLabel}
           scenarioLabel={props.scenarioLabel}
           rubricSummary={props.rubricSummary}
           planDays={props.planDays}

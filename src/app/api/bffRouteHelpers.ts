@@ -40,6 +40,7 @@ export async function forwardBffWithAuth(
     const resp = await forwardJson({
       ...args,
       accessToken: auth.accessToken,
+      devUserEmail: auth.session?.user?.email,
       cache: args.cache ?? 'no-store',
       requestId,
     });
@@ -58,6 +59,11 @@ type TalentPartnerAuthHandler = (auth: {
   accessToken: string;
   cookies: NextResponse;
   requestId: string;
+  session?: Awaited<ReturnType<typeof requireBffAuth>> extends infer R
+    ? R extends { ok: true; session?: infer S }
+      ? S
+      : never
+    : never;
 }) => Promise<NextResponse>;
 
 export async function withTalentPartnerAuth(

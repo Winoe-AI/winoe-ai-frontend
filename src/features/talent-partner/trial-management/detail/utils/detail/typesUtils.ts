@@ -6,6 +6,7 @@ export type TrialLifecycleStatus =
   | 'draft'
   | 'generating'
   | 'ready_for_review'
+  | 'approved'
   | 'active_inviting'
   | 'terminated';
 

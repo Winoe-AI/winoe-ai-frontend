@@ -14,7 +14,7 @@ describe('TrialDetail scenario versions - lock banner and approve', () => {
   it('renders SCENARIO_LOCKED as a non-blocking banner', async () => {
     const user = userEvent.setup();
     mockFetchHandlers({
-      '/api/backend/trials/trial-1/scenario/10': jsonResponse(
+      '/api/trials/trial-1/scenario/10': jsonResponse(
         { detail: 'Scenario version is locked.', errorCode: 'SCENARIO_LOCKED' },
         409,
       ),
@@ -42,7 +42,7 @@ describe('TrialDetail scenario versions - lock banner and approve', () => {
     ).toBe(true);
   });
 
-  it('approves only the selected version id', async () => {
+  it('approves only the selected version id and then activates it', async () => {
     const user = userEvent.setup();
     let detailCalls = 0;
     mockFetchHandlers({
@@ -52,8 +52,8 @@ describe('TrialDetail scenario versions - lock banner and approve', () => {
           return jsonResponse(
             buildDetail({
               status: 'ready_for_review',
-              activeScenarioVersionId: 11,
-              pendingScenarioVersionId: null,
+              activeScenarioVersionId: 10,
+              pendingScenarioVersionId: 11,
               scenario: {
                 id: 11,
                 versionIndex: 2,
@@ -80,6 +80,35 @@ describe('TrialDetail scenario versions - lock banner and approve', () => {
               ],
             }),
           );
+        if (detailCalls === 2)
+          return jsonResponse(
+            buildDetail({
+              status: 'approved',
+              activeScenarioVersionId: 11,
+              pendingScenarioVersionId: null,
+              scenario: {
+                id: 11,
+                versionIndex: 2,
+                status: 'locked',
+                lockedAt: '2026-03-01T12:00:00.000Z',
+                storylineMd: 'Story v2',
+              },
+              scenarioVersions: [
+                {
+                  id: 10,
+                  versionIndex: 1,
+                  status: 'locked',
+                  lockedAt: '2026-03-01T12:00:00.000Z',
+                },
+                {
+                  id: 11,
+                  versionIndex: 2,
+                  status: 'locked',
+                  lockedAt: '2026-03-01T12:00:00.000Z',
+                },
+              ],
+            }),
+          );
         return jsonResponse(
           buildDetail({
             status: 'active_inviting',
@@ -88,8 +117,8 @@ describe('TrialDetail scenario versions - lock banner and approve', () => {
             scenario: {
               id: 11,
               versionIndex: 2,
-              status: 'ready',
-              lockedAt: null,
+              status: 'locked',
+              lockedAt: '2026-03-01T12:00:00.000Z',
               storylineMd: 'Story v2',
             },
             scenarioVersions: [
@@ -99,12 +128,23 @@ describe('TrialDetail scenario versions - lock banner and approve', () => {
                 status: 'locked',
                 lockedAt: '2026-03-01T12:00:00.000Z',
               },
-              { id: 11, versionIndex: 2, status: 'ready', lockedAt: null },
+              {
+                id: 11,
+                versionIndex: 2,
+                status: 'locked',
+                lockedAt: '2026-03-01T12:00:00.000Z',
+              },
             ],
           }),
         );
       },
-      '/api/backend/trials/trial-1/scenario/11/approve': jsonResponse({
+      '/api/trials/trial-1/scenario/11/approve': jsonResponse({
+        trialId: 'trial-1',
+        status: 'approved',
+        activeScenarioVersionId: 11,
+        pendingScenarioVersionId: null,
+      }),
+      '/api/trials/trial-1/activate': jsonResponse({
         trialId: 'trial-1',
         status: 'active_inviting',
         activeScenarioVersionId: 11,
@@ -112,21 +152,32 @@ describe('TrialDetail scenario versions - lock banner and approve', () => {
       }),
     });
     renderPage();
-    await user.click(
-      await screen.findByRole('button', {
-        name: /Approve v2 \/ Start inviting/i,
-      }),
-    );
+    const approveButton = await screen.findByRole('button', {
+      name: /Approve v2/i,
+    });
+    await user.click(approveButton);
     await waitFor(() => {
       const approveCalls = fetchMock.mock.calls.filter(
-        (call) =>
-          getUrl(call[0]) === '/api/backend/trials/trial-1/scenario/11/approve',
+        (call) => getUrl(call[0]) === '/api/trials/trial-1/scenario/11/approve',
       );
       expect(approveCalls.length).toBe(1);
     });
-    const activateCalls = fetchMock.mock.calls.filter(
-      (call) => getUrl(call[0]) === '/api/backend/trials/trial-1/activate',
-    );
-    expect(activateCalls.length).toBe(0);
+    const activateButton = await screen.findByRole('button', {
+      name: /Activate trial/i,
+    });
+    expect(activateButton).toBeEnabled();
+    await user.click(activateButton);
+    await waitFor(() => {
+      const activateCalls = fetchMock.mock.calls.filter(
+        (call) => getUrl(call[0]) === '/api/trials/trial-1/activate',
+      );
+      expect(activateCalls.length).toBe(1);
+    });
+    expect(
+      screen.queryByRole('button', { name: /Activate trial/i }),
+    ).toBeNull();
+    expect(
+      screen.getByRole('button', { name: /Invite candidate/i }),
+    ).toBeEnabled();
   });
 });

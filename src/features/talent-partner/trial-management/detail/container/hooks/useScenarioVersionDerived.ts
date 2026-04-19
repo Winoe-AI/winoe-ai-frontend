@@ -7,6 +7,11 @@ type CanApproveParams = {
   activeScenarioVersionId: string | null;
 };
 
+type CanActivateParams = {
+  trialStatus: string | null;
+  selectedScenarioVersion: ScenarioVersionItem | null;
+};
+
 export function scenarioContentUnavailableMessage(
   selectedScenarioVersion: ScenarioVersionItem | null,
   selectedScenarioVersionText: string,
@@ -52,12 +57,26 @@ export function canApproveSelectedScenario({
   if (!selectedScenarioVersion) return false;
   if (selectedScenarioVersion.contentAvailability !== 'canonical') return false;
   if (selectedScenarioVersion.uiStatus === 'generating') return false;
+  if (selectedScenarioVersion.uiStatus === 'approved') return false;
   if (selectedScenarioVersion.isLocked) return false;
   if (pendingScenarioVersionId != null) {
     return selectedScenarioVersion.id === pendingScenarioVersionId;
   }
   if (activeScenarioVersionId == null) return false;
   return selectedScenarioVersion.id === activeScenarioVersionId;
+}
+
+export function canActivateSelectedTrial({
+  trialStatus,
+  selectedScenarioVersion,
+}: CanActivateParams): boolean {
+  if (trialStatus === 'active_inviting') return false;
+  if (!selectedScenarioVersion) return false;
+  if (selectedScenarioVersion.contentAvailability !== 'canonical') return false;
+  return (
+    selectedScenarioVersion.uiStatus === 'approved' ||
+    selectedScenarioVersion.uiStatus === 'locked'
+  );
 }
 
 export function formatScenarioRubricSummary(

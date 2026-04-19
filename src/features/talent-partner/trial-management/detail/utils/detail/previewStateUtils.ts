@@ -10,6 +10,7 @@ export function isPreviewGenerating(
   detail: TrialDetailPreview | null,
 ): boolean {
   if (!detail) return false;
+  if (detail.hasJobFailure) return false;
   return (
     detail.status === 'generating' ||
     isGeneratingStatus(detail.scenarioVersion.status) ||

@@ -84,8 +84,10 @@ export const primeDetailMocks = () => {
     templateKey: 'template-1',
     role: 'Developer',
     techStack: 'React',
+    preferredLanguageFramework: 'React + TypeScript',
     focus: 'Testing',
-    scenario: 'Build an app',
+    scenario: 'Build a project brief from scratch',
+    rubricSummary: 'Assess clarity, correctness, and resilience.',
     tasks: [
       { dayIndex: 1, title: 'Day 1', type: 'text', prompt: 'Task 1' },
       {

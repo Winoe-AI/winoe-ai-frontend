@@ -5,6 +5,7 @@ import { buildPlanDaysForVersion } from '../planDays';
 import { deriveSelectedScenarioDisplayStatus } from '../scenarioStatus';
 import {
   canApproveSelectedScenario,
+  canActivateSelectedTrial,
   formatScenarioRubricSummary,
   scenarioContentUnavailableMessage,
   scenarioEditorDisabledReason,
@@ -52,7 +53,7 @@ export function deriveScenarioVersionViewFields({
     selectedScenarioVersion?.contentAvailability === 'canonical';
   const scenarioFailureMessage = detailHasJobFailure
     ? (detailGenerationErrorMessage ??
-      'Scenario generation failed. Retry generation to continue.')
+      'Project brief generation failed. Retry generation to continue.')
     : null;
   const scenarioGeneratingLabel =
     selectedScenarioVersion?.uiStatus === 'generating'
@@ -89,6 +90,10 @@ export function deriveScenarioVersionViewFields({
       selectedScenarioVersion,
       pendingScenarioVersionId,
       activeScenarioVersionId,
+    }),
+    canActivate: canActivateSelectedTrial({
+      trialStatus,
+      selectedScenarioVersion,
     }),
     displayedScenarioLabel: selectedScenarioVersion
       ? selectedScenarioHasCanonicalContent

@@ -20,13 +20,16 @@ export function TrialDetailHeaderSection({
       scenarioLocked={props.scenarioLocked}
       scenarioLockedAt={props.scenarioLockedAt}
       titleLabel={props.titleLabel}
-      templateKeyLabel={props.templateKeyLabel}
       inviteEnabled={props.inviteEnabled}
       inviteDisabledReason={props.inviteDisabledReason}
       canApprove={props.canApprove}
       approveButtonLabel={props.approveButtonLabel}
       approveLoading={props.approveLoading}
       onApprove={props.onApprove}
+      canActivate={props.canActivate}
+      activateButtonLabel={props.activateButtonLabel}
+      activateLoading={props.activateLoading}
+      onActivate={props.onActivate}
       regenerateLoading={props.regenerateLoading}
       regenerateDisabled={props.regenerateDisabled}
       onRegenerate={props.onRegenerate}

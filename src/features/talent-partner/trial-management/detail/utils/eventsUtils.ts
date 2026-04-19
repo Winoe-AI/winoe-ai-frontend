@@ -1,11 +1,14 @@
 export type TrialDetailEventName =
   | 'approve_clicked'
+  | 'activate_clicked'
   | 'regenerate_clicked'
   | 'retry_generate_clicked'
   | 'terminate_clicked'
   | 'terminate_confirmed'
   | 'terminate_success'
-  | 'terminate_failure';
+  | 'terminate_failure'
+  | 'activate_success'
+  | 'activate_failure';
 
 type EventPayload = {
   trialId: string;

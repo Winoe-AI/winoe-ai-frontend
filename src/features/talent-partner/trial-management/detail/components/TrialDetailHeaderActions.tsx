@@ -9,6 +9,10 @@ type Props = {
   approveButtonLabel: string;
   approveLoading: boolean;
   onApprove: () => void;
+  canActivate: boolean;
+  activateButtonLabel: string;
+  activateLoading: boolean;
+  onActivate: () => void;
   regenerateLoading: boolean;
   regenerateDisabled: boolean;
   scenarioVersionLabel: string;
@@ -26,6 +30,10 @@ export function TrialDetailHeaderActions({
   approveButtonLabel,
   approveLoading,
   onApprove,
+  canActivate,
+  activateButtonLabel,
+  activateLoading,
+  onActivate,
   regenerateLoading,
   regenerateDisabled,
   scenarioVersionLabel,
@@ -47,6 +55,16 @@ export function TrialDetailHeaderActions({
           disabled={!canApprove}
         >
           {approveButtonLabel}
+        </Button>
+      ) : null}
+      {canActivate ? (
+        <Button
+          onClick={onActivate}
+          size="sm"
+          loading={activateLoading}
+          disabled={!canActivate}
+        >
+          {activateButtonLabel}
         </Button>
       ) : null}
       <RegenerateScenarioButton

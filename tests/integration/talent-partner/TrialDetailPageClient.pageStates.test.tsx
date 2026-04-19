@@ -27,7 +27,7 @@ describe('TalentPartnerTrialDetailPage - page states', () => {
       screen.queryByRole('button', { name: /Invite candidate/i }),
     ).not.toBeInTheDocument();
     expect(
-      screen.queryByRole('button', { name: /Approve .* \/ Start inviting/i }),
+      screen.queryByRole('button', { name: /Approve v\d+/i }),
     ).not.toBeInTheDocument();
 
     const calledUrls = fetchMock.mock.calls.map((call) => getUrl(call[0]));
@@ -55,7 +55,7 @@ describe('TalentPartnerTrialDetailPage - page states', () => {
       screen.queryByRole('button', { name: /Invite candidate/i }),
     ).not.toBeInTheDocument();
     expect(
-      screen.queryByRole('button', { name: /Approve .* \/ Start inviting/i }),
+      screen.queryByRole('button', { name: /Approve v\d+/i }),
     ).not.toBeInTheDocument();
 
     const calledUrls = fetchMock.mock.calls.map((call) => getUrl(call[0]));

@@ -57,13 +57,13 @@ export function buildTrialDetailScenarioProps({
     onRegenerate: scenarioActions.onRegenerate,
     retryGenerateLoading: scenarioActions.retryGenerateLoading,
     onRetryGenerate: scenarioActions.onRetryGenerate,
-    templateKeyLabel: labels.templateKeyLabel,
     titleLabel: labels.titleLabel,
     roleLabel: labels.roleLabel,
-    stackLabel: labels.stackLabel,
+    preferredLanguageFrameworkLabel: labels.preferredLanguageFrameworkLabel,
     levelLabel: labels.levelLabel,
     focusLabel: labels.focusLabel,
     companyContextLabel: labels.companyContextLabel,
+    notesLabel: labels.notesLabel,
     scenarioLabel: scenario.displayedScenarioLabel,
     rubricSummary: scenario.displayedRubricSummary,
     scenarioContentUnavailableMessageForPlan:
@@ -78,5 +78,6 @@ export function buildTrialDetailScenarioProps({
     jobFailureCode: scenario.scenarioFailureCode,
     planError,
     reloadPlan,
+    canActivate: scenario.canActivate,
   };
 }

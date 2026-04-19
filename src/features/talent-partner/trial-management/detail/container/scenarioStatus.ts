@@ -28,6 +28,7 @@ export function deriveScenarioUiStatus(
   if (isActive && args.globalGenerating) return 'generating';
   if (normalizedStatus === 'generating' || normalizedStatus === 'draft')
     return 'generating';
+  if (normalizedStatus === 'approved') return 'approved';
   if (isActive && args.trialStatus === 'active_inviting') return 'approved';
   return 'ready_for_review';
 }
@@ -41,6 +42,9 @@ export function deriveSelectedScenarioDisplayStatus(
   if (selected.uiStatus === 'locked') return 'locked';
   if (selected.contentAvailability === 'local_only') return 'local_only';
   if (selected.contentAvailability === 'unavailable') return 'unavailable';
-  if (selected.uiStatus === 'approved') return 'active_inviting';
+  if (selected.uiStatus === 'approved')
+    return args.trialStatus === 'active_inviting'
+      ? 'active_inviting'
+      : 'approved';
   return selected.uiStatus;
 }

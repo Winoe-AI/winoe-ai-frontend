@@ -15,7 +15,7 @@ describe('TrialDetail scenario versions - drafts and save', () => {
   it('tracks editor dirty state and saves PATCH payload', async () => {
     const user = userEvent.setup();
     mockFetchHandlers({
-      '/api/backend/trials/trial-1/scenario/10': jsonResponse({
+      '/api/trials/trial-1/scenario/10': jsonResponse({
         scenarioVersionId: 10,
         status: 'ready',
       }),
@@ -36,7 +36,7 @@ describe('TrialDetail scenario versions - drafts and save', () => {
     await user.click(screen.getByRole('button', { name: /Save edits/i }));
     await waitFor(() => {
       const patchCall = fetchMock.mock.calls.find(
-        (call) => getUrl(call[0]) === '/api/backend/trials/trial-1/scenario/10',
+        (call) => getUrl(call[0]) === '/api/trials/trial-1/scenario/10',
       );
       expect(patchCall).toBeTruthy();
       const body = JSON.parse(
@@ -112,7 +112,7 @@ describe('TrialDetail scenario versions - drafts and save', () => {
           }),
         );
       },
-      '/api/backend/trials/trial-1/scenario/regenerate': jsonResponse({
+      '/api/trials/trial-1/scenario/regenerate': jsonResponse({
         scenarioVersionId: 12,
         jobId: 'job-regen-draft',
         status: 'generating',
@@ -140,7 +140,7 @@ describe('TrialDetail scenario versions - drafts and save', () => {
     );
     await screen.findByText(/Generating v2\.\.\./i);
     expect(
-      screen.queryByRole('button', { name: /Approve .* \/ Start inviting/i }),
+      screen.queryByRole('button', { name: /Approve v\d+/i }),
     ).not.toBeInTheDocument();
     await user.click(
       await screen.findByRole('button', { name: /Select scenario v1/i }),

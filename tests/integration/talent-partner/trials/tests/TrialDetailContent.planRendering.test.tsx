@@ -15,13 +15,38 @@ describe('TalentPartnerTrialDetailPage - plan rendering', () => {
     render(<TalentPartnerTrialDetailPage />);
     expect(await screen.findByText(/5-day trial plan/i)).toBeInTheDocument();
     expect(await screen.findByText('Backend Engineer')).toBeInTheDocument();
-    expect(await screen.findByText('Python + FastAPI')).toBeInTheDocument();
+    expect(
+      await screen.findByText(/Project brief narrative/i),
+    ).toBeInTheDocument();
     expect(
       await screen.findByText(/Build a billing service/i),
     ).toBeInTheDocument();
-    expect(await screen.findByText('Kickoff')).toBeInTheDocument();
+    expect(
+      await screen.findByText(/Preferred language\/framework/i),
+    ).toBeInTheDocument();
+    expect(await screen.findByText('Python + FastAPI')).toBeInTheDocument();
+    expect(await screen.findByText(/Rubric summary/i)).toBeInTheDocument();
+    expect(
+      await screen.findByText(/Assess API correctness, clarity/i),
+    ).toBeInTheDocument();
+    expect(
+      await screen.findByText(/Project brief narrative/i),
+    ).toBeInTheDocument();
     expect(await screen.findByText('Clarity')).toBeInTheDocument();
-    expect(await screen.findByText(/Day 2 workspace/i)).toBeInTheDocument();
+    expect(
+      await screen.findByText(/^Planning and Design Doc$/i),
+    ).toBeInTheDocument();
+    expect(
+      await screen.findByText(/^Implementation Kickoff$/i),
+    ).toBeInTheDocument();
+    expect(
+      await screen.findByText(/^Implementation Wrap-Up$/i),
+    ).toBeInTheDocument();
+    expect(await screen.findByText(/^Handoff \+ Demo$/i)).toBeInTheDocument();
+    expect(await screen.findByText(/^Reflection Essay$/i)).toBeInTheDocument();
+    expect(
+      await screen.findByText(/^Implementation Kickoff workspace$/i),
+    ).toBeInTheDocument();
     expect(await screen.findByText(/Repo provisioned/i)).toBeInTheDocument();
     expect(
       await screen.findByText(/Repo not provisioned yet/i),
@@ -32,11 +57,11 @@ describe('TalentPartnerTrialDetailPage - plan rendering', () => {
     expect(
       screen.getAllByText(/AI Evaluation: Enabled/i).length,
     ).toBeGreaterThan(0);
-    expect((await screen.findAllByText(/Day 4/i)).length).toBeGreaterThan(0);
-    expect((await screen.findAllByText(/Day 5/i)).length).toBeGreaterThan(0);
     expect(
       (await screen.findAllByText(/Not generated yet/i)).length,
     ).toBeGreaterThanOrEqual(2);
+    expect(screen.queryByText(/Template/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Tech stack/i)).not.toBeInTheDocument();
   });
 
   it('normalizes plan data from nested task objects', async () => {
@@ -50,12 +75,13 @@ describe('TalentPartnerTrialDetailPage - plan rendering', () => {
           template_key: 'python-fastapi',
           role_name: 'Backend Engineer',
           tech_stack: ['Python', 'FastAPI'],
+          preferred_language_framework: 'Python, FastAPI',
           focus_area: ['Performance', 'Reliability'],
-          scenario: { summary: 'Scenario summary from object.' },
+          scenario: { summary: 'Project brief summary from object.' },
           tasks: {
             day_1: {
               title: 'Discovery',
-              description: 'Review the requirements.',
+              description: 'Review the project brief.',
               rubric: { summary: 'Clear and concise notes.' },
             },
             day_2: {
@@ -78,17 +104,24 @@ describe('TalentPartnerTrialDetailPage - plan rendering', () => {
     });
     render(<TalentPartnerTrialDetailPage />);
     expect(
-      await screen.findByText(/Scenario summary from object/i),
+      await screen.findByText(/Project brief summary from object/i),
+    ).toBeInTheDocument();
+    expect(
+      await screen.findByText(/Preferred language\/framework/i),
     ).toBeInTheDocument();
     expect(await screen.findByText('Python, FastAPI')).toBeInTheDocument();
     expect(
       await screen.findByText('Performance, Reliability'),
     ).toBeInTheDocument();
-    expect(await screen.findByText('Discovery')).toBeInTheDocument();
+    expect(
+      await screen.findByText(/^Review the project brief\.$/i),
+    ).toBeInTheDocument();
     expect(
       await screen.findByText(/Clear and concise notes/i),
     ).toBeInTheDocument();
-    expect(await screen.findByText(/Day 2 workspace/i)).toBeInTheDocument();
+    expect(
+      await screen.findByText(/^Implementation Kickoff workspace$/i),
+    ).toBeInTheDocument();
     expect(
       (await screen.findAllByText(/Repo provisioned/i)).length,
     ).toBeGreaterThan(0);
@@ -131,6 +164,7 @@ describe('TalentPartnerTrialDetailPage - plan rendering', () => {
           templateKey: 'python-fastapi',
           role: 'Backend Engineer',
           techStack: 'Python + FastAPI',
+          preferredLanguageFramework: 'Python + FastAPI',
           tasks: [
             {
               dayIndex: 2,

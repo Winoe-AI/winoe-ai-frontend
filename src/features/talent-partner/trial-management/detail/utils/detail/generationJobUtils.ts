@@ -40,7 +40,9 @@ export function normalizeGenerationJob(
   const directErrorMessage = toStringOrNull(
     record.errorMessage ?? record.error_message ?? record.lastError,
   );
-  const directErrorCode = toStringOrNull(record.errorCode ?? record.error_code);
+  const directErrorCode = toStringOrNull(
+    record.errorCode ?? record.error_code ?? record.code,
+  );
   const nestedError = readErrorInfo(record.error ?? record.last_error);
   const errorMessage =
     directErrorMessage ?? nestedError.message ?? toStringOrNull(record.error);
@@ -60,9 +62,13 @@ export function readGenerationJob(
   raw: Record<string, unknown>,
   scenario: Record<string, unknown> | null,
 ): TrialGenerationJob | null {
+  const generationFailure = asRecord(
+    raw.generationFailure ?? raw.generation_failure,
+  );
   const explicitJob =
     normalizeGenerationJob(raw.scenarioJob ?? raw.scenario_job) ??
     normalizeGenerationJob(raw.generationJob ?? raw.generation_job) ??
+    normalizeGenerationJob(generationFailure) ??
     normalizeGenerationJob(raw.job) ??
     normalizeGenerationJob(scenario?.job ?? scenario?.scenarioJob);
   if (explicitJob) return explicitJob;
@@ -86,7 +92,14 @@ export function readGenerationJob(
     errorCode:
       raw.jobErrorCode ??
       raw.job_error_code ??
+      generationFailure?.code ??
+      generationFailure?.errorCode ??
       scenario?.jobErrorCode ??
       scenario?.job_error_code,
+    errorMessage:
+      generationFailure?.error ??
+      generationFailure?.message ??
+      generationFailure?.errorMessage ??
+      generationFailure?.lastError,
   });
 }

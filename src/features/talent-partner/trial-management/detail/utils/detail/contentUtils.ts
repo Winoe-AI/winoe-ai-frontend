@@ -9,12 +9,21 @@ export function readCompanyContext(value: unknown): string | null {
   const record = value as Record<string, unknown>;
   const domain = toStringOrNull(record.domain ?? record.companyDomain);
   const productArea = toStringOrNull(record.productArea ?? record.product_area);
+  const preferredLanguageFramework = toStringOrNull(
+    record.preferredLanguageFramework ??
+      record.preferred_language_framework ??
+      record.preferredLanguage ??
+      record.preferred_language,
+  );
   const context = toStringOrNull(
     record.context ?? record.summary ?? record.description,
   );
   const bits: string[] = [];
   if (domain) bits.push(`Domain: ${domain}`);
   if (productArea) bits.push(`Product: ${productArea}`);
+  if (preferredLanguageFramework) {
+    bits.push(`Preferred language/framework: ${preferredLanguageFramework}`);
+  }
   if (context) bits.push(context);
   return bits.length ? bits.join(' · ') : null;
 }

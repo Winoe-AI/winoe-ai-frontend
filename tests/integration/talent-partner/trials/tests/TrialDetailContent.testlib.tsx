@@ -39,6 +39,7 @@ export const trialDetailResponse = () =>
     templateKey: 'python-fastapi',
     role: 'Backend Engineer',
     techStack: 'Python + FastAPI',
+    preferredLanguageFramework: 'Python + FastAPI',
     focus: 'API design',
     ai: {
       evalEnabledByDay: {
@@ -50,6 +51,7 @@ export const trialDetailResponse = () =>
       },
     },
     scenario: 'Build a billing service for a growing marketplace.',
+    rubricSummary: 'Assess API correctness, clarity, and error handling.',
     tasks: [
       {
         dayIndex: 1,

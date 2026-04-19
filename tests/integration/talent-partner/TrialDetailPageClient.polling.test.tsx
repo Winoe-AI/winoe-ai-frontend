@@ -65,7 +65,7 @@ describe('TalentPartnerTrialDetailPage - scenario polling', () => {
 
     renderPage();
     expect(
-      await screen.findByText(/Scenario generation is in progress/i),
+      await screen.findByText(/Project brief generation is in progress/i),
     ).toBeInTheDocument();
     await act(async () => {
       jest.advanceTimersByTime(2200);
@@ -75,7 +75,7 @@ describe('TalentPartnerTrialDetailPage - scenario polling', () => {
     });
     await waitFor(() => {
       expect(
-        screen.queryByText(/Scenario generation is in progress/i),
+        screen.queryByText(/Project brief generation is in progress/i),
       ).not.toBeInTheDocument();
     });
 
@@ -138,7 +138,7 @@ describe('TalentPartnerTrialDetailPage - scenario polling', () => {
 
     renderPage();
     expect(
-      await screen.findByText(/Scenario generation is in progress/i),
+      await screen.findByText(/Project brief generation is in progress/i),
     ).toBeInTheDocument();
     await act(async () => {
       jest.advanceTimersByTime(2200);
@@ -149,11 +149,62 @@ describe('TalentPartnerTrialDetailPage - scenario polling', () => {
 
     expect(
       await screen.findByRole('button', {
-        name: /Approve v1 \/ Start inviting/i,
+        name: /Approve v1/i,
       }),
     ).toBeInTheDocument();
     const calledUrls = fetchMock.mock.calls.map((call) => getUrl(call[0]));
-    expect(calledUrls).toContain('/api/backend/jobs/job-1');
+    expect(calledUrls).toContain('/api/jobs/job-1');
     jest.useRealTimers();
+  });
+
+  it('shows a generation failure banner with retry action', async () => {
+    mockFetchHandlers({
+      '/api/trials': jsonResponse([
+        {
+          id: 'trial-1',
+          title: 'Trial trial-1',
+          templateKey: 'python-fastapi',
+        },
+      ]),
+      '/api/trials/trial-1': jsonResponse({
+        id: 'trial-1',
+        status: 'generating',
+        title: 'Trial trial-1',
+        templateKey: 'python-fastapi',
+        scenario: {
+          id: 301,
+          versionIndex: 1,
+          status: 'failed',
+          lockedAt: null,
+        },
+        scenarioJob: {
+          jobId: 'job-1',
+          status: 'failed',
+          pollAfterMs: 2000,
+          errorMessage: 'Project brief generation failed upstream.',
+          errorCode: 'BRIEF_FAILED',
+        },
+        tasks: [],
+      }),
+      '/api/trials/trial-1/candidates': jsonResponse([]),
+      '/api/backend/jobs/job-1': jsonResponse({
+        jobId: 'job-1',
+        jobType: 'scenario_generation',
+        status: 'failed',
+        pollAfterMs: 2000,
+        error: {
+          message: 'Project brief generation failed upstream.',
+          code: 'BRIEF_FAILED',
+        },
+      }),
+    });
+
+    renderPage();
+    expect(
+      await screen.findByText(/^Project brief generation failed\.$/i),
+    ).toBeInTheDocument();
+    expect(
+      screen.getAllByRole('button', { name: /Retry generate/i }),
+    ).toHaveLength(1);
   });
 });

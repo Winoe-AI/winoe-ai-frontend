@@ -43,27 +43,28 @@ export function useTrialLabels(
     );
   }, [detail?.aiEvaluationEnabledByDay, plan]);
 
-  const templateKeyLabel = plan?.templateKey?.trim() || '—';
   const titleLabel = plan?.title?.trim() || `Trial ${trialId}`;
   const roleLabel = plan?.role?.trim() || '—';
-  const stackLabel = plan?.techStack?.trim() || '—';
+  const preferredLanguageFrameworkLabel =
+    plan?.preferredLanguageFramework?.trim() || null;
   const levelLabel = detail?.level?.trim() || '—';
   const focusLabel = plan?.focus?.trim() || '—';
   const companyContextLabel = detail?.companyContext?.trim() || '—';
   const scenarioLabel =
     detail?.storyline?.trim() || plan?.scenario?.trim() || null;
   const rubricSummary = detail?.rubricSummary?.trim() || null;
+  const notesLabel = detail?.notes?.trim() || null;
 
   return {
     planDays,
-    templateKeyLabel,
     titleLabel,
     roleLabel,
-    stackLabel,
+    preferredLanguageFrameworkLabel,
     levelLabel,
     focusLabel,
     companyContextLabel,
     scenarioLabel,
     rubricSummary,
+    notesLabel,
   };
 }

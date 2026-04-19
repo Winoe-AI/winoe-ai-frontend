@@ -54,12 +54,12 @@ describe('TrialDetail scenario versions - regenerate lifecycle', () => {
           }),
         );
       },
-      '/api/backend/trials/trial-1/scenario/regenerate': jsonResponse({
+      '/api/trials/trial-1/scenario/regenerate': jsonResponse({
         scenarioVersionId: 12,
         jobId: 'job-regen-1',
         status: 'generating',
       }),
-      '/api/backend/jobs/job-regen-1': jsonResponse({
+      '/api/jobs/job-regen-1': jsonResponse({
         jobId: 'job-regen-1',
         status: 'succeeded',
       }),
@@ -119,12 +119,12 @@ describe('TrialDetail scenario versions - regenerate lifecycle', () => {
           }),
         );
       },
-      '/api/backend/trials/trial-1/scenario/regenerate': jsonResponse({
+      '/api/trials/trial-1/scenario/regenerate': jsonResponse({
         scenarioVersionId: 12,
         jobId: 'job-regen-terminal',
         status: 'generating',
       }),
-      '/api/backend/jobs/job-regen-terminal': jsonResponse({
+      '/api/jobs/job-regen-terminal': jsonResponse({
         jobId: 'job-regen-terminal',
         status: 'completed',
       }),
@@ -146,7 +146,7 @@ describe('TrialDetail scenario versions - regenerate lifecycle', () => {
     await waitFor(() =>
       expect(
         fetchMock.mock.calls.some(
-          (call) => getUrl(call[0]) === '/api/backend/jobs/job-regen-terminal',
+          (call) => getUrl(call[0]) === '/api/jobs/job-regen-terminal',
         ),
       ).toBe(true),
     );
@@ -163,7 +163,7 @@ describe('TrialDetail scenario versions - regenerate lifecycle', () => {
       screen.getAllByText(/^Local draft only$/i).length,
     ).toBeGreaterThanOrEqual(2);
     expect(
-      screen.queryByRole('button', { name: /Approve .* \/ Start inviting/i }),
+      screen.queryByRole('button', { name: /Approve v\d+/i }),
     ).not.toBeInTheDocument();
     expect(
       screen.getByRole('button', { name: /Invite candidate/i }),
