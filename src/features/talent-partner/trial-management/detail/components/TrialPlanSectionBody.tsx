@@ -22,6 +22,7 @@ type TrialPlanSectionBodyProps = Pick<
   | 'levelLabel'
   | 'focusLabel'
   | 'companyContextLabel'
+  | 'notesLabel'
   | 'scenarioLabel'
   | 'rubricSummary'
   | 'contentUnavailableMessage'
@@ -43,6 +44,7 @@ export function TrialPlanSectionBody(props: TrialPlanSectionBodyProps) {
     planDays: props.planDays,
     scenarioLabel: props.scenarioLabel,
     rubricSummary: props.rubricSummary,
+    notesLabel: props.notesLabel,
   });
   if (props.loading) return <TrialPlanLoadingSkeleton />;
   if (props.statusCode === 404) return <TrialPlanNotFoundState />;
@@ -89,6 +91,7 @@ export function TrialPlanSectionBody(props: TrialPlanSectionBodyProps) {
           levelLabel={props.levelLabel}
           focusLabel={props.focusLabel}
           companyContextLabel={props.companyContextLabel}
+          notesLabel={props.notesLabel}
           scenarioLabel={props.scenarioLabel}
           rubricSummary={props.rubricSummary}
           planDays={props.planDays}

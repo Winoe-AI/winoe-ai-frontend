@@ -63,6 +63,7 @@ export function buildTrialDetailScenarioProps({
     levelLabel: labels.levelLabel,
     focusLabel: labels.focusLabel,
     companyContextLabel: labels.companyContextLabel,
+    notesLabel: labels.notesLabel,
     scenarioLabel: scenario.displayedScenarioLabel,
     rubricSummary: scenario.displayedRubricSummary,
     scenarioContentUnavailableMessageForPlan:

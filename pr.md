@@ -48,4 +48,3 @@ This PR restores the Talent Partner Trial detail page and aligns it to the v4 fr
 
 - No reintroduction of legacy template-selection UI.
 - No claim of backend permanence beyond the live QA proof captured here.
-

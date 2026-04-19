@@ -15,6 +15,7 @@ export function TrialPlanSection({
   levelLabel,
   focusLabel,
   companyContextLabel,
+  notesLabel,
   scenarioLabel,
   rubricSummary,
   contentUnavailableMessage,
@@ -44,6 +45,7 @@ export function TrialPlanSection({
         levelLabel={levelLabel}
         focusLabel={focusLabel}
         companyContextLabel={companyContextLabel}
+        notesLabel={notesLabel}
         scenarioLabel={scenarioLabel}
         rubricSummary={rubricSummary}
         contentUnavailableMessage={contentUnavailableMessage}

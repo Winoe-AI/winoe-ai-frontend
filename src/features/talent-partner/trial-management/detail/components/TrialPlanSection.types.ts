@@ -10,6 +10,7 @@ export type TrialPlanSectionProps = {
   levelLabel: string;
   focusLabel: string;
   companyContextLabel: string;
+  notesLabel: string | null;
   scenarioLabel: string | null;
   rubricSummary: string | null;
   contentUnavailableMessage: string | null;

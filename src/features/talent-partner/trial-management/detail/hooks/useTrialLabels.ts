@@ -53,6 +53,7 @@ export function useTrialLabels(
   const scenarioLabel =
     detail?.storyline?.trim() || plan?.scenario?.trim() || null;
   const rubricSummary = detail?.rubricSummary?.trim() || null;
+  const notesLabel = detail?.notes?.trim() || null;
 
   return {
     planDays,
@@ -64,5 +65,6 @@ export function useTrialLabels(
     companyContextLabel,
     scenarioLabel,
     rubricSummary,
+    notesLabel,
   };
 }

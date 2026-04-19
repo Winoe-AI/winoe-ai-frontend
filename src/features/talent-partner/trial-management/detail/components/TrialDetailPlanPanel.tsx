@@ -17,6 +17,7 @@ export function TrialDetailPlanPanel({ props }: TrialDetailPlanPanelProps) {
       levelLabel={props.levelLabel}
       focusLabel={props.focusLabel}
       companyContextLabel={props.companyContextLabel}
+      notesLabel={props.notesLabel}
       scenarioLabel={props.scenarioLabel}
       rubricSummary={props.rubricSummary}
       contentUnavailableMessage={props.scenarioContentUnavailableMessageForPlan}

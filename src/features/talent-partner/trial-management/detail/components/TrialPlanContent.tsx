@@ -9,6 +9,7 @@ type Props = {
   levelLabel: string;
   focusLabel: string;
   companyContextLabel: string;
+  notesLabel: string | null;
   scenarioLabel: string | null;
   rubricSummary: string | null;
   planDays: {
@@ -24,6 +25,7 @@ export function TrialPlanContent({
   levelLabel,
   focusLabel,
   companyContextLabel,
+  notesLabel,
   scenarioLabel,
   rubricSummary,
   planDays,
@@ -31,10 +33,10 @@ export function TrialPlanContent({
   return (
     <div className="mt-4 flex flex-col gap-4">
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        <Meta label="Role" value={roleLabel} />
-        <Meta label="Level" value={levelLabel} />
-        <Meta label="Evaluation focus" value={focusLabel} />
-        <Meta label="Brief context" value={companyContextLabel} />
+        <Meta label="Project context" value={companyContextLabel} />
+        <Meta label="Evaluation focus areas" value={focusLabel} />
+        <Meta label="Target level" value={levelLabel} />
+        <Meta label="Scenario role" value={roleLabel} />
       </div>
       {scenarioLabel ? (
         <div className="rounded border border-gray-200 bg-gray-50 p-3 text-sm text-gray-700">
@@ -42,6 +44,14 @@ export function TrialPlanContent({
             Project brief narrative
           </div>
           <MarkdownPreviewComponent content={scenarioLabel} className="mt-1" />
+        </div>
+      ) : null}
+      {notesLabel ? (
+        <div className="rounded border border-gray-200 bg-gray-50 p-3 text-sm text-gray-700">
+          <div className="text-xs font-medium uppercase tracking-wide text-gray-500">
+            System requirements and technical constraints
+          </div>
+          <MarkdownPreviewComponent content={notesLabel} className="mt-1" />
         </div>
       ) : null}
       {preferredLanguageFrameworkLabel ? (

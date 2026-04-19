@@ -63,6 +63,7 @@ export type TrialDetailViewProps = {
   levelLabel: string;
   focusLabel: string;
   companyContextLabel: string;
+  notesLabel: string | null;
   aiConfig: TrialAiConfig | null;
   scenarioLabel: string | null;
   rubricSummary: string | null;
