@@ -5,9 +5,8 @@ export type TrialPlanSectionProps = {
   scenarioVersionLabel: string;
   scenarioIdLabel: string | null;
   scenarioLocked: boolean;
-  templateKeyLabel: string;
   roleLabel: string;
-  stackLabel: string;
+  preferredLanguageFrameworkLabel: string | null;
   levelLabel: string;
   focusLabel: string;
   companyContextLabel: string;

@@ -12,9 +12,8 @@ export function TrialDetailPlanPanel({ props }: TrialDetailPlanPanelProps) {
       scenarioVersionLabel={props.scenarioVersionLabel}
       scenarioIdLabel={props.scenarioIdLabel}
       scenarioLocked={props.scenarioLocked}
-      templateKeyLabel={props.templateKeyLabel}
       roleLabel={props.roleLabel}
-      stackLabel={props.stackLabel}
+      preferredLanguageFrameworkLabel={props.preferredLanguageFrameworkLabel}
       levelLabel={props.levelLabel}
       focusLabel={props.focusLabel}
       companyContextLabel={props.companyContextLabel}

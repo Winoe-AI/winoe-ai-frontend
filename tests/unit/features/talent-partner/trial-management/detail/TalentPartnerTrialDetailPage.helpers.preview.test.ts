@@ -40,7 +40,11 @@ describe('TalentPartnerTrialDetailPage helper preview normalization', () => {
       activeScenarioVersionId: 10,
       pendingScenarioVersionId: 11,
       seniority: 'mid',
-      companyContext: { domain: 'Fintech', productArea: 'Payments' },
+      companyContext: {
+        domain: 'Fintech',
+        productArea: 'Payments',
+        preferredLanguageFramework: 'Python + FastAPI',
+      },
       ai: { evalEnabledByDay: { '4': false } },
       scenario: {
         id: 10,
@@ -71,9 +75,43 @@ describe('TalentPartnerTrialDetailPage helper preview normalization', () => {
       '4': false,
       '5': true,
     });
+    expect(detail.companyContext).toBe(
+      'Domain: Fintech · Product: Payments · Preferred language/framework: Python + FastAPI',
+    );
     expect(__testables.scenarioVersionLabel(2)).toBe('v2');
     expect(__testables.isPreviewGenerating(detail)).toBe(true);
     expect(__testables.isPreviewEmpty(detail)).toBe(false);
+  });
+
+  it('prefers generation failure metadata over stale generating status', () => {
+    const detail = __testables.normalizeTrialDetailPreview({
+      id: 49,
+      status: 'generating',
+      generationStatus: 'failed',
+      generationFailure: {
+        jobId: 'job-49',
+        status: 'failed',
+        error: 'Project brief generation failed upstream. Please retry.',
+        code: 'SCENARIO_ACTIVE_VERSION_MISSING',
+      },
+      scenario: {
+        id: 401,
+        versionIndex: 3,
+        status: 'failed',
+        lockedAt: null,
+      },
+      tasks: [],
+    });
+
+    expect(detail.generationJob).toEqual({
+      jobId: 'job-49',
+      status: 'failed',
+      pollAfterMs: null,
+      errorMessage: 'Project brief generation failed upstream. Please retry.',
+      errorCode: 'SCENARIO_ACTIVE_VERSION_MISSING',
+    });
+    expect(detail.hasJobFailure).toBe(true);
+    expect(__testables.isPreviewGenerating(detail)).toBe(false);
   });
 
   it('marks metadata-only historical versions unavailable and normalizes snake_case eval map', () => {

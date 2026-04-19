@@ -70,6 +70,8 @@ export function useTrialDetailScenarioModel({
     selectedScenarioVersionIndex: scenario.selectedScenarioVersionIndex,
     selectedScenarioVersionText: scenario.selectedScenarioVersionText,
     hasSelectedScenarioVersion: scenario.selectedScenarioVersion != null,
+    canActivate: scenario.canActivate,
+    refreshPlan: reloadPlan,
     terminatePending: state.terminatePending,
     terminateModalOpen: state.terminateModalOpen,
     isTerminated: state.isTerminated,

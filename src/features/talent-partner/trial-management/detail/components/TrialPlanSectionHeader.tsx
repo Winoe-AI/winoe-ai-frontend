@@ -24,7 +24,8 @@ export function TrialPlanSectionHeader({
           5-day trial plan
         </h2>
         <p className="text-sm text-gray-600">
-          Review storyline, tasks, and rubric before inviting candidates.
+          Review the project brief, tasks, and rubric before inviting
+          candidates.
         </p>
       </div>
       <div className="flex flex-wrap items-center gap-2">

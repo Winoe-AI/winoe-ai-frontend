@@ -17,8 +17,25 @@ describe('TalentPartnerTrialDetailPage component rendering', () => {
       expect(screen.getByText('Test Trial')).toBeInTheDocument(),
     );
     expect(screen.getByText(/Developer/)).toBeInTheDocument();
-    expect(screen.getByText(/React/)).toBeInTheDocument();
-    expect(screen.getByText(/Testing/)).toBeInTheDocument();
+    expect(screen.getByText(/Project brief narrative/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Build a project brief from scratch/i),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/Preferred language\/framework/i),
+    ).toBeInTheDocument();
+    expect(screen.getByText(/React \+ TypeScript/)).toBeInTheDocument();
+    expect(screen.getByText(/Rubric summary/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Assess clarity, correctness, and resilience/i),
+    ).toBeInTheDocument();
+    expect(screen.getByText(/^Planning and Design Doc$/i)).toBeInTheDocument();
+    expect(screen.getByText(/^Implementation Kickoff$/i)).toBeInTheDocument();
+    expect(screen.getByText(/^Implementation Wrap-Up$/i)).toBeInTheDocument();
+    expect(screen.getByText(/^Handoff \+ Demo$/i)).toBeInTheDocument();
+    expect(screen.getByText(/^Reflection Essay$/i)).toBeInTheDocument();
+    expect(screen.queryByText(/template/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/tech stack/i)).not.toBeInTheDocument();
   });
 
   it('shows empty candidates state', async () => {

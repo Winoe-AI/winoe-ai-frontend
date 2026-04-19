@@ -1,5 +1,7 @@
-import type { Dispatch, SetStateAction } from 'react';
+import { useState, type Dispatch, type SetStateAction } from 'react';
 import type { ToastInput } from '@/shared/notifications/types';
+import { logTrialDetailEvent } from '../../utils/eventsUtils';
+import { activateTrialAction } from '../actions/activateTrialAction';
 import { useSubmitInviteCallback } from './useSubmitInviteCallback';
 import { useTerminateCallbacks } from './useTerminateCallbacks';
 
@@ -11,6 +13,8 @@ type UseTrialDetailCallbacksArgs = {
   selectedScenarioVersionIndex: number | null;
   selectedScenarioVersionText: string;
   hasSelectedScenarioVersion: boolean;
+  canActivate: boolean;
+  refreshPlan: () => Promise<void>;
   terminatePending: boolean;
   terminateModalOpen: boolean;
   isTerminated: boolean;
@@ -32,6 +36,8 @@ export function useTrialDetailCallbacks({
   selectedScenarioVersionIndex,
   selectedScenarioVersionText,
   hasSelectedScenarioVersion,
+  canActivate,
+  refreshPlan,
   terminatePending,
   terminateModalOpen,
   isTerminated,
@@ -47,8 +53,10 @@ export function useTrialDetailCallbacks({
   setTerminateBlockedStatus,
 }: UseTrialDetailCallbacksArgs) {
   const approveButtonLabel = hasSelectedScenarioVersion
-    ? `Approve ${selectedScenarioVersionText} / Start inviting`
-    : 'Approve / Start inviting';
+    ? `Approve ${selectedScenarioVersionText}`
+    : 'Approve';
+  const activateButtonLabel = 'Activate trial';
+  const [activateLoading, setActivateLoading] = useState(false);
 
   const onSubmitInvite = useSubmitInviteCallback({
     trialId,
@@ -59,6 +67,21 @@ export function useTrialDetailCallbacks({
     notify,
     setActionError,
   });
+  const onActivate = async () => {
+    if (!canActivate) return;
+    await activateTrialAction({
+      activateLoading,
+      trialId,
+      trialStatus,
+      selectedScenarioVersionIndex,
+      setActionError,
+      setActivateLoading,
+      setStatusOverride,
+      refreshPlan,
+      notify,
+      logEvent: logTrialDetailEvent,
+    });
+  };
   const { onSetTerminateModalOpen, onTerminate } = useTerminateCallbacks({
     trialId,
     trialStatus,
@@ -77,6 +100,10 @@ export function useTrialDetailCallbacks({
 
   return {
     approveButtonLabel,
+    activateButtonLabel,
+    activateLoading,
+    canActivate,
+    onActivate,
     onSubmitInvite,
     onSetTerminateModalOpen,
     onTerminate,

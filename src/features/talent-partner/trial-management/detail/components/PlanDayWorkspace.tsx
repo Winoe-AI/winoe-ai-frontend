@@ -3,9 +3,18 @@ import type { TrialPlanDay } from '../utils/plan';
 
 type Props = { day: TrialPlanDay; dayIndex: number };
 
+const DAY_TITLES: Record<number, string> = {
+  1: 'Planning and Design Doc',
+  2: 'Implementation Kickoff',
+  3: 'Implementation Wrap-Up',
+  4: 'Handoff + Demo',
+  5: 'Reflection Essay',
+};
+
 export function PlanDayWorkspace({ day, dayIndex }: Props) {
   const showRepoStatus = dayIndex === 2 || dayIndex === 3;
   if (!showRepoStatus) return null;
+  const dayTitle = DAY_TITLES[dayIndex] ?? `Day ${dayIndex}`;
 
   const repoStatusLabel =
     day.provisioned === true
@@ -21,7 +30,7 @@ export function PlanDayWorkspace({ day, dayIndex }: Props) {
   return (
     <div className="mt-3 text-sm text-gray-700">
       <div className="text-xs font-medium uppercase tracking-wide text-gray-500">
-        Day {dayIndex} workspace
+        {dayTitle} workspace
       </div>
       <div className="mt-1 flex flex-col gap-1">
         <div>{repoStatusLabel}</div>
@@ -56,7 +65,7 @@ export function PlanDayWorkspace({ day, dayIndex }: Props) {
             target="_blank"
             rel="noreferrer"
           >
-            Open codespace
+            Open workspace
           </a>
         ) : null}
       </div>

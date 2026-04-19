@@ -11,7 +11,7 @@ export function useTrialPlanError(detailError: unknown) {
     if (!detailError) return null;
     if (statusCode === 404) return 'Trial not found.';
     if (statusCode === 403) return "You don't have access to this trial.";
-    return toUserMessage(detailError, 'Failed to load trial details.', {
+    return toUserMessage(detailError, 'Failed to load trial preview.', {
       includeDetail: false,
     });
   }, [detailError, statusCode]);

@@ -31,6 +31,12 @@ export function normalizeTrialPlan(raw: unknown): TrialPlan | null {
     techStack: toStringOrCsv(
       rec.techStack ?? rec.tech_stack ?? rec.stack ?? rec.stack_name,
     ),
+    preferredLanguageFramework: toStringOrNull(
+      rec.preferredLanguageFramework ??
+        rec.preferred_language_framework ??
+        rec.preferredLanguage ??
+        rec.preferred_language,
+    ),
     focus: toStringOrCsv(rec.focus ?? rec.focus_area ?? rec.focusArea),
     scenario,
     days: extractDayTasks(rec).sort((a, b) => a.dayIndex - b.dayIndex),

@@ -4,7 +4,8 @@ import { BRAND_NAME } from '@/platform/config/brand';
 
 export const metadata: Metadata = {
   title: `Trial detail | ${BRAND_NAME}`,
-  description: 'Preview scenario output, approve trial, and invite candidates.',
+  description:
+    'Preview the project brief, review tasks and rubric, approve and activate the trial, manage candidate invites, and terminate the lifecycle when needed.',
 };
 
 export default function Page() {

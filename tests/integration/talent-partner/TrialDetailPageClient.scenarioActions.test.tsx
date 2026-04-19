@@ -42,7 +42,7 @@ describe('TalentPartnerTrialDetailPage - scenario actions', () => {
         ],
       }),
       '/api/trials/trial-1/candidates': jsonResponse([]),
-      '/api/backend/trials/trial-1/scenario/regenerate': jsonResponse({
+      '/api/trials/trial-1/scenario/regenerate': jsonResponse({
         scenarioVersionId: 102,
         jobId: 'job-1',
         status: 'generating',
@@ -61,8 +61,7 @@ describe('TalentPartnerTrialDetailPage - scenario actions', () => {
     expect(dialog).toBeInTheDocument();
     expect(
       fetchMock.mock.calls.filter(
-        (call) =>
-          getUrl(call[0]) === '/api/backend/trials/trial-1/scenario/regenerate',
+        (call) => getUrl(call[0]) === '/api/trials/trial-1/scenario/regenerate',
       ).length,
     ).toBe(0);
 
@@ -77,8 +76,7 @@ describe('TalentPartnerTrialDetailPage - scenario actions', () => {
 
     await waitFor(() => {
       const calls = fetchMock.mock.calls.filter(
-        (call) =>
-          getUrl(call[0]) === '/api/backend/trials/trial-1/scenario/regenerate',
+        (call) => getUrl(call[0]) === '/api/trials/trial-1/scenario/regenerate',
       );
       expect(calls.length).toBe(1);
     });
@@ -110,14 +108,14 @@ describe('TalentPartnerTrialDetailPage - scenario actions', () => {
         ],
       }),
       '/api/trials/trial-1/candidates': jsonResponse([]),
-      '/api/backend/trials/trial-1/scenario/10/approve': () =>
+      '/api/trials/trial-1/scenario/10/approve': () =>
         Promise.reject('approve failed'),
     });
 
     renderPage();
     await user.click(
       await screen.findByRole('button', {
-        name: /Approve v1 \/ Start inviting/i,
+        name: /Approve v1/i,
       }),
     );
     expect(await screen.findByText(/Request failed/i)).toBeInTheDocument();

@@ -1,51 +1,51 @@
 ## 1. Title
 
-Trial creation polish for #176: role title/description split and v4 from-scratch pivot alignment
+Restore Trial detail preview for the v4 project brief flow
 
 ## 2. Summary
 
-This PR sharpens the Trial creation flow for the Talent Partner path and aligns the create experience with the v4 from-scratch pivot.
+This PR restores the Talent Partner Trial detail page and aligns it to the v4 from-scratch pivot. The Trial preview now shows the Project Brief, scenario storyline, task descriptions, rubric summary, scenario version, and frozen AI snapshot metadata.
 
 ## 3. What changed
 
-- Split the create form into separate `Role title` and `Role description` inputs.
-- Kept `Advanced Settings` collapsed by default.
-- Auto-opens `Advanced Settings` when advanced-field validation errors are present.
-- Added an optional `Preferred language/framework` field for scenario-generation context.
-- Included the exact helper text:
-  - `This is optional and helps Winoe generate a relevant project brief. The candidate may ultimately use any language or framework they choose.`
-- Added clearer loading-state behavior while the Trial is being generated.
-- Redirects to the Trial detail page after a successful create.
-- Removed the retired template/stack selector path from the active create flow.
-- Aligned the create payload cleanup with the v4 pivot so the frontend no longer sends legacy template or stack fields.
+- Rebuilt the Trial detail preview so it renders the full scenario experience again after the backend contract fixes.
+- Replaced legacy codespace/template framing with Project Brief language throughout the active Trial detail UI.
+- Removed template name, template repo, and tech stack from the active Trial detail surface.
+- Kept preferred language/framework visible only as informational context when present.
+- Aligned the 5-day labels to the product spec:
+  - Planning and Design Doc
+  - Implementation Kickoff
+  - Implementation Wrap-Up
+  - Handoff + Demo
+  - Reflection Essay
+- Restored lifecycle controls for approve, activate, and terminate flows.
+- Restored the generation failure state with a clear message and retry action.
+- Kept invite controls disabled until the Trial reaches active inviting.
 
 ## 4. Backend alignment
 
-- Live end-to-end Trial creation was initially blocked by a backend Trial-create contract mismatch.
-- That backend blocker was resolved separately.
-- Trial creation was rerun successfully after backend alignment.
+- Backend normalization and retry blockers were resolved enough to complete full real-stack QA on the Trial detail experience.
+- Live validation used the running frontend and backend, not mocked data.
 
 ## 5. QA / verification
 
 - `npm run lint` - pass
 - `npm run typecheck` - pass
-- `npm test -- --runInBand` - pass
-- precommit checks - pass
-- Focused create-flow tests - pass
-- Live local stack verification - pass
-- Real Trial creation returned success and redirected to the Trial detail page
-- Key live evidence:
-  - create request succeeded with `201`
-  - request used the pivoted payload
-  - legacy client `techStack` / `templateKey` were omitted
-  - redirect to `/dashboard/trials/{id}` succeeded
+- Live browser QA on the local stack - pass
+- Trial 67 verified approve, activate, invite gating, and terminate behavior
+- Trial 49 verified the failure state, retry flow, and Project Brief preview
+- Verified outcomes:
+  - scenario storyline loaded
+  - task descriptions loaded
+  - rubric summary loaded
+  - scenario version and frozen AI snapshot metadata were visible
+  - invite controls stayed disabled until activation
+  - Project Brief replaced legacy codespace/template framing
+  - no template name, template repo, or tech stack appeared in the active Trial detail UI
+  - `codespace structure` does not appear in the restored Trial detail surface
 
 ## 6. Scope / non-scope
 
-- No rollback to legacy template-selector behavior.
-- No reintroduction of template or tech stack selector UI.
-- No unrelated product refactors.
+- No reintroduction of legacy template-selection UI.
+- No claim of backend permanence beyond the live QA proof captured here.
 
-## 7. Risks / follow-ups
-
-- The contract-live auth bootstrap helper may still be stale and could use a cleanup pass later, but it is not a blocker for this PR.

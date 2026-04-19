@@ -19,6 +19,11 @@ export function parseEnvFile(content: string): EnvMap {
       (value.startsWith("'") && value.endsWith("'"))
     ) {
       value = value.slice(1, -1);
+    } else {
+      const commentIndex = value.search(/\s+#/);
+      if (commentIndex >= 0) {
+        value = value.slice(0, commentIndex).trimEnd();
+      }
     }
     result[key] = value;
   }

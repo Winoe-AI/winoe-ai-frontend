@@ -29,7 +29,7 @@ describe('TrialDetail scenario versions - unavailable and badges', () => {
     });
     expect(
       await screen.findByRole('button', {
-        name: /Approve v1 \/ Start inviting/i,
+        name: /Approve v1/i,
       }),
     ).toBeInTheDocument();
     await user.click(selectV2);
@@ -42,7 +42,7 @@ describe('TrialDetail scenario versions - unavailable and badges', () => {
       screen.getAllByText(/^Content unavailable$/i).length,
     ).toBeGreaterThanOrEqual(2);
     expect(
-      screen.queryByRole('button', { name: /Approve .* \/ Start inviting/i }),
+      screen.queryByRole('button', { name: /Approve v1/i }),
     ).not.toBeInTheDocument();
     expect(
       screen.getByRole('button', { name: /Invite candidate/i }),

@@ -55,6 +55,25 @@ describe('trialLifecycle', () => {
     );
   });
 
+  it('activateTrialInviting posts to the activate endpoint', async () => {
+    mockRequestTalentPartnerBff.mockResolvedValueOnce({ data: { ok: true } });
+
+    const result = await activateTrialInviting('trial-1');
+    expect(result.ok).toBe(true);
+    expect(mockRequestTalentPartnerBff).toHaveBeenCalledWith(
+      '/backend/trials/trial-1/activate',
+      { method: 'POST', body: { confirm: true } },
+    );
+  });
+
+  it('activateTrialInviting maps failures with activate copy', async () => {
+    mockRequestTalentPartnerBff.mockRejectedValueOnce({});
+
+    const result = await activateTrialInviting('trial-1');
+    expect(result.ok).toBe(false);
+    expect(result.message).toMatch(/Unable to activate trial/i);
+  });
+
   it('patchScenarioVersion returns SCENARIO_LOCKED details from 409 responses', async () => {
     mockRequestTalentPartnerBff.mockRejectedValueOnce({
       status: 409,

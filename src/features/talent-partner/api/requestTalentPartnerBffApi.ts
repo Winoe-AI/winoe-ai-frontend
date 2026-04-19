@@ -18,6 +18,9 @@ export async function requestTalentPartnerBff<T>(
 ) {
   const methodUpper = (options.method ?? 'GET') as HttpMethod;
   const method = methodUpper.toLowerCase() as Lowercase<HttpMethod>;
+  const normalizedPath = path.startsWith('/backend/')
+    ? path.slice('/backend'.length)
+    : path;
   const client = talentPartnerBffClient as unknown as Record<string, unknown>;
   const exec = async (target: string, opts: TalentPartnerRequestOptions) => {
     if (typeof client[method] === 'function') {
@@ -32,7 +35,7 @@ export async function requestTalentPartnerBff<T>(
   };
 
   try {
-    const res = await exec(path, options);
+    const res = await exec(normalizedPath, options);
     return parseTalentPartnerResponse<T>(res);
   } catch (err) {
     throw toTalentPartnerHttpError(err);

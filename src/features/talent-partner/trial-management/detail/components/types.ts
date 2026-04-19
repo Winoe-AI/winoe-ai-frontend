@@ -57,10 +57,9 @@ export type TrialDetailViewProps = {
   cleanupJobIds: string[];
   retryGenerateLoading: boolean;
   onRetryGenerate: () => void;
-  templateKeyLabel: string;
   titleLabel: string;
   roleLabel: string;
-  stackLabel: string;
+  preferredLanguageFrameworkLabel: string | null;
   levelLabel: string;
   focusLabel: string;
   companyContextLabel: string;
@@ -80,6 +79,10 @@ export type TrialDetailViewProps = {
   jobFailureCode: string | null;
   planError: string | null;
   reloadPlan: () => void;
+  canActivate: boolean;
+  activateButtonLabel: string;
+  activateLoading: boolean;
+  onActivate: () => Promise<void>;
   candidates: CandidateSession[];
   candidatesLoading: boolean;
   candidatesError: string | null;

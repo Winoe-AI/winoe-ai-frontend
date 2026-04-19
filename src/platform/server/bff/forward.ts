@@ -11,6 +11,7 @@ export type ForwardOptions = {
   headers?: Record<string, string>;
   body?: unknown;
   accessToken: string;
+  devUserEmail?: string;
   cache?: RequestCache;
   timeoutMs?: number;
   requestId?: string;
@@ -18,7 +19,14 @@ export type ForwardOptions = {
 };
 
 export async function forwardJson(options: ForwardOptions) {
-  const { path, method = 'GET', headers = {}, body, accessToken } = options;
+  const {
+    path,
+    method = 'GET',
+    headers = {},
+    body,
+    accessToken,
+    devUserEmail,
+  } = options;
   const backendBase = getBackendBaseUrl();
   const start = DEBUG_PERF ? Date.now() : null;
   const requestId = options.requestId ?? generateRequestId();
@@ -28,6 +36,16 @@ export async function forwardJson(options: ForwardOptions) {
     Authorization: `Bearer ${accessToken}`,
     ...headers,
   };
+  const session = devUserEmail
+    ? null
+    : await import('@/platform/auth0').then((mod) =>
+        mod.getSessionNormalized(),
+      );
+  const effectiveDevUserEmail =
+    devUserEmail ?? (session?.user?.email as string | undefined);
+  if (effectiveDevUserEmail) {
+    outgoingHeaders['x-dev-user-email'] = effectiveDevUserEmail;
+  }
 
   const hasBody =
     body !== undefined && methodUpper !== 'GET' && methodUpper !== 'HEAD';

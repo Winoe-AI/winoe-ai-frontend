@@ -12,7 +12,6 @@ type Props = Pick<
   | 'scenarioIdLabel'
   | 'scenarioLocked'
   | 'scenarioLockedAt'
-  | 'templateKeyLabel'
   | 'titleLabel'
   | 'inviteEnabled'
   | 'inviteDisabledReason'
@@ -20,6 +19,10 @@ type Props = Pick<
   | 'approveButtonLabel'
   | 'approveLoading'
   | 'onApprove'
+  | 'canActivate'
+  | 'activateButtonLabel'
+  | 'activateLoading'
+  | 'onActivate'
   | 'regenerateLoading'
   | 'regenerateDisabled'
   | 'onRegenerate'
@@ -34,7 +37,6 @@ export function TrialDetailHeader({
   scenarioIdLabel,
   scenarioLocked,
   scenarioLockedAt,
-  templateKeyLabel,
   titleLabel,
   inviteEnabled,
   inviteDisabledReason,
@@ -42,6 +44,10 @@ export function TrialDetailHeader({
   approveButtonLabel,
   approveLoading,
   onApprove,
+  canActivate,
+  activateButtonLabel,
+  activateLoading,
+  onActivate,
   regenerateLoading,
   regenerateDisabled,
   onRegenerate,
@@ -59,13 +65,16 @@ export function TrialDetailHeader({
       scenarioLocked={scenarioLocked}
       scenarioLockedAt={scenarioLockedAt}
       title={titleLabel}
-      templateKey={templateKeyLabel}
       inviteEnabled={inviteEnabled}
       inviteDisabledReason={inviteDisabledReason}
       canApprove={canApprove}
       approveButtonLabel={approveButtonLabel}
       approveLoading={approveLoading}
       onApprove={onApprove}
+      canActivate={canActivate}
+      activateButtonLabel={activateButtonLabel}
+      activateLoading={activateLoading}
+      onActivate={onActivate}
       regenerateLoading={regenerateLoading}
       regenerateDisabled={regenerateDisabled}
       onRegenerate={onRegenerate}

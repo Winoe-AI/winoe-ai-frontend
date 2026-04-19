@@ -30,6 +30,9 @@ type BuildTrialDetailViewPropsArgs = {
   isGenerating: boolean;
   planError: string | null;
   reloadPlan: () => Promise<void>;
+  activateButtonLabel: string;
+  activateLoading: boolean;
+  onActivate: () => Promise<void>;
   candidatesModel: ReturnType<typeof useTrialDetailCandidates>;
   onSubmitInvite: (name: string, email: string) => Promise<void>;
 };
@@ -57,6 +60,9 @@ export function buildTrialDetailViewProps({
   isGenerating,
   planError,
   reloadPlan,
+  activateButtonLabel,
+  activateLoading,
+  onActivate,
   candidatesModel,
   onSubmitInvite,
 }: BuildTrialDetailViewPropsArgs): TrialDetailViewProps {
@@ -91,6 +97,9 @@ export function buildTrialDetailViewProps({
     onTerminate,
     cleanupJobIds,
     aiConfig,
+    activateButtonLabel,
+    activateLoading,
+    onActivate,
     ...scenarioProps,
     ...candidateProps,
   };

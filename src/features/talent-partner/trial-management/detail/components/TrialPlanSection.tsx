@@ -10,9 +10,8 @@ export function TrialPlanSection({
   scenarioVersionLabel,
   scenarioIdLabel,
   scenarioLocked,
-  templateKeyLabel,
   roleLabel,
-  stackLabel,
+  preferredLanguageFrameworkLabel,
   levelLabel,
   focusLabel,
   companyContextLabel,
@@ -40,9 +39,8 @@ export function TrialPlanSection({
         scenarioLocked={scenarioLocked}
       />
       <TrialPlanSectionBody
-        templateKeyLabel={templateKeyLabel}
         roleLabel={roleLabel}
-        stackLabel={stackLabel}
+        preferredLanguageFrameworkLabel={preferredLanguageFrameworkLabel}
         levelLabel={levelLabel}
         focusLabel={focusLabel}
         companyContextLabel={companyContextLabel}

@@ -27,6 +27,7 @@ const STATUS_META: Record<string, StatusMeta> = {
   draft: { label: 'Draft', tone: 'muted' },
   generating: { label: 'Generating', tone: 'info' },
   ready_for_review: { label: 'Ready for review', tone: 'warning' },
+  approved: { label: 'Approved', tone: 'success' },
   local_only: { label: 'Local draft only', tone: 'muted' },
   unavailable: { label: 'Content unavailable', tone: 'muted' },
   active_inviting: { label: 'Active inviting', tone: 'success' },
