@@ -46,6 +46,7 @@ describe('useInviteCandidateFlow', () => {
       trialId: 'trial-123',
       candidateName: 'Jane',
       candidateEmail: 'user@example.com',
+      candidateSessionId: 'cs_1',
     });
   });
 

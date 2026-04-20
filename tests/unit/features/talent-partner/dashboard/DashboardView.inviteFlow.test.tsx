@@ -77,6 +77,7 @@ describe('DashboardView invite modal flow', () => {
       state: { status: 'error', message: 'bad' },
       submit: inviteFlowSubmitMock,
       reset: inviteFlowResetMock,
+      setState: jest.fn(),
     });
 
     render(<DashboardView {...baseProps()} />);

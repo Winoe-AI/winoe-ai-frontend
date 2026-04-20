@@ -1,10 +1,11 @@
 import { useCallback, useState } from 'react';
 import { useInviteCandidateFlow } from '@/features/talent-partner/dashboard/hooks/useInviteCandidateFlow';
 import { useInviteSubmit } from './useInviteSubmit';
+import type { CandidateSession } from '@/features/talent-partner/types';
 
 type Params = {
   trialId: string;
-  reloadCandidates: () => void;
+  reloadCandidates: () => Promise<CandidateSession[]>;
 };
 
 export function useTrialInviteModal({ trialId, reloadCandidates }: Params) {
@@ -28,7 +29,6 @@ export function useTrialInviteModal({ trialId, reloadCandidates }: Params) {
   const submitInvite = useInviteSubmit({
     trialId,
     inviteFlow,
-    closeModal: close,
     reload: reloadCandidates,
   });
 

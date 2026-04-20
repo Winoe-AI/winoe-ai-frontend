@@ -64,6 +64,7 @@ export type CandidateScheduleResponse = {
   candidateSessionId: number;
   scheduledStartAt: string;
   candidateTimezone: string;
+  githubUsername?: string | null;
   dayWindows: CandidateDayWindow[];
   scheduleLockedAt: string;
 };

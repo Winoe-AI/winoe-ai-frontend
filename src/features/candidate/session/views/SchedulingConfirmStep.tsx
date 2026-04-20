@@ -9,6 +9,7 @@ type SchedulingConfirmStepProps = Pick<
   SchedulingViewProps,
   | 'step'
   | 'scheduleTimezone'
+  | 'scheduleGithubUsername'
   | 'schedulePreviewWindows'
   | 'onScheduleBack'
   | 'onScheduleConfirm'
@@ -17,12 +18,14 @@ type SchedulingConfirmStepProps = Pick<
 export function SchedulingConfirmStep({
   step,
   scheduleTimezone,
+  scheduleGithubUsername,
   schedulePreviewWindows,
   onScheduleBack,
   onScheduleConfirm,
 }: SchedulingConfirmStepProps) {
   const firstWindow = schedulePreviewWindows[0] ?? null;
   const timezone = scheduleTimezone.trim();
+  const githubUsername = scheduleGithubUsername?.trim() ?? '';
 
   return (
     <div className="space-y-4 rounded-md border border-gray-200 p-4">
@@ -35,6 +38,12 @@ export function SchedulingConfirmStep({
               : 'your selected date'}
           </span>{' '}
           at <span className="font-semibold">9:00 AM (Your time)</span>.
+        </p>
+      </div>
+      <div>
+        <p className="text-sm text-gray-700">
+          GitHub username:{' '}
+          <span className="font-semibold">{githubUsername || 'not set'}</span>
         </p>
       </div>
       <div>

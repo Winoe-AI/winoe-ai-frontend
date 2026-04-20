@@ -1,50 +1,78 @@
-## 1. Title
+# 1. Title
 
-Restore Trial detail preview for the v4 project brief flow
+Restore candidate invite flow UI with email confirmation and copyable invite URL
 
-## 2. Summary
+# 2. Summary
 
-This PR restores the Talent Partner Trial detail page and aligns it to the v4 from-scratch pivot. The Trial preview now shows the Project Brief, scenario storyline, task descriptions, rubric summary, scenario version, and frozen AI snapshot metadata.
+This PR fixes the Talent Partner candidate invite flow on the Trial detail page. The original `#178` bug is restored end to end: Talent Partner users can now invite from an `active_inviting` Trial, capture candidate full name and email, copy the invite URL, resend the invite, and see invite email status in the candidate list.
 
-## 3. What changed
+During live QA, we also uncovered and fixed a downstream candidate scheduling blocker in the same workstream. Scheduling had been failing with `422` because `body.githubUsername` was required but the frontend was not collecting or submitting it. The scheduling flow now treats GitHub username as a first-class required field through draft, validation, confirmation, and submit.
 
-- Rebuilt the Trial detail preview so it renders the full scenario experience again after the backend contract fixes.
-- Replaced legacy codespace/template framing with Project Brief language throughout the active Trial detail UI.
-- Removed template name, template repo, and tech stack from the active Trial detail surface.
-- Kept preferred language/framework visible only as informational context when present.
-- Aligned the 5-day labels to the product spec:
-  - Planning and Design Doc
-  - Implementation Kickoff
-  - Implementation Wrap-Up
-  - Handoff + Demo
-  - Reflection Essay
-- Restored lifecycle controls for approve, activate, and terminate flows.
-- Restored the generation failure state with a clear message and retry action.
-- Kept invite controls disabled until the Trial reaches active inviting.
+# 3. Problem / Root Cause
 
-## 4. Backend alignment
+- The invite button stayed disabled until Trial activation state handling was corrected for the `active_inviting` phase.
+- The invite modal flow was not presenting a truthful confirmation state after delivery, which made the UI overclaim success before persisted candidate status was fully reconciled.
+- Evidence Trail links were still leaking into the new invite experience, which conflicted with the new flow.
+- Candidate scheduling was missing a required `githubUsername` field in the frontend contract, so confirm and submit could not satisfy the backend payload shape.
 
-- Backend normalization and retry blockers were resolved enough to complete full real-stack QA on the Trial detail experience.
-- Live validation used the running frontend and backend, not mocked data.
+# 4. What Changed
 
-## 5. QA / verification
+- Enabled the invite action for Trials in `active_inviting`.
+- Restored the candidate invite modal to capture:
+  - full name
+  - email
+- Added a truthful invite confirmation state with a copyable invite URL.
+- Kept the invite URL copyable even when persisted invite delivery status is degraded, while surfacing a clear warning instead of overclaiming success.
+- Added invite email status visibility in the candidate list.
+- Restored resend invite behavior.
+- Removed legacy evidence link exposure from the new invite flow.
+- Updated candidate scheduling so `githubUsername` is handled as a required first-class field in:
+  - draft state
+  - validation
+  - confirmation
+  - submit API payload
+
+# 5. Scope Note
+
+- This work covers the original frontend bug in `#178`.
+- The candidate scheduling fix was discovered during live end-to-end QA and landed in the same frontend workstream.
+- Backend code did not need to change for the GitHub username fix; the frontend now satisfies the existing backend contract.
+
+# 6. QA / Verification
+
+## Automated checks
 
 - `npm run lint` - pass
 - `npm run typecheck` - pass
-- Live browser QA on the local stack - pass
-- Trial 67 verified approve, activate, invite gating, and terminate behavior
-- Trial 49 verified the failure state, retry flow, and Project Brief preview
-- Verified outcomes:
-  - scenario storyline loaded
-  - task descriptions loaded
-  - rubric summary loaded
-  - scenario version and frozen AI snapshot metadata were visible
-  - invite controls stayed disabled until activation
-  - Project Brief replaced legacy codespace/template framing
-  - no template name, template repo, or tech stack appeared in the active Trial detail UI
-  - `codespace structure` does not appear in the restored Trial detail surface
+- focused candidate scheduling tests - pass
+- `bash precommit.sh` - pass
+- final repo gates:
+  - 489 test suites passed
+  - 1477 tests passed
+  - build passed
 
-## 6. Scope / non-scope
+## Live browser proof
 
-- No reintroduction of legacy template-selection UI.
-- No claim of backend permanence beyond the live QA proof captured here.
+- Real Talent Partner account used: `robel.kebede@bison.howard.edu`
+- Real Candidate account used: `robiemelaku@gmail.com`
+- Browser-based local-stack verification completed
+- Final successful proof:
+  - Trial ID: `4`
+  - CandidateSessionId: `5`
+  - Invite URL: `http://localhost:3000/candidate/session/UMgogIFqb11Iacu0UmTREIYjBR-NxVv3iQ_2PHfgSJ0`
+  - candidate claim path succeeded
+  - scheduling succeeded in browser
+  - confirmation showed `GitHub username: octocat`
+  - persisted state included:
+    - `githubUsername`
+    - `scheduledStartAt`
+    - `candidateTimezone`
+    - `scheduleLockedAt`
+
+# 7. Risks / Follow-Ups
+
+- A transient backend `GITHUB_UNAVAILABLE` occurred on later fresh-invite retries. It did not block the verified successful flow, but it should be treated as a separate reliability concern rather than a blocker for this PR.
+
+# 8. Final Verdict
+
+Ready for PR.

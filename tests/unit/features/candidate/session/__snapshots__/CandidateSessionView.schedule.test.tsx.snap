@@ -175,6 +175,18 @@ exports[`CandidateSessionView scheduling states renders scheduling confirm state
         </p>
       </div>
       <div>
+        <p
+          class="text-sm text-gray-700"
+        >
+          GitHub username: 
+          <span
+            class="font-semibold"
+          >
+            octocat
+          </span>
+        </p>
+      </div>
+      <div>
         <h2
           class="text-sm font-semibold text-gray-900"
         >
@@ -334,6 +346,23 @@ exports[`CandidateSessionView scheduling states renders scheduling form state 1`
         class="text-xs text-gray-500"
       >
         Detected timezone: America/New_York
+      </p>
+      <label
+        class="block text-sm font-medium text-gray-800"
+      >
+        GitHub username
+      </label>
+      <input
+        aria-label="GitHub username"
+        class="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+        placeholder="octocat"
+        type="text"
+        value="octocat"
+      />
+      <p
+        class="text-xs text-gray-500"
+      >
+        Use the GitHub username that should receive repo access.
       </p>
       <div
         class="flex gap-3 pt-2"

@@ -6,12 +6,10 @@ import type {
   InviteModalState,
   InviteSuccess,
 } from '@/features/talent-partner/types';
+import type { InviteUiState } from '@/features/talent-partner/trial-management/invitations/InviteCandidateTypes';
 
 export function useInviteCandidateFlow(trial: InviteModalState | null) {
-  const [state, setState] = useState<{
-    status: 'idle' | 'loading' | 'error';
-    message?: string;
-  }>({ status: 'idle' });
+  const [state, setState] = useState<InviteUiState>({ status: 'idle' });
 
   const submit = useCallback(
     async (
@@ -34,13 +32,22 @@ export function useInviteCandidateFlow(trial: InviteModalState | null) {
       try {
         const res = await inviteCandidate(safeTrialId, safeName, safeEmail);
 
-        setState({ status: 'idle' });
+        setState({
+          status: 'success',
+          message: res.outcome === 'resent' ? 'Invite resent.' : 'Invite sent.',
+          inviteUrl: res.inviteUrl,
+          candidateName: safeName,
+          candidateEmail: safeEmail,
+          candidateSessionId: res.candidateSessionId,
+          outcome: res.outcome,
+        });
         return {
           inviteUrl: res.inviteUrl,
           outcome: res.outcome,
           trialId: safeTrialId,
           candidateName: safeName,
           candidateEmail: safeEmail,
+          candidateSessionId: res.candidateSessionId,
         };
       } catch (e: unknown) {
         const friendlyMessage = friendlyInviteError(e);
@@ -58,5 +65,5 @@ export function useInviteCandidateFlow(trial: InviteModalState | null) {
 
   const reset = useCallback(() => setState({ status: 'idle' }), []);
 
-  return { state, submit, reset };
+  return { state, submit, reset, setState };
 }

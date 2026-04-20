@@ -81,5 +81,8 @@ export const fillScheduleAndContinue = async (user: UserEvent) => {
   const timezoneInput = screen.getByLabelText('Timezone');
   await user.clear(timezoneInput);
   await user.type(timezoneInput, 'America/New_York');
+  const githubUsernameInput = screen.getByLabelText('GitHub username');
+  await user.clear(githubUsernameInput);
+  await user.type(githubUsernameInput, 'octocat');
   await user.click(screen.getByRole('button', { name: /Continue/i }));
 };

@@ -19,12 +19,17 @@ export function useCandidateSessionScheduleDraft({
   const [scheduleTimezoneState, setScheduleTimezone] = useState<string | null>(
     null,
   );
+  const [scheduleGithubUsernameState, setScheduleGithubUsername] = useState<
+    string | null
+  >(null);
   const [scheduleDateError, setScheduleDateError] = useState<string | null>(
     null,
   );
   const [scheduleTimezoneError, setScheduleTimezoneError] = useState<
     string | null
   >(null);
+  const [scheduleGithubUsernameError, setScheduleGithubUsernameError] =
+    useState<string | null>(null);
   const [scheduleSubmitError, setScheduleSubmitError] = useState<string | null>(
     null,
   );
@@ -34,6 +39,8 @@ export function useCandidateSessionScheduleDraft({
     bootstrap?.candidateTimezone ??
     detectedTimezone ??
     '';
+  const scheduleGithubUsernameValue =
+    scheduleGithubUsernameState ?? bootstrap?.githubUsername ?? '';
   const bootstrapScheduleDate =
     bootstrap?.scheduledStartAt && scheduleTimezoneValue
       ? toDateInputInTimezone(bootstrap.scheduledStartAt, scheduleTimezoneValue)
@@ -43,12 +50,14 @@ export function useCandidateSessionScheduleDraft({
   const clearScheduleErrors = useCallback(() => {
     setScheduleDateError(null);
     setScheduleTimezoneError(null);
+    setScheduleGithubUsernameError(null);
     setScheduleSubmitError(null);
   }, []);
 
   const resetScheduleDraft = useCallback(() => {
     setScheduleDate(null);
     setScheduleTimezone(null);
+    setScheduleGithubUsername(null);
     clearScheduleErrors();
   }, [clearScheduleErrors]);
 
@@ -70,13 +79,29 @@ export function useCandidateSessionScheduleDraft({
       validateScheduleDraft({
         scheduleDateValue,
         scheduleTimezoneValue,
+        scheduleGithubUsernameValue,
         scheduleTimezoneState,
+        scheduleGithubUsernameState,
         setScheduleTimezone,
+        setScheduleGithubUsername,
         setScheduleSubmitError,
         setScheduleDateError,
         setScheduleTimezoneError,
+        setScheduleGithubUsernameError,
       }),
-    [scheduleDateValue, scheduleTimezoneState, scheduleTimezoneValue],
+    [
+      scheduleDateValue,
+      scheduleGithubUsernameState,
+      scheduleGithubUsernameValue,
+      scheduleTimezoneState,
+      scheduleTimezoneValue,
+      setScheduleTimezone,
+      setScheduleGithubUsername,
+      setScheduleSubmitError,
+      setScheduleDateError,
+      setScheduleTimezoneError,
+      setScheduleGithubUsernameError,
+    ],
   );
 
   const onScheduleDateChange = useCallback((value: string) => {
@@ -91,20 +116,30 @@ export function useCandidateSessionScheduleDraft({
     setScheduleSubmitError(null);
   }, []);
 
+  const onScheduleGithubUsernameChange = useCallback((value: string) => {
+    setScheduleGithubUsername(value);
+    setScheduleGithubUsernameError(null);
+    setScheduleSubmitError(null);
+  }, []);
+
   return {
     scheduleDateValue,
     scheduleTimezoneValue,
+    scheduleGithubUsernameValue,
     scheduleDateError,
     scheduleTimezoneError,
+    scheduleGithubUsernameError,
     scheduleSubmitError,
     schedulePreviewWindows,
     setScheduleDateError,
     setScheduleTimezoneError,
+    setScheduleGithubUsernameError,
     setScheduleSubmitError,
     clearScheduleErrors,
     resetScheduleDraft,
     validateForm,
     onScheduleDateChange,
     onScheduleTimezoneChange,
+    onScheduleGithubUsernameChange,
   };
 }

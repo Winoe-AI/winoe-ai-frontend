@@ -49,11 +49,12 @@ export function useTrialCandidates({
 
   const reload = useCallback(async () => {
     await queryClient.invalidateQueries({ queryKey, refetchType: 'none' });
-    await queryClient.fetchQuery({
+    const data = await queryClient.fetchQuery({
       queryKey,
       queryFn: ({ signal }) => fetchTrialCandidatesQuery(trialId, signal, true),
       staleTime: 0,
     });
+    return Array.isArray(data) ? data : [];
   }, [queryClient, queryKey, trialId]);
 
   const setCandidates = useCallback<

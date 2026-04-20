@@ -6,12 +6,15 @@ type SchedulingFormStepProps = Pick<
   SchedulingViewProps,
   | 'scheduleDate'
   | 'scheduleTimezone'
+  | 'scheduleGithubUsername'
   | 'scheduleTimezoneDetected'
   | 'scheduleTimezoneOptions'
   | 'scheduleDateError'
   | 'scheduleTimezoneError'
+  | 'scheduleGithubUsernameError'
   | 'onScheduleDateChange'
   | 'onScheduleTimezoneChange'
+  | 'onScheduleGithubUsernameChange'
   | 'onScheduleContinue'
   | 'onDashboard'
 >;
@@ -19,12 +22,15 @@ type SchedulingFormStepProps = Pick<
 export function SchedulingFormStep({
   scheduleDate,
   scheduleTimezone,
+  scheduleGithubUsername,
   scheduleTimezoneDetected,
   scheduleTimezoneOptions,
   scheduleDateError,
   scheduleTimezoneError,
+  scheduleGithubUsernameError,
   onScheduleDateChange,
   onScheduleTimezoneChange,
+  onScheduleGithubUsernameChange,
   onScheduleContinue,
   onDashboard,
 }: SchedulingFormStepProps) {
@@ -70,6 +76,23 @@ export function SchedulingFormStep({
       )}
       {scheduleTimezoneError ? (
         <p className="text-sm text-red-700">{scheduleTimezoneError}</p>
+      ) : null}
+
+      <label className="block text-sm font-medium text-gray-800">
+        GitHub username
+      </label>
+      <Input
+        type="text"
+        value={scheduleGithubUsername}
+        onChange={(event) => onScheduleGithubUsernameChange(event.target.value)}
+        placeholder="octocat"
+        aria-label="GitHub username"
+      />
+      <p className="text-xs text-gray-500">
+        Use the GitHub username that should receive repo access.
+      </p>
+      {scheduleGithubUsernameError ? (
+        <p className="text-sm text-red-700">{scheduleGithubUsernameError}</p>
       ) : null}
 
       <div className="flex gap-3 pt-2">

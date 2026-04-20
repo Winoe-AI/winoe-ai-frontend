@@ -25,6 +25,7 @@ jest.mock(
       state: { status: 'idle' },
       submit: inviteFlowSubmitMock,
       reset: inviteFlowResetMock,
+      setState: jest.fn(),
     })),
   }),
 );
@@ -94,5 +95,6 @@ export function resetDashboardViewMocks() {
     trialId: '1',
     candidateName: 'Ann',
     candidateEmail: 'a@test.com',
+    candidateSessionId: '99',
   });
 }

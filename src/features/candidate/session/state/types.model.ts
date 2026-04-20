@@ -13,6 +13,7 @@ export type CandidateBootstrap = {
   aiNoticeText: string;
   aiNoticeVersion: string;
   evalEnabledByDay: Record<string, boolean>;
+  githubUsername?: string | null;
   scheduledStartAt?: string | null;
   candidateTimezone?: string | null;
   dayWindows?: CandidateDayWindow[];

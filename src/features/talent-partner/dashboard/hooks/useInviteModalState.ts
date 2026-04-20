@@ -14,14 +14,11 @@ export function useInviteModalState() {
 
   const inviteWho = useMemo(() => modal.trialTitle || '', [modal]);
 
-  const modalState: InviteUiState =
-    inviteFlow.state.status === 'error'
-      ? { status: 'error', message: inviteFlow.state.message ?? '' }
-      : { status: inviteFlow.state.status };
+  const modalState: InviteUiState = inviteFlow.state;
 
-  const openInvite = (simId: string, simTitle: string) => {
+  const openInvite = (trialId: string, trialTitle: string) => {
     inviteFlow.reset();
-    setModal({ open: true, trialId: simId, trialTitle: simTitle });
+    setModal({ open: true, trialId, trialTitle });
   };
 
   const closeModal = () =>

@@ -25,10 +25,12 @@ export const baseScheduleProps = (): CandidateSessionViewProps => ({
   loginHref: '/auth/login',
   scheduleDate: '2099-01-01',
   scheduleTimezone: 'America/New_York',
+  scheduleGithubUsername: 'octocat',
   scheduleTimezoneDetected: 'America/New_York',
   scheduleTimezoneOptions: ['America/New_York', 'America/Chicago'],
   scheduleDateError: null,
   scheduleTimezoneError: null,
+  scheduleGithubUsernameError: null,
   scheduleSubmitError: null,
   schedulePreviewWindows: [
     {
@@ -88,6 +90,7 @@ export const baseScheduleProps = (): CandidateSessionViewProps => ({
   onRetryTask: jest.fn(),
   onScheduleDateChange: jest.fn(),
   onScheduleTimezoneChange: jest.fn(),
+  onScheduleGithubUsernameChange: jest.fn(),
   onScheduleContinue: jest.fn(),
   onScheduleBack: jest.fn(),
   onScheduleConfirm: jest.fn(),

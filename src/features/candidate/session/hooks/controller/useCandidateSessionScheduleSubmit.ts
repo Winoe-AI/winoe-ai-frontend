@@ -20,6 +20,7 @@ type Params = Pick<
 > & {
   scheduleDateValue: string;
   scheduleTimezoneValue: string;
+  scheduleGithubUsernameValue: string;
   validateForm: () => boolean;
   clearScheduleErrors: () => void;
   setScheduleSubmitError: SetNullableString;
@@ -40,6 +41,7 @@ export function useCandidateSessionScheduleSubmit({
   session,
   scheduleDateValue,
   scheduleTimezoneValue,
+  scheduleGithubUsernameValue,
   validateForm,
   clearScheduleErrors,
   setScheduleSubmitError,
@@ -69,6 +71,7 @@ export function useCandidateSessionScheduleSubmit({
     session,
     scheduleDateValue,
     scheduleTimezoneValue,
+    scheduleGithubUsernameValue,
     validateForm,
     clearScheduleErrors,
     setScheduleSubmitError,

@@ -20,6 +20,7 @@ jest.mock(
       state: { status: 'idle' },
       submit: inviteFlowSubmitMock,
       reset: inviteFlowResetMock,
+      setState: jest.fn(),
     })),
   }),
 );
@@ -115,12 +116,14 @@ export function resetDashboardExtraMocks() {
     trialId: '1',
     candidateName: 'Ann',
     candidateEmail: 'a@test.com',
+    candidateSessionId: '99',
   });
   copyInviteLinkMock.mockResolvedValue(true);
   inviteFlowHookMock.mockReturnValue({
     state: { status: 'idle' },
     submit: inviteFlowSubmitMock,
     reset: inviteFlowResetMock,
+    setState: jest.fn(),
   });
 }
 

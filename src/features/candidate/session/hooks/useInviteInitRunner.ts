@@ -48,6 +48,7 @@ export function createInviteInit(params: InviteInitParams) {
         aiNoticeText: resp.aiNoticeText,
         aiNoticeVersion: resp.aiNoticeVersion,
         evalEnabledByDay: resp.evalEnabledByDay,
+        githubUsername: resp.githubUsername ?? null,
         scheduledStartAt: resp.scheduledStartAt ?? null,
         candidateTimezone: resp.candidateTimezone ?? null,
         dayWindows: resp.dayWindows ?? [],

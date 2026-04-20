@@ -48,12 +48,15 @@ export function SchedulingView({
         <SchedulingFormStep
           scheduleDate={rest.scheduleDate}
           scheduleTimezone={rest.scheduleTimezone}
+          scheduleGithubUsername={rest.scheduleGithubUsername}
           scheduleTimezoneDetected={rest.scheduleTimezoneDetected}
           scheduleTimezoneOptions={rest.scheduleTimezoneOptions}
           scheduleDateError={rest.scheduleDateError}
           scheduleTimezoneError={rest.scheduleTimezoneError}
+          scheduleGithubUsernameError={rest.scheduleGithubUsernameError}
           onScheduleDateChange={rest.onScheduleDateChange}
           onScheduleTimezoneChange={rest.onScheduleTimezoneChange}
+          onScheduleGithubUsernameChange={rest.onScheduleGithubUsernameChange}
           onScheduleContinue={rest.onScheduleContinue}
           onDashboard={rest.onDashboard}
         />
@@ -61,6 +64,7 @@ export function SchedulingView({
         <SchedulingConfirmStep
           step={step}
           scheduleTimezone={rest.scheduleTimezone}
+          scheduleGithubUsername={rest.scheduleGithubUsername}
           schedulePreviewWindows={rest.schedulePreviewWindows}
           onScheduleBack={rest.onScheduleBack}
           onScheduleConfirm={rest.onScheduleConfirm}

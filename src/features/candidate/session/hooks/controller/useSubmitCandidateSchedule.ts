@@ -7,6 +7,7 @@ type Params = Pick<
 > & {
   scheduledStartAtUtc: string;
   timezoneValue: string;
+  githubUsernameValue: string;
   clearScheduleErrors: () => void;
 };
 
@@ -16,11 +17,13 @@ export async function submitCandidateSchedule({
   bootstrap,
   scheduledStartAtUtc,
   timezoneValue,
+  githubUsernameValue,
   clearScheduleErrors,
 }: Params) {
   const response = await scheduleCandidateSession(token, {
     scheduledStartAt: scheduledStartAtUtc,
     candidateTimezone: timezoneValue,
+    githubUsername: githubUsernameValue,
   });
 
   session.setBootstrap({
@@ -30,6 +33,7 @@ export async function submitCandidateSchedule({
     aiNoticeText: bootstrap?.aiNoticeText ?? '',
     aiNoticeVersion: bootstrap?.aiNoticeVersion ?? 'mvp1',
     evalEnabledByDay: bootstrap?.evalEnabledByDay ?? {},
+    githubUsername: response.githubUsername ?? githubUsernameValue,
     scheduledStartAt: response.scheduledStartAt,
     candidateTimezone: response.candidateTimezone,
     dayWindows: response.dayWindows,
