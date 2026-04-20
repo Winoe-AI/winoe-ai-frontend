@@ -25,6 +25,7 @@ type Params = Pick<
 > & {
   scheduleDateValue: string;
   scheduleTimezoneValue: string;
+  scheduleGithubUsernameValue: string;
   validateForm: () => boolean;
   clearScheduleErrors: () => void;
   setScheduleSubmitError: SetNullableString;
@@ -45,6 +46,7 @@ export function useScheduleConfirmAction({
   session,
   scheduleDateValue,
   scheduleTimezoneValue,
+  scheduleGithubUsernameValue,
   validateForm,
   clearScheduleErrors,
   setScheduleSubmitError,
@@ -80,6 +82,7 @@ export function useScheduleConfirmAction({
         bootstrap,
         scheduledStartAtUtc,
         timezoneValue,
+        githubUsernameValue: scheduleGithubUsernameValue,
         clearScheduleErrors,
       });
       if (isScheduleLocked(response)) {
@@ -110,6 +113,7 @@ export function useScheduleConfirmAction({
     scheduleTimezoneValue,
     scheduleDateValue,
     setScheduleDateError,
+    scheduleGithubUsernameValue,
     setScheduleSubmitError,
     markStart,
     token,

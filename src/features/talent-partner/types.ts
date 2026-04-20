@@ -25,6 +25,7 @@ export type InviteSuccess = {
   candidateName: string;
   candidateEmail: string;
   trialId: string;
+  candidateSessionId: string;
 };
 
 export type { CandidateSession, TrialListItem };

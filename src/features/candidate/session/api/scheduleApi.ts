@@ -11,6 +11,7 @@ import type { CandidateScheduleResponse } from './typesApi';
 type SchedulePayload = {
   scheduledStartAt: string;
   candidateTimezone: string;
+  githubUsername: string;
 };
 
 function scheduleErrorCode(details: unknown): string | null {
@@ -60,6 +61,12 @@ export async function scheduleCandidateSession(
       if (status === 410)
         throwScheduleError(410, INVITE_EXPIRED_MESSAGE, details);
       if (status === 422) {
+        if (code === 'INVALID_GITHUB_USERNAME')
+          throwScheduleError(
+            422,
+            backendMsg || 'Please enter a valid GitHub username.',
+            details,
+          );
         if (code === 'SCHEDULE_INVALID_TIMEZONE')
           throwScheduleError(
             422,
@@ -70,6 +77,12 @@ export async function scheduleCandidateSession(
           throwScheduleError(
             422,
             backendMsg || 'Start date must be in the future.',
+            details,
+          );
+        if (backendMsg.toLowerCase().includes('githubusername'))
+          throwScheduleError(
+            422,
+            backendMsg || 'Please enter a valid GitHub username.',
             details,
           );
         throwScheduleError(

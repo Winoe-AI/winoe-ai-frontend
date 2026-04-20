@@ -102,4 +102,101 @@ describe('InviteCandidateModal', () => {
     );
     fireEvent.click(getByText('Send invite'));
   });
+
+  it('renders a success confirmation with a copyable invite URL', async () => {
+    const onClose = jest.fn();
+    Object.defineProperty(navigator, 'clipboard', {
+      value: { writeText: jest.fn().mockResolvedValue(undefined) },
+      configurable: true,
+    });
+
+    render(
+      <InviteCandidateModal
+        open
+        title="Test Trial"
+        state={{
+          status: 'success',
+          message: 'Invite sent.',
+          inviteUrl: 'https://example.com/candidate/session/token-123',
+          candidateName: 'Jane Doe',
+          candidateEmail: 'jane@example.com',
+          outcome: 'created',
+        }}
+        onClose={onClose}
+        onSubmit={() => undefined}
+        initialName=""
+        initialEmail=""
+      />,
+    );
+
+    expect(screen.getByTestId('invite-success')).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: /Invite candidate/i }),
+    ).toBeInTheDocument();
+    expect(screen.getByLabelText(/Invite URL/i)).toHaveValue(
+      'https://example.com/candidate/session/token-123',
+    );
+    expect(screen.queryByText(/evidence/i)).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: /Copy invite URL/i }));
+    await waitFor(() =>
+      expect(
+        screen.getByRole('button', { name: /Copied/i }),
+      ).toBeInTheDocument(),
+    );
+    fireEvent.click(screen.getByRole('button', { name: /Done/i }));
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
+
+  it('renders a delivery warning with a copyable invite URL', async () => {
+    const onClose = jest.fn();
+    Object.defineProperty(navigator, 'clipboard', {
+      value: { writeText: jest.fn().mockResolvedValue(undefined) },
+      configurable: true,
+    });
+
+    render(
+      <InviteCandidateModal
+        open
+        title="Test Trial"
+        state={{
+          status: 'warning',
+          message:
+            'Invite link created, but email delivery was rate limited. Copy the invite URL and retry later.',
+          inviteUrl: 'https://example.com/candidate/session/invite-token',
+          candidateName: 'Jane Doe',
+          candidateEmail: 'jane@example.com',
+          candidateSessionId: '99',
+          outcome: 'created',
+          inviteEmailStatus: 'rate_limited',
+        }}
+        onClose={onClose}
+        onSubmit={() => undefined}
+        initialName=""
+        initialEmail=""
+      />,
+    );
+
+    expect(screen.getByTestId('invite-success')).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        /Invite link created, but email delivery was rate limited/i,
+      ),
+    ).toBeInTheDocument();
+    expect(screen.getByLabelText(/Invite URL/i)).toHaveValue(
+      'https://example.com/candidate/session/invite-token',
+    );
+    expect(
+      screen.getByRole('button', { name: /Copy invite URL/i }),
+    ).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: /Copy invite URL/i }));
+    await waitFor(() =>
+      expect(
+        screen.getByRole('button', { name: /Copied/i }),
+      ).toBeInTheDocument(),
+    );
+    fireEvent.click(screen.getByRole('button', { name: /Done/i }));
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
 });

@@ -10,7 +10,7 @@ import {
 describe('CandidateSubmissionsPage extra coverage - latest submission', () => {
   beforeEach(resetCandidateSubmissionsExtraMocks);
 
-  it('picks latest submission by timestamp', async () => {
+  it('renders the latest GitHub artifacts section', async () => {
     talentPartnerGetMock.mockImplementation((path: string) => {
       if (path.startsWith('/submissions?')) {
         return Promise.resolve({
@@ -44,7 +44,9 @@ describe('CandidateSubmissionsPage extra coverage - latest submission', () => {
 
     await act(async () => render(<CandidateSubmissionsPage />));
     await waitFor(() => {
-      expect(screen.getByText(/Latest submission/i)).toBeInTheDocument();
+      expect(
+        screen.getByText(/Latest GitHub artifacts \(Day 2 \/ Day 3\)/i),
+      ).toBeInTheDocument();
     });
   });
 });

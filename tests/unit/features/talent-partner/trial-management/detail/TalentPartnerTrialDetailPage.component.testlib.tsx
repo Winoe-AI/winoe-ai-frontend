@@ -41,6 +41,7 @@ jest.mock(
       state: { status: 'idle' },
       submit: inviteFlowSubmitMock,
       reset: inviteFlowResetMock,
+      setState: jest.fn(),
     }),
   }),
 );

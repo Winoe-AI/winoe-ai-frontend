@@ -52,10 +52,12 @@ export type CandidateSessionViewProps = {
   loginHref: string;
   scheduleDate: string;
   scheduleTimezone: string;
+  scheduleGithubUsername: string;
   scheduleTimezoneDetected: string | null;
   scheduleTimezoneOptions: string[];
   scheduleDateError: string | null;
   scheduleTimezoneError: string | null;
+  scheduleGithubUsernameError: string | null;
   scheduleSubmitError: string | null;
   schedulePreviewWindows: CandidateDayWindow[];
   scheduleResponseWindows: CandidateDayWindow[];
@@ -78,6 +80,7 @@ export type CandidateSessionViewProps = {
   onRetryTask: () => void;
   onScheduleDateChange: (value: string) => void;
   onScheduleTimezoneChange: (value: string) => void;
+  onScheduleGithubUsernameChange: (value: string) => void;
   onScheduleContinue: () => void;
   onScheduleBack: () => void;
   onScheduleConfirm: () => void;

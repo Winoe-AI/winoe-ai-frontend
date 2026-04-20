@@ -80,4 +80,29 @@ describe('CandidateSessionPage auth flow schedule validation errors', () => {
     ).toBeInTheDocument();
     expect(screen.getByText(/Pick your start date/i)).toBeInTheDocument();
   });
+
+  it('requires a GitHub username before continuing', async () => {
+    fetchMock.mockImplementation(async (url: RequestInfo | URL) => {
+      const path = String(url);
+      if (path.endsWith('/candidate/session/valid-token'))
+        return jsonResponse(baseSession());
+      throw new Error(`Unexpected fetch ${path}`);
+    });
+    const user = userEvent.setup();
+    renderSessionPage('valid-token');
+    expect(
+      await screen.findByText(/Pick your start date/i),
+    ).toBeInTheDocument();
+    const startDateInput = screen.getByLabelText('Start date');
+    await user.clear(startDateInput);
+    await user.type(startDateInput, '2099-01-01');
+    const timezoneInput = screen.getByLabelText('Timezone');
+    await user.clear(timezoneInput);
+    await user.type(timezoneInput, 'America/New_York');
+    await user.click(screen.getByRole('button', { name: /Continue/i }));
+    expect(
+      await screen.findByText(/Enter your GitHub username\./i),
+    ).toBeInTheDocument();
+    expect(screen.getByText(/Pick your start date/i)).toBeInTheDocument();
+  });
 });

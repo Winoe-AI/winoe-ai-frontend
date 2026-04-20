@@ -60,7 +60,7 @@ describe('useInviteCandidateFlow', () => {
     const ref = React.createRef<HookReturn>();
     inviteCandidateMock.mockResolvedValue({
       inviteUrl: 'http://invite',
-      outcome: 'sent',
+      outcome: 'created',
     });
     render(
       <HookHarness
@@ -73,7 +73,7 @@ describe('useInviteCandidateFlow', () => {
       const res = await ref.current?.submit('Ann', 'ann@test.com');
       expect(res).toMatchObject({
         inviteUrl: 'http://invite',
-        outcome: 'sent',
+        outcome: 'created',
         trialId: 'trial-1',
         candidateName: 'Ann',
         candidateEmail: 'ann@test.com',
@@ -84,7 +84,13 @@ describe('useInviteCandidateFlow', () => {
       'Ann',
       'ann@test.com',
     );
-    expect(ref.current?.state.status).toBe('idle');
+    expect(ref.current?.state).toMatchObject({
+      status: 'success',
+      inviteUrl: 'http://invite',
+      candidateName: 'Ann',
+      candidateEmail: 'ann@test.com',
+      outcome: 'created',
+    });
   });
 
   it('reset returns state to idle', () => {
