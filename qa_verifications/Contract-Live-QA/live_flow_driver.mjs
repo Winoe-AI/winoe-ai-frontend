@@ -28,9 +28,26 @@ function resolveStorageState(role) {
     path.join(
       storageDir,
       role === 'talent_partner'
-        ? 'talent_partner-only.json'
+        ? 'talent-partner-only.json'
         : 'candidate-only.json',
     )
+  );
+}
+
+function requireStorageState(role) {
+  const storageStatePath = resolveStorageState(role);
+  if (fs.existsSync(storageStatePath)) {
+    return storageStatePath;
+  }
+  const availableFiles = fs.existsSync(storageDir)
+    ? fs.readdirSync(storageDir).sort()
+    : [];
+  throw new Error(
+    [
+      `Error reading storage state for ${role}.`,
+      `Expected: ${storageStatePath}`,
+      `Available in ${storageDir}: ${availableFiles.length ? availableFiles.join(', ') : '<none>'}`,
+    ].join('\n'),
   );
 }
 
@@ -150,7 +167,7 @@ async function withPage(role, work) {
   const browser = await chromium.launch({ headless: true });
   const context = await browser.newContext({
     baseURL,
-    storageState: resolveStorageState(role),
+    storageState: requireStorageState(role),
   });
   const page = await context.newPage();
   try {
@@ -160,7 +177,7 @@ async function withPage(role, work) {
         waitUntil: 'domcontentloaded',
       },
     );
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('domcontentloaded');
     return await work(page);
   } finally {
     await browser.close();
@@ -339,10 +356,25 @@ async function gotoCandidateSession(page, inviteToken) {
 }
 
 async function ensureDayVisible(page, day) {
-  await page
-    .getByText(new RegExp(`^Day ${day} •`, 'i'))
-    .first()
-    .waitFor({ state: 'visible', timeout: 60000 });
+  const patterns = [
+    new RegExp(`^Day ${day}\\s+open(?:\\b|\\s|$)`, 'i'),
+    new RegExp(`^Day ${day}\\s+is not open yet(?:\\b|\\s|$)`, 'i'),
+    /^Day closed$/i,
+  ];
+  for (const pattern of patterns) {
+    const locator = page.getByText(pattern).first();
+    if (await locator.isVisible().catch(() => false)) {
+      return;
+    }
+    try {
+      await locator.waitFor({ state: 'visible', timeout: 20000 });
+      return;
+    } catch {
+      // Try the next real UI state. The candidate session banner may be open,
+      // waiting to open, or briefly transitioning after the Start trial click.
+    }
+  }
+  throw new Error(`Timed out waiting for Day ${day} to become visible.`);
 }
 
 async function waitForText(page, pattern, timeout = 60000) {
@@ -642,6 +674,8 @@ async function runCandidateScheduleFlow() {
   const candidateTimezone =
     trimToNull(process.env.CONTRACT_LIVE_CANDIDATE_TIMEZONE) ||
     'America/New_York';
+  const githubUsername =
+    trimToNull(process.env.CONTRACT_LIVE_GITHUB_USERNAME) || 'robelmelaku';
 
   if (!scheduleDate) {
     throw new Error(
@@ -686,12 +720,29 @@ async function runCandidateScheduleFlow() {
       candidateTimezone,
     });
 
+    const continueButton = page.getByRole('button', { name: /^continue$/i });
+    await continueButton.click();
+    await page.waitForTimeout(500);
+    const githubValidationVisible = await page
+      .getByText(/enter your github username/i)
+      .first()
+      .isVisible()
+      .catch(() => false);
+    if (!githubValidationVisible) {
+      throw new Error(
+        'Candidate schedule should block empty GitHub username before continuing.',
+      );
+    }
+
+    await page.getByLabel(/github username/i).fill(githubUsername);
+
     await page.getByRole('button', { name: /^continue$/i }).click();
     await waitForText(page, /5-day schedule preview/i);
     await capturePage(page, 'candidate-schedule-preview.json', {
       inviteToken,
       scheduleDate,
       candidateTimezone,
+      githubUsername,
     });
 
     const scheduleResponsePromise = page.waitForResponse(
@@ -746,6 +797,10 @@ async function runCandidateScheduleFlow() {
       candidateTimezone:
         scheduleJson?.candidateTimezone ??
         bootstrapAfter.json?.candidateTimezone ??
+        null,
+      githubUsername:
+        scheduleJson?.githubUsername ??
+        bootstrapAfter.json?.githubUsername ??
         null,
       scheduleLockedAt:
         scheduleJson?.scheduleLockedAt ??
@@ -1197,6 +1252,152 @@ async function runTalentPartnerReviewFlow() {
   });
 }
 
+async function runTalentPartnerTerminateFlow() {
+  const context = resolveLiveContext();
+  const trialId = requireTrialId(context);
+  const candidateSessionId = requireCandidateSessionId(context);
+  const inviteToken = requireInviteToken(context);
+
+  return await withPage('talent_partner', async (page) => {
+    await page.goto(`/dashboard/trials/${trialId}`, {
+      waitUntil: 'domcontentloaded',
+    });
+    await page.waitForLoadState('networkidle');
+
+    const trialBefore = await browserFetchJson(page, `/api/trials/${trialId}`, {
+      method: 'GET',
+    });
+    writeJson('talent_partner-terminate-before-trial.json', trialBefore);
+    if (!trialBefore.ok) {
+      throw new Error(
+        `Trial detail before termination failed: ${trialBefore.status} ${trialBefore.text}`,
+      );
+    }
+
+    const terminateResponse = await browserFetchJson(
+      page,
+      `/api/trials/${trialId}/terminate`,
+      {
+        method: 'POST',
+        body: JSON.stringify({
+          confirm: true,
+          reason: 'phase 3 live verification cleanup',
+        }),
+      },
+    );
+    writeJson('talent_partner-terminate-response.json', terminateResponse);
+    if (!terminateResponse.ok) {
+      throw new Error(
+        `Trial terminate failed: ${terminateResponse.status} ${terminateResponse.text}`,
+      );
+    }
+
+    const cleanupJobId = Array.isArray(terminateResponse.json?.cleanupJobIds)
+      ? terminateResponse.json.cleanupJobIds[0]
+      : null;
+    if (!cleanupJobId) {
+      throw new Error(
+        `Terminate response did not include a cleanup job id: ${JSON.stringify(terminateResponse.json, null, 2)}`,
+      );
+    }
+
+    const trialAfter = await browserFetchJson(page, `/api/trials/${trialId}`, {
+      method: 'GET',
+    });
+    writeJson('talent_partner-terminate-after-trial.json', trialAfter);
+
+    const jobStatus = await pollUntil(
+      page,
+      'trial cleanup job terminal state',
+      async () => {
+        return await browserFetchJson(
+          page,
+          `/api/backend/jobs/${cleanupJobId}`,
+          {
+            method: 'GET',
+          },
+        );
+      },
+      (response) =>
+        response.ok &&
+        ['completed', 'failed'].includes(
+          String(response.json?.status ?? '').trim(),
+        ),
+      {
+        attempts: 36,
+        delayMs: 2000,
+        snapshotName: 'talent_partner-terminate-job-poll.json',
+      },
+    );
+    writeJson('talent_partner-terminate-job-final.json', jobStatus);
+
+    const reterminateResponse = await browserFetchJson(
+      page,
+      `/api/trials/${trialId}/terminate`,
+      {
+        method: 'POST',
+        body: JSON.stringify({
+          confirm: true,
+        }),
+      },
+    );
+    writeJson(
+      'talent_partner-terminate-idempotent-response.json',
+      reterminateResponse,
+    );
+
+    const inviteAfterTerminate = await browserFetchJson(
+      page,
+      `/api/trials/${trialId}/invite`,
+      {
+        method: 'POST',
+        body: JSON.stringify({
+          candidateName: 'Blocked Invite',
+          inviteEmail: 'blocked-after-terminate@example.com',
+        }),
+      },
+    );
+    writeJson(
+      'talent_partner-terminate-invite-after.json',
+      inviteAfterTerminate,
+    );
+
+    const candidateInviteResolve = await withPage(
+      'candidate',
+      async (candidatePage) => {
+        const resolveResponse = await browserFetchJson(
+          candidatePage,
+          `/api/backend/candidate/session/${inviteToken}`,
+          { method: 'GET' },
+        );
+        writeJson('candidate-terminate-resolve.json', resolveResponse);
+        const claimResponse = await browserFetchJson(
+          candidatePage,
+          `/api/backend/candidate/session/${inviteToken}/claim`,
+          { method: 'POST' },
+        );
+        writeJson('candidate-terminate-claim.json', claimResponse);
+        return { resolveResponse, claimResponse };
+      },
+    );
+
+    const summary = {
+      trialId,
+      candidateSessionId,
+      inviteToken,
+      cleanupJobId,
+      terminationStatus: terminateResponse.json?.status ?? null,
+      terminationJobStatus: jobStatus.json?.status ?? null,
+      postTerminationInviteStatus: inviteAfterTerminate.status,
+      candidateResolveStatus: candidateInviteResolve.resolveResponse.status,
+      candidateClaimStatus: candidateInviteResolve.claimResponse.status,
+      idempotentTerminationStatus: reterminateResponse.status,
+    };
+    writeJson('talent_partner-terminate-summary.json', summary);
+    process.stdout.write(`${JSON.stringify(summary, null, 2)}\n`);
+  });
+}
+
 switch (command) {
   case 'talent_partner-fresh':
     await runTalentPartnerFreshFlow();
@@ -1209,6 +1410,9 @@ switch (command) {
     break;
   case 'talent_partner-review':
     await runTalentPartnerReviewFlow();
+    break;
+  case 'talent_partner-terminate':
+    await runTalentPartnerTerminateFlow();
     break;
   default:
     throw new Error(`Unknown command: ${command || '<empty>'}`);

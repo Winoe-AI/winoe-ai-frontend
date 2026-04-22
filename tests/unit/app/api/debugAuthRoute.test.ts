@@ -53,6 +53,8 @@ describe('/api/debug/auth route', () => {
     expect(res.status).toBe(200);
     expect(res.body).toEqual({
       userKeys: Object.keys(user),
+      email: 'test@example.com',
+      emailVerified: null,
       permissions: ['read:trials', 'create:invites'],
       roles: ['talent_partner'],
     });
