@@ -54,6 +54,7 @@ describe('/api/trials/[id]/invite route', () => {
       body: { email: 'test@example.com', name: 'Test User' },
       accessToken: 'token',
       requestId: 'req-123',
+      timeoutMs: 90_000,
     });
   });
 });

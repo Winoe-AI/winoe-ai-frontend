@@ -6,6 +6,7 @@ export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 export const revalidate = 0;
 export const fetchCache = 'force-no-store';
+const INVITE_REQUEST_TIMEOUT_MS = 90_000;
 
 export async function POST(
   req: NextRequest,
@@ -25,6 +26,7 @@ export async function POST(
         body: payload ?? {},
         accessToken: auth.accessToken,
         requestId: auth.requestId,
+        timeoutMs: INVITE_REQUEST_TIMEOUT_MS,
       });
     },
   );

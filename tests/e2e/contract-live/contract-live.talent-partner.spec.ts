@@ -7,7 +7,7 @@ test.describe('Contract-Live: TalentPartner Access', () => {
   test('talent partner dashboard and new trial route load against the live stack', async ({
     page,
   }) => {
-    await page.goto('/dashboard');
+    await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
     await expect(page).toHaveURL('/dashboard');
     await expect(
       page.getByRole('heading', { name: /^dashboard$/i }),
@@ -16,7 +16,9 @@ test.describe('Contract-Live: TalentPartner Access', () => {
       page.getByRole('button', { name: /new trial/i }),
     ).toBeVisible();
 
-    await page.goto('/dashboard/trials/new');
+    await page.goto('/dashboard/trials/new', {
+      waitUntil: 'domcontentloaded',
+    });
     await expect(page).toHaveURL('/dashboard/trials/new');
     await expect(
       page.getByRole('heading', { name: /new trial/i }),

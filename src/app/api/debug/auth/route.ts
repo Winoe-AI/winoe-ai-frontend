@@ -26,6 +26,8 @@ export async function GET() {
 
   return NextResponse.json({
     userKeys: Object.keys(user),
+    email: user.email ?? null,
+    emailVerified: user.email_verified ?? null,
     permissions: permissionList,
     roles: user[CUSTOM_CLAIM_ROLES] ?? user.roles ?? [],
   });
