@@ -17,9 +17,7 @@ describe('CandidateSessionPage unit flow', () => {
     mockUseCandidateSession.mockReturnValue(buildSession());
     render(<CandidateSessionPage token="" />);
 
-    expect(
-      await screen.findByText(/Invite link unavailable/i),
-    ).toBeInTheDocument();
+    expect(await screen.findByText(/Invalid invite/i)).toBeInTheDocument();
     expect(
       screen.getByRole('button', { name: /Go to Home/i }),
     ).toBeInTheDocument();
@@ -46,22 +44,30 @@ describe('CandidateSessionPage unit flow', () => {
     expect(await screen.findByText('Access denied')).toBeInTheDocument();
   });
 
-  it.each([400, 404, 409])(
-    'shows invite-unavailable guidance for status %s',
+  it.each([400, 404])(
+    'shows invalid invite guidance for status %s',
     async (status) => {
       mockUseCandidateSession.mockReturnValue(buildSession());
       mockResolveInvite.mockRejectedValueOnce({ status });
 
       render(<CandidateSessionPage token="invite-token" />);
-      expect(
-        await screen.findByText(/Invite link unavailable/i),
-      ).toBeInTheDocument();
-      expect(
-        screen.getByRole('button', { name: /Go to Home/i }),
-      ).toBeInTheDocument();
+      expect(await screen.findByText(/Invalid invite/i)).toBeInTheDocument();
       expect(screen.queryByText(/Retry/i)).not.toBeInTheDocument();
     },
   );
+
+  it('routes already-claimed invite errors into sign-in recovery guidance', async () => {
+    mockUseCandidateSession.mockReturnValue(buildSession());
+    mockResolveInvite.mockRejectedValueOnce({ status: 409 });
+
+    render(<CandidateSessionPage token="invite-token" />);
+    expect(
+      await screen.findByText(/already been claimed/i),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /Continue to sign in/i }),
+    ).toBeInTheDocument();
+  });
 
   it('shows expired invite state for 410', async () => {
     mockUseCandidateSession.mockReturnValue(buildSession());

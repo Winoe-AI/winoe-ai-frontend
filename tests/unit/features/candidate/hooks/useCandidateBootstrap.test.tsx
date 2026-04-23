@@ -1,6 +1,10 @@
 import React from 'react';
 import { act, render, screen } from '@testing-library/react';
 import { useCandidateBootstrap } from '@/features/candidate/session/hooks/useCandidateBootstrap';
+import {
+  INVITE_ALREADY_CLAIMED_MESSAGE,
+  INVITE_INVALID_MESSAGE,
+} from '@/platform/copy/invite';
 
 jest.mock('@/features/candidate/session/api', () => {
   const actual = jest.requireActual('@/features/candidate/session/api');
@@ -67,22 +71,27 @@ describe('useCandidateBootstrap', () => {
     expect(screen.getByTestId('state').textContent).toBe('ready');
   });
 
-  it('surfaces error on failure', async () => {
-    const onResolved = jest.fn();
-    resolveMock.mockRejectedValue(
-      Object.assign(new Error('bad'), { status: 404 }),
-    );
+  it.each([
+    [400, INVITE_INVALID_MESSAGE],
+    [404, INVITE_INVALID_MESSAGE],
+    [409, INVITE_ALREADY_CLAIMED_MESSAGE],
+  ])(
+    'surfaces the correct invite error for status %s',
+    async (status, expected) => {
+      const onResolved = jest.fn();
+      resolveMock.mockRejectedValue(
+        Object.assign(new Error('bad'), { status }),
+      );
 
-    render(<Harness inviteToken="tok_err" onResolved={onResolved} />);
+      render(<Harness inviteToken="tok_err" onResolved={onResolved} />);
 
-    await act(async () => {
-      screen.getByText('load').click();
-    });
+      await act(async () => {
+        screen.getByText('load').click();
+      });
 
-    expect(onResolved).not.toHaveBeenCalled();
-    expect(screen.getByTestId('state').textContent).toBe('error');
-    expect(screen.getByTestId('error').textContent).toContain(
-      'no longer valid',
-    );
-  });
+      expect(onResolved).not.toHaveBeenCalled();
+      expect(screen.getByTestId('state').textContent).toBe('error');
+      expect(screen.getByTestId('error').textContent).toBe(expected);
+    },
+  );
 });

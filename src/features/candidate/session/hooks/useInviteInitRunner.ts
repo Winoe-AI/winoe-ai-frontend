@@ -1,7 +1,9 @@
 import { resolveCandidateInviteToken } from '@/features/candidate/session/api';
 import type { CandidateSessionBootstrapResponse } from '@/features/candidate/session/api/typesApi';
 import {
+  INVITE_ALREADY_CLAIMED_MESSAGE,
   INVITE_EXPIRED_MESSAGE,
+  INVITE_INVALID_MESSAGE,
   INVITE_UNAVAILABLE_MESSAGE,
 } from '@/platform/copy/invite';
 import {
@@ -14,7 +16,14 @@ import type { InviteInitParams } from './useInviteInitRunner.types';
 export type { InviteInitParams } from './useInviteInitRunner.types';
 
 export const inviteErrorCopy = (status: number | null, msg: string | null) =>
-  msg ?? (status === 410 ? INVITE_EXPIRED_MESSAGE : INVITE_UNAVAILABLE_MESSAGE);
+  msg ??
+  (status === 410
+    ? INVITE_EXPIRED_MESSAGE
+    : status === 409
+      ? INVITE_ALREADY_CLAIMED_MESSAGE
+      : status === 400 || status === 404
+        ? INVITE_INVALID_MESSAGE
+        : INVITE_UNAVAILABLE_MESSAGE);
 
 const hasSchedulePayload = (resp: CandidateSessionBootstrapResponse): boolean =>
   'scheduledStartAt' in resp ||

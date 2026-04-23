@@ -16,10 +16,18 @@ export function CandidateSessionErrorRoute({
   errorStatus,
   inviteErrorCopy,
 }: CandidateSessionErrorRouteProps) {
-  const inviteLinkError = [400, 404, 409, 410].includes(errorStatus ?? 0);
-  const errorTitle = inviteLinkError
-    ? 'Invite link unavailable'
-    : 'Unable to load trial';
+  const inviteErrorStatus = errorStatus ?? 0;
+  const inviteLinkError = [400, 404, 409, 410].includes(inviteErrorStatus);
+  const errorTitle =
+    inviteErrorStatus === 400 || inviteErrorStatus === 404
+      ? 'Invalid invite'
+      : inviteErrorStatus === 409
+        ? 'Invite already claimed'
+        : inviteErrorStatus === 410
+          ? 'Invite expired'
+          : inviteLinkError
+            ? 'Invite link unavailable'
+            : 'Unable to load trial';
   const errorCopy = inviteLinkError
     ? inviteErrorCopy
     : (errorMessage ?? 'Something went wrong loading your trial.');
@@ -27,6 +35,7 @@ export function CandidateSessionErrorRoute({
   return (
     <ErrorView
       authStatus={authStatus}
+      errorStatus={errorStatus}
       errorTitle={errorTitle}
       errorCopy={errorCopy}
       inviteLinkError={inviteLinkError}

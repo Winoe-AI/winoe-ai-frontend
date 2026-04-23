@@ -1,5 +1,6 @@
 import { StateMessage } from './components/StateMessage';
 import Button from '@/shared/ui/Button';
+import { INVITE_EXPIRED_MESSAGE } from '@/platform/copy/invite';
 import type {
   CandidateSessionViewProps as Props,
   ViewState,
@@ -22,7 +23,7 @@ export function CandidateSessionAccessRoute({
         title="Access denied"
         description={
           errorMessage ??
-          'You do not have access to this invite. Please confirm you are signed in with the matching email.'
+          'You do not have access to this invite. Please sign in with the email tied to the invite.'
         }
         action={
           <a href={props.loginHref}>
@@ -37,10 +38,7 @@ export function CandidateSessionAccessRoute({
     return (
       <StateMessage
         title="Invite expired"
-        description={
-          errorMessage ??
-          'This invite has expired. Please contact your Talent Partner for a new link.'
-        }
+        description={errorMessage ?? INVITE_EXPIRED_MESSAGE}
       />
     );
   }

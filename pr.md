@@ -1,61 +1,58 @@
-# Phase 3 frontend ship set
+# 1. Title
 
-## Summary
+Candidate invite claim now shows specific invalid, expired, already-claimed, and access-denied states
 
-This frontend PR supports the Phase 3 verification flow for the Talent Partner golden path.
+## 2. Problem
 
-It is verification support, not product UX work.
+Candidate invite flows were collapsing too many backend outcomes into a generic unavailable-state experience. That made it hard to tell the difference between a malformed token, an expired invite, an already-claimed session, and a real access problem.
 
-The change set covers:
+The old candidate sign-in copy also implied a verification workflow that the product does not own. Auth0 owns email verification, so the frontend should only guide candidates through sign-in, invite-email matching, session ownership, and invite lifecycle errors.
 
-- the contract-live browser harness,
-- the contract-live stack runner,
-- a debug auth evidence route,
-- the invite proxy route,
-- and the corresponding live/unit tests.
+## 3. What Changed
 
-## Why
+- Invite token resolution now maps backend responses to distinct candidate states:
+  - `400` and `404` become an invalid invite response.
+  - `409` becomes an already-claimed invite response, and a recoverable bootstrap payload is treated as a live session.
+  - `410` becomes an expired invite response.
+  - `403` now resolves to access-denied or sign-in guidance instead of verification-flavored copy.
+- Candidate invite error rendering now shows distinct titles and messages for invalid, expired, and already-claimed cases.
+- The candidate error view now sends already-claimed unauthenticated users to sign in, while keeping the home/retry actions for the other invite states.
+- Candidate login copy now says to sign in with the email tied to the invite.
+- Shared invite copy now has separate messages for invalid, expired, already-claimed, and generic unavailable states.
+- Unit coverage was expanded for:
+  - invite token resolution and 409 recovery
+  - candidate bootstrap error mapping
+  - candidate session error routing
+  - invite error message helpers
+  - candidate login copy
+  - the legacy `/candidate-sessions/[token]` redirect path
 
-Phase 3 needed a repeatable live-stack proof path that could:
+## 4. Why This Is Correct
 
-- validate storage state before browser execution,
-- capture candidate scheduling proof including GitHub username handling,
-- verify termination and post-termination behavior,
-- and expose enough auth evidence to support the verification report.
+The candidate runtime now matches the intended contract:
 
-## Implementation Notes
+- sign-in state
+- invite email match
+- session ownership
+- already-claimed handling
+- invalid and expired invite handling
 
-### Live QA harness
+There is no shipped frontend email-verification workflow here because Auth0 owns that concern. The frontend should only surface the invite/session state that the backend returns.
 
-- `live_flow_driver.mjs` now fails fast when the expected storage-state file is missing.
-- Navigation and load handling were tightened to rely on `domcontentloaded` instead of overusing network-idle assumptions.
-- Candidate scheduling proof capture now records the GitHub username field and persisted schedule state.
-- The harness explicitly checks that an empty GitHub username blocks continue, then fills a valid value and verifies the confirmed state includes it.
-- Termination flow coverage was added so the live QA run can capture cleanup and post-termination evidence.
+Treating a recoverable `409` payload as the active session is correct because it represents an already-claimed invite that can continue instead of a dead-end error.
 
-### Stack runner
+## 5. Validation / QA
 
-- `run_contract_live_stack.sh` now wires explicit scenario-generation environment values into the live verification stack.
-- The runner can reuse `gh auth token` when available so the harness can execute with the operator's existing GitHub auth context.
+- Updated unit tests cover the new invite-status mapping and error-copy paths.
+- Route coverage now includes the legacy redirect-only `/candidate-sessions/[token]` behavior.
+- The candidate login page behavior test now verifies the invite-email sign-in subtitle.
 
-### API routes
+## 6. Risks / Follow-Ups
 
-- The debug auth evidence route now returns `email` and `emailVerified` in addition to the existing user metadata.
-- The trial invite route now forwards the request with a 90 second timeout, which matches the live invite/bootstrap path budget.
+- Issue `#179` still mentions unverified-email verification instructions. That wording is stale relative to the actual product contract and should not be treated as shipped candidate behavior.
+- The already-claimed recovery path depends on the backend returning a recoverable bootstrap payload for `409`; otherwise the user sees already-claimed guidance.
+- If backend invite error shapes drift, the status-to-copy mapping will need to be kept in sync.
 
-### Tests
+## 7. Final Result
 
-- Contract-live E2E coverage was updated to use the more reliable load handling.
-- Unit tests were updated for the debug auth route and invite route behavior.
-
-## Test / Verification
-
-- Updated contract-live and unit tests cover the verification-specific route and harness changes.
-- The live QA harness itself was exercised against the real local stack as part of the Phase 3 verification work.
-
-## Risks / Limitations
-
-- The harness is verification support, not end-user product UX.
-- Cleanup/job anomaly remains documented in evidence, not hidden.
-- This PR does not change candidate auth policy.
-- The route timeout change improves the live invite path, but it does not guarantee upstream GitHub latency will never exceed the budget.
+The frontend candidate invite flow now gives candidates clear, specific recovery paths for invalid, expired, already-claimed, and access-denied invite states, without introducing a frontend-owned email-verification flow.

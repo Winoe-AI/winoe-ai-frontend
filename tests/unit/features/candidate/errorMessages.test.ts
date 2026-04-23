@@ -5,21 +5,31 @@ import {
   friendlyTaskError,
 } from '@/features/candidate/session/utils/errorMessagesUtils';
 import { HttpError } from '@/features/candidate/session/api';
+import {
+  INVITE_ALREADY_CLAIMED_MESSAGE,
+  INVITE_EXPIRED_MESSAGE,
+  INVITE_INVALID_MESSAGE,
+} from '@/platform/copy/invite';
 
 describe('candidate error messages', () => {
   it('maps bootstrap statuses to friendly messages', () => {
     [
-      [400, 'no longer valid'],
-      [404, 'no longer valid'],
-      [409, 'no longer valid'],
+      [400, INVITE_INVALID_MESSAGE],
+      [404, INVITE_INVALID_MESSAGE],
+      [409, INVITE_ALREADY_CLAIMED_MESSAGE],
       [401, 'sign in'],
-      [403, 'sign in'],
-      [410, 'expired or was already used'],
+      [410, INVITE_EXPIRED_MESSAGE],
     ].forEach(([status, expected]) => {
       expect(
         friendlyBootstrapError(new HttpError(status as number, 'x')),
       ).toContain(expected as string);
     });
+    expect(friendlyBootstrapError(new HttpError(403, 'email claim'))).toBe(
+      'We could not confirm your sign-in. Please sign in again.',
+    );
+    expect(friendlyBootstrapError(new HttpError(403, 'forbidden'))).toBe(
+      'You do not have access to this invite.',
+    );
     expect(friendlyBootstrapError(new Error('Backend fail'))).toContain(
       'Network error',
     );
@@ -37,17 +47,24 @@ describe('candidate error messages', () => {
   it('maps claim errors and defaults', () => {
     expect(friendlyClaimError(new HttpError(401, ''))).toContain('sign in');
     expect(friendlyClaimError(new HttpError(410, 'x'))).toContain('expired');
-    expect(friendlyClaimError(new HttpError(403, 'use this'))).toContain(
-      'sign in',
+    expect(friendlyClaimError(new HttpError(403, 'email claim'))).toBe(
+      'We could not confirm your sign-in. Please sign in again.',
+    );
+    expect(friendlyClaimError(new HttpError(403, 'use this'))).toBe(
+      'You do not have access to this invite.',
     );
     expect(friendlyClaimError(new HttpError(500, ''))).toContain(
       'Unable to claim',
     );
-    [400, 404, 409].forEach((status) => {
-      expect(friendlyClaimError(new HttpError(status, ''))).toContain(
-        'no longer valid',
-      );
-    });
+    expect(friendlyClaimError(new HttpError(400, ''))).toBe(
+      INVITE_INVALID_MESSAGE,
+    );
+    expect(friendlyClaimError(new HttpError(404, ''))).toBe(
+      INVITE_INVALID_MESSAGE,
+    );
+    expect(friendlyClaimError(new HttpError(409, ''))).toBe(
+      INVITE_ALREADY_CLAIMED_MESSAGE,
+    );
     expect(friendlyClaimError(new HttpError(0, ''))).toContain('Network error');
     expect(friendlyClaimError(new HttpError(502, 'Custom claim error'))).toBe(
       'Custom claim error',
@@ -58,16 +75,18 @@ describe('candidate error messages', () => {
   });
 
   it('maps task errors for session mismatch, network, and defaults', () => {
-    expect(friendlyTaskError(new HttpError(400, 'x'))).toContain(
-      'no longer valid',
+    expect(friendlyTaskError(new HttpError(400, 'x'))).toBe(
+      INVITE_INVALID_MESSAGE,
     );
-    expect(friendlyTaskError(new HttpError(404, 'x'))).toContain(
-      'no longer valid',
+    expect(friendlyTaskError(new HttpError(404, 'x'))).toBe(
+      INVITE_INVALID_MESSAGE,
     );
-    expect(friendlyTaskError(new HttpError(409, ''))).toContain(
-      'no longer valid',
+    expect(friendlyTaskError(new HttpError(409, ''))).toBe(
+      INVITE_ALREADY_CLAIMED_MESSAGE,
     );
-    expect(friendlyTaskError(new HttpError(410, 'x'))).toContain('expired');
+    expect(friendlyTaskError(new HttpError(410, 'x'))).toBe(
+      INVITE_EXPIRED_MESSAGE,
+    );
     expect(friendlyTaskError(new HttpError(0, 'offline'))).toContain(
       'Network error',
     );

@@ -6,6 +6,10 @@ import {
   waitFor,
 } from '@testing-library/react';
 import {
+  INVITE_ALREADY_CLAIMED_MESSAGE,
+  INVITE_INVALID_MESSAGE,
+} from '@/platform/copy/invite';
+import {
   CandidateSessionPage,
   buildState,
   primeErrorApiMocks,
@@ -52,25 +56,34 @@ describe('CandidateSessionPage error states - invite error variants', () => {
     await waitFor(() => expect(resolveInviteMock).toHaveBeenCalledTimes(2));
   });
 
-  it('handles 400 status as invite unavailable', async () => {
+  it('handles 400 status as invalid invite', async () => {
     resolveInviteMock.mockRejectedValue({ status: 400 });
     useCandidateSessionMock.mockReturnValue(buildState());
     await act(async () => render(<CandidateSessionPage token="inv" />));
     await waitFor(() =>
       expect(screen.getByTestId('state-message')).toHaveTextContent(
-        'Invite link unavailable',
+        'Invalid invite',
       ),
+    );
+    expect(screen.getByTestId('state-message')).toHaveTextContent(
+      INVITE_INVALID_MESSAGE,
     );
   });
 
-  it('handles 409 status as invite unavailable', async () => {
+  it('handles 409 status as already claimed invite guidance', async () => {
     resolveInviteMock.mockRejectedValue({ status: 409 });
     useCandidateSessionMock.mockReturnValue(buildState());
     await act(async () => render(<CandidateSessionPage token="inv" />));
     await waitFor(() =>
       expect(screen.getByTestId('state-message')).toHaveTextContent(
-        'Invite link unavailable',
+        'Sign in to continue',
       ),
     );
+    expect(screen.getByTestId('state-message')).toHaveTextContent(
+      INVITE_ALREADY_CLAIMED_MESSAGE,
+    );
+    expect(
+      screen.getByRole('button', { name: /Continue to sign in/i }),
+    ).toBeInTheDocument();
   });
 });

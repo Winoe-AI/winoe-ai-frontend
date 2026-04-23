@@ -35,6 +35,11 @@ describe('LoginPage', () => {
     expect(
       screen.getByText(/Sign in to continue your trial/i),
     ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        /Sign in with the email tied to your invite to continue\./i,
+      ),
+    ).toBeInTheDocument();
     const authLink = screen.getByRole('link', { name: 'Continue with Auth0' });
     expect(authLink).toHaveAttribute(
       'href',
