@@ -51,17 +51,31 @@ describe('CandidateSessionPage error states - auth and invite paths', () => {
     expect(screen.queryByRole('button', { name: /Go to sign in/i })).toBeNull();
   });
 
-  it('shows invite error with go home action when authenticated', async () => {
+  it('shows invalid invite state with go home action when authenticated', async () => {
     resolveInviteMock.mockRejectedValue(new HttpError(404));
     useCandidateSessionMock.mockReturnValue(buildState());
     await act(async () => render(<CandidateSessionPage token="inv" />));
     await waitFor(() =>
       expect(screen.getByTestId('state-message')).toHaveTextContent(
-        'Invite link unavailable',
+        'Invalid invite',
       ),
     );
     fireEvent.click(screen.getByRole('button', { name: /Go to Home/i }));
     expect(routerMock.push).toHaveBeenCalledWith('/');
+  });
+
+  it('routes 403 invite errors to access denied guidance', async () => {
+    resolveInviteMock.mockRejectedValue(new HttpError(403, 'Forbidden'));
+    useCandidateSessionMock.mockReturnValue(buildState());
+    await act(async () => render(<CandidateSessionPage token="inv" />));
+    await waitFor(() =>
+      expect(screen.getByTestId('state-message')).toHaveTextContent(
+        'Access denied',
+      ),
+    );
+    expect(
+      screen.getByText(/You do not have access to this invite/i),
+    ).toBeInTheDocument();
   });
 
   it('redirects to login when resolve fails with 401', async () => {

@@ -53,13 +53,33 @@ describe('candidate api invite helpers', () => {
 
   it('maps resolveCandidateInviteToken auth and access statuses', async () => {
     const { resolveCandidateInviteToken } = await importCandidateApi();
+    mockGet.mockRejectedValueOnce({ status: 400 });
+    await expect(resolveCandidateInviteToken('tok')).rejects.toMatchObject({
+      status: 400,
+      message: expect.stringContaining('invalid'),
+    });
     mockGet.mockRejectedValueOnce({ status: 404 });
     await expect(resolveCandidateInviteToken('tok')).rejects.toMatchObject({
       status: 404,
+      message: expect.stringContaining('invalid'),
     });
     mockGet.mockRejectedValueOnce({ status: 410 });
     await expect(resolveCandidateInviteToken('tok')).rejects.toMatchObject({
       status: 410,
+      message: expect.stringContaining('expired'),
+    });
+    mockGet.mockRejectedValueOnce({
+      status: 409,
+      details: {
+        candidateSessionId: 77,
+        status: 'in_progress',
+        trial: { title: 'Existing trial', role: 'Role' },
+      },
+    });
+    await expect(resolveCandidateInviteToken('tok')).resolves.toMatchObject({
+      candidateSessionId: 77,
+      status: 'in_progress',
+      trial: { title: 'Existing trial', role: 'Role' },
     });
     mockGet.mockRejectedValueOnce({ status: 401 });
     await expect(resolveCandidateInviteToken('tok')).rejects.toMatchObject({
@@ -68,11 +88,11 @@ describe('candidate api invite helpers', () => {
     });
     mockGet.mockRejectedValueOnce({
       status: 403,
-      details: { message: 'Email verification required' },
+      details: { message: 'email claim missing' },
     });
     await expect(resolveCandidateInviteToken('tok')).rejects.toMatchObject({
       status: 403,
-      message: 'Please verify your email, then try again.',
+      message: 'We could not confirm your sign-in. Please sign in again.',
     });
     mockGet.mockRejectedValueOnce({
       status: 403,
@@ -80,7 +100,7 @@ describe('candidate api invite helpers', () => {
     });
     await expect(resolveCandidateInviteToken('tok')).rejects.toMatchObject({
       status: 403,
-      message: 'We could not confirm your email. Please sign in again.',
+      message: 'We could not confirm your sign-in. Please sign in again.',
     });
     mockGet.mockRejectedValueOnce({
       status: 403,

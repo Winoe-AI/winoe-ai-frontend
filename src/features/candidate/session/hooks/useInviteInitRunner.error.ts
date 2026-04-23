@@ -9,6 +9,15 @@ export function handleInviteInitError(params: InviteInitParams, err: unknown) {
     return;
   }
 
+  if (status === 409) {
+    params.setErrorStatus(409);
+    params.setErrorMessage(null);
+    params.setAuthMessage(friendlyBootstrapError(err));
+    params.setView('auth');
+    params.markEnd('candidate:init', { status: 'already_claimed' });
+    return;
+  }
+
   if (status === 403) {
     params.setErrorStatus(403);
     params.setErrorMessage(friendlyBootstrapError(err));

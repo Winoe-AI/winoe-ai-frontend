@@ -34,6 +34,11 @@ describe('LoginPage', () => {
     ).toBeInTheDocument();
     expect(
       screen.getByText(
+        /Sign in with the email tied to your invite to continue\./i,
+      ),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(
         /Dev warning: set NEXT_PUBLIC_WINOE_AUTH0_CANDIDATE_CONNECTION/i,
       ),
     ).toBeInTheDocument();

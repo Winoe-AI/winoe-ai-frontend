@@ -3,6 +3,7 @@ import { StateMessage } from '../components/StateMessage';
 
 type Props = {
   authStatus: 'idle' | 'loading' | 'ready' | 'unauthenticated' | 'error';
+  errorStatus: number | null;
   errorTitle: string;
   errorCopy: string;
   inviteLinkError: boolean;
@@ -13,6 +14,7 @@ type Props = {
 
 export function ErrorView({
   authStatus,
+  errorStatus,
   errorTitle,
   errorCopy,
   inviteLinkError,
@@ -20,9 +22,11 @@ export function ErrorView({
   onRetry,
   onGoHome,
 }: Props) {
+  const shouldGoToSignIn =
+    inviteLinkError && errorStatus === 409 && authStatus === 'unauthenticated';
   const action = inviteLinkError ? (
     <div className="flex gap-3">
-      {authStatus === 'unauthenticated' ? (
+      {shouldGoToSignIn ? (
         <a href={loginHref}>
           <Button>Go to sign in</Button>
         </a>

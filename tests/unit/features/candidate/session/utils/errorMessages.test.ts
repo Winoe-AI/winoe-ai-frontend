@@ -11,7 +11,9 @@ const httpErr = (status: number, message?: string) =>
 describe('candidate error messages', () => {
   it('handles bootstrap errors by status', () => {
     expect(friendlyBootstrapError(httpErr(401))).toMatch(/sign in/i);
-    expect(friendlyBootstrapError(httpErr(403))).toMatch(/confirm your email/i);
+    expect(friendlyBootstrapError(httpErr(403))).toBe(
+      'You do not have access to this invite.',
+    );
     expect(friendlyBootstrapError(httpErr(410))).toMatch(/expired/i);
     expect(friendlyBootstrapError(httpErr(0))).toMatch(/Network/i);
     expect(friendlyBootstrapError(httpErr(500, 'boom'))).toBe('boom');
@@ -25,7 +27,9 @@ describe('candidate error messages', () => {
 
   it('handles claim errors by status', () => {
     expect(friendlyClaimError(httpErr(401))).toMatch(/sign in again/i);
-    expect(friendlyClaimError(httpErr(403))).toMatch(/confirm your email/i);
+    expect(friendlyClaimError(httpErr(403))).toBe(
+      'You do not have access to this invite.',
+    );
     expect(friendlyClaimError(httpErr(410))).toMatch(/expired/i);
     expect(friendlyClaimError(httpErr(0))).toMatch(/Network/i);
     expect(friendlyClaimError(httpErr(500, 'y'))).toBe('y');

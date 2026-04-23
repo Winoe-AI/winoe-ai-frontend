@@ -24,7 +24,7 @@ export default function LoginPage({
     ? 'Sign in to continue your trial'
     : 'Talent Partner login';
   const subtitle = isCandidate
-    ? 'Sign in to verify your invite and continue.'
+    ? 'Sign in with the email tied to your invite to continue.'
     : `Sign in to access your ${BRAND_NAME} dashboard.`;
   const missingCandidateConnection =
     process.env.NODE_ENV !== 'production' &&
