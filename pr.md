@@ -107,6 +107,7 @@ The candidate dashboard now reflects the 5-day Trial model correctly:
 - terminated Trials are shown as terminal and cannot be resumed
 
 Worker Report:
+
 - Summary
   - Updated `pr.md` only to describe the completed fix for issue #180 and the final QA-passed contract/state model.
 - Files changed
