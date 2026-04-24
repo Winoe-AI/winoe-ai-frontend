@@ -44,9 +44,31 @@ type Invite = {
   isExpired: boolean;
   token: string;
   company?: string | null;
+  candidateEmail?: string | null;
+  inviteEmail?: string | null;
+  talentPartnerName?: string | null;
+  talentPartnerEmail?: string | null;
   progress?: { completed: number; total: number } | null;
   lastActivityAt?: string | null;
   expiresAt?: string | null;
+  scheduledStartAt?: string | null;
+  candidateTimezone?: string | null;
+  dayWindows?: Array<{
+    dayIndex: number;
+    windowStartAt: string;
+    windowEndAt: string;
+  }> | null;
+  currentDayWindow?: {
+    dayIndex: number;
+    windowStartAt: string;
+    windowEndAt: string;
+    state: 'upcoming' | 'active' | 'closed';
+  } | null;
+  reportReady?: boolean | null;
+  hasReport?: boolean | null;
+  completedAt?: string | null;
+  terminatedAt?: string | null;
+  isTerminated?: boolean;
 };
 
 export const makeInvite = (overrides: Partial<Invite> = {}): Invite => ({
@@ -56,6 +78,9 @@ export const makeInvite = (overrides: Partial<Invite> = {}): Invite => ({
   status: 'in_progress',
   isExpired: false,
   token: 'tok-1',
+  talentPartnerName: 'Taylor Partner',
+  candidateEmail: 'candidate@example.com',
+  inviteEmail: 'candidate@example.com',
   ...overrides,
 });
 

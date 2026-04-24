@@ -25,7 +25,7 @@ export default function CandidateDashboardPage({
     router.replace(buildLoginHref('/candidate/dashboard', 'candidate'));
   }, [router]);
   const { sortedInvites, loading, error, refresh, setError } =
-    useCandidateInvites(handleAuthRequired);
+    useCandidateInvites(signedInEmail ?? null, handleAuthRequired);
 
   const displayEmail = useMemo(() => signedInEmail ?? '', [signedInEmail]);
   const { handleContinue, prefetchContinue, resolveFallbackToken } =

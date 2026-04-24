@@ -20,7 +20,7 @@ describe('CandidateDashboardPage extra rendering coverage', () => {
     await renderDashboardInvite(
       makeInvite({ title: 'No Company Sim', company: null }),
     );
-    expect(screen.getByText('Developer')).toBeInTheDocument();
+    expect(screen.getByText(/Company pending/i)).toBeInTheDocument();
   });
 
   it.each([
@@ -38,21 +38,51 @@ describe('CandidateDashboardPage extra rendering coverage', () => {
     },
   );
 
-  it('formats underscore status labels for display', async () => {
-    await renderDashboardInvite(
-      makeInvite({ title: 'Status Test', status: 'in_progress' }),
-    );
-    expect(screen.getByText('in progress')).toBeInTheDocument();
-  });
-
-  it('caps percentage at 100 when completed exceeds total', async () => {
+  it('renders current day and active status text', async () => {
     await renderDashboardInvite(
       makeInvite({
-        title: 'Over Progress Sim',
-        status: 'completed',
-        progress: { completed: 10, total: 5 },
+        title: 'Status Test',
+        status: 'in_progress',
+        progress: { completed: 1, total: 5 },
       }),
     );
-    expect(screen.getByText(/100% complete/)).toBeInTheDocument();
+    expect(screen.getByText('Day 2 open')).toBeInTheDocument();
+    expect(screen.getByText(/Current day: Day 2 of 5/i)).toBeInTheDocument();
+  });
+
+  it('normalizes legacy ten-unit progress to the five-day model', async () => {
+    await renderDashboardInvite(
+      makeInvite({
+        title: 'Legacy Progress Sim',
+        status: 'in_progress',
+        progress: { completed: 10, total: 10 },
+      }),
+    );
+    expect(screen.getByText(/Progress: 5\/5/)).toBeInTheDocument();
+  });
+
+  it('pins partial legacy progress to the five-day model', async () => {
+    await renderDashboardInvite(
+      makeInvite({
+        title: 'Partial Legacy Progress Sim',
+        status: 'in_progress',
+        progress: { completed: 5, total: 10 },
+      }),
+    );
+    expect(screen.getByText(/Progress: 5\/5/)).toBeInTheDocument();
+  });
+
+  it('shows terminated state as non-active', async () => {
+    await renderDashboardInvite(
+      makeInvite({
+        title: 'Terminated Sim',
+        status: 'in_progress',
+        isTerminated: true,
+        terminatedAt: '2025-01-01T00:00:00Z',
+      }),
+    );
+    expect(screen.getByText('Terminated')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Ended/i })).toBeDisabled();
+    expect(screen.getByText(/This trial has ended/i)).toBeInTheDocument();
   });
 });

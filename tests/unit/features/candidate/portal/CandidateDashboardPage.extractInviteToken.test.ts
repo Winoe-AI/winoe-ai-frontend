@@ -11,6 +11,15 @@ describe('extractInviteToken', () => {
   it('extracts trailing segment for simple paths', () => {
     expect(extractInviteToken('simpletoken')).toBe('simpletoken');
     expect(extractInviteToken('path/token')).toBe('token');
-    expect(extractInviteToken('/path/token/')).toBe('');
+    expect(extractInviteToken('/path/token/')).toBe('token');
+  });
+
+  it('extracts invite tokens from canonical paths with trailing slashes', () => {
+    expect(
+      extractInviteToken('https://app.test/candidate/session/ABC123/'),
+    ).toBe('ABC123');
+    expect(
+      extractInviteToken('https://app.test/candidate-sessions/XYZ789/'),
+    ).toBe('XYZ789');
   });
 });

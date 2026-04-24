@@ -1,4 +1,5 @@
 import type { CandidateInvite } from '@/features/candidate/session/api';
+import { isTerminatedInvite } from '../utils/candidateInviteViewModel';
 
 type Props = {
   invite: CandidateInvite;
@@ -6,6 +7,14 @@ type Props = {
 };
 
 export function InviteWarnings({ invite, tokenAvailable }: Props) {
+  if (isTerminatedInvite(invite)) {
+    return (
+      <div className="mt-3 text-xs text-amber-700">
+        This trial has ended. Please contact your Talent Partner for next steps.
+      </div>
+    );
+  }
+
   if (invite.isExpired) {
     return (
       <div className="mt-3 text-xs text-amber-700">

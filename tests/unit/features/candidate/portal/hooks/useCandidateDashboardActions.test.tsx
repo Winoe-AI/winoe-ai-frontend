@@ -87,6 +87,31 @@ describe('useCandidateDashboardActions', () => {
     );
   });
 
+  it('blocks terminated invites from continuing', () => {
+    const { result } = renderHook(() =>
+      useCandidateDashboardActions({
+        router,
+        queryClient,
+        candidateSessionId: 9,
+        inviteToken: null,
+        setError,
+      }),
+    );
+
+    result.current.handleContinue({
+      isExpired: false,
+      status: 'in_progress',
+      isTerminated: true,
+      terminatedAt: '2025-01-15T11:00:00Z',
+      token: 'terminated-token',
+    } as never);
+
+    expect(setError).toHaveBeenCalledWith(
+      'This trial has ended. Please contact your Talent Partner.',
+    );
+    expect(router.push).not.toHaveBeenCalled();
+  });
+
   it('navigates to encoded token path when continue succeeds', () => {
     const { result } = renderHook(() =>
       useCandidateDashboardActions({
@@ -105,6 +130,44 @@ describe('useCandidateDashboardActions', () => {
 
     expect(router.push).toHaveBeenCalledWith(
       '/candidate/session/token%20with%20spaces',
+    );
+  });
+
+  it.each([
+    {
+      name: 'completed invite',
+      invite: {
+        isExpired: false,
+        status: 'completed',
+        completedAt: '2025-01-15T10:00:00Z',
+        token: 'completed-token',
+      },
+    },
+    {
+      name: 'report-ready invite',
+      invite: {
+        isExpired: false,
+        status: 'completed',
+        reportReady: true,
+        hasReport: true,
+        token: 'report-ready-token',
+      },
+    },
+  ])('routes $name to review', ({ invite }) => {
+    const { result } = renderHook(() =>
+      useCandidateDashboardActions({
+        router,
+        queryClient,
+        candidateSessionId: 9,
+        inviteToken: null,
+        setError,
+      }),
+    );
+
+    result.current.handleContinue(invite as never);
+
+    expect(router.push).toHaveBeenCalledWith(
+      `/candidate/session/${encodeURIComponent(invite.token)}/review`,
     );
   });
 

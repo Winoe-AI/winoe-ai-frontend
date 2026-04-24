@@ -6,6 +6,7 @@ import {
 } from '@/features/candidate/session/api';
 import { toUserMessage } from '@/platform/errors/errors';
 import { queryKeys } from '@/shared/query';
+import { filterCandidateInvitesForViewer } from '../utils/candidateInviteViewModel';
 
 type UseCandidateInvitesResult = {
   invites: CandidateInvite[];
@@ -17,6 +18,7 @@ type UseCandidateInvitesResult = {
 };
 
 export function useCandidateInvites(
+  signedInEmail?: string | null,
   onAuthRequired?: () => void,
 ): UseCandidateInvitesResult {
   const queryClient = useQueryClient();
@@ -42,12 +44,16 @@ export function useCandidateInvites(
   const invites = useMemo(() => invitesQuery.data ?? [], [invitesQuery.data]);
 
   const sortedInvites = useMemo(() => {
-    return [...invites].sort((a, b) => {
+    const filteredInvites = filterCandidateInvitesForViewer(
+      invites,
+      signedInEmail ?? null,
+    );
+    return [...filteredInvites].sort((a, b) => {
       const aDate = a.lastActivityAt || a.expiresAt || '';
       const bDate = b.lastActivityAt || b.expiresAt || '';
       return bDate.localeCompare(aDate);
     });
-  }, [invites]);
+  }, [invites, signedInEmail]);
 
   const refresh = useCallback(() => {
     setLocalError(null);
@@ -66,7 +72,7 @@ export function useCandidateInvites(
   }, [invitesQuery.error]);
 
   return {
-    invites,
+    invites: sortedInvites,
     sortedInvites,
     loading: invitesQuery.isLoading || invitesQuery.isFetching,
     error: localError ?? queryError,

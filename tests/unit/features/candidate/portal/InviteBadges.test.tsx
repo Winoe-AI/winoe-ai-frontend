@@ -16,9 +16,9 @@ const baseInvite: CandidateInvite = {
 };
 
 describe('InviteBadges', () => {
-  it('renders status pill using statusMeta', () => {
+  it('renders status pill using the five-day state model', () => {
     render(<InviteBadges invite={baseInvite} />);
-    expect(screen.getByText(/In progress/i)).toBeInTheDocument();
+    expect(screen.getByText(/Day 2 open/i)).toBeInTheDocument();
   });
 
   it('shows expired pill when invite is expired', () => {

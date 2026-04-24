@@ -1,5 +1,9 @@
 import Button from '@/shared/ui/Button';
 import type { CandidateInvite } from '@/features/candidate/session/api';
+import {
+  deriveCandidateInviteState,
+  isTerminatedInvite,
+} from '../utils/candidateInviteViewModel';
 
 type Props = {
   invite: CandidateInvite;
@@ -14,14 +18,13 @@ export function InviteActions({
   onContinue,
   onIntent,
 }: Props) {
+  const { actionLabel, actionDisabled } = deriveCandidateInviteState(invite);
   const tokenAvailable = invite.token || fallbackToken;
-  const disabled = !tokenAvailable || invite.isExpired;
-  const label =
-    invite.status === 'completed'
-      ? 'Review submissions'
-      : invite.status === 'not_started'
-        ? 'Start trial'
-        : 'Continue';
+  const disabled =
+    !tokenAvailable ||
+    invite.isExpired ||
+    isTerminatedInvite(invite) ||
+    actionDisabled;
 
   return (
     <Button
@@ -31,7 +34,7 @@ export function InviteActions({
       onMouseEnter={() => onIntent?.(invite)}
       onFocus={() => onIntent?.(invite)}
     >
-      {label}
+      {actionLabel}
     </Button>
   );
 }
