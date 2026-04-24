@@ -16,6 +16,8 @@ import type {
   CandidateSessionBootstrapResponse,
 } from './typesApi';
 
+const CANDIDATE_INVITES_PATH = '/candidate/invites?includeTerminated=true';
+
 function isBootstrapLike(
   value: unknown,
 ): value is CandidateSessionBootstrapResponse {
@@ -60,7 +62,7 @@ export async function listCandidateInvites(options?: {
 }): Promise<CandidateInvite[]> {
   try {
     const data = await apiClient.get<unknown[]>(
-      '/candidate/invites',
+      CANDIDATE_INVITES_PATH,
       {
         cache: 'no-store',
         signal: options?.signal,

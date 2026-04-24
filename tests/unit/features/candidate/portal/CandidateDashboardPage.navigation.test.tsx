@@ -62,6 +62,31 @@ describe('CandidateDashboardPage navigation behavior', () => {
     );
   });
 
+  it('routes report-ready invites to the completed review hub', async () => {
+    listCandidateInvitesMock.mockResolvedValue([
+      {
+        candidateSessionId: 3,
+        title: 'Report Ready Sim',
+        role: 'Developer',
+        status: 'completed',
+        reportReady: true,
+        hasReport: true,
+        isExpired: false,
+        token: 'report-token',
+      },
+    ]);
+    await renderDashboardPage();
+    await waitFor(() => {
+      expect(screen.getByText('Report Ready Sim')).toBeInTheDocument();
+    });
+    fireEvent.click(
+      screen.getByRole('button', { name: /Review submissions/i }),
+    );
+    expect(useRouterMock.push).toHaveBeenCalledWith(
+      '/candidate/session/report-token/review',
+    );
+  });
+
   it('uses fallback token when invite token is missing for same session', async () => {
     setCandidateSessionState({
       candidateSessionId: 999,

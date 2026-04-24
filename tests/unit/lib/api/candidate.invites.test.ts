@@ -18,17 +18,29 @@ describe('candidate api invite helpers', () => {
         role: 'Eng',
         company: 'Co',
         status: 'not_started',
-        progress: { completed: 0, total: 3 },
+        progress: { completed: 5, total: 10 },
         expiresAt: '2024-01-01',
       },
     ]);
     const invites = await (await importCandidateApi()).listCandidateInvites();
-    expect(mockGet).toHaveBeenCalled();
+    expect(mockGet).toHaveBeenCalledWith(
+      '/candidate/invites?includeTerminated=true',
+      expect.objectContaining({
+        cache: 'no-store',
+        cacheTtlMs: 60_000,
+        dedupeKey: 'candidate-invites',
+      }),
+      expect.objectContaining({
+        basePath: '/api/backend',
+        skipAuth: false,
+      }),
+    );
     expect(invites[0]).toMatchObject({
       candidateSessionId: 5,
       token: 'tok',
       title: 'Sim',
       role: 'Eng',
+      progress: { completed: 5, total: 5 },
     });
   });
 

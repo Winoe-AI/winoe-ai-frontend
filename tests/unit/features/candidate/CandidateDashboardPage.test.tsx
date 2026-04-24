@@ -50,7 +50,7 @@ describe('CandidateDashboardPage', () => {
     ]);
     renderPage();
     expect(await screen.findByText(/Infra Trial/i)).toBeInTheDocument();
-    fireEvent.click(screen.getByRole('button', { name: /Continue/i }));
+    fireEvent.click(screen.getByRole('button', { name: /Continue trial/i }));
     expect(routerMock.push).toHaveBeenCalledWith('/candidate/session/INV123');
   });
   it('shows empty state when no invites', async () => {
@@ -77,9 +77,7 @@ describe('CandidateDashboardPage', () => {
     ]);
     renderPage();
     expect(await screen.findByText(/Old Trial/i)).toBeInTheDocument();
-    const cta = screen.getByRole('button', {
-      name: /Start trial|Continue/i,
-    });
+    const cta = screen.getByRole('button', { name: /Expired/i });
     expect(cta).toBeDisabled();
   });
   it('redirects to login when invite lookup returns 401', async () => {

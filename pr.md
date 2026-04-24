@@ -1,58 +1,124 @@
 # 1. Title
 
-Candidate invite claim now shows specific invalid, expired, already-claimed, and access-denied states
+Fix Candidate Portal Trial listing, progress, and status for the 5-day Trial model
 
-## 2. Problem
+# 2. Problem
 
-Candidate invite flows were collapsing too many backend outcomes into a generic unavailable-state experience. That made it hard to tell the difference between a malformed token, an expired invite, an already-claimed session, and a real access problem.
+Issue #180 was caused by two user-facing defects in the candidate dashboard:
 
-The old candidate sign-in copy also implied a verification workflow that the product does not own. Auth0 owns email verification, so the frontend should only guide candidates through sign-in, invite-email matching, session ownership, and invite lifecycle errors.
+- progress was rendered as `X/10` and 50% even though the product now uses a 5-day Trial model
+- the invite list included Trials that did not belong to the signed-in candidate
 
-## 3. What Changed
+The dashboard also needed a cleaner state model so the UI could show the right candidate-facing states without treating every presentation state as a persisted session status.
 
-- Invite token resolution now maps backend responses to distinct candidate states:
-  - `400` and `404` become an invalid invite response.
-  - `409` becomes an already-claimed invite response, and a recoverable bootstrap payload is treated as a live session.
-  - `410` becomes an expired invite response.
-  - `403` now resolves to access-denied or sign-in guidance instead of verification-flavored copy.
-- Candidate invite error rendering now shows distinct titles and messages for invalid, expired, and already-claimed cases.
-- The candidate error view now sends already-claimed unauthenticated users to sign in, while keeping the home/retry actions for the other invite states.
-- Candidate login copy now says to sign in with the email tied to the invite.
-- Shared invite copy now has separate messages for invalid, expired, already-claimed, and generic unavailable states.
-- Unit coverage was expanded for:
-  - invite token resolution and 409 recovery
-  - candidate bootstrap error mapping
-  - candidate session error routing
-  - invite error message helpers
-  - candidate login copy
-  - the legacy `/candidate-sessions/[token]` redirect path
+# 3. What Changed
 
-## 4. Why This Is Correct
+- The candidate dashboard invite list now uses the terminated-aware contract path:
+  - `/candidate/invites?includeTerminated=true`
+- Progress is normalized and rendered against a fixed 5-day model, so the dashboard now shows `X/5`.
+- Invite isolation is enforced so the signed-in candidate only sees Trials they were actually invited to.
+- Each Trial card now renders the required fields:
+  - title
+  - company
+  - Talent Partner name
+  - current day
+  - status
+- Candidate-facing state rendering now covers the full Trial lifecycle:
+  - invited
+  - awaiting start date
+  - scheduled
+  - Day N open
+  - Day N closed
+  - complete
+  - report ready
+  - terminated
+- Completed Trials route to review.
+- Report-ready Trials also route to review.
+- Terminated Trials remain non-active and non-resumable.
+- Tests were updated for:
+  - state derivation
+  - navigation
+  - rendering
+  - candidate invite API behavior
 
-The candidate runtime now matches the intended contract:
+# 4. Contract / State Model
 
-- sign-in state
-- invite email match
-- session ownership
-- already-claimed handling
-- invalid and expired invite handling
+The final contract keeps the persisted session lifecycle canonical:
 
-There is no shipped frontend email-verification workflow here because Auth0 owns that concern. The frontend should only surface the invite/session state that the backend returns.
+- `CandidateSession.status` remains the source of truth for the canonical session lifecycle
+- `report ready` and `terminated` are invite-facing derived states, not literal persisted candidate-session statuses
 
-Treating a recoverable `409` payload as the active session is correct because it represents an already-claimed invite that can continue instead of a dead-end error.
+Those invite-facing states are represented through explicit fields on the invite payload, including:
 
-## 5. Validation / QA
+- `reportReady`
+- `hasReport`
+- `terminatedAt`
+- `isTerminated`
 
-- Updated unit tests cover the new invite-status mapping and error-copy paths.
-- Route coverage now includes the legacy redirect-only `/candidate-sessions/[token]` behavior.
-- The candidate login page behavior test now verifies the invite-email sign-in subtitle.
+The dashboard consumes those fields to derive the correct UI state while leaving the canonical session status model intact.
 
-## 6. Risks / Follow-Ups
+# 5. Why This Is Correct
 
-- Issue `#179` still mentions unverified-email verification instructions. That wording is stale relative to the actual product contract and should not be treated as shipped candidate behavior.
-- The already-claimed recovery path depends on the backend returning a recoverable bootstrap payload for `409`; otherwise the user sees already-claimed guidance.
-- If backend invite error shapes drift, the status-to-copy mapping will need to be kept in sync.
+This fixes the original bug and aligns the UI with the actual product model:
 
-## 7. Final Result
+- the progress display now matches the 5-day Trial flow
+- invite rows are filtered to the real candidate scope, so cross-contaminated rows do not appear
+- the UI can represent richer invite-facing states without widening the persisted session enum
+- review routing is correct for both `complete` and `report ready`
+- termination is treated as a terminal, non-resumable state
 
-The frontend candidate invite flow now gives candidates clear, specific recovery paths for invalid, expired, already-claimed, and access-denied invite states, without introducing a frontend-owned email-verification flow.
+The result is a cleaner separation between canonical session state and dashboard presentation state.
+
+# 6. Validation / QA
+
+Real end-to-end QA passed with:
+
+- the frontend and backend stack running locally
+- an authenticated browser session
+- seeded candidate data
+- the actual dashboard request path verified
+- the browser-session BFF payload matching the backend payload content
+- live browser verification of:
+  - invited
+  - awaiting start date
+  - scheduled
+  - Day N open
+  - Day N closed
+  - complete
+  - report ready
+  - terminated
+- completed and report-ready review routing verified
+- terminated non-resumable behavior verified
+- the control candidate row did not appear
+
+# 7. Risks / Follow-Ups
+
+- Any future invite fixture should continue to treat `CandidateSession.status` as canonical and use the explicit invite fields for derived report-ready and termination behavior.
+- If additional Trial lifecycle states are introduced later, they should be added as invite-facing derivations rather than by expanding the persisted session status model unless the product contract explicitly requires that change.
+
+# 8. Final Result
+
+The candidate dashboard now reflects the 5-day Trial model correctly:
+
+- progress is shown as `X/5`
+- only the signed-in candidate's invited Trials appear
+- Trial cards show the expected metadata and status
+- completed and report-ready Trials route to review
+- terminated Trials are shown as terminal and cannot be resumed
+
+Worker Report:
+
+- Summary
+  - Updated `pr.md` only to describe the completed fix for issue #180 and the final QA-passed contract/state model.
+- Files changed
+  - `pr.md`
+- Commands run
+  - `pwd` and `rg --files -g 'pr.md' -g 'PR.md' -g 'Issue.md' -g 'issue.md'` - pass
+  - `git status --short` - pass
+  - `sed -n '1,240p' pr.md` - pass
+  - `sed -n '1,260p' issue.md` - pass
+- Risks / assumptions
+  - Assumed the existing implementation and QA are final and only the PR write-up needed updating.
+  - Kept `CandidateSession.status` described as canonical and treated `report ready` / `terminated` as derived invite states only.
+- Open questions / blockers
+  - None

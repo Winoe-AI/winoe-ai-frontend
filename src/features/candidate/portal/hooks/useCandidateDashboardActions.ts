@@ -7,6 +7,10 @@ import {
   type CandidateInvite,
 } from '@/features/candidate/session/api';
 import { queryKeys } from '@/shared/query';
+import {
+  isTerminatedInvite,
+  isReviewRouteInvite,
+} from '../utils/candidateInviteViewModel';
 
 type RouterLike = {
   push: (href: string) => void;
@@ -28,17 +32,17 @@ export function useCandidateDashboardActions({
   inviteToken,
   setError,
 }: Params) {
-  const isCompletedInvite = useCallback(
-    (invite: CandidateInvite) => invite.status === 'completed',
+  const shouldRouteToReview = useCallback(
+    (invite: CandidateInvite) => isReviewRouteInvite(invite),
     [],
   );
 
   const resolveDestination = useCallback(
     (invite: CandidateInvite, token: string) =>
-      isCompletedInvite(invite)
+      shouldRouteToReview(invite)
         ? `/candidate/session/${encodeURIComponent(token)}/review`
         : `/candidate/session/${encodeURIComponent(token)}`,
-    [isCompletedInvite],
+    [shouldRouteToReview],
   );
 
   const resolveFallbackToken = useCallback(
@@ -57,6 +61,10 @@ export function useCandidateDashboardActions({
         );
         return;
       }
+      if (isTerminatedInvite(invite)) {
+        setError('This trial has ended. Please contact your Talent Partner.');
+        return;
+      }
       const token = invite.token ?? resolveFallbackToken(invite);
       if (!token) {
         setError('Invite link unavailable. Please reopen your invite email.');
@@ -69,13 +77,13 @@ export function useCandidateDashboardActions({
 
   const prefetchContinue = useCallback(
     (invite: CandidateInvite) => {
-      if (invite.isExpired) return;
+      if (invite.isExpired || isTerminatedInvite(invite)) return;
       const token = invite.token ?? resolveFallbackToken(invite);
       if (!token) return;
       const destination = resolveDestination(invite, token);
 
       void router.prefetch(destination);
-      if (isCompletedInvite(invite)) {
+      if (shouldRouteToReview(invite)) {
         void queryClient.prefetchQuery({
           queryKey: queryKeys.candidate.sessionReview(token),
           queryFn: ({ signal }) =>
@@ -110,11 +118,11 @@ export function useCandidateDashboardActions({
         .catch(() => {});
     },
     [
-      isCompletedInvite,
       queryClient,
       resolveDestination,
       resolveFallbackToken,
       router,
+      shouldRouteToReview,
     ],
   );
 

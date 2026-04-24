@@ -27,14 +27,26 @@ export type CandidateSessionBootstrapResponse = {
 
 export type CandidateInvite = {
   candidateSessionId: number;
+  candidateEmail?: string | null;
+  inviteEmail?: string | null;
   token: string | null;
   title: string;
   role: string;
   company: string | null;
   talentPartnerName?: string | null;
   talentPartnerEmail?: string | null;
-  status: CandidateSessionBootstrapResponse['status'] | string;
+  status: CandidateSessionBootstrapResponse['status'];
   progress: { completed: number; total: number } | null;
+  scheduledStartAt?: string | null;
+  candidateTimezone?: string | null;
+  dayWindows?: CandidateDayWindow[] | null;
+  currentDayWindow?: CandidateCurrentDayWindow | null;
+  scheduleLockedAt?: string | null;
+  completedAt?: string | null;
+  reportReady?: boolean | null;
+  hasReport?: boolean | null;
+  terminatedAt?: string | null;
+  isTerminated?: boolean;
   expiresAt: string | null;
   lastActivityAt: string | null;
   isExpired: boolean;
