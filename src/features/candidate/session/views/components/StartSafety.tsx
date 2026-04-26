@@ -11,8 +11,8 @@ export function StartSafety() {
         </li>
       </ul>
       <div className="mt-3 text-xs text-amber-900">
-        Unsure where the editor/terminal is? Open Codespaces from the workspace
-        card once it appears.
+        Unsure where the editor or terminal is? Open the Codespace from the
+        workspace card once it appears.
       </div>
     </div>
   );

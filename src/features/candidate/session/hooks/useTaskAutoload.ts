@@ -22,6 +22,8 @@ export function useTaskAutoload({
   setErrorMessage,
   setView,
 }: Params) {
+  const started = state.started || state.bootstrap?.status === 'in_progress';
+
   useEffect(() => {
     if (
       view === 'auth' ||
@@ -35,7 +37,7 @@ export function useTaskAutoload({
     )
       return;
     if (!state.candidateSessionId) return;
-    if (!state.started) return;
+    if (!started) return;
     if (
       state.taskState.loading ||
       state.taskState.isComplete ||
@@ -47,5 +49,5 @@ export function useTaskAutoload({
       setErrorMessage(friendlyTaskError(err));
       setView('error');
     });
-  }, [fetchCurrentTask, setErrorMessage, setView, state, view]);
+  }, [fetchCurrentTask, setErrorMessage, setView, started, state, view]);
 }

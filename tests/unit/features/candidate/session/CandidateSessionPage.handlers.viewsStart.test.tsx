@@ -81,6 +81,7 @@ describe('CandidateSessionPage handlers - view and start flows', () => {
       setStarted,
       state: {
         ...state.state,
+        bootstrap: { ...state.state.bootstrap, status: 'not_started' },
         started: false,
         taskState: {
           ...state.state.taskState,

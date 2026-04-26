@@ -23,6 +23,7 @@ export function renderPanel(opts?: Partial<{ dayIndex: number }>) {
       taskId={1}
       candidateSessionId={2}
       dayIndex={opts?.dayIndex ?? 2}
+      githubUsername="octocat"
     />,
   );
 }

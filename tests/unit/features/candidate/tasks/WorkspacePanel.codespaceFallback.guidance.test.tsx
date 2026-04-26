@@ -4,6 +4,7 @@ import {
   CODESPACE_NOT_READY_MAX_POLLS,
   advancePollCycles,
   getStatusMock,
+  initWorkspaceMock,
   renderPanel,
   resetWorkspacePanelMocks,
 } from './WorkspacePanel.testlib';
@@ -42,6 +43,11 @@ describe('WorkspacePanel codespace fallback guidance', () => {
         codespaceUrl: null,
         codespaceState: 'UNAVAILABLE',
       });
+    initWorkspaceMock.mockResolvedValue({
+      repoName: 'acme/repo',
+      repoFullName: 'acme/repo',
+      codespaceUrl: null,
+    });
     const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
     renderPanel({ taskId: 9, candidateSessionId: 10 });
     await screen.findByText(/Repository is ready/i);
@@ -53,7 +59,7 @@ describe('WorkspacePanel codespace fallback guidance', () => {
       }),
     ).toBeInTheDocument();
     expect(
-      screen.getByText(/Local clone instructions are intentionally disabled/i),
+      screen.getByText(/Codespace access is required for Day 2 and Day 3/i),
     ).toBeInTheDocument();
   });
 
@@ -77,6 +83,11 @@ describe('WorkspacePanel codespace fallback guidance', () => {
       .mockRejectedValueOnce(
         Object.assign(new Error('status failed again'), { status: 500 }),
       );
+    initWorkspaceMock.mockResolvedValue({
+      repoName: 'acme/repo',
+      repoFullName: 'acme/repo',
+      codespaceUrl: null,
+    });
     const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
     renderPanel({ taskId: 11, candidateSessionId: 12 });
     await screen.findByText(/Repository is ready/i);
@@ -88,7 +99,7 @@ describe('WorkspacePanel codespace fallback guidance', () => {
       }),
     ).toBeInTheDocument();
     expect(
-      screen.getByText(/Local clone instructions are intentionally disabled/i),
+      screen.getByText(/Codespace access is required for Day 2 and Day 3/i),
     ).toBeInTheDocument();
   });
 
@@ -108,7 +119,7 @@ describe('WorkspacePanel codespace fallback guidance', () => {
       await screen.findByText(/Workspace is ready/i);
       expect(
         screen.getByText(
-          /You may work offline\/locally, but only commits pushed to the official repo before cutoff are evaluated\./i,
+          /Only commits pushed to the official repo before cutoff are evaluated\./i,
         ),
       ).toBeInTheDocument();
     },

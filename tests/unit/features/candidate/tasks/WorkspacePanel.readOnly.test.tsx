@@ -26,8 +26,8 @@ describe('WorkspacePanel read-only and cutoff', () => {
     ).toBeInTheDocument();
     expect(screen.getByText(/Day closed for this task/i)).toBeInTheDocument();
     expect(
-      screen.queryByRole('link', { name: /Open Codespace/i }),
-    ).not.toBeInTheDocument();
+      screen.getByRole('link', { name: /Open Codespace/i }),
+    ).toHaveAttribute('href', 'https://codespaces.new/acme/repo');
     expect(initWorkspaceMock).not.toHaveBeenCalled();
   });
 

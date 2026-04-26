@@ -16,6 +16,7 @@ export type PollResultStatus =
 export type PollResult = {
   status: PollResultStatus;
   message?: string;
+  pollAfterMs?: number | null;
   passed: number | null;
   failed: number | null;
   total: number | null;

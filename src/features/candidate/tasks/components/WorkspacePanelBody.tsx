@@ -32,9 +32,7 @@ export function WorkspacePanelBody({
   readOnlyReason,
 }: Props) {
   const repoLabel = workspace?.repoFullName ?? workspace?.repoName;
-  const cta = workspace?.codespaceUrl
-    ? { href: workspace.codespaceUrl, label: 'Open Codespace' }
-    : null;
+  const codespaceUrl = workspace?.codespaceUrl ?? null;
   if (loading) return <WorkspacePanelLoadingState />;
   if (error) {
     return (
@@ -60,23 +58,30 @@ export function WorkspacePanelBody({
       {integrityCallout ? <div>{integrityCallout}</div> : null}
       {fallbackPanel ? <div>{fallbackPanel}</div> : null}
       <div>{message}</div>
-      {readOnly ? (
-        <div className="rounded border border-gray-300 bg-gray-200 p-2 text-xs text-gray-700">
-          {readOnlyReason ??
-            'Day closed. Workspace links are hidden until the next window opens.'}
-        </div>
-      ) : null}
-      {repoLabel ? <div>Repo: {repoLabel}</div> : null}
-      {!readOnly && cta ? (
+      {codespaceUrl ? (
         <a
-          className="block text-blue-600 hover:underline"
-          href={cta.href}
+          aria-label="Open Codespace"
+          className="block rounded-md border border-blue-200 bg-blue-50 p-3 text-sm font-semibold text-blue-900 hover:bg-blue-100 hover:underline"
+          href={codespaceUrl}
           target="_blank"
           rel="noopener noreferrer"
         >
-          {cta.label}
+          Open Codespace
+          <span
+            aria-hidden="true"
+            className="mt-1 block break-all text-xs font-normal text-blue-800"
+          >
+            {codespaceUrl}
+          </span>
         </a>
       ) : null}
+      {readOnly ? (
+        <div className="rounded border border-gray-300 bg-gray-200 p-2 text-xs text-gray-700">
+          {readOnlyReason ??
+            'Day closed. Workspace access is read-only until the next window opens.'}
+        </div>
+      ) : null}
+      {repoLabel ? <div>Repo: {repoLabel}</div> : null}
     </div>
   );
 }

@@ -3,7 +3,7 @@ import type { ToastTone } from '@/shared/notifications/types';
 
 export const statusLabel: Record<RunState, string> = {
   idle: 'Idle',
-  starting: 'Starting',
+  starting: 'Initializing',
   running: 'Running',
   success: 'Passed',
   failed: 'Failed',
@@ -26,7 +26,7 @@ export const statusTone: Record<
 
 export const ctaLabel = (state: RunState) =>
   state === 'starting'
-    ? 'Starting…'
+    ? 'Initializing…'
     : state === 'running'
       ? 'Running tests…'
       : state === 'success'

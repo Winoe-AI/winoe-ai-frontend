@@ -54,14 +54,14 @@ export const sessionExpired = (): WorkspaceLoadResult => ({
 
 export const provisioning = (): WorkspaceLoadResult => ({
   workspace: null,
-  notice: 'Workspace repo not provisioned yet. Please try again shortly.',
+  notice: 'Codespace repo is not provisioned yet. Please try again shortly.',
   error: null,
   errorCode: 'WORKSPACE_NOT_INITIALIZED',
   codespaceState: 'not_ready',
   notify: {
     tone: 'warning',
     title: 'Workspace still provisioning',
-    description: 'Repo/Codespace may take a moment. Hit Refresh in ~15–30s.',
+    description: 'Codespace may take a moment. Hit Refresh in ~15–30s.',
   },
 });
 

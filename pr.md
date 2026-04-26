@@ -1,124 +1,135 @@
 # 1. Title
 
-Fix Candidate Portal Trial listing, progress, and status for the 5-day Trial model
+Fix Day 2 candidate UI: GitHub username capture, pending-state reliability, and Codespace-only copy for issue #183
 
-# 2. Problem
+# 2. Linked Issue
 
-Issue #180 was caused by two user-facing defects in the candidate dashboard:
+- Winoe-AI/winoe-ai-frontend issue #183
+- Depends on backend issues #285 and #286
 
-- progress was rendered as `X/10` and 50% even though the product now uses a 5-day Trial model
-- the invite list included Trials that did not belong to the signed-in candidate
+# 3. Problem / Why
 
-The dashboard also needed a cleaner state model so the UI could show the right candidate-facing states without treating every presentation state as a persisted session status.
+Day 2 candidate flow had multiple user-facing failures that prevented a real candidate from moving through the workspace lifecycle cleanly:
 
-# 3. What Changed
+- GitHub username was not reliably captured and sent into the Codespace init contract.
+- Run tests and submit flows could hang in pending states instead of resolving to success or failure.
+- Frontend polling could drift from the backend-provided `pollAfterMs` guidance.
+- Day 2 and Day 3 copy still implied offline/local work paths instead of Codespace-only work.
+- The workspace CTA and status messaging were not strong enough for the actual Codespace-first flow.
+- Day-window behavior needed to be explicit: open from 9 AM to 5 PM local time, then switch to read-only with a closed message after cutoff.
+- Reload and restart recovery needed to use durable product state instead of a volatile client-only "started" state.
 
-- The candidate dashboard invite list now uses the terminated-aware contract path:
-  - `/candidate/invites?includeTerminated=true`
-- Progress is normalized and rendered against a fixed 5-day model, so the dashboard now shows `X/5`.
-- Invite isolation is enforced so the signed-in candidate only sees Trials they were actually invited to.
-- Each Trial card now renders the required fields:
-  - title
-  - company
-  - Talent Partner name
-  - current day
-  - status
-- Candidate-facing state rendering now covers the full Trial lifecycle:
-  - invited
-  - awaiting start date
-  - scheduled
-  - Day N open
-  - Day N closed
-  - complete
-  - report ready
-  - terminated
-- Completed Trials route to review.
-- Report-ready Trials also route to review.
-- Terminated Trials remain non-active and non-resumable.
-- Tests were updated for:
-  - state derivation
-  - navigation
-  - rendering
-  - candidate invite API behavior
+# 4. What Changed
 
-# 4. Contract / State Model
+- Day 2 workspace init now uses the captured GitHub username correctly.
+- The candidate flow now validates GitHub username before opening Day 2.
+- Codespace init and task bootstrap follow the backend contract expected by #285.
+- Day 2 and Day 3 copy is Codespace-only throughout the candidate UI.
+- The Codespace URL is shown prominently and is accessible from the workspace view.
+- Run tests lifecycle now resolves correctly through idle, running, success, and failure instead of getting stuck at Starting.
+- Submit and Continue now resolves correctly instead of getting stuck at Submitting.
+- Frontend polling now honors the backend `pollAfterMs` value from the response utils.
+- Day 2 open-window behavior is explicit, with local-time countdown support for the 9 AM to 5 PM window.
+- After cutoff, the UI switches to read-only state and shows the Day closed message.
+- Restart and reload recovery now come from durable product state rather than a client-only started flag.
 
-The final contract keeps the persisted session lifecycle canonical:
+# 5. Key Files Changed
 
-- `CandidateSession.status` remains the source of truth for the canonical session lifecycle
-- `report ready` and `terminated` are invite-facing derived states, not literal persisted candidate-session statuses
+- `src/features/candidate/session/api/workspaceApi.ts`
+- `src/features/candidate/tasks/hooks/useRunTests.ts`
+- `src/features/candidate/tasks/hooks/useRunTestsScheduler.ts`
+- `src/features/candidate/tasks/` Day 2 candidate components
 
-Those invite-facing states are represented through explicit fields on the invite payload, including:
+# 6. QA Summary
 
-- `reportReady`
-- `hasReport`
-- `terminatedAt`
-- `isTerminated`
+Final verification was completed on the real local stack with:
 
-The dashboard consumes those fields to derive the correct UI state while leaving the canonical session status model intact.
+- real frontend + backend services
+- real browser auth
+- no QA-driver state seeding
+- live Day 2 open proof
+- live after-cutoff read-only proof
+- live Codespace init, run tests, and submit flow verification
 
-# 5. Why This Is Correct
+Behavior verified end to end:
 
-This fixes the original bug and aligns the UI with the actual product model:
+- GitHub username capture/validation before Day 2 opens
+- `githubUsername` included in the Codespace init request
+- run tests lifecycle reaches terminal success/failure states
+- submit and continue completes reliably
+- polling follows backend `pollAfterMs`
+- Codespace-only copy is used throughout
+- Codespace URL is surfaced prominently
+- Day 2 is open only during 9 AM to 5 PM local time
+- after cutoff the workspace is read-only with a closed message
 
-- the progress display now matches the 5-day Trial flow
-- invite rows are filtered to the real candidate scope, so cross-contaminated rows do not appear
-- the UI can represent richer invite-facing states without widening the persisted session enum
-- review routing is correct for both `complete` and `report ready`
-- termination is treated as a terminal, non-resumable state
+# 7. Exact Live Evidence / Artifact Paths
 
-The result is a cleaner separation between canonical session state and dashboard presentation state.
+- Open-day screenshot:
+  - `/Users/robelmelaku/Desktop/Winoe-AI/winoe-frontend/qa_verifications/Contract-Live-QA/contract_live_qa_latest/artifacts/20260425T213610/candidate-day2-open.png`
+- Closed-day screenshot:
+  - `/Users/robelmelaku/Desktop/Winoe-AI/winoe-frontend/qa_verifications/Contract-Live-QA/contract_live_qa_latest/artifacts/20260425T213909/candidate-day2-closed.png`
+- Schedule response:
+  - `/Users/robelmelaku/Desktop/Winoe-AI/winoe-frontend/qa_verifications/Contract-Live-QA/contract_live_qa_latest/artifacts/20260425T212929/api/candidate-schedule-response.json`
+- Workspace:
+  - `/Users/robelmelaku/Desktop/Winoe-AI/winoe-frontend/qa_verifications/Contract-Live-QA/contract_live_qa_latest/artifacts/20260425T213610/api/candidate-day2-workspace.json`
+- Run start:
+  - `/Users/robelmelaku/Desktop/Winoe-AI/winoe-frontend/qa_verifications/Contract-Live-QA/contract_live_qa_latest/artifacts/20260425T213610/api/candidate-day2-run-start.json`
+- Run poll:
+  - `/Users/robelmelaku/Desktop/Winoe-AI/winoe-frontend/qa_verifications/Contract-Live-QA/contract_live_qa_latest/artifacts/20260425T213610/api/candidate-day2-run-tests-poll.json`
+- Terminal run result:
+  - `/Users/robelmelaku/Desktop/Winoe-AI/winoe-frontend/qa_verifications/Contract-Live-QA/contract_live_qa_latest/artifacts/20260425T213610/api/candidate-day2-run-result.json`
+- Submit:
+  - `/Users/robelmelaku/Desktop/Winoe-AI/winoe-frontend/qa_verifications/Contract-Live-QA/contract_live_qa_latest/artifacts/20260425T213610/api/candidate-day2-submit.json`
+- Current task after submit:
+  - `/Users/robelmelaku/Desktop/Winoe-AI/winoe-frontend/qa_verifications/Contract-Live-QA/contract_live_qa_latest/artifacts/20260425T213610/api/candidate-day2-current-task-after.json`
+- Final contract-live report:
+  - `/Users/robelmelaku/Desktop/Winoe-AI/winoe-frontend/qa_verifications/Contract-Live-QA/contract_live_qa_latest/contract_live_qa_report.md`
 
-# 6. Validation / QA
+# 8. Zero-Seeding Verification
 
-Real end-to-end QA passed with:
+- No browser state was injected by the QA driver.
+- No `sessionStorage` / `localStorage` / bootstrap / task-state restoration hacks were used.
+- Real frontend + backend stack was used.
+- Real browser auth was used.
+- No mocked API routes were used.
 
-- the frontend and backend stack running locally
-- an authenticated browser session
-- seeded candidate data
-- the actual dashboard request path verified
-- the browser-session BFF payload matching the backend payload content
-- live browser verification of:
-  - invited
-  - awaiting start date
-  - scheduled
-  - Day N open
-  - Day N closed
-  - complete
-  - report ready
-  - terminated
-- completed and report-ready review routing verified
-- terminated non-resumable behavior verified
-- the control candidate row did not appear
+# 9. Acceptance Criteria Checklist
 
-# 7. Risks / Follow-Ups
+- [x] GitHub username capture/validation step before Day 2 opens
+- [x] Frontend sends `githubUsername` in Codespace init request
+- [x] Run tests shows correct lifecycle: idle, running, success/failure
+- [x] Submit and Continue completes reliably
+- [x] Frontend polling honors backend `pollAfterMs`
+- [x] All copy states are Codespace-only
+- [x] Codespace URL is prominently displayed
+- [x] Day 2 window is 9 AM - 5 PM local with countdown timer
+- [x] After cutoff, the UI becomes read-only with a Day closed message
 
-- Any future invite fixture should continue to treat `CandidateSession.status` as canonical and use the explicit invite fields for derived report-ready and termination behavior.
-- If additional Trial lifecycle states are introduced later, they should be added as invite-facing derivations rather than by expanding the persisted session status model unless the product contract explicitly requires that change.
+# 10. Risks / Follow-Ups
 
-# 8. Final Result
+- The frontend is now aligned with the verified backend contract, but this flow still depends on backend issues #285 and #286 remaining in place.
+- If the Codespace init payload changes again, the username capture step and polling contract should be re-validated against the live backend response.
+- Any future Day 2/3 wording changes should keep the Codespace-only framing consistent across the session shell, workspace CTA, and task instructions.
 
-The candidate dashboard now reflects the 5-day Trial model correctly:
+# 11. Reviewer Notes
 
-- progress is shown as `X/5`
-- only the signed-in candidate's invited Trials appear
-- Trial cards show the expected metadata and status
-- completed and report-ready Trials route to review
-- terminated Trials are shown as terminal and cannot be resumed
+- This PR closes the frontend side of issue #183 on the real stack.
+- Backend blockers #285 and #286 were required to make the flow verifiable end to end.
+- The live QA evidence includes both the open-day and closed-day states, plus the run-tests and submit lifecycle artifacts.
+- The UI now recovers from reload/restart using durable product state rather than a volatile client-only started state.
 
 Worker Report:
 
 - Summary
-  - Updated `pr.md` only to describe the completed fix for issue #180 and the final QA-passed contract/state model.
+  - Updated `pr.md` only to describe the verified Day 2 candidate UI fix for issue #183.
 - Files changed
   - `pr.md`
 - Commands run
-  - `pwd` and `rg --files -g 'pr.md' -g 'PR.md' -g 'Issue.md' -g 'issue.md'` - pass
-  - `git status --short` - pass
   - `sed -n '1,240p' pr.md` - pass
-  - `sed -n '1,260p' issue.md` - pass
+  - `rg -n "workspace|run-tests|submit|pollAfterMs|githubUsername|Day 2|closed|read-only|queued|jobs: \[\]" ...` - pass
 - Risks / assumptions
-  - Assumed the existing implementation and QA are final and only the PR write-up needed updating.
-  - Kept `CandidateSession.status` described as canonical and treated `report ready` / `terminated` as derived invite states only.
+  - Assumed the live QA artifacts are the source of truth for the final PR narrative.
+  - Kept the frontend PR scoped to issue #183 and referenced backend blockers #285 and #286 without claiming backend alone closes the issue.
 - Open questions / blockers
   - None

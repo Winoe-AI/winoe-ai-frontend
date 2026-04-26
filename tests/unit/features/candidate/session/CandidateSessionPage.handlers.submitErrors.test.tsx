@@ -54,6 +54,7 @@ describe('CandidateSessionPage handlers - submit and error flows', () => {
       ...state,
       state: {
         ...state.state,
+        bootstrap: { ...state.state.bootstrap, status: 'not_started' },
         started: false,
         taskState: {
           loading: true,

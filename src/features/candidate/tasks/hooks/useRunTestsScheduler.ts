@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { useBackoffPolling } from '@/shared/polling';
 import {
   useRunTestsCleanup,
@@ -34,6 +34,7 @@ export function useRunTestsScheduler(config: SchedulerConfig) {
     startedAt: startedAtRef,
   } = config;
   const pollInterval = config.pollIntervalMs ?? 1500;
+  const pollAfterMsRef = useRef<number | null>(null);
 
   const poller = useBackoffPolling<string>({
     initialDelayMs: pollInterval,
@@ -41,14 +42,30 @@ export function useRunTestsScheduler(config: SchedulerConfig) {
     maxDelayMs: config.maxPollIntervalMs ?? pollInterval,
     maxAttempts: config.maxAttempts,
     maxDurationMs: config.maxDurationMs,
+    getDelayMs: (attempt) => {
+      if (
+        typeof pollAfterMsRef.current === 'number' &&
+        pollAfterMsRef.current > 0
+      ) {
+        return pollAfterMsRef.current;
+      }
+      const base = Math.max(1, pollInterval);
+      const cap = Math.max(config.maxPollIntervalMs ?? pollInterval, base);
+      return Math.min(Math.round(base * 1.4 ** attempt), cap);
+    },
     run: async (runId) => {
       try {
         const res = await onPoll(runId);
         setResult(res);
         if (res.status === 'running') {
+          pollAfterMsRef.current =
+            typeof res.pollAfterMs === 'number' && res.pollAfterMs > 0
+              ? res.pollAfterMs
+              : null;
           setState('running');
           return true;
         }
+        pollAfterMsRef.current = null;
         const mapped = statusMap[res.status];
         if (mapped) {
           finish(mapped, res.message);
@@ -79,6 +96,7 @@ export function useRunTestsScheduler(config: SchedulerConfig) {
     (runId: string, attemptStart = 0) => {
       startedAtRef.current = Date.now();
       lockedRef.current = true;
+      pollAfterMsRef.current = null;
       if (attemptStart > 0) poller.startFrom(attemptStart, runId);
       else poller.start(runId);
     },

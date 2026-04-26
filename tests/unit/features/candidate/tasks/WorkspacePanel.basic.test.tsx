@@ -42,7 +42,7 @@ describe('WorkspacePanel basic states', () => {
   it.each([
     [
       Object.assign(new Error('provisioning'), { status: 409 }),
-      /Workspace repo not provisioned yet/i,
+      /Codespace repo is not provisioned yet/i,
       'warning',
     ],
     [
@@ -50,7 +50,7 @@ describe('WorkspacePanel basic states', () => {
         status: 422,
         details: { errorCode: 'WORKSPACE_NOT_INITIALIZED' },
       }),
-      /Workspace repo not provisioned yet/i,
+      /Codespace repo is not provisioned yet/i,
       undefined,
     ],
     [
@@ -90,6 +90,6 @@ describe('WorkspacePanel basic states', () => {
     await userEvent
       .setup()
       .click(screen.getByRole('button', { name: /Refresh/i }));
-    await screen.findByText(/Workspace provisioning is underway/i);
+    await screen.findByText(/Codespace provisioning is underway/i);
   });
 });

@@ -66,6 +66,42 @@ describe('RunTestsPanel - core flow', () => {
     expect(screen.getByRole('button', { name: /re-run tests/i })).toBeEnabled();
   });
 
+  it('honors server pollAfterMs for the next poll', async () => {
+    useFakeTimers();
+    const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
+    const onStart = jest.fn().mockResolvedValue({ runId: 'run-delay' });
+    const onPoll = jest
+      .fn()
+      .mockResolvedValueOnce({
+        ...baseResult,
+        status: 'running' as const,
+        pollAfterMs: 2500,
+      })
+      .mockResolvedValueOnce({
+        ...baseResult,
+        status: 'passed' as const,
+      });
+    render(
+      <RunTestsPanel onStart={onStart} onPoll={onPoll} pollIntervalMs={1000} />,
+    );
+    await user.click(getTestsButton());
+    await act(async () => {
+      jest.advanceTimersByTime(1000);
+      await Promise.resolve();
+    });
+    expect(onPoll).toHaveBeenCalledTimes(1);
+    await act(async () => {
+      jest.advanceTimersByTime(2000);
+      await Promise.resolve();
+    });
+    expect(onPoll).toHaveBeenCalledTimes(1);
+    await act(async () => {
+      jest.advanceTimersByTime(500);
+      await Promise.resolve();
+    });
+    expect(onPoll).toHaveBeenCalledTimes(2);
+  });
+
   it('disables start button when window gate is read-only', async () => {
     const onStart = jest.fn().mockResolvedValue({ runId: 'run-disabled' });
     const onPoll = jest

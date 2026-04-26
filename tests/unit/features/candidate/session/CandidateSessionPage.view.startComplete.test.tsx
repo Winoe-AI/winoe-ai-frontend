@@ -47,6 +47,7 @@ describe('CandidateSessionPage view - completion and start state', () => {
       buildState({
         state: {
           ...state.state,
+          bootstrap: { ...state.state.bootstrap, status: 'not_started' },
           started: false,
           taskState: {
             loading: false,
@@ -63,12 +64,35 @@ describe('CandidateSessionPage view - completion and start state', () => {
     await waitFor(() => expect(getCurrentTaskMock).toHaveBeenCalled());
   });
 
+  it('resumes running state from an in-progress bootstrap after reload', async () => {
+    const state = baseState();
+    useCandidateSessionMock.mockReturnValue(
+      buildState({
+        state: {
+          ...state.state,
+          started: false,
+          taskState: {
+            loading: false,
+            error: null,
+            isComplete: false,
+            completedTaskIds: [],
+            currentTask: null,
+          },
+        },
+      }),
+    );
+    await act(async () => render(<CandidateSessionPage token="inv" />));
+    await waitFor(() => expect(getCurrentTaskMock).toHaveBeenCalled());
+    expect(screen.queryByRole('button', { name: /Start trial/i })).toBeNull();
+  });
+
   it('navigates to candidate dashboard from start view back button', async () => {
     const state = baseState();
     useCandidateSessionMock.mockReturnValue(
       buildState({
         state: {
           ...state.state,
+          bootstrap: { ...state.state.bootstrap, status: 'not_started' },
           started: false,
           taskState: {
             loading: false,

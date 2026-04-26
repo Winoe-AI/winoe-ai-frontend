@@ -19,14 +19,14 @@ describe('CodespaceFallbackPanel', () => {
     ).toBeInTheDocument();
     expect(
       screen.getByText(
-        /You may work offline\/locally, but only commits pushed to the official repo before cutoff are evaluated\./i,
+        /Only commits pushed to the official repo before cutoff are evaluated\./i,
       ),
     ).toBeInTheDocument();
     expect(
       screen.getByText(/Workspace:\s*acme\/workspace-repo/i),
     ).toBeInTheDocument();
     expect(
-      screen.getByText(/Local clone instructions are intentionally disabled/i),
+      screen.getByText(/Codespace access is required for Day 2 and Day 3/i),
     ).toBeInTheDocument();
     expect(screen.getByText(/Cutoff time:/i)).toBeInTheDocument();
   });

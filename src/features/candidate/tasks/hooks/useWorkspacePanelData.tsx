@@ -7,10 +7,12 @@ import { deriveWorkspacePanelState } from '../components/workspacePanelDerived';
 import { resolveSharedWorkspace } from '../components/workspacePanelSharedWorkspace';
 import { useWorkspaceFallbackLogging } from '../components/useWorkspaceFallbackLogging';
 import { useWorkspaceSnapshotSync } from '../components/useWorkspaceSnapshotSync';
+import { isPastTaskCutoff } from '../utils/taskCutoffUtils';
 
 export function useWorkspacePanelData(props: WorkspacePanelProps) {
   const readOnly = props.readOnly ?? false;
   const hasCutoffProps = Boolean(props.cutoffCommitSha || props.cutoffAt);
+  const cutoffClosed = isPastTaskCutoff(props.cutoffAt);
   const isWorkspaceIntegrityDay = props.dayIndex === 2 || props.dayIndex === 3;
   const shouldLoadWorkspace =
     !readOnly || props.isClosed || hasCutoffProps || isWorkspaceIntegrityDay;
@@ -19,6 +21,7 @@ export function useWorkspacePanelData(props: WorkspacePanelProps) {
     candidateSessionId: props.candidateSessionId,
     enabled: shouldLoadWorkspace,
     enableCodespaceFallback: isWorkspaceIntegrityDay && !readOnly,
+    githubUsername: props.githubUsername ?? null,
     onTaskWindowClosed: props.onTaskWindowClosed,
   });
 
@@ -56,9 +59,7 @@ export function useWorkspacePanelData(props: WorkspacePanelProps) {
       codespaceUrl={derived.effectiveWorkspace?.codespaceUrl ?? null}
       cutoffCommitSha={derived.effectiveCutoffCommitSha}
       cutoffAt={derived.effectiveCutoffAt}
-      isClosed={
-        Boolean(props.isClosed) || Boolean(derived.effectiveCutoffCommitSha)
-      }
+      isClosed={Boolean(props.isClosed) || cutoffClosed}
     />
   );
 

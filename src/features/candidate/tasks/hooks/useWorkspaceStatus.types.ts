@@ -10,6 +10,7 @@ export type Params = {
   candidateSessionId: number;
   enabled?: boolean;
   enableCodespaceFallback?: boolean;
+  githubUsername?: string | null;
   onTaskWindowClosed?: (err: unknown) => void;
 };
 

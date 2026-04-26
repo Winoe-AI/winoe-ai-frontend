@@ -26,6 +26,8 @@ export function buildCandidateSessionControllerResult({
   onTaskWindowClosed,
   onCodingWorkspaceSnapshot,
 }: BuildCandidateSessionControllerResultArgs) {
+  const started = state.started || state.bootstrap?.status === 'in_progress';
+
   return {
     view: finalView,
     authStatus: state.authStatus,
@@ -34,7 +36,7 @@ export function buildCandidateSessionControllerResult({
     errorStatus,
     loginHref,
     ...derived,
-    started: state.started,
+    started,
     submitting: actions.submitting,
     taskError: state.taskState.error,
     candidateSessionId,

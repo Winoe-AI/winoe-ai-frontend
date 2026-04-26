@@ -41,6 +41,11 @@ export function useTaskSubmitControllerSaveAndSubmit({
 
   const saveAndSubmit = useCallback(async () => {
     if (disabled || actionStatus !== 'idle') return;
+    const clearDraftsIfSubmitted = (resp: unknown) => {
+      if (resp !== 'submit-failed') clearDrafts();
+      return resp;
+    };
+
     if (githubNative) {
       setLocalError(null);
       const resp = await handleSubmit({});
@@ -51,9 +56,9 @@ export function useTaskSubmitControllerSaveAndSubmit({
           shaRefs: toCodingShaRefs(resp),
         });
       }
-      if (resp !== 'submit-failed') clearDrafts();
-      return;
+      return clearDraftsIfSubmitted(resp);
     }
+
     if (textTask) {
       const trimmed = textRef.current?.trim() ?? '';
       if (!trimmed) {
@@ -61,13 +66,13 @@ export function useTaskSubmitControllerSaveAndSubmit({
         return;
       }
       setLocalError(null);
-      const resp = await handleSubmit({ contentText: trimmed });
-      if (resp !== 'submit-failed') clearDrafts();
-      return;
+      return clearDraftsIfSubmitted(
+        await handleSubmit({ contentText: trimmed }),
+      );
     }
+
     setLocalError(null);
-    const resp = await handleSubmit({});
-    if (resp !== 'submit-failed') clearDrafts();
+    return clearDraftsIfSubmitted(await handleSubmit({}));
   }, [
     actionStatus,
     clearDrafts,

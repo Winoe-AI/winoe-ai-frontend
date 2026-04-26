@@ -25,6 +25,10 @@ export function resolveCandidateSessionView({
       ? 'running'
       : view;
 
+  if (resolvedView === 'locked' && hasTaskData) {
+    return 'running';
+  }
+
   const hasSchedule =
     hasScheduleConfigured(bootstrap) ||
     (bootstrap?.scheduledStartAt != null &&

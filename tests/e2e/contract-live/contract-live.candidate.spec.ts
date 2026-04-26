@@ -16,7 +16,7 @@ test.describe('Contract-Live: Candidate Access', () => {
       page.getByRole('heading', { name: /your invitations/i }),
     ).toBeVisible();
 
-    await page.goto('/dashboard');
+    await page.goto('/dashboard', { waitUntil: 'domcontentloaded' });
     await expect(page).toHaveURL(/\/not-authorized\?mode=talent_partner/);
     await expect(
       page.getByRole('heading', { name: /not authorized/i }),

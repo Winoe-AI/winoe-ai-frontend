@@ -28,6 +28,7 @@ export function renderWorkspacePanel(
       taskId={taskId}
       candidateSessionId={candidateSessionId}
       dayIndex={dayIndex}
+      githubUsername="octocat"
     />,
   );
 }

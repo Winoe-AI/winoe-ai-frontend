@@ -79,6 +79,11 @@ describe('WorkspacePanel codespace fallback behavior', () => {
       repoFullName: 'acme/repo',
       codespaceUrl: null,
     });
+    initWorkspaceMock.mockResolvedValue({
+      repoName: 'acme/repo',
+      repoFullName: 'acme/repo',
+      codespaceUrl: null,
+    });
     renderPanel({ taskId: 3, candidateSessionId: 4 });
     await screen.findByText(/Repository is ready/i);
     await advancePollCycles(CODESPACE_NOT_READY_MAX_POLLS - 1);
@@ -101,6 +106,11 @@ describe('WorkspacePanel codespace fallback behavior', () => {
         repoFullName: 'acme/repo',
         codespaceUrl: 'https://codespaces.new/acme/repo',
       });
+    initWorkspaceMock.mockResolvedValue({
+      repoName: 'acme/repo',
+      repoFullName: 'acme/repo',
+      codespaceUrl: null,
+    });
     renderPanel({ taskId: 5, candidateSessionId: 6 });
     await screen.findByText(/Repository is ready/i);
     await advancePollCycles(1);
