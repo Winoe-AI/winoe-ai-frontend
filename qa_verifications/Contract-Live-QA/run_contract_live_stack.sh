@@ -115,10 +115,15 @@ trap cleanup EXIT INT TERM
 wait_for_url() {
   local url="$1"
   local label="$2"
+  local pid="${3:-}"
   for _ in $(seq 1 90); do
     if curl -fsS "$url" >/dev/null 2>&1; then
       echo "$label is ready: $url"
       return 0
+    fi
+    if [[ -n "$pid" ]] && ! kill -0 "$pid" >/dev/null 2>&1; then
+      echo "$label process exited before ready: $url" >&2
+      return 1
     fi
     sleep 1
   done
@@ -137,6 +142,7 @@ wait_for_url() {
   export WINOE_DEV_AUTH_BYPASS="${WINOE_DEV_AUTH_BYPASS:-0}"
   export CONTRACT_LIVE_FAKE_TIME_UTC="$FAKE_TIME_UTC"
   export WINOE_TEST_NOW_UTC="$FAKE_TIME_UTC"
+  export WINOE_BACKEND_BASE_URL="http://$BACKEND_HOST:$BACKEND_PORT"
   exec poetry run uvicorn app.main:app --host "$BACKEND_HOST" --port "$BACKEND_PORT"
 ) >"$BACKEND_LOG" 2>&1 &
 BACKEND_PID=$!
@@ -149,6 +155,7 @@ BACKEND_PID=$!
   export WINOE_DEV_AUTH_BYPASS="${WINOE_DEV_AUTH_BYPASS:-0}"
   export CONTRACT_LIVE_FAKE_TIME_UTC="$FAKE_TIME_UTC"
   export WINOE_TEST_NOW_UTC="$FAKE_TIME_UTC"
+  export WINOE_BACKEND_BASE_URL="http://$BACKEND_HOST:$BACKEND_PORT"
   exec poetry run python -m app.shared.jobs.shared_jobs_worker_service
 ) >"$WORKER_LOG" 2>&1 &
 WORKER_PID=$!
@@ -159,12 +166,14 @@ WORKER_PID=$!
   export CONTRACT_LIVE_FAKE_TIME_UTC="$FAKE_TIME_UTC"
   export WINOE_TEST_NOW_UTC="$FAKE_TIME_UTC"
   export NEXT_PUBLIC_WINOE_TEST_NOW_UTC="$FAKE_TIME_UTC"
-  exec npm run dev -- --hostname "$FRONTEND_HOST" --port "$FRONTEND_PORT"
+  export WINOE_BACKEND_BASE_URL="http://$BACKEND_HOST:$BACKEND_PORT"
+  npm run build
+  exec npm run start -- --hostname "$FRONTEND_HOST" --port "$FRONTEND_PORT"
 ) >"$FRONTEND_LOG" 2>&1 &
 FRONTEND_PID=$!
 
-wait_for_url "http://$BACKEND_HOST:$BACKEND_PORT/health" "Backend"
-wait_for_url "http://$FRONTEND_HOST:$FRONTEND_PORT/api/health" "Frontend"
+wait_for_url "http://$BACKEND_HOST:$BACKEND_PORT/health" "Backend" "$BACKEND_PID"
+wait_for_url "http://$FRONTEND_HOST:$FRONTEND_PORT/api/health" "Frontend" "$FRONTEND_PID"
 
 echo "Backend PID: $BACKEND_PID"
 echo "Worker PID: $WORKER_PID"

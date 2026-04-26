@@ -57,7 +57,7 @@ describe('CandidateSessionPage', () => {
   it('resolves invite and starts current task', async () => {
     resolveMock.mockResolvedValueOnce({
       candidateSessionId: 123,
-      status: 'in_progress',
+      status: 'not_started',
       trial: { title: 'Backend Engineer Trial', role: 'Backend' },
     });
     currentTaskMock.mockResolvedValue({

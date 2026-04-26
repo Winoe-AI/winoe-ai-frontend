@@ -4,13 +4,14 @@ import { requestWorkspaceStatus } from './workspace.requestApi';
 export async function initCandidateWorkspace(params: {
   taskId: number;
   candidateSessionId: number;
+  githubUsername: string;
 }): Promise<CandidateWorkspaceStatus> {
-  const { taskId, candidateSessionId } = params;
+  const { taskId, candidateSessionId, githubUsername } = params;
   return requestWorkspaceStatus({
     path: `/tasks/${taskId}/codespace/init`,
     candidateSessionId,
     method: 'POST',
-    body: {},
+    body: { githubUsername },
   });
 }
 

@@ -30,8 +30,13 @@ describe('WorkspacePanel extra rendering', () => {
       repoName: 'test-repo-name',
       codespaceUrl: null,
     });
+    initWorkspaceMock.mockResolvedValue({
+      repoName: 'test-repo-name',
+      codespaceUrl: null,
+    });
     renderPanel();
     expect(await screen.findByText(/test-repo-name/)).toBeInTheDocument();
+    expect(initWorkspaceMock).toHaveBeenCalledTimes(1);
     expect(
       screen.queryByRole('link', { name: /Open Codespace/i }),
     ).not.toBeInTheDocument();
@@ -46,10 +51,16 @@ describe('WorkspacePanel extra rendering', () => {
       repoName: null,
       codespaceUrl: null,
     });
+    initWorkspaceMock.mockResolvedValue({
+      repoFullName: 'org/repo-only',
+      repoName: null,
+      codespaceUrl: null,
+    });
     renderPanel();
     expect(
       await screen.findByText(/Repo: org\/repo-only/i),
     ).toBeInTheDocument();
+    expect(initWorkspaceMock).toHaveBeenCalledTimes(1);
     expect(screen.queryByRole('link', { name: /Open Repo/i })).toBeNull();
   });
 
@@ -59,8 +70,14 @@ describe('WorkspacePanel extra rendering', () => {
       repoFullName: 'org/full-repo-name',
       codespaceUrl: null,
     });
+    initWorkspaceMock.mockResolvedValue({
+      repoName: 'short-name',
+      repoFullName: 'org/full-repo-name',
+      codespaceUrl: null,
+    });
     renderPanel();
     expect(await screen.findByText(/org\/full-repo-name/)).toBeInTheDocument();
+    expect(initWorkspaceMock).toHaveBeenCalledTimes(1);
   });
 
   it('shows workspace status updating message when only codespace is available', async () => {
@@ -70,7 +87,7 @@ describe('WorkspacePanel extra rendering', () => {
     });
     renderPanel();
     expect(
-      await screen.findByText(/Workspace status is updating/i),
+      await screen.findByText(/Codespace status is updating/i),
     ).toBeInTheDocument();
   });
 });

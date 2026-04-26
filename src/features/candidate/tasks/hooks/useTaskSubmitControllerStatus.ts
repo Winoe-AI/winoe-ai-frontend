@@ -3,6 +3,7 @@ import {
   isGithubNativeDay,
   isTextTask,
 } from '../utils/taskGuardsUtils';
+import { isPastTaskCutoff } from '../utils/taskCutoffUtils';
 import type { Task } from '../types';
 import type { WindowActionGate } from '@/features/candidate/session/lib/windowState';
 import type { DurableCodingSubmission } from './useTaskSubmitControllerContent';
@@ -30,7 +31,7 @@ export function deriveTaskSubmitStatus({
     isGithubNativeDay(task.dayIndex) || isCodeTask(task.type);
   const textTask = !githubNative && isTextTask(task.type);
   const actionStatus = submitting ? 'submitting' : submitStatus;
-  const cutoffClosed = githubNative && Boolean(task.cutoffCommitSha);
+  const cutoffClosed = githubNative && isPastTaskCutoff(task.cutoffAt);
   const readOnly = actionGate.isReadOnly || cutoffClosed;
   const disabled = Boolean(
     readOnly || submitting || submitStatus === 'submitted',

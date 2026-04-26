@@ -47,8 +47,8 @@ export function CodespaceFallbackPanel({
       <p className="mt-2 text-xs">{OFFICIAL_REPO_CUTOFF_COPY}</p>
       <p className="mt-3 text-xs text-amber-900">Workspace: {workspaceLabel}</p>
       <p className="mt-2 text-xs text-amber-900">
-        Local clone instructions are intentionally disabled. Retry until the
-        shared Codespace link is available.
+        Codespace access is required for Day 2 and Day 3. Retry until the shared
+        Codespace link is available.
       </p>
 
       {cutoffAtLabel ? (

@@ -30,6 +30,7 @@ describe('CandidateSessionPage auth flow remount and token isolation', () => {
             candidateSessionId: 654,
             scheduledStartAt: '2000-01-01T14:00:00Z',
             candidateTimezone: 'UTC',
+            status: 'not_started',
             dayWindows: [
               {
                 dayIndex: 1,

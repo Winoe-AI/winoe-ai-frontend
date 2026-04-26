@@ -9,12 +9,14 @@ type LoaderRefs = {
 type LoaderParams = LoaderRefs & {
   taskId: number;
   candidateSessionId: number;
+  githubUsername: string | null | undefined;
   onTaskWindowClosed?: (err: unknown) => void;
 };
 
 export function createWorkspaceStatusLoader({
   taskId,
   candidateSessionId,
+  githubUsername,
   modeRef,
   initAttemptedRef,
   onTaskWindowClosed,
@@ -25,6 +27,7 @@ export function createWorkspaceStatusLoader({
       taskId,
       candidateSessionId,
       initAttempted: initAttemptedRef.current,
+      githubUsername,
       onTaskWindowClosed,
     });
   };

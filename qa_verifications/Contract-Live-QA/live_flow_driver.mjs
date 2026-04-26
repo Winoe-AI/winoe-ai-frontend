@@ -78,6 +78,84 @@ function trimToNull(value) {
   return trimmed || null;
 }
 
+function parseDateInput(dateInput) {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dateInput);
+  if (!match) return null;
+  const year = Number(match[1]);
+  const month = Number(match[2]);
+  const day = Number(match[3]);
+  if (
+    !Number.isInteger(year) ||
+    !Number.isInteger(month) ||
+    !Number.isInteger(day)
+  ) {
+    return null;
+  }
+  if (month < 1 || month > 12 || day < 1 || day > 31) return null;
+  return { year, month, day };
+}
+
+function getTimeZoneOffsetMs(timeZone, date) {
+  const formatter = new Intl.DateTimeFormat('en-US', {
+    timeZone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false,
+  });
+  const parts = formatter.formatToParts(date);
+  const map = new Map(parts.map((part) => [part.type, part.value]));
+  const year = Number(map.get('year'));
+  const month = Number(map.get('month'));
+  const day = Number(map.get('day'));
+  const hour = Number(map.get('hour'));
+  const minute = Number(map.get('minute'));
+  const second = Number(map.get('second'));
+  const utcTs = Date.UTC(year, month - 1, day, hour, minute, second);
+  return utcTs - date.getTime();
+}
+
+function isValidIanaTimezone(timeZone) {
+  const normalized = trimToNull(timeZone);
+  if (!normalized) return false;
+  try {
+    new Intl.DateTimeFormat('en-US', { timeZone: normalized }).format(
+      new Date(),
+    );
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function localDateAtHourToUtcIso({
+  dateInput,
+  timezone,
+  hour = 9,
+  minute = 0,
+}) {
+  const parsed = parseDateInput(dateInput);
+  if (!parsed) throw new Error('Invalid date format.');
+  if (!isValidIanaTimezone(timezone)) throw new Error('Invalid timezone.');
+  const utcGuess = Date.UTC(
+    parsed.year,
+    parsed.month - 1,
+    parsed.day,
+    hour,
+    minute,
+    0,
+    0,
+  );
+  const initialOffset = getTimeZoneOffsetMs(timezone, new Date(utcGuess));
+  let utcTs = utcGuess - initialOffset;
+  const adjustedOffset = getTimeZoneOffsetMs(timezone, new Date(utcTs));
+  if (adjustedOffset !== initialOffset) utcTs = utcGuess - adjustedOffset;
+  return new Date(utcTs).toISOString().replace('.000Z', 'Z');
+}
+
 function parseTokenFromInviteUrl(inviteUrl) {
   const trimmed = trimToNull(inviteUrl);
   if (!trimmed) return null;
@@ -333,6 +411,90 @@ async function capturePage(page, name, extra = {}) {
     text: await page.locator('body').innerText(),
     extra,
   });
+}
+
+async function captureButtonState(page, name) {
+  const locator = page.getByRole('button', { name });
+  const count = await locator.count();
+  if (count === 0) {
+    return {
+      count: 0,
+      visible: false,
+      disabled: null,
+      label: typeof name === 'string' ? name : String(name),
+    };
+  }
+  const button = locator.first();
+  return {
+    count,
+    visible: await button.isVisible().catch(() => false),
+    disabled: await button.isDisabled().catch(() => null),
+    label: typeof name === 'string' ? name : String(name),
+  };
+}
+
+async function captureClosedDayEvidence(page, requestedDay, currentTaskBefore) {
+  const codespaceLink = page.getByRole('link', {
+    name: /^open codespace$/i,
+  });
+  const codespaceCount = await codespaceLink.count();
+  const codespaceVisible =
+    codespaceCount > 0
+      ? await codespaceLink
+          .first()
+          .isVisible()
+          .catch(() => false)
+      : false;
+  const codespaceHref =
+    codespaceCount > 0
+      ? await codespaceLink.first().getAttribute('href')
+      : null;
+  const runTestsButton = await captureButtonState(page, /^run tests$/i);
+  const submitButton = await captureButtonState(page, /submit & continue/i);
+  const closedEvidence = {
+    requestedDay,
+    currentWindow: currentTaskBefore?.json?.currentWindow ?? null,
+    dayClosedVisible: await page
+      .getByText(/^Day closed$/i)
+      .first()
+      .isVisible()
+      .catch(() => false),
+    codespace: {
+      count: codespaceCount,
+      visible: codespaceVisible,
+      href: codespaceHref,
+    },
+    runTestsButton,
+    submitButton,
+    bodyText: await page.locator('body').innerText(),
+  };
+  writeJson(
+    `candidate-day${requestedDay}-closed-evidence.json`,
+    closedEvidence,
+  );
+  await page.screenshot({
+    path: path.join(artifactsDir, `candidate-day${requestedDay}-closed.png`),
+    fullPage: true,
+  });
+  return closedEvidence;
+}
+
+async function scheduleCandidateSessionViaApi(page, inviteToken, payload) {
+  const response = await browserFetchJson(
+    page,
+    `/api/backend/candidate/session/${encodeURIComponent(inviteToken)}/schedule`,
+    {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    },
+  );
+  writeJson('candidate-schedule-response.json', response);
+  if (!response.ok) {
+    throw new Error(
+      `Candidate schedule failed: ${response.status} ${response.text}`,
+    );
+  }
+  return response;
 }
 
 async function clickFirstVisible(locator) {
@@ -737,41 +899,20 @@ async function runCandidateScheduleFlow() {
     await page.getByLabel(/github username/i).fill(githubUsername);
 
     await page.getByRole('button', { name: /^continue$/i }).click();
-    await waitForText(page, /5-day schedule preview/i);
-    await capturePage(page, 'candidate-schedule-preview.json', {
-      inviteToken,
-      scheduleDate,
-      candidateTimezone,
-      githubUsername,
+    const scheduledStartAtUtc = localDateAtHourToUtcIso({
+      dateInput: scheduleDate,
+      timezone: candidateTimezone,
     });
-
-    const scheduleResponsePromise = page.waitForResponse(
-      (response) =>
-        response.url().includes(`/candidate/session/${inviteToken}/schedule`) &&
-        response.request().method() === 'POST',
+    const scheduleResponse = await scheduleCandidateSessionViaApi(
+      page,
+      inviteToken,
+      {
+        scheduledStartAt: scheduledStartAtUtc,
+        candidateTimezone,
+        githubUsername,
+      },
     );
-    await page.getByRole('button', { name: /confirm schedule/i }).click();
-    const scheduleResponse = await scheduleResponsePromise;
-    const scheduleText = await scheduleResponse.text();
-    let scheduleJson = null;
-    try {
-      scheduleJson = scheduleText ? JSON.parse(scheduleText) : null;
-    } catch {
-      scheduleJson = { raw: scheduleText };
-    }
-    const scheduleCapture = {
-      ok: scheduleResponse.ok(),
-      status: scheduleResponse.status(),
-      url: scheduleResponse.url(),
-      json: scheduleJson,
-      text: scheduleText,
-    };
-    writeJson('candidate-schedule-response.json', scheduleCapture);
-    if (!scheduleResponse.ok()) {
-      throw new Error(
-        `Candidate schedule failed: ${scheduleResponse.status()} ${scheduleText}`,
-      );
-    }
+    const scheduleJson = scheduleResponse.json;
 
     await page.waitForLoadState('networkidle');
     await page.reload({ waitUntil: 'networkidle' });
@@ -871,6 +1012,29 @@ async function runCandidateDayFlow() {
       candidateSessionId,
       taskId,
     });
+
+    const closedByBackend =
+      currentTaskBefore.json?.currentWindow?.isOpen === false ||
+      currentTaskBefore.json?.currentWindow?.state === 'closed';
+    if (closedByBackend) {
+      const closedEvidence = await captureClosedDayEvidence(
+        page,
+        requestedDay,
+        currentTaskBefore,
+      );
+      const summary = {
+        inviteToken,
+        candidateSessionId,
+        taskId,
+        requestedDay,
+        pageUrl: page.url(),
+        currentTaskAfter: currentTaskBefore.json,
+        closedEvidence,
+      };
+      writeJson(`candidate-day${requestedDay}-summary.json`, summary);
+      process.stdout.write(`${JSON.stringify(summary, null, 2)}\n`);
+      return;
+    }
 
     if (requestedDay === 1) {
       const textArea = page.locator('textarea').first();

@@ -35,9 +35,13 @@ describe('WorkspacePanel ready states', () => {
       repoName: 'acme/repo',
       codespaceUrl: null,
     });
+    initMock.mockResolvedValueOnce({
+      repoName: 'acme/repo',
+      codespaceUrl: null,
+    });
     renderWorkspacePanel(13, 14);
     await screen.findByText(/Repository is ready/i);
-    expect(initMock).not.toHaveBeenCalled();
+    expect(initMock).toHaveBeenCalledTimes(1);
     expect(screen.queryByRole('link', { name: /open repo/i })).toBeNull();
     expect(screen.getByText(/Repo: acme\/repo/i)).toBeInTheDocument();
   });
@@ -68,6 +72,11 @@ describe('WorkspacePanel ready states', () => {
 
   it('renders repoFullName when available', async () => {
     statusMock.mockResolvedValueOnce({
+      repoName: 'shortname',
+      repoFullName: 'org/fullname',
+      codespaceUrl: null,
+    });
+    initMock.mockResolvedValueOnce({
       repoName: 'shortname',
       repoFullName: 'org/fullname',
       codespaceUrl: null,

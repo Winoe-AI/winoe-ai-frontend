@@ -74,6 +74,7 @@ describe('CandidateTaskView closed/read-only states', () => {
         dayIndex: 2,
         type: 'code',
         cutoffCommitSha: 'abc123def456',
+        cutoffAt: '2026-03-08T17:45:00.000Z',
       },
       actionGate: { isReadOnly: false, disabledReason: null, comeBackAt: null },
       onSubmit,

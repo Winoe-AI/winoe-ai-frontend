@@ -60,6 +60,7 @@ describe('CandidateSessionPage auth flow locked bootstrap and backend proxy', ()
           baseSession({
             scheduledStartAt: '2024-01-01T14:00:00Z',
             candidateTimezone: 'America/New_York',
+            status: 'not_started',
             dayWindows: [
               {
                 dayIndex: 1,

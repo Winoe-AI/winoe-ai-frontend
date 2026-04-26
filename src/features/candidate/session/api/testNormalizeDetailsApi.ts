@@ -13,6 +13,10 @@ export type CandidateTestRunDetails = Pick<
   | 'commitSha'
 >;
 
+type CandidateTestRunDetailsWithPollAfterMs = CandidateTestRunDetails & {
+  pollAfterMs?: number;
+};
+
 const numberField = (sources: Record<string, unknown>[], keys: string[]) =>
   toNumberOrNull(pickFirst(sources, keys));
 
@@ -21,7 +25,7 @@ const stringField = (sources: Record<string, unknown>[], keys: string[]) =>
 
 export const normalizeRunDetails = (
   rec: Record<string, unknown>,
-): CandidateTestRunDetails => {
+): CandidateTestRunDetailsWithPollAfterMs => {
   const sources = buildSources(rec);
 
   const passed = numberField(sources, [
@@ -82,6 +86,24 @@ export const normalizeRunDetails = (
     'commitId',
     'commit_id',
   ]);
+  const pollAfterMs = numberField(sources, [
+    'pollAfterMs',
+    'poll_after_ms',
+    'pollIntervalMs',
+    'poll_interval_ms',
+  ]);
 
-  return { passed, failed, total, stdout, stderr, workflowUrl, commitSha };
+  const details: CandidateTestRunDetailsWithPollAfterMs = {
+    passed,
+    failed,
+    total,
+    stdout,
+    stderr,
+    workflowUrl,
+    commitSha,
+  };
+
+  if (pollAfterMs != null) details.pollAfterMs = pollAfterMs;
+
+  return details;
 };

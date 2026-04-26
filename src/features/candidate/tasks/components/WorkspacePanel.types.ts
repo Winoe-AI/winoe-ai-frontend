@@ -8,6 +8,7 @@ export type WorkspacePanelProps = {
   taskId: number;
   candidateSessionId: number;
   dayIndex: number;
+  githubUsername?: string | null;
   readOnly?: boolean;
   readOnlyReason?: string | null;
   codingWorkspace?: CodingWorkspace | null;

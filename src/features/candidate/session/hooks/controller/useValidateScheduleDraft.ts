@@ -2,9 +2,11 @@ import {
   isScheduleDateInPast,
   isValidIanaTimezone,
 } from '../../utils/scheduleUtils';
+import {
+  isValidGithubUsername,
+  normalizeGithubUsername,
+} from '@/features/candidate/session/utils/githubUsername';
 import type { SetNullableString } from './useCandidateSessionSchedule.types';
-
-const GITHUB_USERNAME_RE = /^[A-Za-z0-9](?:[A-Za-z0-9-]{0,37}[A-Za-z0-9])?$/;
 
 type Params = {
   scheduleDateValue: string;
@@ -34,7 +36,9 @@ export function validateScheduleDraft({
   setScheduleGithubUsernameError,
 }: Params): boolean {
   const timezoneValue = scheduleTimezoneValue.trim();
-  const githubUsernameValue = scheduleGithubUsernameValue.trim();
+  const githubUsernameValue = normalizeGithubUsername(
+    scheduleGithubUsernameValue,
+  );
   const dateValue = scheduleDateValue;
   let valid = true;
 
@@ -66,10 +70,7 @@ export function validateScheduleDraft({
   if (!githubUsernameValue) {
     setScheduleGithubUsernameError('Enter your GitHub username.');
     valid = false;
-  } else if (
-    githubUsernameValue.length > 39 ||
-    !GITHUB_USERNAME_RE.test(githubUsernameValue)
-  ) {
+  } else if (!isValidGithubUsername(githubUsernameValue)) {
     setScheduleGithubUsernameError(
       'Use a valid GitHub username, for example octocat.',
     );

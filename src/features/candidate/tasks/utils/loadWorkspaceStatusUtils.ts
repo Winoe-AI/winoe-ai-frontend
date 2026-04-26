@@ -23,6 +23,7 @@ type Params = {
   taskId: number;
   candidateSessionId: number;
   initAttempted: boolean;
+  githubUsername: string | null | undefined;
   onTaskWindowClosed?: (err: unknown) => void;
 };
 
@@ -31,6 +32,7 @@ export async function loadWorkspaceStatus({
   taskId,
   candidateSessionId,
   initAttempted,
+  githubUsername,
   onTaskWindowClosed,
 }: Params): Promise<WorkspaceLoadResult> {
   try {
@@ -39,6 +41,7 @@ export async function loadWorkspaceStatus({
       initAttempted,
       taskId,
       candidateSessionId,
+      githubUsername,
     );
     if (mode === 'refresh' && workspace) {
       return refreshed(workspace, buildWorkspaceMessage(workspace));
@@ -61,7 +64,7 @@ export async function loadWorkspaceStatus({
       status === 401 || status === 403 || normalized.action === 'signin';
     if (isSignin) return sessionExpired();
     if (errorCode === 'WORKSPACE_NOT_INITIALIZED') return provisioning();
-    if (status === 409) return provisioning();
+    if (status === 409 || status === 410) return provisioning();
     return workspaceError(mode, normalized.message, {
       errorCode,
       codespaceState,

@@ -7,7 +7,7 @@ export function buildWorkspaceMessage(
   const codespaceReady = Boolean(workspace?.codespaceUrl);
 
   if (!repoReady && !codespaceReady) {
-    return 'Workspace provisioning is underway.';
+    return 'Codespace provisioning is underway.';
   }
   if (repoReady && !codespaceReady) {
     return 'Repository is ready. Codespace link will appear when ready.';
@@ -15,5 +15,5 @@ export function buildWorkspaceMessage(
   if (repoReady && codespaceReady) {
     return 'Workspace is ready.';
   }
-  return 'Workspace status is updating.';
+  return 'Codespace status is updating.';
 }

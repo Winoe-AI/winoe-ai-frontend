@@ -6,12 +6,12 @@ export function StartHowCode() {
       </h2>
       <ol className="mt-2 list-decimal space-y-2 pl-5 text-sm text-gray-700">
         <li>
-          Winoe provisions a GitHub repo from a template. You may be asked for
-          your GitHub username.
+          Winoe provisions an empty GitHub Codespace for Day 2. Your GitHub
+          username is collected before the day opens.
         </li>
         <li>
-          Open the repo in Codespaces from the workspace card — that’s your
-          editor and terminal.
+          Open the Codespace from the workspace card. That is your editor and
+          terminal.
         </li>
         <li>
           Run tests from Winoe. We trigger GitHub Actions and show results back

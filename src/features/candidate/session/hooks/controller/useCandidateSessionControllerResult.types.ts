@@ -4,12 +4,14 @@ import type { useWindowState } from '../useWindowState';
 import type { ViewState } from '../../views/types';
 import type { useCandidateSessionSchedule } from './useCandidateSessionSchedule';
 import type { useCodingWorkspaceSync } from './useCodingWorkspaceSync';
+import type { SessionCtx } from './useCandidateSessionSchedule.types';
 
 export type BuildCandidateSessionControllerResultArgs = {
   finalView: ViewState;
   state: {
     authStatus: 'idle' | 'loading' | 'ready' | 'unauthenticated' | 'error';
     started: boolean;
+    bootstrap: SessionCtx['state']['bootstrap'];
     taskState: { error: string | null; loading: boolean; isComplete: boolean };
   };
   authMessage: string | null;

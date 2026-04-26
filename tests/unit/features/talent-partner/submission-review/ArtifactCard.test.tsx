@@ -74,7 +74,7 @@ describe('ArtifactCard', () => {
 
     expect(
       screen.getByText(
-        /You may work offline\/locally, but only commits pushed to the official repo before cutoff are evaluated\./i,
+        /Only commits pushed to the official repo before cutoff are evaluated\./i,
       ),
     ).toBeInTheDocument();
     expect(

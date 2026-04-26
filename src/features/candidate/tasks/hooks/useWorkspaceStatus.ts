@@ -22,6 +22,7 @@ export function useWorkspaceStatus({
   candidateSessionId,
   enabled = true,
   enableCodespaceFallback = true,
+  githubUsername = null,
   onTaskWindowClosed,
 }: Params) {
   const { notify } = useNotifications();
@@ -83,12 +84,13 @@ export function useWorkspaceStatus({
     const run = createWorkspaceStatusLoader({
       taskId,
       candidateSessionId,
+      githubUsername,
       modeRef,
       initAttemptedRef,
       onTaskWindowClosed,
     });
     return run();
-  }, [candidateSessionId, onTaskWindowClosed, taskId]);
+  }, [candidateSessionId, githubUsername, onTaskWindowClosed, taskId]);
 
   const { load, abort } = useAsyncLoader(loader, {
     immediate: false,

@@ -1,3 +1,6 @@
+'use client';
+
+import { useOptionalCandidateSession } from '../state/context';
 import { RunTestsPanel } from '@/features/candidate/tasks/components/RunTestsPanel';
 import { WorkspacePanel } from '@/features/candidate/tasks/components/WorkspacePanel';
 import type { CandidateTask } from '../CandidateSessionProvider';
@@ -7,6 +10,7 @@ import type {
   CodingWorkspace,
   CodingWorkspaceSnapshot,
 } from '@/features/candidate/tasks/utils/codingWorkspaceUtils';
+import { isPastTaskCutoff } from '@/features/candidate/tasks/utils/taskCutoffUtils';
 
 export type WorkspaceAndTestsProps = {
   task: CandidateTask;
@@ -29,7 +33,9 @@ export function WorkspaceAndTests({
   onTaskWindowClosed,
   onCodingWorkspaceSnapshot,
 }: WorkspaceAndTestsProps) {
-  const closedByCutoff = Boolean(task.cutoffCommitSha);
+  const session = useOptionalCandidateSession();
+  const githubUsername = session?.state.bootstrap?.githubUsername ?? null;
+  const closedByCutoff = isPastTaskCutoff(task.cutoffAt);
   const workspaceReadOnly = actionGate.isReadOnly || closedByCutoff;
   const cutoffDisabledReason = closedByCutoff
     ? 'Day closed. Work after cutoff will not be considered.'
@@ -42,6 +48,7 @@ export function WorkspaceAndTests({
         taskId={task.id}
         candidateSessionId={candidateSessionId}
         dayIndex={task.dayIndex}
+        githubUsername={githubUsername}
         readOnly={workspaceReadOnly}
         readOnlyReason={disabledReason}
         codingWorkspace={codingWorkspace}

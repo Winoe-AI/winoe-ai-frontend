@@ -31,8 +31,8 @@ export function TaskWorkArea({
           </div>
         ) : (
           <div className="rounded-md border border-blue-100 bg-blue-50 p-3 text-sm text-blue-900">
-            Work in your GitHub repository or Codespace. When you’re ready,
-            submit to move to the next day.
+            Work in your Codespace. When you’re ready, submit to move to the
+            next day.
           </div>
         )
       ) : (

@@ -34,6 +34,7 @@ export const renderPanel = (
       taskId={1}
       candidateSessionId={2}
       dayIndex={2}
+      githubUsername="octocat"
       {...props}
     />,
   );

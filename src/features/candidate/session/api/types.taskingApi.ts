@@ -51,6 +51,7 @@ export type CandidateTestRunStartResponse = { runId: string };
 export type CandidateTestRunStatusResponse = {
   status: 'running' | 'passed' | 'failed' | 'timeout' | 'error';
   message?: string;
+  pollAfterMs?: number | null;
   passed: number | null;
   failed: number | null;
   total: number | null;

@@ -88,9 +88,7 @@ describe('TaskView submission', () => {
       />,
     );
 
-    expect(
-      screen.getByText(/Work in your GitHub repository or Codespace/i),
-    ).toBeInTheDocument();
+    expect(screen.getByText(/Work in your Codespace/i)).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: /submit & continue/i }));
     await act(async () => Promise.resolve());
     expect(onSubmit).toHaveBeenCalledWith({});
