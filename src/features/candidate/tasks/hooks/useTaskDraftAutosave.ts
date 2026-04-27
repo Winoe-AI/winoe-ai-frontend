@@ -49,6 +49,8 @@ export function useTaskDraftAutosave<TValue>({
   const [restoreApplied, setRestoreApplied] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [autosaveLocked, setAutosaveLocked] = useState(false);
+  const [restoreReadyKey, setRestoreReadyKey] = useState<string | null>(null);
+  const restoreKey = `${candidateSessionId ?? 'none'}:${taskId}`;
   const serializeRef = useRef(serialize);
   const deserializeRef = useRef(deserialize);
   const onRestoreRef = useRef(onRestore);
@@ -79,7 +81,11 @@ export function useTaskDraftAutosave<TValue>({
     };
   }, [taskId, candidateSessionId]);
 
-  const isDisabled = !isEditable || hasFinalizedContent || autosaveLocked;
+  const isDisabled =
+    !isEditable ||
+    hasFinalizedContent ||
+    autosaveLocked ||
+    restoreReadyKey !== restoreKey;
   const status: TaskDraftAutosaveStatus = useMemo(
     () => (isDisabled ? 'disabled' : internalStatus),
     [internalStatus, isDisabled],
@@ -116,9 +122,13 @@ export function useTaskDraftAutosave<TValue>({
     setError,
     setLastSavedAt,
     setRestoreApplied,
+    restoreKey,
+    setRestoreReadyKey,
     deserializeRef,
     onRestoreRef,
     onSavedAtRef,
+    serializeRef,
+    valueRef,
     lastSavedFingerprintRef,
   });
   useTaskDraftAutosaveTriggers({

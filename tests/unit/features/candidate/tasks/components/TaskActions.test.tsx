@@ -33,4 +33,61 @@ describe('TaskActions', () => {
     expect(onSaveDraft).not.toHaveBeenCalled();
     expect(onSubmit).not.toHaveBeenCalled();
   });
+
+  it('requires confirmation only when requested and prevents duplicate confirm submits', async () => {
+    let resolveSubmit: (() => void) | undefined;
+    const onSubmit = jest.fn(
+      () =>
+        new Promise<void>((resolve) => {
+          resolveSubmit = resolve;
+        }),
+    );
+
+    render(
+      <TaskActions
+        isTextTask
+        displayStatus="idle"
+        disabled={false}
+        onSubmit={onSubmit}
+        requireSubmitConfirmation
+      />,
+    );
+
+    const user = userEvent.setup();
+    await user.click(
+      screen.getByRole('button', { name: /submit & continue/i }),
+    );
+    expect(
+      screen.getByRole('dialog', { name: /submit day 1 design document/i }),
+    ).toHaveAttribute('aria-modal', 'true');
+
+    const confirmButton = screen.getByRole('button', {
+      name: /submit and lock/i,
+    });
+    await user.click(confirmButton);
+    await user.click(confirmButton);
+    expect(onSubmit).toHaveBeenCalledTimes(1);
+    resolveSubmit?.();
+  });
+
+  it('submits immediately when confirmation is not requested', async () => {
+    const onSubmit = jest.fn();
+
+    render(
+      <TaskActions
+        isTextTask
+        displayStatus="idle"
+        disabled={false}
+        onSubmit={onSubmit}
+      />,
+    );
+
+    const user = userEvent.setup();
+    await user.click(
+      screen.getByRole('button', { name: /submit & continue/i }),
+    );
+
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    expect(onSubmit).toHaveBeenCalledTimes(1);
+  });
 });

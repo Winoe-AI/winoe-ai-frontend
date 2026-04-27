@@ -1,5 +1,5 @@
 'use client';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { resolveCodingSubmissionStatus } from '../utils/submissionStatusUtils';
 import type { SubmitPayload, SubmitResponse, Task } from '../types';
 import type { WindowActionGate } from '@/features/candidate/session/lib/windowState';
@@ -37,6 +37,12 @@ export function useTaskSubmitController({
     useSubmitHandler(onSubmit);
   const [recordedCodingSubmission, setRecordedCodingSubmission] =
     useState<DurableCodingSubmission | null>(null);
+  const [localTextSubmitted, setLocalTextSubmitted] = useState(false);
+  const [day1DeadlineClosed, setDay1DeadlineClosed] = useState(() => {
+    if (task.dayIndex !== 1 || !task.cutoffAt) return false;
+    const cutoffMs = Date.parse(task.cutoffAt);
+    return Number.isFinite(cutoffMs) && Date.now() >= cutoffMs;
+  });
   const finalized = useMemo(() => resolveFinalizedText(task), [task]);
   const durableCodingSubmission =
     recordedCodingSubmission?.taskId === task.id
@@ -47,6 +53,8 @@ export function useTaskSubmitController({
     actionGate,
     submitting,
     submitStatus,
+    localTextSubmitted,
+    day1DeadlineClosed,
     finalizedAvailable: finalized.available,
     durableCodingSubmission,
     lastProgress,
@@ -57,8 +65,38 @@ export function useTaskSubmitController({
     textTask: status.textTask,
     disabled: status.disabled,
     readOnly: status.readOnly,
+    hasFinalizedContent: finalized.available,
     onTaskWindowClosed,
   });
+  useEffect(() => {
+    if (
+      task.dayIndex !== 1 ||
+      !task.cutoffAt ||
+      day1DeadlineClosed ||
+      localTextSubmitted ||
+      actionGate.isReadOnly
+    ) {
+      return;
+    }
+    const cutoffMs = Date.parse(task.cutoffAt);
+    if (!Number.isFinite(cutoffMs)) return;
+    const delayMs = Math.max(0, cutoffMs - Date.now());
+    const timerId = window.setTimeout(() => {
+      void draft.draftAutosave.flushNow().finally(() => {
+        setDay1DeadlineClosed(true);
+      });
+    }, delayMs);
+    return () => {
+      window.clearTimeout(timerId);
+    };
+  }, [
+    actionGate.isReadOnly,
+    day1DeadlineClosed,
+    draft.draftAutosave,
+    localTextSubmitted,
+    task.cutoffAt,
+    task.dayIndex,
+  ]);
   const { localError, saveAndSubmit } = useTaskSubmitControllerSaveAndSubmit({
     taskId: task.id,
     actionStatus: status.actionStatus,
@@ -69,6 +107,8 @@ export function useTaskSubmitController({
     handleSubmit,
     clearDrafts: draft.clearDrafts,
     setRecordedCodingSubmission,
+    onTextSubmitted:
+      task.dayIndex === 1 ? () => setLocalTextSubmitted(true) : undefined,
   });
   const codingSubmissionStatus = resolveCodingSubmissionStatus(
     task.dayIndex,
@@ -77,7 +117,10 @@ export function useTaskSubmitController({
 
   return {
     textTask: status.textTask,
-    text: status.textTask && status.readOnly ? finalized.text : draft.text,
+    text:
+      status.textTask && status.readOnly && finalized.available
+        ? finalized.text
+        : draft.text,
     setText: draft.setText,
     savedAt: draft.draftAutosave.lastSavedAt,
     draftAutosaveStatus: draft.draftAutosave.status,

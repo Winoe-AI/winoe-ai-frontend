@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { markTextDraftSavedAt } from '../utils/draftStorageUtils';
 import type { Task } from '../types';
+import { getDay1DesignDocInitialValue } from '../utils/day1DesignDocUtils';
 import { useTaskDraftAutosave } from './useTaskDraftAutosave';
 import { pickTextFromStructuredJson } from './useTaskSubmitControllerContent';
 
@@ -10,6 +11,7 @@ type UseTaskSubmitControllerDraftArgs = {
   textTask: boolean;
   disabled: boolean;
   readOnly: boolean;
+  hasFinalizedContent: boolean;
   onTaskWindowClosed?: (err: unknown) => void;
 };
 
@@ -19,9 +21,14 @@ export function useTaskSubmitControllerDraft({
   textTask,
   disabled,
   readOnly,
+  hasFinalizedContent,
   onTaskWindowClosed,
 }: UseTaskSubmitControllerDraftArgs) {
-  const [text, setText] = useState('');
+  const [text, setText] = useState(() =>
+    readOnly && task.dayIndex === 1 && !hasFinalizedContent
+      ? ''
+      : getDay1DesignDocInitialValue(task.dayIndex),
+  );
   const textRef = useRef(text);
   useEffect(() => {
     textRef.current = text;
@@ -31,7 +38,8 @@ export function useTaskSubmitControllerDraft({
     taskId: task.id,
     candidateSessionId,
     isEditable: textTask && !disabled,
-    hasFinalizedContent: !textTask || readOnly,
+    hasFinalizedContent:
+      !textTask || hasFinalizedContent || (readOnly && task.dayIndex !== 1),
     value: text,
     serialize: useCallback(
       (value: string) =>

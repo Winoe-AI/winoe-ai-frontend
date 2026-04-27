@@ -1,147 +1,109 @@
-# PR: Implement candidate start-date scheduling UI
+# PR: Complete Day 1 design document workspace
 
 ## Linked Issue
 
-- Winoe-AI/winoe-ai-frontend issue #181
+- Winoe-AI/winoe-ai-frontend issue #182
 
 ## Summary
 
-This PR implements the candidate start-date scheduling UI after invite claim/session bootstrap. It shows "Pick your start date", detects and displays the candidate timezone with a UTC fallback, renders a 5-day Trial preview, rejects past dates client-side, requires a GitHub username before scheduling, requires confirmation before schedule submission, and shows a locked countdown after scheduling.
+This PR implements the Day 1 candidate design document workspace for the v4 from-scratch Tech Trial model. Day 1 is now Project Brief-first: candidates plan from scratch, choose their tech stack, make architecture and dependency decisions, define project organization, set a testing strategy, document risks and tradeoffs, and outline their Days 2-3 implementation plan.
 
-The scheduling and locked states prevent Trial content from appearing before Day 1 opens. The copy also preserves from-scratch terminology and avoids retired terms.
+The stale GitHub issue criterion for a read-only repository exploration link is intentionally not implemented because it was superseded by the v4 pivot. There is no pre-populated codebase to explore on Day 1.
 
-## Acceptance Criteria
+## Implementation Summary
 
-- [x] Pick your start date shown after invite claim/session bootstrap
-- [x] Timezone-aware date picker with 5-day preview
-- [x] Past dates rejected with clear message
-- [x] Confirmation step before finalizing
-- [x] After scheduling: countdown with date, time, and timezone
-- [x] No Trial content visible before Day 1 opens
+- Added a Day 1-specific design document workspace.
+- Displayed Project Brief / prestart context prominently above the editor.
+- Added from-scratch design guidance and starter content covering tech stack, architecture, project structure, testing strategy, risks, tradeoffs, and Days 2-3 plan.
+- Added side-by-side markdown editor and live preview.
+- Added responsive layout behavior for narrower screens.
+- Added autosave states: `Saving...`, `Saved`, and `Save failed`.
+- Added submit confirmation dialog before final Day 1 submission.
+- Added deadline card / countdown using existing `task.cutoffAt`.
+- Added deadline-triggered autosave.
+- Added immutable closed/submitted Day 1 view.
+- Preserved saved draft artifact restoration after cutoff when no finalized submission exists.
+- Prevented starter content from being written before restore settles.
+- Kept finalized submitted content authoritative over draft restore.
+- Hardened submit confirmation against disabled/pending duplicate submission states.
 
-## Implementation Notes
+## Files Changed
 
-Key implementation areas:
-
-- `src/features/candidate/session/views/SchedulingView.tsx`
-- `src/features/candidate/session/views/SchedulingFormStep.tsx`
-- `src/features/candidate/session/views/SchedulingConfirmStep.tsx`
-- `src/features/candidate/session/views/LockedView.tsx`
-- `src/features/candidate/session/views/LockedViewCountdownCard.tsx`
-- `src/features/candidate/session/views/LockedViewDayWindows.tsx`
-- `src/features/candidate/session/hooks/controller/useCandidateSessionSchedule.ts`
-- `src/features/candidate/session/hooks/controller/useCandidateSessionScheduleDraft.ts`
-- `src/features/candidate/session/api/scheduleApi.ts`
-- candidate session route/controller prop plumbing
-- focused tests and fixture updates
-
-`githubUsername` remains required by validation and by `scheduleApi.ts`.
+- `src/features/candidate/tasks/CandidateTaskViewInner.tsx`
+- `src/features/candidate/tasks/components/Day1DesignDocWorkspace.tsx`
+- `src/features/candidate/tasks/components/Day1DeadlineCard.tsx`
+- `src/features/candidate/tasks/components/TaskActions.tsx`
+- `src/features/candidate/tasks/components/TaskWorkArea.tsx`
+- `src/features/candidate/tasks/components/DraftSaveStatus.tsx`
+- `src/features/candidate/tasks/hooks/useTaskSubmitController.ts`
+- `src/features/candidate/tasks/hooks/useTaskSubmitController.types.ts`
+- `src/features/candidate/tasks/hooks/useTaskDraftAutosave.ts`
+- `src/features/candidate/tasks/hooks/useTaskDraftAutosave.types.ts`
+- `src/features/candidate/tasks/utils/day1DesignDocUtils.ts`
+- Focused Day 1/task autosave/submit tests
 
 ## QA Evidence
 
-### Environment
+### Manual QA
 
-- Backend API was already listening on `:8000`; `/health` returned `{"status":"ok"}`
-- Backend worker started with `bash scripts/local_qa_backend.sh worker`
-- Frontend started with `./runFrontend.sh`
-- Next served `http://localhost:3000` with `.env.local`
-- `FRONTEND_QA_PLAYBOOK.md` was not present, so repo README/local dev guidance was followed
+- QA PASSED - ready for pr.md update
+- Frontend URL used: `http://localhost:3000`
+- Backend URL used: `http://localhost:8000`
+- Candidate QA account used: candidate account only; credentials are not included here.
+- Controlled Day 1 fixture:
+  - token `qa-day1`
+  - candidateSessionId `77`
+  - taskId `1`
+- `FRONTEND_QA_PLAYBOOK.md` was not present, so QA followed repo README/run scripts and documented QA fixtures.
 
-### Session Path
+### Manual QA Scenarios Passed
 
-- Supplied Candidate account: `robiemelaku@gmail.com`
-- Supplied Talent Partner account: `robel.kebede@bison.howard.edu`
-- Local backend had no existing trials/invites for supplied accounts
-- A backend Trial was created, but live invite/session setup was blocked by backend `scenario_generation_llm_failed`
-- Browser QA used a Playwright-authenticated candidate session with routed `/api/backend/candidate/session/...` responses
-- This verified the real frontend scheduling UI, validation, confirmation, locked state, direct navigation behavior, and schedule request payload
-- A true live backend schedule mutation was not verified because of the backend scenario-generation blocker
+- Candidate login and active Day 1 workspace
+- Project Brief displayed prominently above editor
+- No repository exploration link/copy
+- From-scratch design prompts present
+- Markdown editor and live preview work
+- Responsive layout checked
+- Autosave success checked
+- Autosave failure forced via mocked `PUT /api/backend/tasks/1/draft` returning 500
+- Submit confirmation cancel/confirm checked
+- Submitted Day 1 locks read-only
+- Deadline countdown checked
+- Deadline reached while page open checked
+- Reload after cutoff with saved draft checked
+- Reload after cutoff with finalized submission checked
+- Reload after cutoff with no saved content checked
+- Forbidden-term scan passed
 
-### Browser QA Results
+### QA Artifacts
 
-- PASS: "Pick your start date" shown after candidate session bootstrap; no automatic Day 1 content
-- PASS: timezone field populated as `America/New_York`
-- PASS: 5-day preview shown with:
-  - Day 1 - Planning & Design Doc
-  - Day 2 - Implementation Kickoff
-  - Day 3 - Implementation Wrap-Up
-  - Day 4 - Handoff + Demo
-  - Day 5 - Reflection Essay
-- PASS: past date `2026-04-26` rejected with `Start date cannot be in the past.`
-- PASS: Continue disabled / blocked for invalid past date
-- PASS: no schedule request sent for invalid past date
-- PASS: blank GitHub username blocked with `Enter your GitHub username.`
-- PASS: no schedule request sent until username was valid
-- PASS: confirmation step shown before submission
-- PASS: schedule request count stayed 0 until `Confirm schedule`
-- PASS: after confirmation, locked/countdown state shown with date, time, timezone, and "Come back then"
-- PASS: direct navigation back to `/candidate/session/qa-issue-181-schedule-token-0001` still showed locked state
-- PASS: locked state did not expose Project Brief, scenario, repository URL, Codespace URL, Day 1 editor, Start Trial, current task, or Trial work content
-- PASS: no forbidden terms visible in scheduling/locked surfaces:
-  - Tenon
-  - SimuHire
-  - recruiter
-  - simulation
-  - Fit Profile
-  - Fit Score
-  - template
-  - precommit
-  - Specializor
-  - existing codebase
-  - read-only repository exploration
-  - offline/local work
+The issue #182 manual QA artifact directory is tracked in this repo. The latest contract-live Playwright result path is ignored by `.gitignore`, so it is referenced as local evidence and should not be added unless repo convention changes.
 
-### Network/API Evidence
+- `qa_verifications/issue182-day1-manual-qa/2026-04-27T20-00-18-214Z/`
+- `qa_verifications/issue182-day1-manual-qa/2026-04-27T20-00-18-214Z/manual-qa-results.json`
+- `qa_verifications/Contract-Live-QA/contract_live_qa_latest/artifacts/2026-04-27T19-55-37-266Z/playwright/results.json`
 
-Schedule POST endpoint observed:
-
-```text
-/api/backend/candidate/session/qa-issue-181-schedule-token-0001/schedule
-```
-
-Payload:
-
-```json
-{
-  "scheduledStartAt": "2026-04-29T13:00:00Z",
-  "candidateTimezone": "America/New_York",
-  "githubUsername": "octocat"
-}
-```
-
-This matches 9:00 AM America/New_York on April 29, 2026 converted to UTC.
-
-### Screenshots
-
-- `qa_verifications/issue-181-manual-qa/screenshots/01-scheduling-form.png`
-- `qa_verifications/issue-181-manual-qa/screenshots/02-five-day-preview.png`
-- `qa_verifications/issue-181-manual-qa/screenshots/03-confirmation-step.png`
-- `qa_verifications/issue-181-manual-qa/screenshots/04-locked-countdown.png`
-
-## Test / Command Evidence
+## Automated Checks
 
 - PASS `npm run typecheck`
-- PASS `npm run lint:eslint`
-- PASS `npm run lint:prettier`
-- PASS `npm run build`
-- PASS `npm test -- --runInBand tests/unit/features/candidate/session/CandidateSessionView.windowGating.test.tsx`
-- PASS `npm test -- --runInBand tests/unit/features/candidate/session/CandidateSessionView.schedule.test.tsx tests/integration/candidate/CandidateSessionPageClient.behavior.scheduleSuccess.test.tsx tests/integration/candidate/CandidateSessionPageClient.behavior.scheduleValidation.test.tsx tests/integration/candidate/CandidateSessionPageClient.behavior.lockedProxy.test.tsx tests/unit/candidateApi.schedule.test.ts`
-- PASS `git diff --check`
-- PASS `./precommit.sh`
-  - lint passed
-  - full `test:ci` passed: 498 suites, 1533 tests
-  - coverage passed
-  - typecheck passed
-  - build passed
+- PASS `npm run lint`
+- PASS `npm test -- --runInBand` - 499 suites / 1550 tests
+- PASS `npm test -- --runInBand tests/unit/features/candidate/tasks/CandidateTaskView.day1DesignDoc.test.tsx` - 13 tests
+- PASS `npm test -- --runInBand tests/unit/features/candidate/tasks/components/TaskActions.test.tsx` - 3 tests
+- PASS `npm test -- --runInBand tests/unit/features/candidate/tasks/hooks/useTaskDraftAutosave.test.tsx` - 4 tests
+- PASS `npm test -- --runInBand tests/unit/features/candidate/tasks/hooks/useTaskDraftAutosave.extra.test.tsx` - 4 tests
 
-## Known Limitations / Follow-up
+### Forbidden-Term Scan
 
-- Live full-stack invite/session scheduling mutation was not verified because local backend Trial setup was blocked by `scenario_generation_llm_failed`.
-- Frontend behavior and schedule POST payload were verified with Playwright-routed backend responses.
-- Backend #288 remains the upstream source-of-truth dependency for final production contract behavior and Talent Partner notification.
+```bash
+rg -n "Tenon|SimuHire|recruiter|simulation|Fit Profile|Fit Score|template|precommit|Specializor|existing codebase|starter code|read-only repository|offline|local work" src/features/candidate/tasks tests/unit/components/candidate tests/unit/features/candidate/tasks
+```
 
-## PR Risk
+Result: PASS, no matches.
 
-Risk is low on frontend UI behavior because focused tests, integration tests, browser QA, and full precommit are green.
+## Risks / Assumptions
 
-Remaining risk is integration-only: backend scenario generation/local invite setup blocked true live backend schedule mutation verification.
+- Deadline behavior depends on backend providing accurate `task.cutoffAt`.
+- `FRONTEND_QA_PLAYBOOK.md` was not present locally; QA used repo README/run scripts.
+- Cutoff edge cases were verified with controlled Playwright fixtures.
+- Downstream Talent Partner review surfaces, Evidence Trail entries, Winoe Report content, and Winoe Score calculations depend on existing backend/reporting flows consuming the finalized Day 1 artifact correctly.

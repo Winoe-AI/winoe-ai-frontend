@@ -66,9 +66,9 @@ describe('TaskView UI states', () => {
       screen.getAllByText(/panel is read-only outside the scheduled window/i)
         .length,
     ).toBeGreaterThanOrEqual(1);
-    expect(screen.getByRole('button', { name: /save draft/i })).toBeDisabled();
+    expect(screen.queryByRole('button', { name: /save draft/i })).toBeNull();
     expect(
-      screen.getByRole('button', { name: /submit & continue/i }),
-    ).toBeDisabled();
+      screen.queryByRole('button', { name: /submit & continue/i }),
+    ).toBeNull();
   });
 });

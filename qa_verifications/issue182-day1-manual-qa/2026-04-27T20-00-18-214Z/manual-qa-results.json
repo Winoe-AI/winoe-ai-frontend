@@ -1,0 +1,101 @@
+{
+  "artifactsDir": "/Users/robelmelaku/Desktop/Winoe-AI/winoe-frontend/qa_verifications/issue182-day1-manual-qa/2026-04-27T20-00-18-214Z",
+  "results": [
+    {
+      "name": "candidate dashboard with authenticated QA storage",
+      "status": "PASS",
+      "evidence": {
+        "url": "http://localhost:3000/candidate/dashboard",
+        "screenshots": [
+          "/Users/robelmelaku/Desktop/Winoe-AI/winoe-frontend/qa_verifications/issue182-day1-manual-qa/2026-04-27T20-00-18-214Z/candidate-dashboard.png"
+        ]
+      }
+    },
+    {
+      "name": "scenario 1 active Day 1 workspace desktop and narrow",
+      "status": "PASS",
+      "evidence": {
+        "screenshots": [
+          "/Users/robelmelaku/Desktop/Winoe-AI/winoe-frontend/qa_verifications/issue182-day1-manual-qa/2026-04-27T20-00-18-214Z/scenario1-active-desktop.png",
+          "/Users/robelmelaku/Desktop/Winoe-AI/winoe-frontend/qa_verifications/issue182-day1-manual-qa/2026-04-27T20-00-18-214Z/scenario1-active-narrow.png"
+        ],
+        "url": "http://localhost:3000/candidate/session/qa-day1"
+      }
+    },
+    {
+      "name": "scenario 2 autosave success and visible failure",
+      "status": "PASS",
+      "evidence": {
+        "screenshots": [
+          "/Users/robelmelaku/Desktop/Winoe-AI/winoe-frontend/qa_verifications/issue182-day1-manual-qa/2026-04-27T20-00-18-214Z/scenario2-autosave-success.png",
+          "/Users/robelmelaku/Desktop/Winoe-AI/winoe-frontend/qa_verifications/issue182-day1-manual-qa/2026-04-27T20-00-18-214Z/scenario2-autosave-failure.png"
+        ]
+      }
+    },
+    {
+      "name": "scenario 3 submit confirmation, latest content, immutable after submit",
+      "status": "PASS",
+      "evidence": {
+        "screenshots": [
+          "/Users/robelmelaku/Desktop/Winoe-AI/winoe-frontend/qa_verifications/issue182-day1-manual-qa/2026-04-27T20-00-18-214Z/scenario3-submitted-readonly.png"
+        ],
+        "submitBodies": [
+          {
+            "contentText": "Latest submitted Day 1 design document"
+          }
+        ]
+      }
+    },
+    {
+      "name": "scenario 4 deadline countdown and unavailable warning",
+      "status": "PASS",
+      "evidence": {
+        "screenshots": [
+          "/Users/robelmelaku/Desktop/Winoe-AI/winoe-frontend/qa_verifications/issue182-day1-manual-qa/2026-04-27T20-00-18-214Z/scenario4-deadline-countdown.png",
+          "/Users/robelmelaku/Desktop/Winoe-AI/winoe-frontend/qa_verifications/issue182-day1-manual-qa/2026-04-27T20-00-18-214Z/scenario4-deadline-unavailable.png"
+        ]
+      }
+    },
+    {
+      "name": "scenario 5 deadline reached while page open",
+      "status": "PASS",
+      "evidence": {
+        "screenshots": [
+          "/Users/robelmelaku/Desktop/Winoe-AI/winoe-frontend/qa_verifications/issue182-day1-manual-qa/2026-04-27T20-00-18-214Z/scenario5-cutoff-lock.png"
+        ],
+        "savedBodies": [
+          {
+            "contentText": "Edited before cutoff and should persist"
+          }
+        ]
+      }
+    },
+    {
+      "name": "scenario 6 past cutoff with saved draft",
+      "status": "PASS",
+      "evidence": {
+        "screenshots": [
+          "/Users/robelmelaku/Desktop/Winoe-AI/winoe-frontend/qa_verifications/issue182-day1-manual-qa/2026-04-27T20-00-18-214Z/scenario6-past-cutoff-draft.png"
+        ]
+      }
+    },
+    {
+      "name": "scenario 7 past cutoff with finalized submission",
+      "status": "PASS",
+      "evidence": {
+        "screenshots": [
+          "/Users/robelmelaku/Desktop/Winoe-AI/winoe-frontend/qa_verifications/issue182-day1-manual-qa/2026-04-27T20-00-18-214Z/scenario7-past-cutoff-finalized.png"
+        ]
+      }
+    },
+    {
+      "name": "scenario 8 past cutoff with no saved content",
+      "status": "PASS",
+      "evidence": {
+        "screenshots": [
+          "/Users/robelmelaku/Desktop/Winoe-AI/winoe-frontend/qa_verifications/issue182-day1-manual-qa/2026-04-27T20-00-18-214Z/scenario8-past-cutoff-empty.png"
+        ]
+      }
+    }
+  ]
+}
