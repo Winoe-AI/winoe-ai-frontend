@@ -52,7 +52,9 @@ describe('WorkspacePanel extra notifications and retry', () => {
     await userEvent
       .setup()
       .click(screen.getByRole('button', { name: /Retry/i }));
-    expect(await screen.findByText(/Workspace is ready/i)).toBeInTheDocument();
+    expect(
+      await screen.findByText(/GitHub Codespace ready/i),
+    ).toBeInTheDocument();
   });
 
   it('does not re-initialize on second 404 after first attempt', async () => {
@@ -89,7 +91,9 @@ describe('WorkspacePanel extra notifications and retry', () => {
     await userEvent
       .setup()
       .click(screen.getByRole('button', { name: /Retry/i }));
-    expect(await screen.findByText(/Workspace is ready/i)).toBeInTheDocument();
+    expect(
+      await screen.findByText(/GitHub Codespace ready/i),
+    ).toBeInTheDocument();
 
     getStatusMock.mockRejectedValueOnce(
       Object.assign(new Error('error again'), { status: 500 }),

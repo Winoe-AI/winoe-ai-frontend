@@ -54,8 +54,25 @@ describe('ArtifactCard', () => {
     });
 
     expect(
-      screen.getByText(/Evaluation is based on the commit shown below/i),
+      screen.getByText(
+        /The cutoff commit below marks the final implementation snapshot Winoe will evaluate\./i,
+      ),
     ).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        /Implementation evidence comes from the official Trial repository and Codespace-captured work\. Only commits pushed before cutoff are included in the Evidence Trail\./i,
+      ),
+    ).toBeInTheDocument();
+    expect(
+      screen.getAllByText(
+        /The cutoff commit below marks the final implementation snapshot Winoe will evaluate\./i,
+      ),
+    ).toHaveLength(1);
+    expect(
+      screen.queryByText(
+        /Day 2 and Day 3 implementation work must happen in GitHub Codespaces only\./i,
+      ),
+    ).toBeNull();
     expect(screen.getByRole('link', { name: /abc123def456/i })).toHaveAttribute(
       'href',
       'https://github.com/acme/repo/commit/abc123def456',
@@ -74,12 +91,14 @@ describe('ArtifactCard', () => {
 
     expect(
       screen.getByText(
-        /Only commits pushed to the official repo before cutoff are evaluated\./i,
+        /Implementation evidence comes from the official Trial repository and Codespace-captured work\. Only commits pushed before cutoff are included in the Evidence Trail\./i,
       ),
     ).toBeInTheDocument();
     expect(
-      screen.getByText(/Work after cutoff will not be considered/i),
-    ).toBeInTheDocument();
+      screen.queryByText(
+        /The cutoff commit below marks the final implementation snapshot Winoe will evaluate\./i,
+      ),
+    ).toBeNull();
     expect(
       screen.queryByText(/Evaluation is based on the commit shown below/i),
     ).toBeNull();

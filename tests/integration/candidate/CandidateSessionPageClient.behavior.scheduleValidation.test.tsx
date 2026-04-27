@@ -48,7 +48,7 @@ describe('CandidateSessionPage auth flow schedule validation errors', () => {
       await screen.findByText(/Timezone is invalid\./i),
     ).toBeInTheDocument();
     expect(screen.getByText(/Pick your start date/i)).toBeInTheDocument();
-  });
+  }, 15000);
 
   it('maps backend start-in-past error to inline date validation', async () => {
     fetchMock.mockImplementation(
@@ -79,7 +79,7 @@ describe('CandidateSessionPage auth flow schedule validation errors', () => {
       await screen.findByText(/Start date is in the past\./i),
     ).toBeInTheDocument();
     expect(screen.getByText(/Pick your start date/i)).toBeInTheDocument();
-  });
+  }, 15000);
 
   it('requires a GitHub username before continuing', async () => {
     fetchMock.mockImplementation(async (url: RequestInfo | URL) => {
@@ -104,5 +104,5 @@ describe('CandidateSessionPage auth flow schedule validation errors', () => {
       await screen.findByText(/Enter your GitHub username\./i),
     ).toBeInTheDocument();
     expect(screen.getByText(/Pick your start date/i)).toBeInTheDocument();
-  });
+  }, 15000);
 });

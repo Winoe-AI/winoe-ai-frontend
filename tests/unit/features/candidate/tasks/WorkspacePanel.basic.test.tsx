@@ -19,7 +19,9 @@ describe('WorkspacePanel basic states', () => {
       codespaceUrl: 'https://codespaces.com/open',
     });
     renderPanel();
-    expect(await screen.findByText(/Workspace is ready/i)).toBeInTheDocument();
+    expect(
+      await screen.findByText(/GitHub Codespace ready/i),
+    ).toBeInTheDocument();
     expect(screen.getByText(/Repo: repo/i)).toBeInTheDocument();
     expect(
       screen.getByRole('link', { name: /Open Codespace/i }),
@@ -42,7 +44,7 @@ describe('WorkspacePanel basic states', () => {
   it.each([
     [
       Object.assign(new Error('provisioning'), { status: 409 }),
-      /Codespace repo is not provisioned yet/i,
+      /Codespace is not provisioned yet/i,
       'warning',
     ],
     [
@@ -50,7 +52,7 @@ describe('WorkspacePanel basic states', () => {
         status: 422,
         details: { errorCode: 'WORKSPACE_NOT_INITIALIZED' },
       }),
-      /Codespace repo is not provisioned yet/i,
+      /Codespace is not provisioned yet/i,
       undefined,
     ],
     [
@@ -74,7 +76,7 @@ describe('WorkspacePanel basic states', () => {
       codespaceUrl: 'http://codespace',
     });
     renderPanel();
-    await screen.findByText(/Workspace is ready/i);
+    await screen.findByText(/GitHub Codespace ready/i);
     await userEvent
       .setup()
       .click(screen.getByRole('button', { name: /Refresh/i }));
@@ -90,6 +92,6 @@ describe('WorkspacePanel basic states', () => {
     await userEvent
       .setup()
       .click(screen.getByRole('button', { name: /Refresh/i }));
-    await screen.findByText(/Codespace provisioning is underway/i);
+    await screen.findByText(/Your GitHub Codespace is provisioning/i);
   });
 });

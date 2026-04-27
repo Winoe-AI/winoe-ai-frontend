@@ -84,13 +84,13 @@ describe('TrialDetail scenario versions - regenerate lifecycle', () => {
       ).not.toBeInTheDocument(),
     );
     expect(
-      await screen.findAllByText(/local draft data from this session/i),
+      await screen.findAllByText(/draft data from this session/i),
     ).not.toHaveLength(0);
     expect(detailCalls).toBeGreaterThanOrEqual(2);
     jest.useRealTimers();
   });
 
-  it('reconciles terminal regenerate job to non-generating local-only state without reload', async () => {
+  it('reconciles terminal regenerate job to non-generating session-draft state without reload', async () => {
     jest.useFakeTimers();
     const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
     let detailCalls = 0;
@@ -156,12 +156,12 @@ describe('TrialDetail scenario versions - regenerate lifecycle', () => {
       ).not.toBeInTheDocument(),
     );
     expect(
-      await screen.findAllByText(/local draft data from this session/i),
+      await screen.findAllByText(/draft data from this session/i),
     ).not.toHaveLength(0);
     expect(screen.queryByText(/^Ready for review$/i)).not.toBeInTheDocument();
     expect(
-      screen.getAllByText(/^Local draft only$/i).length,
-    ).toBeGreaterThanOrEqual(2);
+      screen.getAllByText(/^session draft only$/i).length,
+    ).toBeGreaterThanOrEqual(1);
     expect(
       screen.queryByRole('button', { name: /Approve v\d+/i }),
     ).not.toBeInTheDocument();

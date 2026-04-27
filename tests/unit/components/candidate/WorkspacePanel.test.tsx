@@ -18,7 +18,9 @@ describe('WorkspacePanel ready states', () => {
     });
     renderWorkspacePanel(12, 34);
 
-    expect(await screen.findByText(/Workspace is ready/i)).toBeInTheDocument();
+    expect(
+      await screen.findByText(/GitHub Codespace ready/i),
+    ).toBeInTheDocument();
     expect(statusMock).toHaveBeenCalledWith({
       taskId: 12,
       candidateSessionId: 34,

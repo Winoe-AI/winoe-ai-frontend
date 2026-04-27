@@ -74,7 +74,7 @@ describe('useScenarioVersionDerived', () => {
         localOnlyVersion as never,
         'Scenario v1',
       ),
-    ).toMatch(/local draft data from this session/i);
+    ).toMatch(/draft data from this session/i);
     expect(
       scenarioEditorDisabledReason(
         localOnlyVersion as never,

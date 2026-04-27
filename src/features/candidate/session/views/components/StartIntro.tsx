@@ -6,8 +6,8 @@ export function StartIntro({ title, role }: Props) {
       <h1 className="text-lg font-semibold text-gray-900">{title}</h1>
       <div className="text-sm text-gray-600">Role: {role}</div>
       <div className="text-xs text-gray-500">
-        5-day trial over 5 consecutive days. Days 2 and 3 open in GitHub
-        Codespaces from 9:00 AM–5:00 PM local time. Complete each day in order.
+        5-day trial over 5 consecutive days. Days 2 and 3 run in the GitHub
+        Codespace from 9:00 AM–5:00 PM local time. Complete each day in order.
       </div>
     </div>
   );

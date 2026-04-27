@@ -116,10 +116,10 @@ describe('WorkspacePanel codespace fallback guidance', () => {
         candidateSessionId: 30 + dayIndex,
         dayIndex,
       });
-      await screen.findByText(/Workspace is ready/i);
+      await screen.findByText(/GitHub Codespace ready/i);
       expect(
         screen.getByText(
-          /Only commits pushed to the official repo before cutoff are evaluated\./i,
+          /The official Trial repository and its Codespace are the source of truth\. Only commits pushed before cutoff are evaluated\./i,
         ),
       ).toBeInTheDocument();
     },

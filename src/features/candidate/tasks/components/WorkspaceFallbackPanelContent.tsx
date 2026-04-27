@@ -62,6 +62,10 @@ export function WorkspaceFallbackPanelContent({
         GitHub Codespaces are the only supported workspace for this trial. Retry
         while the shared Codespace finishes provisioning.
       </p>
+      <p className="mt-2 text-xs text-amber-900">
+        Use the Codespace link as soon as it appears. Do not switch to another
+        environment.
+      </p>
     </section>
   );
 }

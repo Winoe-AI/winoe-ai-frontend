@@ -16,7 +16,8 @@ export function LatestArtifacts({ day2, day3, loading = false }: Props) {
         Latest GitHub artifacts (Day 2 / Day 3)
       </div>
       <div className="text-xs text-gray-600">
-        Shows the newest Day 2 and Day 3 submissions by submitted time.
+        Shows the newest Day 2 and Day 3 evidence from the official Trial
+        repository and Codespace-captured work.
       </div>
       <div className="mt-3 flex flex-col gap-3 md:grid md:grid-cols-2">
         <Slot label="Day 2" artifact={day2} loading={loading} />

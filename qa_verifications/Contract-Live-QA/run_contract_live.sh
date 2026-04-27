@@ -4,6 +4,9 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 QA_ROOT="$SCRIPT_DIR"
 REPO_ROOT="$(cd "$QA_ROOT/../.." && pwd)"
+BACKEND_DIR="$REPO_ROOT/../winoe-backend"
+FRONTEND_ENV_FILE="$REPO_ROOT/.env.local"
+BACKEND_ENV_FILE="$BACKEND_DIR/.env"
 LATEST_DIR="$QA_ROOT/contract_live_qa_latest"
 REPORT_MD="$LATEST_DIR/contract_live_qa_report.md"
 TIMESTAMP="${CONTRACT_LIVE_TIMESTAMP:-$(date +%Y%m%dT%H%M%S)}"
@@ -25,11 +28,128 @@ declare -a FAILURES=()
 
 mkdir -p "$ARTIFACTS_ROOT" "$EVIDENCE_DIR" "$STORAGE_DIR"
 
+# Load only the local QA env files. This preserves space-containing values like
+# WINOE_AUTH0_SCOPE without relying on `source`-ing raw env files.
+source "$SCRIPT_DIR/contract_live_env.sh"
+load_contract_live_local_env "$FRONTEND_ENV_FILE" "$BACKEND_ENV_FILE"
+
 export CONTRACT_LIVE_TIMESTAMP="$TIMESTAMP"
 export CONTRACT_LIVE_ARTIFACTS_DIR="$EVIDENCE_DIR"
 export QA_E2E_STORAGE_DIR="$STORAGE_DIR"
 export CONTRACT_LIVE_BASE_URL="${CONTRACT_LIVE_BASE_URL:-http://localhost:3000}"
+export CONTRACT_LIVE_SCENARIO_GENERATION_RUNTIME_MODE="${CONTRACT_LIVE_SCENARIO_GENERATION_RUNTIME_MODE:-demo}"
 export WINOE_EMAIL_PROVIDER="${WINOE_EMAIL_PROVIDER:-console}"
+STACK_BOOTSTRAP_PID=""
+STACK_BOOTSTRAP_LOG="$ARTIFACTS_ROOT/stack-bootstrap.log"
+
+start_clean_local_stack() {
+  if [[ -n "${STACK_BOOTSTRAP_PID:-}" ]] && kill -0 "$STACK_BOOTSTRAP_PID" >/dev/null 2>&1; then
+    return 0
+  fi
+
+  echo "Bootstrapping clean local stack with run_contract_live_stack.sh" | tee -a "$RUNNER_LOG"
+  bash "$QA_ROOT/run_contract_live_stack.sh" >"$STACK_BOOTSTRAP_LOG" 2>&1 &
+  STACK_BOOTSTRAP_PID=$!
+  echo "$STACK_BOOTSTRAP_PID" >"$ARTIFACTS_ROOT/stack-bootstrap.pid"
+}
+
+wait_for_http_ready() {
+  local url="$1"
+  local label="$2"
+  local deadline=$((SECONDS + 180))
+  local port="${url##*:}"
+  port="${port%%/*}"
+  while (( SECONDS < deadline )); do
+    if curl -fsS "$url" >/dev/null 2>&1; then
+      return 0
+    fi
+    if [[ -n "${STACK_BOOTSTRAP_PID:-}" ]] && ! kill -0 "$STACK_BOOTSTRAP_PID" >/dev/null 2>&1; then
+      {
+        echo "${label} stack bootstrap exited before ${url} became ready."
+        echo "Bootstrap log: ${STACK_BOOTSTRAP_LOG}"
+        if [[ -f "$STACK_BOOTSTRAP_LOG" ]]; then
+          echo "--- stack bootstrap log tail ---"
+          tail -n 80 "$STACK_BOOTSTRAP_LOG"
+          echo "--- end stack bootstrap log tail ---"
+        fi
+      } >&2
+      exit 1
+    fi
+    sleep 2
+  done
+
+  local listener_info=""
+  if command -v lsof >/dev/null 2>&1; then
+    local pids
+    mapfile -t pids < <(lsof -nP -ti tcp:"$port" 2>/dev/null | sort -u)
+    if [[ "${#pids[@]}" -gt 0 ]]; then
+      local pid command_line
+      for pid in "${pids[@]}"; do
+        command_line="$(ps -p "$pid" -o command= 2>/dev/null | xargs || true)"
+        listener_info+=$'\n'"- PID ${pid}: ${command_line:-<unknown>}"
+      done
+    fi
+  fi
+
+  {
+    echo "${label} is not responding at ${url}."
+    if [[ -n "$listener_info" ]]; then
+      echo "Listening processes:"
+      echo "$listener_info"
+    else
+      echo "No process is listening on port ${port}."
+    fi
+    if [[ -f "$STACK_BOOTSTRAP_LOG" ]]; then
+      echo "Bootstrap log: ${STACK_BOOTSTRAP_LOG}"
+      echo "--- stack bootstrap log tail ---"
+      tail -n 80 "$STACK_BOOTSTRAP_LOG"
+      echo "--- end stack bootstrap log tail ---"
+    fi
+  } >&2
+  exit 1
+}
+
+auth_login_preflight() {
+  local label="$1"
+  local url="$2"
+  local headers_file
+  local body_file
+  headers_file="$(mktemp "$ARTIFACTS_ROOT/${label,,}-auth-headers.XXXXXX")"
+  body_file="$(mktemp "$ARTIFACTS_ROOT/${label,,}-auth-body.XXXXXX")"
+  local status_code
+  status_code="$(curl -sS -D "$headers_file" -o "$body_file" -w '%{http_code}' "$url" || true)"
+
+  local evidence_file="$EVIDENCE_DIR/${label}-auth-preflight.txt"
+  {
+    echo "URL: $url"
+    echo "Status: ${status_code:-<empty>}"
+    echo "--- headers ---"
+    cat "$headers_file"
+    echo "--- body (first 120 lines) ---"
+    sed -n '1,120p' "$body_file"
+  } >"$evidence_file"
+
+  rm -f "$headers_file" "$body_file"
+
+  if [[ ! "$status_code" =~ ^[23][0-9][0-9]$ ]]; then
+    {
+      echo "${label} auth preflight failed for ${url}."
+      echo "Expected a 2xx or 3xx response, got ${status_code:-<empty>}."
+      echo "Evidence: ${evidence_file}"
+    } >&2
+    exit 1
+  fi
+}
+
+cleanup_stack_bootstrap() {
+  local exit_code=$?
+  if [[ -n "${STACK_BOOTSTRAP_PID:-}" ]]; then
+    kill "$STACK_BOOTSTRAP_PID" >/dev/null 2>&1 || true
+    wait "$STACK_BOOTSTRAP_PID" >/dev/null 2>&1 || true
+  fi
+  exit "$exit_code"
+}
+trap cleanup_stack_bootstrap EXIT INT TERM
 
 status_label() {
   local status="$1"
@@ -180,6 +300,16 @@ echo "Auth bootstrap: real Auth0 browser login" | tee -a "$RUNNER_LOG"
 echo "Driver sequence: ${DRIVER_SEQUENCE_RAW:-<none>}" | tee -a "$RUNNER_LOG"
 echo | tee -a "$RUNNER_LOG"
 
+start_clean_local_stack
+wait_for_http_ready "http://localhost:3000" "Frontend"
+wait_for_http_ready "http://localhost:8000/health" "Backend"
+auth_login_preflight \
+  "talent_partner" \
+  "http://localhost:3000/auth/login?mode=talent_partner&returnTo=%2Fdashboard"
+auth_login_preflight \
+  "candidate" \
+  "http://localhost:3000/auth/login?mode=candidate&returnTo=%2Fcandidate%2Fdashboard"
+
 if ! run_with_log \
   "playwright_access_and_bootstrap" \
   "$EVIDENCE_DIR/playwright-run.log" \
@@ -194,17 +324,51 @@ elif [[ -z "${DRIVER_SEQUENCE_RAW// }" ]]; then
   echo "No live flow driver commands requested." | tee -a "$RUNNER_LOG"
   record_status "live_flow_driver" 99 0
 else
+  if [[ -f "$EVIDENCE_DIR/api/fresh-live-summary.json" ]]; then
+    export CONTRACT_LIVE_SUMMARY_FILE="$EVIDENCE_DIR/api/fresh-live-summary.json"
+    export CONTRACT_LIVE_INVITE_TOKEN="$(
+      node -e 'const fs = require("fs"); const path = process.argv[1]; const data = JSON.parse(fs.readFileSync(path, "utf8")); process.stdout.write(String(data.inviteToken ?? "").trim())' \
+        "$EVIDENCE_DIR/api/fresh-live-summary.json"
+    )"
+    export CONTRACT_LIVE_TRIAL_ID="$(
+      node -e 'const fs = require("fs"); const path = process.argv[1]; const data = JSON.parse(fs.readFileSync(path, "utf8")); process.stdout.write(String(data.trialId ?? "").trim())' \
+        "$EVIDENCE_DIR/api/fresh-live-summary.json"
+    )"
+    export CONTRACT_LIVE_CANDIDATE_SESSION_ID="$(
+      node -e 'const fs = require("fs"); const path = process.argv[1]; const data = JSON.parse(fs.readFileSync(path, "utf8")); process.stdout.write(String(data.candidateSessionId ?? "").trim())' \
+        "$EVIDENCE_DIR/api/fresh-live-summary.json"
+    )"
+    echo "Loaded fresh live summary into driver env: trial=${CONTRACT_LIVE_TRIAL_ID:-<missing>} candidateSessionId=${CONTRACT_LIVE_CANDIDATE_SESSION_ID:-<missing>}" | tee -a "$RUNNER_LOG"
+  fi
+
   IFS=',' read -r -a DRIVER_COMMANDS <<<"$DRIVER_SEQUENCE_RAW"
   for raw_command in "${DRIVER_COMMANDS[@]}"; do
-    command="$(echo "$raw_command" | xargs)"
-    if [[ -z "$command" ]]; then
+    command_spec="$(echo "$raw_command" | xargs)"
+    if [[ -z "$command_spec" ]]; then
       continue
     fi
-    step_key="live_flow_driver_$(slugify "$command")"
+    command_name="$command_spec"
+    command_arg=""
+    if [[ "$command_spec" == *:* ]]; then
+      command_name="${command_spec%%:*}"
+      command_arg="${command_spec#*:}"
+    fi
+    if [[ -z "$command_name" ]]; then
+      continue
+    fi
+    step_key="live_flow_driver_$(slugify "$command_spec")"
+    command_env=()
+    if [[ "$command_name" == "candidate-day" && -n "$command_arg" ]]; then
+      command_env=(
+        CONTRACT_LIVE_DAY="$command_arg"
+        CONTRACT_LIVE_EXPECT_DAY="$command_arg"
+      )
+    fi
     if ! run_with_log \
       "$step_key" \
       "$EVIDENCE_DIR/${step_key}.log" \
-      bash -lc "cd '$REPO_ROOT' && node 'qa_verifications/Contract-Live-QA/live_flow_driver.mjs' '$command'"; then
+      env "${command_env[@]}" \
+      bash -lc "cd '$REPO_ROOT' && node 'qa_verifications/Contract-Live-QA/live_flow_driver.mjs' '$command_name'"; then
       OVERALL_STATUS="FAIL"
       break
     fi

@@ -87,7 +87,7 @@ describe('candidate error messages', () => {
     expect(friendlyTaskError(new HttpError(410, 'x'))).toBe(
       INVITE_EXPIRED_MESSAGE,
     );
-    expect(friendlyTaskError(new HttpError(0, 'offline'))).toContain(
+    expect(friendlyTaskError(new HttpError(0, 'network'))).toContain(
       'Network error',
     );
     expect(friendlyTaskError(new HttpError(500, 'Custom task'))).toBe(

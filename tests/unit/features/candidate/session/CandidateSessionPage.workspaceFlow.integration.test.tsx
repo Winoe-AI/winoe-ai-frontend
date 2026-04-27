@@ -130,6 +130,8 @@ describe('CandidateSessionPage shared coding workspace flow', () => {
         /Workspace mismatch detected between Day 2 and Day 3/i,
       ),
     ).toBeInTheDocument();
-    expect(screen.queryByRole('link', { name: /Open Codespace/i })).toBeNull();
+    expect(
+      screen.getByRole('link', { name: /Open Codespace/i }),
+    ).toHaveAttribute('href', 'https://codespaces.new/acme/day3');
   });
 });

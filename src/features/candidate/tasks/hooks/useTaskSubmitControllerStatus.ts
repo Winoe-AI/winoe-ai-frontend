@@ -39,7 +39,7 @@ export function deriveTaskSubmitStatus({
   const disabledReason = readOnly
     ? (actionGate.disabledReason ??
       (cutoffClosed
-        ? 'Day closed. Work after cutoff will not be considered.'
+        ? 'Day closed. The Codespace is read-only after cutoff.'
         : null))
     : null;
   const statusHasDurableRecord = Boolean(

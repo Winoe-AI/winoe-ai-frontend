@@ -22,6 +22,13 @@ type LiveIdentity = {
   returnTo: string;
 };
 
+const REQUIRED_QA_AUTH_ENV_KEYS = [
+  'QA_E2E_TALENT_PARTNER_EMAIL',
+  'QA_E2E_TALENT_PARTNER_PASSWORD',
+  'QA_E2E_CANDIDATE_EMAIL',
+  'QA_E2E_CANDIDATE_PASSWORD',
+] as const;
+
 async function loadEnvMapFrom(paths: string[]): Promise<EnvMap> {
   const merged: EnvMap = {};
   for (const envPath of paths) {
@@ -38,13 +45,7 @@ async function loadEnvMapFrom(paths: string[]): Promise<EnvMap> {
 function resolveSupportedEnvPaths(repoRoot: string): string[] {
   return [
     path.join(repoRoot, '.env.local'),
-    path.join(repoRoot, '.env'),
-    path.resolve(repoRoot, '..', '.env.local'),
-    path.resolve(repoRoot, '..', '.env'),
-    path.resolve(repoRoot, '..', 'Winoe-Envs', '.env.local'),
-    path.resolve(repoRoot, '..', 'Winoe-Envs', '.env'),
-    path.resolve(repoRoot, '..', '..', 'Winoe-Envs', '.env.local'),
-    path.resolve(repoRoot, '..', '..', 'Winoe-Envs', '.env'),
+    path.resolve(repoRoot, '..', 'winoe-backend', '.env'),
   ];
 }
 
@@ -53,6 +54,17 @@ function requireEnv(key: string, envMap: EnvMap): string {
   if (value) return value;
   throw new Error(
     `Contract-live requires ${key}. Set it in the environment or one of the supported local env files.`,
+  );
+}
+
+function validateRequiredQaAuthEnv(envMap: EnvMap): void {
+  const missing = REQUIRED_QA_AUTH_ENV_KEYS.filter(
+    (key) => !readEnv(key, envMap),
+  );
+  if (missing.length === 0) return;
+
+  throw new Error(
+    `Contract-live browser QA requires real Auth0 QA credentials. Missing: ${missing.join(', ')}. Set them in the environment or one of the supported local env files before rerunning the lane.`,
   );
 }
 
@@ -117,7 +129,9 @@ async function clickPrimaryAuthButton(page: Page): Promise<void> {
   for (const selector of selectors) {
     const button = page.locator(selector).first();
     if (await button.count()) {
-      await button.click();
+      await button.evaluate((el) => {
+        (el as HTMLElement).click();
+      });
       return;
     }
   }
@@ -162,7 +176,15 @@ async function maybeApproveConsent(
     )
     .first();
   if (await isVisible(approveButton)) {
-    await approveButton.click();
+    try {
+      await approveButton.click({ noWaitAfter: true, force: true });
+    } catch {
+      if (new URL(page.url()).origin !== baseOrigin) {
+        throw new Error(
+          `Failed to approve Auth0 consent while on ${page.url()}.`,
+        );
+      }
+    }
   }
 }
 
@@ -203,6 +225,36 @@ async function createStorageState(params: {
   }
 }
 
+async function reuseStorageStateIfAvailable(params: {
+  storagePath: string;
+  sourcePath?: string | null;
+}): Promise<boolean> {
+  const { storagePath, sourcePath } = params;
+  if (sourcePath) {
+    try {
+      const resolvedSource = path.resolve(sourcePath);
+      const sourceExists = await fs
+        .access(resolvedSource)
+        .then(() => true)
+        .catch(() => false);
+      if (sourceExists) {
+        const samePath = path.resolve(storagePath) === resolvedSource;
+        if (!samePath) {
+          await fs.copyFile(resolvedSource, storagePath);
+        }
+        return true;
+      }
+    } catch {
+      // Fall back to interactive creation below.
+    }
+  }
+
+  return await fs
+    .access(storagePath)
+    .then(() => true)
+    .catch(() => false);
+}
+
 export default async function globalSetup(config: FullConfig) {
   const repoRoot = path.resolve(__dirname, '..', '..', '..');
   const envMap = await loadEnvMapFrom(resolveSupportedEnvPaths(repoRoot));
@@ -210,9 +262,21 @@ export default async function globalSetup(config: FullConfig) {
   const storageDir = resolveStorageDir(repoRoot);
 
   await fs.mkdir(storageDir, { recursive: true });
+  validateRequiredQaAuthEnv(envMap);
 
   for (const role of ['talent_partner', 'candidate'] as const) {
     const identity = resolveIdentity(role, envMap);
+    const sourcePath =
+      role === 'talent_partner'
+        ? readEnv('CONTRACT_LIVE_TALENT_PARTNER_STORAGE_STATE', envMap)
+        : readEnv('CONTRACT_LIVE_CANDIDATE_STORAGE_STATE', envMap);
+    const reused = await reuseStorageStateIfAvailable({
+      storagePath: path.join(storageDir, identity.fileName),
+      sourcePath,
+    });
+    if (reused) {
+      continue;
+    }
     await createStorageState({
       baseURL,
       identity,

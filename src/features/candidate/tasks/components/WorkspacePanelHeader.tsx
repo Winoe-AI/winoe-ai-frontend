@@ -17,12 +17,12 @@ export function WorkspacePanelHeader({
     <div className="flex items-start justify-between gap-3">
       <div>
         <div className="text-sm font-semibold text-gray-900">
-          Coding workspace
+          Codespace workspace
         </div>
         <div className="text-xs text-gray-600">
           {readOnly
             ? 'Workspace actions are paused while this day is closed.'
-            : 'Day 2 and Day 3 open in GitHub Codespaces only.'}
+            : 'Day 2 and Day 3 implementation work must happen in GitHub Codespaces only.'}
         </div>
       </div>
       <Button

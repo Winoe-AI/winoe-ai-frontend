@@ -30,7 +30,7 @@ function statusClass(status: ScenarioUiStatus): string {
 function availabilityLabel(
   availability: ScenarioVersionItem['contentAvailability'],
 ): string {
-  if (availability === 'local_only') return 'local only';
+  if (availability === 'local_only') return 'session draft only';
   if (availability === 'unavailable') return 'content unavailable';
   return 'canonical';
 }

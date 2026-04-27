@@ -115,7 +115,7 @@ exports[`CandidateSessionView scheduling states renders scheduling confirm state
       <p
         class="mt-1 text-sm text-gray-600"
       >
-        Confirm your local schedule before starting Infra Trial (Backend Engineer).
+        Confirm your schedule before starting Infra Trial (Backend Engineer).
       </p>
     </div>
     <div
@@ -268,7 +268,7 @@ exports[`CandidateSessionView scheduling states renders scheduling form state 1`
       <p
         class="mt-1 text-sm text-gray-600"
       >
-        Confirm your local schedule before starting Infra Trial (Backend Engineer).
+        Confirm your schedule before starting Infra Trial (Backend Engineer).
       </p>
     </div>
     <div

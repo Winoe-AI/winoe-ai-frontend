@@ -7,13 +7,13 @@ export function buildWorkspaceMessage(
   const codespaceReady = Boolean(workspace?.codespaceUrl);
 
   if (!repoReady && !codespaceReady) {
-    return 'Codespace provisioning is underway.';
+    return 'Your GitHub Codespace is provisioning.';
   }
   if (repoReady && !codespaceReady) {
-    return 'Repository is ready. Codespace link will appear when ready.';
+    return 'Repository is ready. Waiting for the GitHub Codespace link.';
   }
   if (repoReady && codespaceReady) {
-    return 'Workspace is ready.';
+    return 'GitHub Codespace ready.';
   }
   return 'Codespace status is updating.';
 }
