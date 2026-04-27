@@ -157,4 +157,3 @@ No current user-facing candidate or Talent Partner UI copy in the active fronten
 - Frontend QA harness changes are in scope.
 - Backend local/test support changes are not present in the current diff.
 - The unrelated backend compare-summary behavior change is not in scope.
-

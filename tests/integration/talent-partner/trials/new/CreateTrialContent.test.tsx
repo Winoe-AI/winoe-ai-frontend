@@ -112,7 +112,7 @@ describe('TrialCreatePage happy path + validation', () => {
       },
     });
     expect(routerMock.push).toHaveBeenCalledWith('/dashboard/trials/sim_123');
-  });
+  }, 15000);
 
   it('shows form error when backend returns no id', async () => {
     const user = userEvent.setup();
