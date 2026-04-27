@@ -28,7 +28,8 @@ export function SchedulingView({
       <div>
         <h1 className="text-lg font-semibold">Pick your start date</h1>
         <p className="mt-1 text-sm text-gray-600">
-          Confirm your schedule before starting {title || 'your trial'}
+          Choose when your 5-day Trial begins. Trial content unlocks only when
+          Day 1 opens for {title || 'your Trial'}
           {role ? ` (${role})` : ''}.
         </p>
       </div>
@@ -54,6 +55,8 @@ export function SchedulingView({
           scheduleDateError={rest.scheduleDateError}
           scheduleTimezoneError={rest.scheduleTimezoneError}
           scheduleGithubUsernameError={rest.scheduleGithubUsernameError}
+          schedulePreviewWindows={rest.schedulePreviewWindows}
+          scheduleCanContinue={rest.scheduleCanContinue}
           onScheduleDateChange={rest.onScheduleDateChange}
           onScheduleTimezoneChange={rest.onScheduleTimezoneChange}
           onScheduleGithubUsernameChange={rest.onScheduleGithubUsernameChange}

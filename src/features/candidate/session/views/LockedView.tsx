@@ -36,8 +36,9 @@ export function LockedView({
       <div>
         <h1 className="text-lg font-semibold">Trial locked until start</h1>
         <p className="mt-1 text-sm text-gray-600">
-          {title || 'Your trial'}
-          {role ? ` (${role})` : ''} opens when Day 1 starts.
+          {title || 'Your Trial'}
+          {role ? ` (${role})` : ''} opens when Day 1 starts. Come back at the
+          scheduled opening time.
         </p>
       </div>
 

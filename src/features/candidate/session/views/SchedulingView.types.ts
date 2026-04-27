@@ -14,6 +14,7 @@ export type SchedulingViewProps = {
   scheduleGithubUsernameError: string | null;
   scheduleSubmitError: string | null;
   schedulePreviewWindows: CandidateDayWindow[];
+  scheduleCanContinue: boolean;
   onScheduleDateChange: (value: string) => void;
   onScheduleTimezoneChange: (value: string) => void;
   onScheduleGithubUsernameChange: (value: string) => void;

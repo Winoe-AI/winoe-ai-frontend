@@ -71,7 +71,36 @@ export const sampleWindows = [
     windowStartAt: '2099-01-02T14:00:00Z',
     windowEndAt: '2099-01-02T22:00:00Z',
   },
+  {
+    dayIndex: 3,
+    windowStartAt: '2099-01-03T14:00:00Z',
+    windowEndAt: '2099-01-03T22:00:00Z',
+  },
+  {
+    dayIndex: 4,
+    windowStartAt: '2099-01-04T14:00:00Z',
+    windowEndAt: '2099-01-04T22:00:00Z',
+  },
+  {
+    dayIndex: 5,
+    windowStartAt: '2099-01-05T14:00:00Z',
+    windowEndAt: '2099-01-05T22:00:00Z',
+  },
 ];
+
+export const scheduleDayLabels = [
+  'Day 1 — Planning & Design Doc',
+  'Day 2 — Implementation Kickoff',
+  'Day 3 — Implementation Wrap-Up',
+  'Day 4 — Handoff + Demo',
+  'Day 5 — Reflection Essay',
+];
+
+export function expectAllScheduleDaysVisible() {
+  for (const label of scheduleDayLabels) {
+    expect(screen.getByText(label)).toBeInTheDocument();
+  }
+}
 
 export const fillScheduleAndContinue = async (user: UserEvent) => {
   expect(await screen.findByText(/Pick your start date/i)).toBeInTheDocument();

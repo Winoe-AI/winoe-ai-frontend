@@ -1,159 +1,147 @@
-# PR: Remove offline/local work copy and enforce Codespace-only messaging throughout candidate UI
+# PR: Implement candidate start-date scheduling UI
 
 ## Linked Issue
 
-- Winoe-AI/winoe-ai-frontend issue #194
+- Winoe-AI/winoe-ai-frontend issue #181
 
 ## Summary
 
-This PR removes offline/local-work permission copy from candidate and Talent Partner surfaces, enforces Codespace-only messaging for Day 2 and Day 3, and makes the Codespace URL/card the primary work environment in the candidate UI.
+This PR implements the candidate start-date scheduling UI after invite claim/session bootstrap. It shows "Pick your start date", detects and displays the candidate timezone with a UTC fallback, renders a 5-day Trial preview, rejects past dates client-side, requires a GitHub username before scheduling, requires confirmation before schedule submission, and shows a locked countdown after scheduling.
 
-The Talent Partner submission review copy now frames evidence as coming from the official Trial repository and Codespace-captured work.
+The scheduling and locked states prevent Trial content from appearing before Day 1 opens. The copy also preserves from-scratch terminology and avoids retired terms.
 
-The contract-live QA harness also now runs the full Day 1 -> Day 2 -> Day 3 -> Talent Partner review proof deterministically on the local demo-mode backend, while preserving environment discipline:
+## Acceptance Criteria
 
-- local QA sources local env files only
-- prod env files are not sourced
-- dev-auth bypass is not used
-- backend demo fallback is env-controlled only
+- [x] Pick your start date shown after invite claim/session bootstrap
+- [x] Timezone-aware date picker with 5-day preview
+- [x] Past dates rejected with clear message
+- [x] Confirmation step before finalizing
+- [x] After scheduling: countdown with date, time, and timezone
+- [x] No Trial content visible before Day 1 opens
 
-## What Changed
+## Implementation Notes
 
-### Frontend product changes
+Key implementation areas:
 
-- Removed offline/local-work permission copy from candidate-facing and Talent Partner-facing UI.
-- Updated Day 2 and Day 3 informational text to emphasize Codespace-only workflow.
-- Promoted the Codespace URL/card so it is the primary work environment for Day 2 and Day 3.
-- Updated Talent Partner submission review copy to reference the official Trial repository and Codespace-captured work.
+- `src/features/candidate/session/views/SchedulingView.tsx`
+- `src/features/candidate/session/views/SchedulingFormStep.tsx`
+- `src/features/candidate/session/views/SchedulingConfirmStep.tsx`
+- `src/features/candidate/session/views/LockedView.tsx`
+- `src/features/candidate/session/views/LockedViewCountdownCard.tsx`
+- `src/features/candidate/session/views/LockedViewDayWindows.tsx`
+- `src/features/candidate/session/hooks/controller/useCandidateSessionSchedule.ts`
+- `src/features/candidate/session/hooks/controller/useCandidateSessionScheduleDraft.ts`
+- `src/features/candidate/session/api/scheduleApi.ts`
+- candidate session route/controller prop plumbing
+- focused tests and fixture updates
 
-### Frontend QA harness changes
-
-- Improved the contract-live harness so the full sequence runs deterministically on the local demo-mode backend.
-- Kept the harness aligned with the day-by-day proof flow:
-  - `talent_partner-fresh`
-  - `candidate-schedule`
-  - `candidate-day:1`
-  - `candidate-day:2`
-  - `candidate-day:3`
-  - `talent_partner-review`
-- Verified the flow with `trialId=1` and `candidateSessionId=1`.
-
-### Backend scope
-
-- No backend files remain changed in the current diff.
-- The unrelated backend compare-summary behavior change was reverted and is not part of this PR.
-
-## Files Changed
-
-### Frontend
-
-- `pr.md`
-
-### Backend
-
-- None in the current diff.
+`githubUsername` remains required by validation and by `scheduleApi.ts`.
 
 ## QA Evidence
 
-Evidence bundle:
+### Environment
 
-- `qa_verifications/Contract-Live-QA/contract_live_qa_latest/artifacts/20260426T201813`
+- Backend API was already listening on `:8000`; `/health` returned `{"status":"ok"}`
+- Backend worker started with `bash scripts/local_qa_backend.sh worker`
+- Frontend started with `./runFrontend.sh`
+- Next served `http://localhost:3000` with `.env.local`
+- `FRONTEND_QA_PLAYBOOK.md` was not present, so repo README/local dev guidance was followed
 
-Full contract-live sequence passed:
+### Session Path
 
-- `talent_partner-fresh,candidate-schedule,candidate-day:1,candidate-day:2,candidate-day:3,talent_partner-review`
+- Supplied Candidate account: `robiemelaku@gmail.com`
+- Supplied Talent Partner account: `robel.kebede@bison.howard.edu`
+- Local backend had no existing trials/invites for supplied accounts
+- A backend Trial was created, but live invite/session setup was blocked by backend `scenario_generation_llm_failed`
+- Browser QA used a Playwright-authenticated candidate session with routed `/api/backend/candidate/session/...` responses
+- This verified the real frontend scheduling UI, validation, confirmation, locked state, direct navigation behavior, and schedule request payload
+- A true live backend schedule mutation was not verified because of the backend scenario-generation blocker
 
-Trial/session:
+### Browser QA Results
 
-- `trialId=1`
-- `candidateSessionId=1`
+- PASS: "Pick your start date" shown after candidate session bootstrap; no automatic Day 1 content
+- PASS: timezone field populated as `America/New_York`
+- PASS: 5-day preview shown with:
+  - Day 1 - Planning & Design Doc
+  - Day 2 - Implementation Kickoff
+  - Day 3 - Implementation Wrap-Up
+  - Day 4 - Handoff + Demo
+  - Day 5 - Reflection Essay
+- PASS: past date `2026-04-26` rejected with `Start date cannot be in the past.`
+- PASS: Continue disabled / blocked for invalid past date
+- PASS: no schedule request sent for invalid past date
+- PASS: blank GitHub username blocked with `Enter your GitHub username.`
+- PASS: no schedule request sent until username was valid
+- PASS: confirmation step shown before submission
+- PASS: schedule request count stayed 0 until `Confirm schedule`
+- PASS: after confirmation, locked/countdown state shown with date, time, timezone, and "Come back then"
+- PASS: direct navigation back to `/candidate/session/qa-issue-181-schedule-token-0001` still showed locked state
+- PASS: locked state did not expose Project Brief, scenario, repository URL, Codespace URL, Day 1 editor, Start Trial, current task, or Trial work content
+- PASS: no forbidden terms visible in scheduling/locked surfaces:
+  - Tenon
+  - SimuHire
+  - recruiter
+  - simulation
+  - Fit Profile
+  - Fit Score
+  - template
+  - precommit
+  - Specializor
+  - existing codebase
+  - read-only repository exploration
+  - offline/local work
 
-### Day 2 evidence
+### Network/API Evidence
 
-- Route: `http://localhost:3000/candidate/session/3ayfNEd6d5ySAKUM5FmBH8n2fsODfbxF3-r6mMP6Te4`
-- Screenshot: `candidate-day2-after.png`
-- Verified text:
-  - `Codespace workspace`
-  - `Day 2 and Day 3 implementation work must happen in GitHub Codespaces only.`
-  - `PRIMARY WORK ENVIRONMENT`
-  - `Open Codespace`
-  - `Use this Codespace for all Day 2 and Day 3 implementation work.`
+Schedule POST endpoint observed:
 
-### Day 3 evidence
-
-- Route: `http://localhost:3000/candidate/session/3ayfNEd6d5ySAKUM5FmBH8n2fsODfbxF3-r6mMP6Te4`
-- Screenshot: `candidate-day3-after.png`
-- Verified text:
-  - `Codespace workspace`
-  - Codespace-only implementation language
-  - `PRIMARY WORK ENVIRONMENT`
-  - `Open Codespace`
-  - `Implementation Wrap-Up`
-
-### Talent Partner review evidence
-
-- Route: `http://localhost:3000/dashboard/trials/1/candidates/1`
-- Screenshot: `talent_partner-submissions-page.png`
-- Verified text:
-  - `Latest GitHub artifacts (Day 2 / Day 3)`
-  - `official Trial repository and Codespace-captured work`
-  - no offline/local permission copy
-
-## Checks
-
-Frontend:
-
-- `npm run lint` - pass
-- `npm run typecheck` - pass
-- targeted Jest suite - pass
-  - `tests/unit/shared/ui/IntegrityCallout.test.tsx`
-  - `tests/unit/features/talent-partner/submission-review/ArtifactCard.test.tsx`
-  - `tests/unit/features/candidate/session/views/WorkspaceAndTests.test.tsx`
-  - `tests/unit/features/candidate/tasks/CodespaceFallbackPanel.test.tsx`
-  - `tests/unit/features/candidate/session/CandidateSessionView.schedule.test.tsx`
-- Full precommit - pass
-
-Backend:
-
-- `python3 -m py_compile ...` - pass for changed backend files
-- `bash -n runBackend.sh` - pass
-- targeted backend pytest - pass if backend files remain changed
-- Not applicable in the current diff because no backend files remain changed.
-
-## Forbidden-Term Scan
-
-Exact command:
-
-```bash
-rg -n -i "offline|local work|work locally|work offline|local-only|offline/local" src tests qa_verifications pr.md
+```text
+/api/backend/candidate/session/qa-issue-181-schedule-token-0001/schedule
 ```
 
-Result:
+Payload:
 
-- One stale mention in `pr.md` before this rewrite.
-- `tests/*` hits only use `new TypeError('offline')` as a technical failure fixture.
-- `qa_verifications/*` hits are archived historical artifacts from earlier bundles, not current product copy.
+```json
+{
+  "scheduledStartAt": "2026-04-29T13:00:00Z",
+  "candidateTimezone": "America/New_York",
+  "githubUsername": "octocat"
+}
+```
 
-No current user-facing candidate or Talent Partner UI copy in the active frontend source tree should mention offline or local work after this PR material update.
+This matches 9:00 AM America/New_York on April 29, 2026 converted to UTC.
 
-## Acceptance Criteria Checklist
+### Screenshots
 
-- [x] No UI copy anywhere mentions offline or local work.
-- [x] Day 2 and Day 3 informational text emphasizes Codespace-only workflow.
-- [x] Talent Partner submission review copy removes offline/local permission.
-- [x] Day 2/3 UI prominently displays the Codespace URL as primary work environment.
+- `qa_verifications/issue-181-manual-qa/screenshots/01-scheduling-form.png`
+- `qa_verifications/issue-181-manual-qa/screenshots/02-five-day-preview.png`
+- `qa_verifications/issue-181-manual-qa/screenshots/03-confirmation-step.png`
+- `qa_verifications/issue-181-manual-qa/screenshots/04-locked-countdown.png`
 
-## Risk / Rollback
+## Test / Command Evidence
 
-- The contract-live proof uses env-controlled backend demo mode because Anthropic quota was exhausted.
-- Prod env files were not sourced.
-- Dev-auth bypass was not used.
-- The local QA harness resets and boots a clean local stack to avoid stale port/server issues.
-- Any backend day-window support should be treated as local/test-only QA support, not a production behavior change.
+- PASS `npm run typecheck`
+- PASS `npm run lint:eslint`
+- PASS `npm run lint:prettier`
+- PASS `npm run build`
+- PASS `npm test -- --runInBand tests/unit/features/candidate/session/CandidateSessionView.windowGating.test.tsx`
+- PASS `npm test -- --runInBand tests/unit/features/candidate/session/CandidateSessionView.schedule.test.tsx tests/integration/candidate/CandidateSessionPageClient.behavior.scheduleSuccess.test.tsx tests/integration/candidate/CandidateSessionPageClient.behavior.scheduleValidation.test.tsx tests/integration/candidate/CandidateSessionPageClient.behavior.lockedProxy.test.tsx tests/unit/candidateApi.schedule.test.ts`
+- PASS `git diff --check`
+- PASS `./precommit.sh`
+  - lint passed
+  - full `test:ci` passed: 498 suites, 1533 tests
+  - coverage passed
+  - typecheck passed
+  - build passed
 
-## Scope Confirmation
+## Known Limitations / Follow-up
 
-- Frontend product changes are in scope.
-- Frontend QA harness changes are in scope.
-- Backend local/test support changes are not present in the current diff.
-- The unrelated backend compare-summary behavior change is not in scope.
+- Live full-stack invite/session scheduling mutation was not verified because local backend Trial setup was blocked by `scenario_generation_llm_failed`.
+- Frontend behavior and schedule POST payload were verified with Playwright-routed backend responses.
+- Backend #288 remains the upstream source-of-truth dependency for final production contract behavior and Talent Partner notification.
+
+## PR Risk
+
+Risk is low on frontend UI behavior because focused tests, integration tests, browser QA, and full precommit are green.
+
+Remaining risk is integration-only: backend scenario generation/local invite setup blocked true live backend schedule mutation verification.

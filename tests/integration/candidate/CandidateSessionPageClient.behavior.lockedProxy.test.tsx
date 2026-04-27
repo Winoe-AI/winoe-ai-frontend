@@ -2,10 +2,12 @@ import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {
   baseSession,
+  expectAllScheduleDaysVisible,
   fetchMock,
   renderSessionPage,
   resetBehaviorEnv,
   restoreFetch,
+  sampleWindows,
 } from './CandidateSessionPageClient.behavior.testlib';
 import { jsonResponse } from '../../setup/responseHelpers';
 
@@ -27,13 +29,7 @@ describe('CandidateSessionPage auth flow locked bootstrap and backend proxy', ()
             candidateSessionId: 654,
             scheduledStartAt: '2099-01-01T14:00:00Z',
             candidateTimezone: 'America/New_York',
-            dayWindows: [
-              {
-                dayIndex: 1,
-                windowStartAt: '2099-01-01T14:00:00Z',
-                windowEndAt: '2099-01-01T22:00:00Z',
-              },
-            ],
+            dayWindows: sampleWindows,
             scheduleLockedAt: '2098-12-01T14:00:00Z',
           }),
         );
@@ -44,7 +40,12 @@ describe('CandidateSessionPage auth flow locked bootstrap and backend proxy', ()
     expect(
       await screen.findByText(/Trial locked until start/i),
     ).toBeInTheDocument();
-    expect(screen.getByText(/Day windows/i)).toBeInTheDocument();
+    expect(screen.getByText(/5-day schedule preview/i)).toBeInTheDocument();
+    expectAllScheduleDaysVisible();
+    expect(screen.queryByText(/Project Brief/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Repository URL/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Codespace/i)).not.toBeInTheDocument();
+    expect(screen.queryByLabelText(/Day 1 editor/i)).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /Start trial/i })).toBeNull();
     expect(
       fetchMock.mock.calls.find(([url]) =>

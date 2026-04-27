@@ -61,6 +61,7 @@ export function useCandidateSessionSchedule({
     scheduleGithubUsernameError: draft.scheduleGithubUsernameError,
     scheduleSubmitError: draft.scheduleSubmitError,
     schedulePreviewWindows: draft.schedulePreviewWindows,
+    scheduleCanContinue: draft.scheduleCanContinue,
     scheduleResponseWindows: viewState.scheduleResponseWindows,
     scheduleCurrentDayWindow: viewState.scheduleCurrentDayWindow,
     scheduleCountdownLabel: viewState.scheduleCountdownLabel,

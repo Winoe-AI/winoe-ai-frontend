@@ -32,6 +32,7 @@ export const baseScheduleProps = (): CandidateSessionViewProps => ({
   scheduleTimezoneError: null,
   scheduleGithubUsernameError: null,
   scheduleSubmitError: null,
+  scheduleCanContinue: true,
   schedulePreviewWindows: [
     {
       dayIndex: 1,
@@ -42,6 +43,21 @@ export const baseScheduleProps = (): CandidateSessionViewProps => ({
       dayIndex: 2,
       windowStartAt: '2099-01-02T14:00:00Z',
       windowEndAt: '2099-01-02T22:00:00Z',
+    },
+    {
+      dayIndex: 3,
+      windowStartAt: '2099-01-03T14:00:00Z',
+      windowEndAt: '2099-01-03T22:00:00Z',
+    },
+    {
+      dayIndex: 4,
+      windowStartAt: '2099-01-04T14:00:00Z',
+      windowEndAt: '2099-01-04T22:00:00Z',
+    },
+    {
+      dayIndex: 5,
+      windowStartAt: '2099-01-05T14:00:00Z',
+      windowEndAt: '2099-01-05T22:00:00Z',
     },
   ],
   scheduleResponseWindows: [
@@ -54,6 +70,21 @@ export const baseScheduleProps = (): CandidateSessionViewProps => ({
       dayIndex: 2,
       windowStartAt: '2099-01-02T14:00:00Z',
       windowEndAt: '2099-01-02T22:00:00Z',
+    },
+    {
+      dayIndex: 3,
+      windowStartAt: '2099-01-03T14:00:00Z',
+      windowEndAt: '2099-01-03T22:00:00Z',
+    },
+    {
+      dayIndex: 4,
+      windowStartAt: '2099-01-04T14:00:00Z',
+      windowEndAt: '2099-01-04T22:00:00Z',
+    },
+    {
+      dayIndex: 5,
+      windowStartAt: '2099-01-05T14:00:00Z',
+      windowEndAt: '2099-01-05T22:00:00Z',
     },
   ],
   scheduleCurrentDayWindow: {

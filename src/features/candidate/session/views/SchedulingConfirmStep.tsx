@@ -2,7 +2,9 @@ import Button from '@/shared/ui/Button';
 import type { SchedulingViewProps } from './SchedulingView.types';
 import {
   formatScheduleDate,
+  formatScheduleTime,
   formatScheduleTimeRange,
+  SCHEDULE_DAY_LABELS,
 } from './SchedulingView.format';
 
 type SchedulingConfirmStepProps = Pick<
@@ -31,13 +33,23 @@ export function SchedulingConfirmStep({
     <div className="space-y-4 rounded-md border border-gray-200 p-4">
       <div className="rounded-md border border-blue-200 bg-blue-50 p-3 text-sm text-blue-900">
         <p>
-          Starts on{' '}
+          Your Trial opens on{' '}
           <span className="font-semibold">
             {firstWindow && timezone
               ? formatScheduleDate(firstWindow.windowStartAt, timezone)
               : 'your selected date'}
           </span>{' '}
-          at <span className="font-semibold">9:00 AM (Your time)</span>.
+          at{' '}
+          <span className="font-semibold">
+            {firstWindow && timezone
+              ? `${formatScheduleTime(firstWindow.windowStartAt, timezone)} ${timezone}`
+              : '9:00 AM in your timezone'}
+          </span>
+          .
+        </p>
+        <p className="mt-2">
+          Trial content unlocks only when Day 1 opens. Confirm this schedule
+          before the Talent Partner is notified.
         </p>
       </div>
       <div>
@@ -56,7 +68,10 @@ export function SchedulingConfirmStep({
               key={window.dayIndex}
               className="rounded-md border border-gray-200 p-3 text-sm"
             >
-              <div className="font-medium">Day {window.dayIndex}</div>
+              <div className="font-medium">
+                Day {window.dayIndex} —{' '}
+                {SCHEDULE_DAY_LABELS[window.dayIndex] ?? 'Trial work'}
+              </div>
               <div className="text-gray-700">
                 {timezone
                   ? formatScheduleDate(window.windowStartAt, timezone)
@@ -76,7 +91,11 @@ export function SchedulingConfirmStep({
         </ul>
       </div>
       <div className="flex gap-3 pt-1">
-        <Button variant="secondary" onClick={onScheduleBack}>
+        <Button
+          variant="secondary"
+          disabled={step === 'submitting'}
+          onClick={onScheduleBack}
+        >
           Back
         </Button>
         <Button loading={step === 'submitting'} onClick={onScheduleConfirm}>
