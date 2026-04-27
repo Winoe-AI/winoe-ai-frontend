@@ -19,8 +19,9 @@ test.describe('Candidate Day 3 Flow', () => {
         id: 3,
         dayIndex: 3,
         type: 'code',
-        title: 'Debug and finalize',
-        description: 'Fix bugs and finalize.',
+        title: 'Implementation Wrap-Up',
+        description:
+          'Continue in the same Codespace and repository from Day 2.',
       }),
       nextTaskAfterSubmit: makeCandidateTask({
         id: 4,

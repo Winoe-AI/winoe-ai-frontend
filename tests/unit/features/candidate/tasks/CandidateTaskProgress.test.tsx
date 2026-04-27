@@ -9,12 +9,12 @@ describe('CandidateTaskProgress', () => {
         completedCount={2}
         currentDayIndex={3}
         totalDays={5}
-        currentTaskTitle="Fix bugs"
+        currentTaskTitle="Implementation Wrap-Up"
       />,
     );
 
     expect(screen.getByText(/2\/5 complete/)).toBeInTheDocument();
-    expect(screen.getByText('Fix bugs')).toBeInTheDocument();
+    expect(screen.getByText('Implementation Wrap-Up')).toBeInTheDocument();
     expect(screen.getAllByText('Completed').length).toBeGreaterThan(0);
     expect(screen.getByText('In progress')).toBeInTheDocument();
     expect(screen.getByText(/Complete Day 3 first/)).toBeInTheDocument();

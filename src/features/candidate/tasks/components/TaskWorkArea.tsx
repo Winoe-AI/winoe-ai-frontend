@@ -56,8 +56,9 @@ export function TaskWorkArea({
           </div>
         ) : (
           <div className="rounded-md border border-blue-100 bg-blue-50 p-3 text-sm text-blue-900">
-            Use your Codespace for all implementation work. When you’re ready,
-            submit to move to the next day.
+            {dayIndex === 3
+              ? 'Use the same Codespace and repository from Day 2 for all wrap-up work. When the implementation is ready for handoff, submit to record the final commit SHA.'
+              : 'Use your Codespace for all implementation work. When you’re ready, submit to move to the next day.'}
           </div>
         )
       ) : (

@@ -90,4 +90,20 @@ describe('TaskActions', () => {
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
     expect(onSubmit).toHaveBeenCalledTimes(1);
   });
+
+  it('allows a custom idle submit label', () => {
+    render(
+      <TaskActions
+        isTextTask={false}
+        displayStatus="idle"
+        disabled={false}
+        onSubmit={jest.fn()}
+        submitLabel="Submit Implementation Wrap-Up"
+      />,
+    );
+
+    expect(
+      screen.getByRole('button', { name: /submit implementation wrap-up/i }),
+    ).toBeInTheDocument();
+  });
 });

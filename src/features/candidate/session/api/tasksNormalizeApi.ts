@@ -7,6 +7,10 @@ import {
 } from './tasksNormalize.cutoffApi';
 import { asRecord } from './tasksNormalize.primitivesApi';
 import { findRecordedSubmission } from './tasksNormalize.submissionApi';
+import {
+  DAY3_IMPLEMENTATION_WRAP_UP_DESCRIPTION,
+  DAY3_IMPLEMENTATION_WRAP_UP_TITLE,
+} from '@/features/candidate/tasks/utils/day3ImplementationWrapUpUtils';
 
 export const normalizeTask = (raw: unknown): CandidateTask | null => {
   const rec = asRecord(raw);
@@ -24,11 +28,17 @@ export const normalizeTask = (raw: unknown): CandidateTask | null => {
     readCutoffAt(rec) ??
     (nestedCutoffRecord ? readCutoffAt(nestedCutoffRecord) : null);
 
+  const isDay3 = dayIndex === 3;
+
   return {
     id,
     dayIndex,
-    title: toStringOrNull(rec.title) ?? 'Task',
-    description: toStringOrNull(rec.description) ?? '',
+    title: isDay3
+      ? DAY3_IMPLEMENTATION_WRAP_UP_TITLE
+      : (toStringOrNull(rec.title) ?? 'Task'),
+    description: isDay3
+      ? DAY3_IMPLEMENTATION_WRAP_UP_DESCRIPTION
+      : (toStringOrNull(rec.description) ?? ''),
     type: toStringOrNull(rec.type) ?? 'code',
     recordedSubmission: findRecordedSubmission(rec),
     cutoffCommitSha,

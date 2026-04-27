@@ -12,8 +12,8 @@ export const DAY_SUMMARIES = [
     hint: 'Workspace + tests.',
   },
   {
-    title: 'Debug + iterate',
-    detail: 'Fix issues and ship a clean run.',
+    title: 'Implementation Wrap-Up',
+    detail: 'Finish the build, improve tests, optimize, and document.',
     hint: 'Workspace + tests.',
   },
   {

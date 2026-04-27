@@ -1,5 +1,6 @@
 import type { CandidateCurrentTaskResponse } from '@/features/candidate/session/api';
 import type { Task } from '@/features/candidate/tasks/types';
+import { withDay3ImplementationWrapUpCopy } from '@/features/candidate/tasks/utils/day3ImplementationWrapUpUtils';
 
 export function normalizeCompletedTaskIds(
   dto: CandidateCurrentTaskResponse,
@@ -16,7 +17,7 @@ export function toTask(
   dtoTask: CandidateCurrentTaskResponse['currentTask'],
 ): Task | null {
   if (!dtoTask) return null;
-  return {
+  return withDay3ImplementationWrapUpCopy({
     id: dtoTask.id,
     dayIndex: dtoTask.dayIndex,
     type: dtoTask.type,
@@ -25,7 +26,7 @@ export function toTask(
     recordedSubmission: dtoTask.recordedSubmission ?? null,
     cutoffCommitSha: dtoTask.cutoffCommitSha ?? null,
     cutoffAt: dtoTask.cutoffAt ?? null,
-  };
+  });
 }
 
 export function deriveCurrentDayIndex(
