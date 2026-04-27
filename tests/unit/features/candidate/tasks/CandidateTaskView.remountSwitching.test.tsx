@@ -12,6 +12,7 @@ import {
   primeDraftMocks,
   putCandidateTaskDraftMock,
 } from './CandidateTaskView.testlib';
+import { DAY1_DESIGN_DOC_STARTER } from '@/features/candidate/tasks/utils/day1DesignDocUtils';
 
 describe('CandidateTaskView task switch remount behavior', () => {
   beforeEach(() => {
@@ -79,7 +80,7 @@ describe('CandidateTaskView task switch remount behavior', () => {
     );
     expect(screen.queryByText(/Saving/i)).toBeNull();
     expect(screen.queryByDisplayValue('Task 1 draft text')).toBeNull();
-    expect(screen.getByRole('textbox')).toHaveValue('');
+    expect(screen.getByRole('textbox')).toHaveValue(DAY1_DESIGN_DOC_STARTER);
 
     rerender(
       <CandidateTaskView

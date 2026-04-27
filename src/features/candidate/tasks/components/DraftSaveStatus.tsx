@@ -29,13 +29,13 @@ export const DraftSaveStatus = memo(function DraftSaveStatus({
   if (restoreApplied) parts.push('Draft restored');
 
   if (status === 'saving') {
-    parts.push('Saving…');
+    parts.push('Saving...');
   } else if (status === 'saved') {
     parts.push(
       lastSavedAt ? `Saved at ${formatSavedAt(lastSavedAt)}` : 'Saved',
     );
   } else if (status === 'error') {
-    parts.push('Autosave failed. Keep editing to retry.');
+    parts.push('Save failed. Keep editing to retry.');
   } else if (status === 'disabled' && error) {
     parts.push(error);
   }

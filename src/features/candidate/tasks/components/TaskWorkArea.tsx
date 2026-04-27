@@ -1,11 +1,16 @@
 'use client';
 
 import { TaskTextInput } from './TaskTextInput';
+import { Day1DesignDocWorkspace } from './Day1DesignDocWorkspace';
 
 type TaskWorkAreaProps = {
+  dayIndex: number;
+  projectBrief: string;
+  cutoffAt?: string | null;
   githubNative: boolean;
   readOnly: boolean;
   disabledReason: string | null;
+  draftError: string | null;
   text: string;
   disabled: boolean;
   savedAt: number | null;
@@ -13,14 +18,34 @@ type TaskWorkAreaProps = {
 };
 
 export function TaskWorkArea({
+  dayIndex,
+  projectBrief,
+  cutoffAt,
   githubNative,
   readOnly,
   disabledReason,
+  draftError,
   text,
   disabled,
   savedAt,
   onChangeText,
 }: TaskWorkAreaProps) {
+  if (!githubNative && dayIndex === 1) {
+    return (
+      <Day1DesignDocWorkspace
+        projectBrief={projectBrief}
+        value={text}
+        disabled={disabled}
+        readOnly={readOnly}
+        readOnlyReason={disabledReason}
+        draftError={draftError}
+        savedAt={savedAt}
+        cutoffAt={cutoffAt}
+        onChange={onChangeText}
+      />
+    );
+  }
+
   return (
     <div className="mt-6">
       {githubNative ? (

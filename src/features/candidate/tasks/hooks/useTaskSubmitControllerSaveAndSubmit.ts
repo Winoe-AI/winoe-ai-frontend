@@ -24,6 +24,7 @@ type UseTaskSubmitControllerSaveAndSubmitArgs = {
   setRecordedCodingSubmission: Dispatch<
     SetStateAction<DurableCodingSubmission | null>
   >;
+  onTextSubmitted?: () => void;
 };
 
 export function useTaskSubmitControllerSaveAndSubmit({
@@ -36,6 +37,7 @@ export function useTaskSubmitControllerSaveAndSubmit({
   handleSubmit,
   clearDrafts,
   setRecordedCodingSubmission,
+  onTextSubmitted,
 }: UseTaskSubmitControllerSaveAndSubmitArgs) {
   const [localError, setLocalError] = useState<string | null>(null);
 
@@ -66,9 +68,9 @@ export function useTaskSubmitControllerSaveAndSubmit({
         return;
       }
       setLocalError(null);
-      return clearDraftsIfSubmitted(
-        await handleSubmit({ contentText: trimmed }),
-      );
+      const resp = await handleSubmit({ contentText: trimmed });
+      if (resp !== 'submit-failed') onTextSubmitted?.();
+      return clearDraftsIfSubmitted(resp);
     }
 
     setLocalError(null);
@@ -79,6 +81,7 @@ export function useTaskSubmitControllerSaveAndSubmit({
     disabled,
     githubNative,
     handleSubmit,
+    onTextSubmitted,
     setRecordedCodingSubmission,
     taskId,
     textRef,

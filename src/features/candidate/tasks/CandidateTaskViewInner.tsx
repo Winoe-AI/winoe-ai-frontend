@@ -34,8 +34,12 @@ export function CandidateTaskViewInner({
   });
   const showDay1DraftStatus = controller.textTask && task.dayIndex === 1;
   const showDay5DraftStatus = controller.textTask && task.dayIndex === 5;
+  const isDay1DesignDoc = controller.textTask && task.dayIndex === 1;
+  const comeBackAt = (actionGate ?? DEFAULT_ACTION_GATE).comeBackAt;
+  const hideDay1Actions = isDay1DesignDoc && controller.readOnly && !comeBackAt;
   const draftStatus = TaskDraftStatusSlots({
-    showDay1DraftStatus,
+    showDay1DraftStatus:
+      showDay1DraftStatus && (!controller.readOnly || !!controller.draftError),
     showDay5DraftStatus,
     draftAutosaveStatus: controller.draftAutosaveStatus,
     savedAt: controller.savedAt,
@@ -46,11 +50,17 @@ export function CandidateTaskViewInner({
   return (
     <TaskContainer>
       <TaskHeader task={task} statusSlot={draftStatus.headerStatusSlot} />
-      <TaskDescription description={task.description} />
+      {isDay1DesignDoc ? null : (
+        <TaskDescription description={task.description} />
+      )}
       <TaskWorkArea
+        dayIndex={task.dayIndex}
+        projectBrief={task.description}
+        cutoffAt={task.cutoffAt}
         githubNative={controller.githubNative}
         readOnly={controller.readOnly}
         disabledReason={controller.disabledReason}
+        draftError={controller.draftError}
         text={controller.text}
         disabled={controller.disabled}
         savedAt={controller.savedAt}
@@ -65,14 +75,19 @@ export function CandidateTaskViewInner({
         submittedSha={controller.submittedSha}
       />
       <TaskPanelErrorBanner message={controller.errorToShow} />
-      <TaskActions
-        isTextTask={controller.textTask}
-        displayStatus={controller.actionStatus}
-        disabled={controller.disabled}
-        disabledReason={controller.disabledReason}
-        onSaveDraft={controller.textTask ? controller.saveDraftNow : undefined}
-        onSubmit={controller.saveAndSubmit}
-      />
+      {hideDay1Actions ? null : (
+        <TaskActions
+          isTextTask={controller.textTask}
+          displayStatus={controller.actionStatus}
+          disabled={controller.disabled}
+          disabledReason={controller.disabledReason}
+          onSaveDraft={
+            controller.textTask ? controller.saveDraftNow : undefined
+          }
+          onSubmit={controller.saveAndSubmit}
+          requireSubmitConfirmation={isDay1DesignDoc}
+        />
+      )}
     </TaskContainer>
   );
 }

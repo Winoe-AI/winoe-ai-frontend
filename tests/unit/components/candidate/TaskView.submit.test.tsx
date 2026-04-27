@@ -38,12 +38,12 @@ describe('TaskView submission', () => {
         onSubmit={onSubmit}
       />,
     );
-
-    await act(async () => {
-      fireEvent.click(
-        screen.getByRole('button', { name: /submit & continue/i }),
-      );
+    fireEvent.change(screen.getByRole('textbox'), {
+      target: { value: '   ' },
     });
+
+    fireEvent.click(screen.getByRole('button', { name: /submit & continue/i }));
+    fireEvent.click(screen.getByRole('button', { name: /submit and lock/i }));
 
     expect(
       await screen.findByText(/please enter an answer before submitting/i),
@@ -73,6 +73,11 @@ describe('TaskView submission', () => {
       target: { value: '  Needs trim  ' },
     });
     fireEvent.click(screen.getByRole('button', { name: /submit & continue/i }));
+    expect(onSubmit).not.toHaveBeenCalled();
+    expect(
+      screen.getByRole('dialog', { name: /submit day 1 design document/i }),
+    ).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: /submit and lock/i }));
     await act(async () => Promise.resolve());
     expect(onSubmit).toHaveBeenCalledWith({ contentText: 'Needs trim' });
   });

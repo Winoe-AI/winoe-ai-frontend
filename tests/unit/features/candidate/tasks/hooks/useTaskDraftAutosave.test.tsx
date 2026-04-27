@@ -15,6 +15,13 @@ describe('useTaskDraftAutosave core behavior', () => {
     jest.useRealTimers();
   });
 
+  const settleInitialRestore = async () => {
+    await act(async () => {
+      jest.advanceTimersByTime(0);
+      await Promise.resolve();
+    });
+  };
+
   it('debounces autosave around 1.5s after edits', async () => {
     const { rerender } = setupHook({ value: '' });
     await waitFor(() =>
@@ -31,6 +38,7 @@ describe('useTaskDraftAutosave core behavior', () => {
 
   it('flushes pending draft on visibilitychange hidden', async () => {
     const { rerender } = setupHook({ value: '' });
+    await settleInitialRestore();
     rerender({ value: 'flush hidden' });
 
     Object.defineProperty(document, 'visibilityState', {
@@ -45,6 +53,7 @@ describe('useTaskDraftAutosave core behavior', () => {
 
   it('flushes pending draft on beforeunload', async () => {
     const { rerender } = setupHook({ value: '' });
+    await settleInitialRestore();
     rerender({ value: 'flush unload' });
 
     await act(async () => window.dispatchEvent(new Event('beforeunload')));
