@@ -105,4 +105,26 @@ describe('CandidateSessionPage auth flow schedule validation errors', () => {
     ).toBeInTheDocument();
     expect(screen.getByText(/Pick your start date/i)).toBeInTheDocument();
   }, 15000);
+
+  it('rejects a past start date before confirmation', async () => {
+    fetchMock.mockImplementation(async (url: RequestInfo | URL) => {
+      const path = String(url);
+      if (path.endsWith('/candidate/session/valid-token'))
+        return jsonResponse(baseSession());
+      throw new Error(`Unexpected fetch ${path}`);
+    });
+    const user = userEvent.setup();
+    renderSessionPage('valid-token');
+    expect(
+      await screen.findByText(/Pick your start date/i),
+    ).toBeInTheDocument();
+    const startDateInput = screen.getByLabelText('Start date');
+    await user.clear(startDateInput);
+    await user.type(startDateInput, '2000-01-01');
+    expect(
+      await screen.findByText(/Start date cannot be in the past\./i),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Continue/i })).toBeDisabled();
+    expect(screen.queryByText(/Confirm schedule/i)).not.toBeInTheDocument();
+  }, 15000);
 });

@@ -14,7 +14,7 @@ exports[`CandidateSessionView scheduling states renders locked state with countd
       <p
         class="mt-1 text-sm text-gray-600"
       >
-        Infra Trial (Backend Engineer) opens when Day 1 starts.
+        Infra Trial (Backend Engineer) opens when Day 1 starts. Come back at the scheduled opening time.
       </p>
     </div>
     <div
@@ -33,7 +33,7 @@ exports[`CandidateSessionView scheduling states renders locked state with countd
       <p
         class="mt-1 text-xs text-blue-800"
       >
-        Opens on Thu, Jan 1, 2099 at 9:00 AM (America/New_York)
+        Your Trial opens on Thu, Jan 1, 2099 at 9:00 AM America/New_York. Come back then.
       </p>
     </div>
     <div
@@ -42,7 +42,7 @@ exports[`CandidateSessionView scheduling states renders locked state with countd
       <h2
         class="text-sm font-semibold text-gray-900"
       >
-        Day windows
+        5-day schedule preview
       </h2>
       <ul
         class="mt-2 space-y-2"
@@ -53,7 +53,7 @@ exports[`CandidateSessionView scheduling states renders locked state with countd
           <div
             class="font-medium"
           >
-            Day 1
+            Day 1 — Planning & Design Doc
           </div>
           <div
             class="text-gray-700"
@@ -72,12 +72,69 @@ exports[`CandidateSessionView scheduling states renders locked state with countd
           <div
             class="font-medium"
           >
-            Day 2
+            Day 2 — Implementation Kickoff
           </div>
           <div
             class="text-gray-700"
           >
             Fri, Jan 2, 2099
+          </div>
+          <div
+            class="text-gray-600"
+          >
+            9:00 AM - 5:00 PM
+          </div>
+        </li>
+        <li
+          class="rounded-md border border-gray-200 p-3 text-sm"
+        >
+          <div
+            class="font-medium"
+          >
+            Day 3 — Implementation Wrap-Up
+          </div>
+          <div
+            class="text-gray-700"
+          >
+            Sat, Jan 3, 2099
+          </div>
+          <div
+            class="text-gray-600"
+          >
+            9:00 AM - 5:00 PM
+          </div>
+        </li>
+        <li
+          class="rounded-md border border-gray-200 p-3 text-sm"
+        >
+          <div
+            class="font-medium"
+          >
+            Day 4 — Handoff + Demo
+          </div>
+          <div
+            class="text-gray-700"
+          >
+            Sun, Jan 4, 2099
+          </div>
+          <div
+            class="text-gray-600"
+          >
+            9:00 AM - 5:00 PM
+          </div>
+        </li>
+        <li
+          class="rounded-md border border-gray-200 p-3 text-sm"
+        >
+          <div
+            class="font-medium"
+          >
+            Day 5 — Reflection Essay
+          </div>
+          <div
+            class="text-gray-700"
+          >
+            Mon, Jan 5, 2099
           </div>
           <div
             class="text-gray-600"
@@ -115,7 +172,7 @@ exports[`CandidateSessionView scheduling states renders scheduling confirm state
       <p
         class="mt-1 text-sm text-gray-600"
       >
-        Confirm your schedule before starting Infra Trial (Backend Engineer).
+        Choose when your 5-day Trial begins. Trial content unlocks only when Day 1 opens for Infra Trial (Backend Engineer).
       </p>
     </div>
     <div
@@ -159,7 +216,7 @@ exports[`CandidateSessionView scheduling states renders scheduling confirm state
         class="rounded-md border border-blue-200 bg-blue-50 p-3 text-sm text-blue-900"
       >
         <p>
-          Starts on 
+          Your Trial opens on 
           <span
             class="font-semibold"
           >
@@ -169,9 +226,14 @@ exports[`CandidateSessionView scheduling states renders scheduling confirm state
           <span
             class="font-semibold"
           >
-            9:00 AM (Your time)
+            9:00 AM America/New_York
           </span>
           .
+        </p>
+        <p
+          class="mt-2"
+        >
+          Trial content unlocks only when Day 1 opens. Confirm this schedule before the Talent Partner is notified.
         </p>
       </div>
       <div>
@@ -201,7 +263,7 @@ exports[`CandidateSessionView scheduling states renders scheduling confirm state
             <div
               class="font-medium"
             >
-              Day 1
+              Day 1 — Planning & Design Doc
             </div>
             <div
               class="text-gray-700"
@@ -220,12 +282,69 @@ exports[`CandidateSessionView scheduling states renders scheduling confirm state
             <div
               class="font-medium"
             >
-              Day 2
+              Day 2 — Implementation Kickoff
             </div>
             <div
               class="text-gray-700"
             >
               Fri, Jan 2, 2099
+            </div>
+            <div
+              class="text-gray-600"
+            >
+              9:00 AM - 5:00 PM
+            </div>
+          </li>
+          <li
+            class="rounded-md border border-gray-200 p-3 text-sm"
+          >
+            <div
+              class="font-medium"
+            >
+              Day 3 — Implementation Wrap-Up
+            </div>
+            <div
+              class="text-gray-700"
+            >
+              Sat, Jan 3, 2099
+            </div>
+            <div
+              class="text-gray-600"
+            >
+              9:00 AM - 5:00 PM
+            </div>
+          </li>
+          <li
+            class="rounded-md border border-gray-200 p-3 text-sm"
+          >
+            <div
+              class="font-medium"
+            >
+              Day 4 — Handoff + Demo
+            </div>
+            <div
+              class="text-gray-700"
+            >
+              Sun, Jan 4, 2099
+            </div>
+            <div
+              class="text-gray-600"
+            >
+              9:00 AM - 5:00 PM
+            </div>
+          </li>
+          <li
+            class="rounded-md border border-gray-200 p-3 text-sm"
+          >
+            <div
+              class="font-medium"
+            >
+              Day 5 — Reflection Essay
+            </div>
+            <div
+              class="text-gray-700"
+            >
+              Mon, Jan 5, 2099
             </div>
             <div
               class="text-gray-600"
@@ -268,7 +387,7 @@ exports[`CandidateSessionView scheduling states renders scheduling form state 1`
       <p
         class="mt-1 text-sm text-gray-600"
       >
-        Confirm your schedule before starting Infra Trial (Backend Engineer).
+        Choose when your 5-day Trial begins. Trial content unlocks only when Day 1 opens for Infra Trial (Backend Engineer).
       </p>
     </div>
     <div
@@ -308,30 +427,40 @@ exports[`CandidateSessionView scheduling states renders scheduling form state 1`
     <div
       class="space-y-4 rounded-md border border-gray-200 p-4"
     >
-      <label
-        class="block text-sm font-medium text-gray-800"
-      >
-        Start date
-      </label>
-      <input
-        aria-label="Start date"
-        class="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-        type="date"
-        value="2099-01-01"
-      />
-      <label
-        class="block text-sm font-medium text-gray-800"
-      >
-        Timezone (IANA)
-      </label>
-      <input
-        aria-label="Timezone"
-        class="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-        list="candidate-timezone-list"
-        placeholder="America/New_York"
-        type="text"
-        value="America/New_York"
-      />
+      <div>
+        <label
+          class="block text-sm font-medium text-gray-800"
+          for="schedule-start-date"
+        >
+          Start date
+        </label>
+        <input
+          aria-invalid="false"
+          aria-label="Start date"
+          class="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          id="schedule-start-date"
+          type="date"
+          value="2099-01-01"
+        />
+      </div>
+      <div>
+        <label
+          class="block text-sm font-medium text-gray-800"
+          for="schedule-timezone"
+        >
+          Timezone
+        </label>
+        <input
+          aria-invalid="false"
+          aria-label="Timezone"
+          class="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          id="schedule-timezone"
+          list="candidate-timezone-list"
+          placeholder="America/New_York"
+          type="text"
+          value="America/New_York"
+        />
+      </div>
       <datalist
         id="candidate-timezone-list"
       >
@@ -347,23 +476,126 @@ exports[`CandidateSessionView scheduling states renders scheduling form state 1`
       >
         Detected timezone: America/New_York
       </p>
-      <label
-        class="block text-sm font-medium text-gray-800"
-      >
-        GitHub username
-      </label>
-      <input
-        aria-label="GitHub username"
-        class="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
-        placeholder="octocat"
-        type="text"
-        value="octocat"
-      />
+      <div>
+        <label
+          class="block text-sm font-medium text-gray-800"
+          for="schedule-github-username"
+        >
+          GitHub username
+        </label>
+        <input
+          aria-invalid="false"
+          aria-label="GitHub username"
+          class="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          id="schedule-github-username"
+          placeholder="octocat"
+          type="text"
+          value="octocat"
+        />
+      </div>
       <p
         class="text-xs text-gray-500"
       >
-        Use the GitHub username that should receive repo access.
+        Use the GitHub username connected to your Trial workspace.
       </p>
+      <div
+        class="rounded-md border border-blue-200 bg-blue-50 p-3 text-sm text-blue-900"
+      >
+        Your Trial opens on 
+        <span
+          class="font-semibold"
+        >
+          Thu, Jan 1, 2099
+        </span>
+         at 
+        <span
+          class="font-semibold"
+        >
+          9:00 AM America/New_York
+        </span>
+        .
+      </div>
+      <div>
+        <h2
+          class="text-sm font-semibold text-gray-900"
+        >
+          5-day schedule preview
+        </h2>
+        <ul
+          class="mt-2 space-y-2"
+        >
+          <li
+            class="rounded-md border border-gray-200 p-3 text-sm"
+          >
+            <div
+              class="font-medium"
+            >
+              Day 1 — Planning & Design Doc
+            </div>
+            <div
+              class="text-gray-700"
+            >
+              Thu, Jan 1, 2099
+            </div>
+          </li>
+          <li
+            class="rounded-md border border-gray-200 p-3 text-sm"
+          >
+            <div
+              class="font-medium"
+            >
+              Day 2 — Implementation Kickoff
+            </div>
+            <div
+              class="text-gray-700"
+            >
+              Fri, Jan 2, 2099
+            </div>
+          </li>
+          <li
+            class="rounded-md border border-gray-200 p-3 text-sm"
+          >
+            <div
+              class="font-medium"
+            >
+              Day 3 — Implementation Wrap-Up
+            </div>
+            <div
+              class="text-gray-700"
+            >
+              Sat, Jan 3, 2099
+            </div>
+          </li>
+          <li
+            class="rounded-md border border-gray-200 p-3 text-sm"
+          >
+            <div
+              class="font-medium"
+            >
+              Day 4 — Handoff + Demo
+            </div>
+            <div
+              class="text-gray-700"
+            >
+              Sun, Jan 4, 2099
+            </div>
+          </li>
+          <li
+            class="rounded-md border border-gray-200 p-3 text-sm"
+          >
+            <div
+              class="font-medium"
+            >
+              Day 5 — Reflection Essay
+            </div>
+            <div
+              class="text-gray-700"
+            >
+              Mon, Jan 5, 2099
+            </div>
+          </li>
+        </ul>
+      </div>
       <div
         class="flex gap-3 pt-2"
       >

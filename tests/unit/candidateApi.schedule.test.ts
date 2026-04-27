@@ -34,6 +34,7 @@ describe('candidateApi schedule', () => {
     const result = await scheduleCandidateSession('tok_123', {
       scheduledStartAt: '2026-03-10T13:00:00Z',
       candidateTimezone: 'America/New_York',
+      githubUsername: 'octocat',
     });
     expect(result.candidateSessionId).toBe(10);
     expect(fetchMock).toHaveBeenCalledWith(
@@ -59,6 +60,7 @@ describe('candidateApi schedule', () => {
       scheduleCandidateSession('tok_123', {
         scheduledStartAt: '2026-03-10T13:00:00Z',
         candidateTimezone: 'America/New_York',
+        githubUsername: 'octocat',
       }),
     ).rejects.toMatchObject({ status: 422, message: 'Timezone is invalid.' });
   });

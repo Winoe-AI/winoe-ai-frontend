@@ -51,6 +51,7 @@ export function buildCandidateSessionControllerResult({
     scheduleGithubUsernameError: schedule.scheduleGithubUsernameError,
     scheduleSubmitError: schedule.scheduleSubmitError,
     schedulePreviewWindows: schedule.schedulePreviewWindows,
+    scheduleCanContinue: schedule.scheduleCanContinue,
     scheduleResponseWindows: schedule.scheduleResponseWindows,
     scheduleCurrentDayWindow: schedule.scheduleCurrentDayWindow,
     scheduleCountdownLabel: schedule.scheduleCountdownLabel,

@@ -60,6 +60,7 @@ export type CandidateSessionViewProps = {
   scheduleGithubUsernameError: string | null;
   scheduleSubmitError: string | null;
   schedulePreviewWindows: CandidateDayWindow[];
+  scheduleCanContinue: boolean;
   scheduleResponseWindows: CandidateDayWindow[];
   scheduleCurrentDayWindow: CandidateCurrentDayWindow | null;
   scheduleCountdownLabel: string;

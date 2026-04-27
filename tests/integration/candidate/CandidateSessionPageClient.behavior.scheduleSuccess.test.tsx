@@ -2,6 +2,7 @@ import { screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import {
   baseSession,
+  expectAllScheduleDaysVisible,
   fetchMock,
   fillScheduleAndContinue,
   renderSessionPage,
@@ -54,6 +55,10 @@ describe('CandidateSessionPage auth flow schedule success', () => {
     expect(
       await screen.findByText(/5-day schedule preview/i),
     ).toBeInTheDocument();
+    expectAllScheduleDaysVisible();
+    expect(
+      screen.getByText(/Confirm this schedule before the Talent Partner/i),
+    ).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: /Confirm schedule/i }));
     expect(scheduleRequestBody).toMatchObject({
       scheduledStartAt: '2099-01-01T14:00:00Z',
@@ -63,7 +68,12 @@ describe('CandidateSessionPage auth flow schedule success', () => {
     expect(
       await screen.findByText(/Trial locked until start/i),
     ).toBeInTheDocument();
-    expect(screen.getByText(/Day windows/i)).toBeInTheDocument();
+    expect(screen.getByText(/5-day schedule preview/i)).toBeInTheDocument();
+    expectAllScheduleDaysVisible();
+    expect(screen.queryByText(/Project Brief/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Codespace/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Repository URL/i)).not.toBeInTheDocument();
+    expect(screen.queryByLabelText(/Day 1 editor/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/Start trial/i)).not.toBeInTheDocument();
     expect(
       fetchMock.mock.calls.find(([url]) =>

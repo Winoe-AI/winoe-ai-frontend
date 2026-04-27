@@ -39,6 +39,7 @@ export function buildCandidateSessionViewProps(): CandidateSessionViewProps {
     scheduleTimezoneError: null,
     scheduleGithubUsernameError: null,
     scheduleSubmitError: null,
+    scheduleCanContinue: true,
     schedulePreviewWindows: [],
     scheduleResponseWindows: [
       {

@@ -14,7 +14,10 @@ jest.mock('@/features/candidate/session/api', () => ({
 }));
 
 export function resetWorkspacePanelExtraMocks() {
-  jest.clearAllMocks();
+  jest.useRealTimers();
+  notifyMock.mockReset();
+  getStatusMock.mockReset();
+  initWorkspaceMock.mockReset();
 }
 
 export function renderPanel(opts?: Partial<{ dayIndex: number }>) {

@@ -42,6 +42,7 @@ export function CandidateSessionSchedulingRoute({
       scheduleGithubUsernameError={props.scheduleGithubUsernameError}
       scheduleSubmitError={props.scheduleSubmitError}
       schedulePreviewWindows={props.schedulePreviewWindows}
+      scheduleCanContinue={props.scheduleCanContinue}
       onScheduleDateChange={props.onScheduleDateChange}
       onScheduleTimezoneChange={props.onScheduleTimezoneChange}
       onScheduleGithubUsernameChange={props.onScheduleGithubUsernameChange}

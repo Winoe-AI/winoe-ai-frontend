@@ -20,13 +20,13 @@ export function LockedViewCountdownCard({
       </p>
       {countdownTargetAt && timezone ? (
         <p className="mt-1 text-xs text-blue-800">
-          Opens on {formatDate(countdownTargetAt, timezone)} at{' '}
-          {formatTime(countdownTargetAt, timezone)} ({timezone})
+          Your Trial opens on {formatDate(countdownTargetAt, timezone)} at{' '}
+          {formatTime(countdownTargetAt, timezone)} {timezone}. Come back then.
         </p>
       ) : scheduledStartAt && timezone ? (
         <p className="mt-1 text-xs text-blue-800">
-          Opens on {formatDate(scheduledStartAt, timezone)} at{' '}
-          {formatTime(scheduledStartAt, timezone)} ({timezone})
+          Your Trial opens on {formatDate(scheduledStartAt, timezone)} at{' '}
+          {formatTime(scheduledStartAt, timezone)} {timezone}. Come back then.
         </p>
       ) : null}
     </div>

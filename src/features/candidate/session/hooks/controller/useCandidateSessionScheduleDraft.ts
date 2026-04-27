@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useState } from 'react';
 import {
   buildSchedulePreview,
+  isScheduleDateInPast,
   isValidIanaTimezone,
   toDateInputInTimezone,
 } from '../../utils/scheduleUtils';
@@ -38,7 +39,7 @@ export function useCandidateSessionScheduleDraft({
     scheduleTimezoneState ??
     bootstrap?.candidateTimezone ??
     detectedTimezone ??
-    '';
+    'UTC';
   const scheduleGithubUsernameValue =
     scheduleGithubUsernameState ?? bootstrap?.githubUsername ?? '';
   const bootstrapScheduleDate =
@@ -74,6 +75,19 @@ export function useCandidateSessionScheduleDraft({
     }
   }, [scheduleDateValue, scheduleTimezoneValue]);
 
+  const scheduleCanContinue = useMemo(() => {
+    const timezoneValue = scheduleTimezoneValue.trim();
+    if (!scheduleDateValue || !isValidIanaTimezone(timezoneValue)) return false;
+    try {
+      return !isScheduleDateInPast({
+        dateInput: scheduleDateValue,
+        timezone: timezoneValue,
+      });
+    } catch {
+      return false;
+    }
+  }, [scheduleDateValue, scheduleTimezoneValue]);
+
   const validateForm = useCallback(
     () =>
       validateScheduleDraft({
@@ -104,17 +118,53 @@ export function useCandidateSessionScheduleDraft({
     ],
   );
 
-  const onScheduleDateChange = useCallback((value: string) => {
-    setScheduleDate(value);
-    setScheduleDateError(null);
-    setScheduleSubmitError(null);
-  }, []);
+  const onScheduleDateChange = useCallback(
+    (value: string) => {
+      setScheduleDate(value);
+      setScheduleSubmitError(null);
+      const timezoneValue = scheduleTimezoneValue.trim();
+      if (!value || !isValidIanaTimezone(timezoneValue)) {
+        setScheduleDateError(null);
+        return;
+      }
+      try {
+        setScheduleDateError(
+          isScheduleDateInPast({ dateInput: value, timezone: timezoneValue })
+            ? 'Start date cannot be in the past.'
+            : null,
+        );
+      } catch {
+        setScheduleDateError('Select a valid start date.');
+      }
+    },
+    [scheduleTimezoneValue],
+  );
 
-  const onScheduleTimezoneChange = useCallback((value: string) => {
-    setScheduleTimezone(value);
-    setScheduleTimezoneError(null);
-    setScheduleSubmitError(null);
-  }, []);
+  const onScheduleTimezoneChange = useCallback(
+    (value: string) => {
+      setScheduleTimezone(value);
+      setScheduleTimezoneError(null);
+      setScheduleSubmitError(null);
+      const timezoneValue = value.trim();
+      if (!scheduleDateValue || !isValidIanaTimezone(timezoneValue)) {
+        setScheduleDateError(null);
+        return;
+      }
+      try {
+        setScheduleDateError(
+          isScheduleDateInPast({
+            dateInput: scheduleDateValue,
+            timezone: timezoneValue,
+          })
+            ? 'Start date cannot be in the past.'
+            : null,
+        );
+      } catch {
+        setScheduleDateError('Select a valid start date.');
+      }
+    },
+    [scheduleDateValue],
+  );
 
   const onScheduleGithubUsernameChange = useCallback((value: string) => {
     setScheduleGithubUsername(value);
@@ -131,6 +181,7 @@ export function useCandidateSessionScheduleDraft({
     scheduleGithubUsernameError,
     scheduleSubmitError,
     schedulePreviewWindows,
+    scheduleCanContinue,
     setScheduleDateError,
     setScheduleTimezoneError,
     setScheduleGithubUsernameError,
