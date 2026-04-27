@@ -43,11 +43,11 @@ describe('WorkspacePanel refresh and provisioning states', () => {
   it('shows provisioning messages when workspace is not ready', async () => {
     statusMock.mockRejectedValueOnce({
       status: 409,
-      message: 'Codespace repo is not provisioned yet. Please try again.',
+      message: 'Codespace is not provisioned yet. Please try again.',
     });
     renderWorkspacePanel(15, 16);
     expect(
-      await screen.findByText(/Codespace repo is not provisioned yet/i),
+      await screen.findByText(/Codespace is not provisioned yet/i),
     ).toBeInTheDocument();
 
     resetWorkspacePanelMocks();
@@ -61,7 +61,7 @@ describe('WorkspacePanel refresh and provisioning states', () => {
     });
     renderWorkspacePanel(17, 18);
     expect(
-      await screen.findByText(/Codespace provisioning is underway/i),
+      await screen.findByText(/Your GitHub Codespace is provisioning/i),
     ).toBeInTheDocument();
   });
 
@@ -94,7 +94,7 @@ describe('WorkspacePanel refresh and provisioning states', () => {
     });
     renderWorkspacePanel(29, 30);
     expect(
-      await screen.findByText(/Codespace provisioning is underway/i),
+      await screen.findByText(/Your GitHub Codespace is provisioning/i),
     ).toBeInTheDocument();
   });
 });

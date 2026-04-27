@@ -81,7 +81,7 @@ describe('CandidateTaskView closed/read-only states', () => {
     });
     expect(
       screen.getAllByText(
-        /Day closed\. Work after cutoff will not be considered\./i,
+        /Day closed\. The Codespace is read-only after cutoff\./i,
       ).length,
     ).toBeGreaterThan(0);
     const submitButton = screen.getByRole('button', {

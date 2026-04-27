@@ -7,7 +7,7 @@ export function StartSafety() {
         <li>Use the repo link provided; do not create your own repo.</li>
         <li>
           Use the Codespace link in the workspace card to open your editor and
-          terminal.
+          terminal for implementation work.
         </li>
       </ul>
       <div className="mt-3 text-xs text-amber-900">

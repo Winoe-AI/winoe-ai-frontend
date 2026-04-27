@@ -19,11 +19,11 @@ describe('CodespaceFallbackPanel', () => {
     ).toBeInTheDocument();
     expect(
       screen.getByText(
-        /Only commits pushed to the official repo before cutoff are evaluated\./i,
+        /The official Trial repository and its Codespace are the source of truth\. Only commits pushed before cutoff are evaluated\./i,
       ),
     ).toBeInTheDocument();
     expect(
-      screen.getByText(/Workspace:\s*acme\/workspace-repo/i),
+      screen.getByText(/Repository:\s*acme\/workspace-repo/i),
     ).toBeInTheDocument();
     expect(
       screen.getByText(/Codespace access is required for Day 2 and Day 3/i),

@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
-import { OFFICIAL_REPO_CUTOFF_COPY } from '@/platform/copy/integrity';
+import { CANDIDATE_INTEGRITY_CUTOFF_COPY } from '@/platform/copy/integrity';
 import { formatDateTime } from '@/shared/formatters';
 import Button from '@/shared/ui/Button';
 import { fallbackSummary, trimOrNull } from './codespaceFallbackPanel.utils';
@@ -44,8 +44,10 @@ export function CodespaceFallbackPanel({
       </div>
 
       <p className="mt-2">{summary}</p>
-      <p className="mt-2 text-xs">{OFFICIAL_REPO_CUTOFF_COPY}</p>
-      <p className="mt-3 text-xs text-amber-900">Workspace: {workspaceLabel}</p>
+      <p className="mt-2 text-xs">{CANDIDATE_INTEGRITY_CUTOFF_COPY}</p>
+      <p className="mt-3 text-xs text-amber-900">
+        Repository: {workspaceLabel}
+      </p>
       <p className="mt-2 text-xs text-amber-900">
         Codespace access is required for Day 2 and Day 3. Retry until the shared
         Codespace link is available.

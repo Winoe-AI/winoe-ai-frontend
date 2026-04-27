@@ -31,8 +31,7 @@ describe('loadWorkspaceStatus', () => {
       }),
     ).resolves.toEqual(
       expect.objectContaining({
-        notice:
-          'Codespace repo is not provisioned yet. Please try again shortly.',
+        notice: 'Codespace is not provisioned yet. Please try again shortly.',
         error: null,
         errorCode: 'WORKSPACE_NOT_INITIALIZED',
         codespaceState: 'not_ready',

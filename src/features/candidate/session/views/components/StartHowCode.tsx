@@ -11,7 +11,7 @@ export function StartHowCode() {
         </li>
         <li>
           Open the Codespace from the workspace card. That is your editor and
-          terminal.
+          terminal for implementation work.
         </li>
         <li>
           Run tests from Winoe. We trigger GitHub Actions and show results back

@@ -16,10 +16,24 @@ Required auth env vars:
 
 The lane reads those from the current shell first, then falls back to `winoe-frontend/.env.local`, `../Winoe-Envs/.env.local`, and `../Winoe-Envs/.env` when present.
 
+If any of the four `QA_E2E_*` values are missing, the lane now fails fast with:
+
+`Contract-live browser QA requires real Auth0 QA credentials. Missing: ...`
+
+Archived storage states are not reusable across local stack or session changes. Regenerate them for each fresh run instead of copying prior `storage/*.json` files into a new environment.
+
+Run `npm run typecheck` before starting browser QA. That command removes `.next`, so it must happen before the browser stack is already relying on those build artifacts.
+
 Use `winoe-frontend/qa_verifications/Contract-Live-QA/run_contract_live.sh` to create the evidence directory under `contract_live_qa_latest/artifacts`, update `contract_live_qa_report.md`, build the real auth storage states, run the Playwright access checks, and then execute one or more `live_flow_driver.mjs` commands inside the same evidence bundle.
 By default it runs `talent_partner-fresh`, which proves more than auth/access smoke by creating a fresh trial and issuing a real invite.
-Set `CONTRACT_LIVE_DRIVER_SEQUENCE` to a comma-separated list such as `talent_partner-fresh,candidate-schedule,candidate-day` or `candidate-day,talent_partner-review` to advance later phases of the same proof.
+Set `CONTRACT_LIVE_DRIVER_SEQUENCE` to a comma-separated list such as `talent_partner-fresh,candidate-schedule,candidate-day:2,candidate-day:3,talent_partner-review` to advance later phases of the same proof while preserving the same live trial/session. For `candidate-day`, the suffix after `:` is passed through as `CONTRACT_LIVE_DAY` and `CONTRACT_LIVE_EXPECT_DAY`.
 Use `CONTRACT_LIVE_SKIP_DRIVER=1` only when you intentionally want auth/bootstrap without the live driver.
+
+After credentials are available, rerun the lane with:
+
+```bash
+bash qa_verifications/Contract-Live-QA/run_contract_live.sh
+```
 
 Use `winoe-frontend/qa_verifications/Contract-Live-QA/run_contract_live_stack.sh` to boot the real frontend, backend, and worker under a shared test clock while capturing stack logs into the same evidence bundle.
 Set `CONTRACT_LIVE_STACK_LABEL` when restarting the stack across Day 1 through Day 5 so each phase keeps distinct `backend-<label>.log`, `worker-<label>.log`, and `frontend-<label>.log` evidence instead of overwriting prior phases.

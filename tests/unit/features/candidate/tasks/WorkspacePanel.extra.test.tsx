@@ -41,7 +41,7 @@ describe('WorkspacePanel extra rendering', () => {
       screen.queryByRole('link', { name: /Open Codespace/i }),
     ).not.toBeInTheDocument();
     expect(
-      screen.getByText(/Codespace link will appear when ready/i),
+      screen.getByText(/Waiting for the GitHub Codespace link/i),
     ).toBeInTheDocument();
   });
 

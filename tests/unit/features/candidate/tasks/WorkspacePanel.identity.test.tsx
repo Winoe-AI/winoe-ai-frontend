@@ -18,7 +18,7 @@ describe('WorkspacePanel shared identity behavior', () => {
       codespaceUrl: 'https://codespaces.new/acme/shared',
     });
     renderPanel({ onCodingWorkspaceSnapshot });
-    await screen.findByText(/Workspace is ready/i);
+    await screen.findByText(/GitHub Codespace ready/i);
     expect(onCodingWorkspaceSnapshot).toHaveBeenCalledWith({
       dayIndex: 2,
       workspace: expect.objectContaining({ repoFullName: 'acme/shared' }),

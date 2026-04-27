@@ -22,7 +22,7 @@ export function scenarioContentUnavailableMessage(
     return `${selectedScenarioVersionText} is still generating. Preview, editing, and approval stay disabled until canonical content is available.`;
   }
   if (selectedScenarioVersion.contentAvailability === 'local_only') {
-    return `${selectedScenarioVersionText} only has local draft data from this session. Backend does not expose canonical historical content yet, so this version is read-only and cannot be approved.`;
+    return `${selectedScenarioVersionText} only has draft data from this session. Backend does not expose canonical historical content yet, so this version is read-only and cannot be approved.`;
   }
   return `${selectedScenarioVersionText} content is unavailable from the backend. This version is read-only and cannot be edited or approved.`;
 }

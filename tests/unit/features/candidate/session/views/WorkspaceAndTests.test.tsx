@@ -62,7 +62,9 @@ describe('WorkspaceAndTests', () => {
       await screen.findByRole('link', { name: /Open Codespace/i }),
     ).toHaveAttribute('href', 'https://codespaces.new/acme/repo');
     expect(
-      screen.getByText(/Evaluation is based on the commit shown below/i),
+      screen.getByText(
+        /The official Trial repository and its Codespace are the source of truth\. Only commits pushed before cutoff are evaluated\./i,
+      ),
     ).toBeInTheDocument();
     expect(screen.getByLabelText(/Cutoff commit SHA abc123def456/i));
     expect(screen.queryByText(/^Day closed$/i)).toBeNull();
@@ -109,7 +111,7 @@ describe('WorkspaceAndTests', () => {
     expect(await screen.findByText(/^Day closed$/i)).toBeInTheDocument();
     expect(
       screen.getAllByText(
-        /Day closed\. Work after cutoff will not be considered\./i,
+        /Day closed\. The Codespace is read-only after cutoff\./i,
       ),
     ).toHaveLength(2);
     expect(

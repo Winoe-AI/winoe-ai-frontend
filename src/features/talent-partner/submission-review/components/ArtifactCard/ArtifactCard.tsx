@@ -46,6 +46,7 @@ export function ArtifactCard({ artifact, repoLinkLabel }: Props) {
 
       {showIntegrity ? (
         <IntegrityCallout
+          audience="talentPartner"
           className="mt-3"
           repoUrl={repoUrl}
           cutoffCommitSha={artifact.cutoffCommitSha ?? null}

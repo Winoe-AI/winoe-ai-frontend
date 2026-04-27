@@ -8,19 +8,6 @@ export function IntegrityCalloutLinks({ repoUrl, codespaceUrl }: Props) {
 
   return (
     <div className="mt-2 space-y-1">
-      {repoUrl ? (
-        <p className="break-all">
-          <span className="font-semibold">Repository:</span>{' '}
-          <a
-            className="text-blue-700 underline hover:text-blue-800"
-            href={repoUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            {repoUrl}
-          </a>
-        </p>
-      ) : null}
       {codespaceUrl ? (
         <p className="break-all">
           <span className="font-semibold">Codespace:</span>{' '}
@@ -31,6 +18,19 @@ export function IntegrityCalloutLinks({ repoUrl, codespaceUrl }: Props) {
             rel="noopener noreferrer"
           >
             {codespaceUrl}
+          </a>
+        </p>
+      ) : null}
+      {repoUrl ? (
+        <p className="break-all">
+          <span className="font-semibold">Repository:</span>{' '}
+          <a
+            className="text-blue-700 underline hover:text-blue-800"
+            href={repoUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            {repoUrl}
           </a>
         </p>
       ) : null}

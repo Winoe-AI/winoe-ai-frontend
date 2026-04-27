@@ -1,135 +1,160 @@
-# 1. Title
+# PR: Remove offline/local work copy and enforce Codespace-only messaging throughout candidate UI
 
-Fix Day 2 candidate UI: GitHub username capture, pending-state reliability, and Codespace-only copy for issue #183
+## Linked Issue
 
-# 2. Linked Issue
+- Winoe-AI/winoe-ai-frontend issue #194
 
-- Winoe-AI/winoe-ai-frontend issue #183
-- Depends on backend issues #285 and #286
+## Summary
 
-# 3. Problem / Why
+This PR removes offline/local-work permission copy from candidate and Talent Partner surfaces, enforces Codespace-only messaging for Day 2 and Day 3, and makes the Codespace URL/card the primary work environment in the candidate UI.
 
-Day 2 candidate flow had multiple user-facing failures that prevented a real candidate from moving through the workspace lifecycle cleanly:
+The Talent Partner submission review copy now frames evidence as coming from the official Trial repository and Codespace-captured work.
 
-- GitHub username was not reliably captured and sent into the Codespace init contract.
-- Run tests and submit flows could hang in pending states instead of resolving to success or failure.
-- Frontend polling could drift from the backend-provided `pollAfterMs` guidance.
-- Day 2 and Day 3 copy still implied offline/local work paths instead of Codespace-only work.
-- The workspace CTA and status messaging were not strong enough for the actual Codespace-first flow.
-- Day-window behavior needed to be explicit: open from 9 AM to 5 PM local time, then switch to read-only with a closed message after cutoff.
-- Reload and restart recovery needed to use durable product state instead of a volatile client-only "started" state.
+The contract-live QA harness also now runs the full Day 1 -> Day 2 -> Day 3 -> Talent Partner review proof deterministically on the local demo-mode backend, while preserving environment discipline:
 
-# 4. What Changed
+- local QA sources local env files only
+- prod env files are not sourced
+- dev-auth bypass is not used
+- backend demo fallback is env-controlled only
 
-- Day 2 workspace init now uses the captured GitHub username correctly.
-- The candidate flow now validates GitHub username before opening Day 2.
-- Codespace init and task bootstrap follow the backend contract expected by #285.
-- Day 2 and Day 3 copy is Codespace-only throughout the candidate UI.
-- The Codespace URL is shown prominently and is accessible from the workspace view.
-- Run tests lifecycle now resolves correctly through idle, running, success, and failure instead of getting stuck at Starting.
-- Submit and Continue now resolves correctly instead of getting stuck at Submitting.
-- Frontend polling now honors the backend `pollAfterMs` value from the response utils.
-- Day 2 open-window behavior is explicit, with local-time countdown support for the 9 AM to 5 PM window.
-- After cutoff, the UI switches to read-only state and shows the Day closed message.
-- Restart and reload recovery now come from durable product state rather than a client-only started flag.
+## What Changed
 
-# 5. Key Files Changed
+### Frontend product changes
 
-- `src/features/candidate/session/api/workspaceApi.ts`
-- `src/features/candidate/tasks/hooks/useRunTests.ts`
-- `src/features/candidate/tasks/hooks/useRunTestsScheduler.ts`
-- `src/features/candidate/tasks/` Day 2 candidate components
+- Removed offline/local-work permission copy from candidate-facing and Talent Partner-facing UI.
+- Updated Day 2 and Day 3 informational text to emphasize Codespace-only workflow.
+- Promoted the Codespace URL/card so it is the primary work environment for Day 2 and Day 3.
+- Updated Talent Partner submission review copy to reference the official Trial repository and Codespace-captured work.
 
-# 6. QA Summary
+### Frontend QA harness changes
 
-Final verification was completed on the real local stack with:
+- Improved the contract-live harness so the full sequence runs deterministically on the local demo-mode backend.
+- Kept the harness aligned with the day-by-day proof flow:
+  - `talent_partner-fresh`
+  - `candidate-schedule`
+  - `candidate-day:1`
+  - `candidate-day:2`
+  - `candidate-day:3`
+  - `talent_partner-review`
+- Verified the flow with `trialId=1` and `candidateSessionId=1`.
 
-- real frontend + backend services
-- real browser auth
-- no QA-driver state seeding
-- live Day 2 open proof
-- live after-cutoff read-only proof
-- live Codespace init, run tests, and submit flow verification
+### Backend scope
 
-Behavior verified end to end:
+- No backend files remain changed in the current diff.
+- The unrelated backend compare-summary behavior change was reverted and is not part of this PR.
 
-- GitHub username capture/validation before Day 2 opens
-- `githubUsername` included in the Codespace init request
-- run tests lifecycle reaches terminal success/failure states
-- submit and continue completes reliably
-- polling follows backend `pollAfterMs`
-- Codespace-only copy is used throughout
-- Codespace URL is surfaced prominently
-- Day 2 is open only during 9 AM to 5 PM local time
-- after cutoff the workspace is read-only with a closed message
+## Files Changed
 
-# 7. Exact Live Evidence / Artifact Paths
+### Frontend
 
-- Open-day screenshot:
-  - `/Users/robelmelaku/Desktop/Winoe-AI/winoe-frontend/qa_verifications/Contract-Live-QA/contract_live_qa_latest/artifacts/20260425T213610/candidate-day2-open.png`
-- Closed-day screenshot:
-  - `/Users/robelmelaku/Desktop/Winoe-AI/winoe-frontend/qa_verifications/Contract-Live-QA/contract_live_qa_latest/artifacts/20260425T213909/candidate-day2-closed.png`
-- Schedule response:
-  - `/Users/robelmelaku/Desktop/Winoe-AI/winoe-frontend/qa_verifications/Contract-Live-QA/contract_live_qa_latest/artifacts/20260425T212929/api/candidate-schedule-response.json`
-- Workspace:
-  - `/Users/robelmelaku/Desktop/Winoe-AI/winoe-frontend/qa_verifications/Contract-Live-QA/contract_live_qa_latest/artifacts/20260425T213610/api/candidate-day2-workspace.json`
-- Run start:
-  - `/Users/robelmelaku/Desktop/Winoe-AI/winoe-frontend/qa_verifications/Contract-Live-QA/contract_live_qa_latest/artifacts/20260425T213610/api/candidate-day2-run-start.json`
-- Run poll:
-  - `/Users/robelmelaku/Desktop/Winoe-AI/winoe-frontend/qa_verifications/Contract-Live-QA/contract_live_qa_latest/artifacts/20260425T213610/api/candidate-day2-run-tests-poll.json`
-- Terminal run result:
-  - `/Users/robelmelaku/Desktop/Winoe-AI/winoe-frontend/qa_verifications/Contract-Live-QA/contract_live_qa_latest/artifacts/20260425T213610/api/candidate-day2-run-result.json`
-- Submit:
-  - `/Users/robelmelaku/Desktop/Winoe-AI/winoe-frontend/qa_verifications/Contract-Live-QA/contract_live_qa_latest/artifacts/20260425T213610/api/candidate-day2-submit.json`
-- Current task after submit:
-  - `/Users/robelmelaku/Desktop/Winoe-AI/winoe-frontend/qa_verifications/Contract-Live-QA/contract_live_qa_latest/artifacts/20260425T213610/api/candidate-day2-current-task-after.json`
-- Final contract-live report:
-  - `/Users/robelmelaku/Desktop/Winoe-AI/winoe-frontend/qa_verifications/Contract-Live-QA/contract_live_qa_latest/contract_live_qa_report.md`
+- `pr.md`
 
-# 8. Zero-Seeding Verification
+### Backend
 
-- No browser state was injected by the QA driver.
-- No `sessionStorage` / `localStorage` / bootstrap / task-state restoration hacks were used.
-- Real frontend + backend stack was used.
-- Real browser auth was used.
-- No mocked API routes were used.
+- None in the current diff.
 
-# 9. Acceptance Criteria Checklist
+## QA Evidence
 
-- [x] GitHub username capture/validation step before Day 2 opens
-- [x] Frontend sends `githubUsername` in Codespace init request
-- [x] Run tests shows correct lifecycle: idle, running, success/failure
-- [x] Submit and Continue completes reliably
-- [x] Frontend polling honors backend `pollAfterMs`
-- [x] All copy states are Codespace-only
-- [x] Codespace URL is prominently displayed
-- [x] Day 2 window is 9 AM - 5 PM local with countdown timer
-- [x] After cutoff, the UI becomes read-only with a Day closed message
+Evidence bundle:
 
-# 10. Risks / Follow-Ups
+- `qa_verifications/Contract-Live-QA/contract_live_qa_latest/artifacts/20260426T201813`
 
-- The frontend is now aligned with the verified backend contract, but this flow still depends on backend issues #285 and #286 remaining in place.
-- If the Codespace init payload changes again, the username capture step and polling contract should be re-validated against the live backend response.
-- Any future Day 2/3 wording changes should keep the Codespace-only framing consistent across the session shell, workspace CTA, and task instructions.
+Full contract-live sequence passed:
 
-# 11. Reviewer Notes
+- `talent_partner-fresh,candidate-schedule,candidate-day:1,candidate-day:2,candidate-day:3,talent_partner-review`
 
-- This PR closes the frontend side of issue #183 on the real stack.
-- Backend blockers #285 and #286 were required to make the flow verifiable end to end.
-- The live QA evidence includes both the open-day and closed-day states, plus the run-tests and submit lifecycle artifacts.
-- The UI now recovers from reload/restart using durable product state rather than a volatile client-only started state.
+Trial/session:
 
-Worker Report:
+- `trialId=1`
+- `candidateSessionId=1`
 
-- Summary
-  - Updated `pr.md` only to describe the verified Day 2 candidate UI fix for issue #183.
-- Files changed
-  - `pr.md`
-- Commands run
-  - `sed -n '1,240p' pr.md` - pass
-  - `rg -n "workspace|run-tests|submit|pollAfterMs|githubUsername|Day 2|closed|read-only|queued|jobs: \[\]" ...` - pass
-- Risks / assumptions
-  - Assumed the live QA artifacts are the source of truth for the final PR narrative.
-  - Kept the frontend PR scoped to issue #183 and referenced backend blockers #285 and #286 without claiming backend alone closes the issue.
-- Open questions / blockers
-  - None
+### Day 2 evidence
+
+- Route: `http://localhost:3000/candidate/session/3ayfNEd6d5ySAKUM5FmBH8n2fsODfbxF3-r6mMP6Te4`
+- Screenshot: `candidate-day2-after.png`
+- Verified text:
+  - `Codespace workspace`
+  - `Day 2 and Day 3 implementation work must happen in GitHub Codespaces only.`
+  - `PRIMARY WORK ENVIRONMENT`
+  - `Open Codespace`
+  - `Use this Codespace for all Day 2 and Day 3 implementation work.`
+
+### Day 3 evidence
+
+- Route: `http://localhost:3000/candidate/session/3ayfNEd6d5ySAKUM5FmBH8n2fsODfbxF3-r6mMP6Te4`
+- Screenshot: `candidate-day3-after.png`
+- Verified text:
+  - `Codespace workspace`
+  - Codespace-only implementation language
+  - `PRIMARY WORK ENVIRONMENT`
+  - `Open Codespace`
+  - `Implementation Wrap-Up`
+
+### Talent Partner review evidence
+
+- Route: `http://localhost:3000/dashboard/trials/1/candidates/1`
+- Screenshot: `talent_partner-submissions-page.png`
+- Verified text:
+  - `Latest GitHub artifacts (Day 2 / Day 3)`
+  - `official Trial repository and Codespace-captured work`
+  - no offline/local permission copy
+
+## Checks
+
+Frontend:
+
+- `npm run lint` - pass
+- `npm run typecheck` - pass
+- targeted Jest suite - pass
+  - `tests/unit/shared/ui/IntegrityCallout.test.tsx`
+  - `tests/unit/features/talent-partner/submission-review/ArtifactCard.test.tsx`
+  - `tests/unit/features/candidate/session/views/WorkspaceAndTests.test.tsx`
+  - `tests/unit/features/candidate/tasks/CodespaceFallbackPanel.test.tsx`
+  - `tests/unit/features/candidate/session/CandidateSessionView.schedule.test.tsx`
+- Full precommit - pass
+
+Backend:
+
+- `python3 -m py_compile ...` - pass for changed backend files
+- `bash -n runBackend.sh` - pass
+- targeted backend pytest - pass if backend files remain changed
+- Not applicable in the current diff because no backend files remain changed.
+
+## Forbidden-Term Scan
+
+Exact command:
+
+```bash
+rg -n -i "offline|local work|work locally|work offline|local-only|offline/local" src tests qa_verifications pr.md
+```
+
+Result:
+
+- One stale mention in `pr.md` before this rewrite.
+- `tests/*` hits only use `new TypeError('offline')` as a technical failure fixture.
+- `qa_verifications/*` hits are archived historical artifacts from earlier bundles, not current product copy.
+
+No current user-facing candidate or Talent Partner UI copy in the active frontend source tree should mention offline or local work after this PR material update.
+
+## Acceptance Criteria Checklist
+
+- [x] No UI copy anywhere mentions offline or local work.
+- [x] Day 2 and Day 3 informational text emphasizes Codespace-only workflow.
+- [x] Talent Partner submission review copy removes offline/local permission.
+- [x] Day 2/3 UI prominently displays the Codespace URL as primary work environment.
+
+## Risk / Rollback
+
+- The contract-live proof uses env-controlled backend demo mode because Anthropic quota was exhausted.
+- Prod env files were not sourced.
+- Dev-auth bypass was not used.
+- The local QA harness resets and boots a clean local stack to avoid stale port/server issues.
+- Any backend day-window support should be treated as local/test-only QA support, not a production behavior change.
+
+## Scope Confirmation
+
+- Frontend product changes are in scope.
+- Frontend QA harness changes are in scope.
+- Backend local/test support changes are not present in the current diff.
+- The unrelated backend compare-summary behavior change is not in scope.
+

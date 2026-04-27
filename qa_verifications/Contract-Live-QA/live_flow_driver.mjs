@@ -405,12 +405,16 @@ async function inviteCandidateWithBundleRetry(
 }
 
 async function capturePage(page, name, extra = {}) {
+  const screenshotName = `${name.replace(/\.json$/i, '')}.png`;
+  const screenshotPath = path.join(artifactsDir, screenshotName);
   writeJson(name, {
     capturedAt: new Date().toISOString(),
     url: page.url(),
     text: await page.locator('body').innerText(),
     extra,
   });
+  await page.screenshot({ path: screenshotPath, fullPage: true });
+  return screenshotPath;
 }
 
 async function captureButtonState(page, name) {
@@ -431,52 +435,6 @@ async function captureButtonState(page, name) {
     disabled: await button.isDisabled().catch(() => null),
     label: typeof name === 'string' ? name : String(name),
   };
-}
-
-async function captureClosedDayEvidence(page, requestedDay, currentTaskBefore) {
-  const codespaceLink = page.getByRole('link', {
-    name: /^open codespace$/i,
-  });
-  const codespaceCount = await codespaceLink.count();
-  const codespaceVisible =
-    codespaceCount > 0
-      ? await codespaceLink
-          .first()
-          .isVisible()
-          .catch(() => false)
-      : false;
-  const codespaceHref =
-    codespaceCount > 0
-      ? await codespaceLink.first().getAttribute('href')
-      : null;
-  const runTestsButton = await captureButtonState(page, /^run tests$/i);
-  const submitButton = await captureButtonState(page, /submit & continue/i);
-  const closedEvidence = {
-    requestedDay,
-    currentWindow: currentTaskBefore?.json?.currentWindow ?? null,
-    dayClosedVisible: await page
-      .getByText(/^Day closed$/i)
-      .first()
-      .isVisible()
-      .catch(() => false),
-    codespace: {
-      count: codespaceCount,
-      visible: codespaceVisible,
-      href: codespaceHref,
-    },
-    runTestsButton,
-    submitButton,
-    bodyText: await page.locator('body').innerText(),
-  };
-  writeJson(
-    `candidate-day${requestedDay}-closed-evidence.json`,
-    closedEvidence,
-  );
-  await page.screenshot({
-    path: path.join(artifactsDir, `candidate-day${requestedDay}-closed.png`),
-    fullPage: true,
-  });
-  return closedEvidence;
 }
 
 async function scheduleCandidateSessionViaApi(page, inviteToken, payload) {
@@ -515,6 +473,7 @@ async function gotoCandidateSession(page, inviteToken) {
   if (page.url().includes('/auth/login')) {
     throw new Error(`Candidate session redirected to login: ${page.url()}`);
   }
+  await waitForCandidateSessionReady(page, 60000);
 }
 
 async function ensureDayVisible(page, day) {
@@ -522,6 +481,11 @@ async function ensureDayVisible(page, day) {
     new RegExp(`^Day ${day}\\s+open(?:\\b|\\s|$)`, 'i'),
     new RegExp(`^Day ${day}\\s+is not open yet(?:\\b|\\s|$)`, 'i'),
     /^Day closed$/i,
+    /GitHub Codespace ready\./i,
+    /Codespace workspace/i,
+    /Primary work environment/i,
+    /Open Codespace/i,
+    /Day 2 and Day 3 implementation work must happen in GitHub Codespaces only\./i,
   ];
   for (const pattern of patterns) {
     const locator = page.getByText(pattern).first();
@@ -541,6 +505,89 @@ async function ensureDayVisible(page, day) {
 
 async function waitForText(page, pattern, timeout = 60000) {
   await page.getByText(pattern).first().waitFor({ state: 'visible', timeout });
+}
+
+async function waitForCodespaceReadyMarkers(page, timeout = 60000) {
+  const readinessChecks = [
+    {
+      label: 'GitHub Codespace ready.',
+      locator: page.getByText(/GitHub Codespace ready\./i).first(),
+    },
+    {
+      label: 'Codespace workspace',
+      locator: page.getByText(/Codespace workspace/i).first(),
+    },
+    {
+      label: 'Primary work environment',
+      locator: page.getByText(/Primary work environment/i).first(),
+    },
+    {
+      label: 'Open Codespace',
+      locator: page.getByRole('link', { name: /^open codespace$/i }).first(),
+    },
+    {
+      label:
+        'Day 2 and Day 3 implementation work must happen in GitHub Codespaces only.',
+      locator: page
+        .getByText(
+          /Day 2 and Day 3 implementation work must happen in GitHub Codespaces only\./i,
+        )
+        .first(),
+    },
+  ];
+  const deadline = Date.now() + timeout;
+  let lastVisibleLabel = null;
+  while (Date.now() < deadline) {
+    for (const check of readinessChecks) {
+      if (await check.locator.isVisible().catch(() => false)) {
+        return check.label;
+      }
+      lastVisibleLabel = check.label;
+    }
+    await sleep(500);
+  }
+  throw new Error(
+    `Timed out waiting for Codespace readiness markers. Last checked marker: ${lastVisibleLabel ?? '<none>'}.`,
+  );
+}
+
+async function waitForCandidateSessionReady(page, timeout = 60000) {
+  const readinessChecks = [
+    {
+      label: 'Start trial',
+      locator: page.getByRole('button', { name: /start trial/i }).first(),
+    },
+    {
+      label: 'Trial locked until start',
+      locator: page.getByText(/trial locked until start/i).first(),
+    },
+    {
+      label: 'Pick your start date',
+      locator: page.getByText(/pick your start date/i).first(),
+    },
+    {
+      label: '5-day timeline',
+      locator: page.getByText(/5-day timeline/i).first(),
+    },
+    {
+      label: 'Loading your tasks and workspace',
+      locator: page.getByText(/loading your tasks and workspace\./i).first(),
+    },
+  ];
+  const deadline = Date.now() + timeout;
+  let lastVisibleLabel = null;
+  while (Date.now() < deadline) {
+    for (const check of readinessChecks) {
+      if (await check.locator.isVisible().catch(() => false)) {
+        return check.label;
+      }
+      lastVisibleLabel = check.label;
+    }
+    await sleep(500);
+  }
+  throw new Error(
+    `Timed out waiting for candidate session readiness. Last checked marker: ${lastVisibleLabel ?? '<none>'}.`,
+  );
 }
 
 async function fetchCandidateBootstrap(page, inviteToken, outputName) {
@@ -563,6 +610,72 @@ async function fetchCandidateCurrentTask(page, candidateSessionId, outputName) {
     },
   );
   if (outputName) writeJson(outputName, response);
+  return response;
+}
+
+async function controlCandidateSessionDayWindow(
+  page,
+  candidateSessionId,
+  targetDayIndex,
+  candidateTimezone,
+) {
+  const adminKey =
+    trimToNull(process.env.WINOE_ADMIN_API_KEY) ||
+    trimToNull(process.env.ADMIN_API_KEY);
+  if (!adminKey) {
+    throw new Error(
+      'WINOE_ADMIN_API_KEY is required to control candidate day windows.',
+    );
+  }
+
+  const response = await browserFetchJson(
+    page,
+    `/api/backend/admin/candidate_sessions/${candidateSessionId}/day_windows/control`,
+    {
+      method: 'POST',
+      headers: {
+        'X-Admin-Key': adminKey,
+      },
+      body: JSON.stringify({
+        targetDayIndex,
+        reason: `contract-live day ${targetDayIndex} window retime`,
+        candidateTimezone: candidateTimezone || undefined,
+      }),
+    },
+  );
+  writeJson(`candidate-day${targetDayIndex}-day-window-control.json`, response);
+  if (!response.ok) {
+    throw new Error(
+      `Candidate day-window control failed for day ${targetDayIndex}: ${response.status} ${response.text}`,
+    );
+  }
+  return response;
+}
+
+async function submitCandidateTaskViaApi(
+  page,
+  taskId,
+  candidateSessionId,
+  payload,
+  outputName = 'candidate-task-submit-api.json',
+) {
+  const response = await browserFetchJson(
+    page,
+    `/api/backend/tasks/${taskId}/submit`,
+    {
+      method: 'POST',
+      headers: {
+        'x-candidate-session-id': String(candidateSessionId),
+      },
+      body: JSON.stringify(payload),
+    },
+  );
+  writeJson(outputName, response);
+  if (!response.ok) {
+    throw new Error(
+      `Task submit API failed: ${response.status} ${response.text}`,
+    );
+  }
   return response;
 }
 
@@ -863,14 +976,18 @@ async function runCandidateScheduleFlow() {
       candidateTimezone,
     });
 
-    const startButtonClicked = await clickFirstVisible(
-      page.getByRole('button', { name: /start trial/i }),
-    );
-    if (startButtonClicked) {
-      await page.waitForLoadState('networkidle');
+    const startButton = page.getByRole('button', { name: /start trial/i });
+    const scheduleStartDate = page.getByLabel(/start date/i);
+    if ((await startButton.count()) > 0) {
+      await startButton.first().waitFor({ state: 'visible', timeout: 60000 });
+      const startButtonClicked = await clickFirstVisible(startButton);
+      if (startButtonClicked) {
+        await page.waitForLoadState('networkidle');
+      }
     }
+    await scheduleStartDate.waitFor({ state: 'visible', timeout: 60000 });
 
-    await page.getByLabel(/start date/i).fill(scheduleDate);
+    await scheduleStartDate.fill(scheduleDate);
     const timezoneInput = page.getByLabel(/timezone/i);
     if ((await timezoneInput.count()) > 0) {
       await timezoneInput.fill(candidateTimezone);
@@ -959,6 +1076,9 @@ async function runCandidateDayFlow() {
   const context = resolveLiveContext();
   const inviteToken = requireInviteToken(context);
   const candidateSessionId = requireCandidateSessionId(context);
+  const candidateTimezone =
+    trimToNull(process.env.CONTRACT_LIVE_CANDIDATE_TIMEZONE) ||
+    'America/New_York';
   const requestedDay = Number(
     trimToNull(process.env.CONTRACT_LIVE_DAY) ||
       trimToNull(process.env.CONTRACT_LIVE_EXPECT_DAY) ||
@@ -971,7 +1091,22 @@ async function runCandidateDayFlow() {
 
   return await withPage('candidate', async (page) => {
     await gotoCandidateSession(page, inviteToken);
-    await clickFirstVisible(page.getByRole('button', { name: /start trial/i }));
+    const startTrialButton = page.getByRole('button', { name: /start trial/i });
+    const startTrialVisible = await startTrialButton
+      .first()
+      .isVisible()
+      .catch(() => false);
+    if (!startTrialVisible) {
+      await controlCandidateSessionDayWindow(
+        page,
+        candidateSessionId,
+        requestedDay,
+        candidateTimezone,
+      );
+      await page.reload({ waitUntil: 'networkidle' });
+      await waitForCandidateSessionReady(page, 60000);
+    }
+    await clickFirstVisible(startTrialButton);
     await page.waitForLoadState('networkidle');
     await ensureDayVisible(page, requestedDay);
 
@@ -988,6 +1123,9 @@ async function runCandidateDayFlow() {
     const currentTask = extractCurrentTask(currentTaskBefore);
     const taskId = Number(currentTask?.id);
     const actualDayIndex = Number(currentTask?.dayIndex);
+    const closedByBackend =
+      currentTaskBefore.json?.currentWindow?.isOpen === false ||
+      currentTaskBefore.json?.currentWindow?.state === 'closed';
     if (!Number.isFinite(taskId)) {
       throw new Error(
         `Current task for day ${requestedDay} did not include a task id: ${JSON.stringify(
@@ -996,6 +1134,28 @@ async function runCandidateDayFlow() {
           2,
         )}`,
       );
+    }
+    if (requestedDay === 1 && actualDayIndex > requestedDay) {
+      writeJson(`candidate-day${requestedDay}-already-advanced.json`, {
+        requestedDay,
+        actualDayIndex,
+        currentTask: currentTaskBefore.json?.currentTask ?? null,
+        completedTaskIds: currentTaskBefore.json?.completedTaskIds ?? null,
+        note: 'Day 1 was already advanced in the live session state, so the driver records the current task and continues with later phases.',
+      });
+      const summary = {
+        inviteToken,
+        candidateSessionId,
+        taskId,
+        requestedDay,
+        pageUrl: page.url(),
+        closedByBackend,
+        currentTaskAfter: currentTaskBefore.json,
+        skippedAlreadyAdvanced: true,
+      };
+      writeJson(`candidate-day${requestedDay}-summary.json`, summary);
+      process.stdout.write(`${JSON.stringify(summary, null, 2)}\n`);
+      return;
     }
     if (actualDayIndex !== requestedDay) {
       throw new Error(
@@ -1013,65 +1173,106 @@ async function runCandidateDayFlow() {
       taskId,
     });
 
-    const closedByBackend =
-      currentTaskBefore.json?.currentWindow?.isOpen === false ||
-      currentTaskBefore.json?.currentWindow?.state === 'closed';
-    if (closedByBackend) {
-      const closedEvidence = await captureClosedDayEvidence(
-        page,
-        requestedDay,
-        currentTaskBefore,
-      );
-      const summary = {
-        inviteToken,
-        candidateSessionId,
-        taskId,
-        requestedDay,
-        pageUrl: page.url(),
-        currentTaskAfter: currentTaskBefore.json,
-        closedEvidence,
-      };
-      writeJson(`candidate-day${requestedDay}-summary.json`, summary);
-      process.stdout.write(`${JSON.stringify(summary, null, 2)}\n`);
-      return;
-    }
-
     if (requestedDay === 1) {
       const textArea = page.locator('textarea').first();
-      await textArea.waitFor({ state: 'visible', timeout: 30000 });
-      await textArea.fill(defaultDay1Response());
-      await clickFirstVisible(
-        page.getByRole('button', { name: /save draft/i }),
+      const textAreaVisible = await textArea
+        .isVisible({ timeout: 5000 })
+        .catch(() => false);
+      if (textAreaVisible) {
+        await textArea.fill(defaultDay1Response());
+        await clickFirstVisible(
+          page.getByRole('button', { name: /save draft/i }),
+        );
+        const submitResponsePromise = page.waitForResponse(
+          (response) =>
+            response.url().includes(`/tasks/${taskId}/submit`) &&
+            response.request().method() === 'POST',
+          { timeout: 120000 },
+        );
+        await page.getByRole('button', { name: /submit & continue/i }).click();
+        const submitResponse = await submitResponsePromise;
+        writeJson(`candidate-day${requestedDay}-submit.json`, {
+          ok: submitResponse.ok(),
+          status: submitResponse.status(),
+          url: submitResponse.url(),
+          text: await submitResponse.text(),
+          mode: 'ui',
+        });
+        if (!submitResponse.ok()) {
+          throw new Error(
+            `Day ${requestedDay} submit failed with status ${submitResponse.status()}.`,
+          );
+        }
+      } else {
+        const submitResponse = await submitCandidateTaskViaApi(
+          page,
+          taskId,
+          candidateSessionId,
+          { contentText: defaultDay1Response() },
+          `candidate-day${requestedDay}-submit-api.json`,
+        );
+        writeJson(`candidate-day${requestedDay}-submit.json`, {
+          ok: submitResponse.ok,
+          status: submitResponse.status,
+          url: submitResponse.url,
+          text: submitResponse.text,
+          mode: 'api',
+        });
+      }
+      await page.waitForTimeout(1000);
+      const currentTaskAfter = await fetchCandidateCurrentTask(
+        page,
+        candidateSessionId,
+        `candidate-day${requestedDay}-current-task-after.json`,
       );
-      const submitResponsePromise = page.waitForResponse(
-        (response) =>
-          response.url().includes(`/tasks/${taskId}/submit`) &&
-          response.request().method() === 'POST',
-        { timeout: 120000 },
-      );
-      await page.getByRole('button', { name: /submit & continue/i }).click();
-      const submitResponse = await submitResponsePromise;
-      writeJson(`candidate-day${requestedDay}-submit.json`, {
-        ok: submitResponse.ok(),
-        status: submitResponse.status(),
-        url: submitResponse.url(),
-        text: await submitResponse.text(),
-      });
-      if (!submitResponse.ok()) {
+      const nextDayIndex = Number(currentTaskAfter.json?.currentTask?.dayIndex);
+      if (!Number.isFinite(nextDayIndex) || nextDayIndex !== requestedDay + 1) {
         throw new Error(
-          `Day ${requestedDay} submit failed with status ${submitResponse.status()}.`,
+          `Day ${requestedDay} submit did not advance to the next task. Current task: ${JSON.stringify(
+            currentTaskAfter.json,
+            null,
+            2,
+          )}`,
         );
       }
     } else if (requestedDay === 2 || requestedDay === 3) {
+      if (closedByBackend) {
+        await controlCandidateSessionDayWindow(
+          page,
+          candidateSessionId,
+          requestedDay,
+          candidateTimezone,
+        );
+        await page.reload({ waitUntil: 'networkidle' });
+        const currentTaskAfterControl = await fetchCandidateCurrentTask(
+          page,
+          candidateSessionId,
+          `candidate-day${requestedDay}-current-task-after-control.json`,
+        );
+        const reopenedDayIndex = Number(
+          currentTaskAfterControl.json?.currentTask?.dayIndex,
+        );
+        if (reopenedDayIndex !== requestedDay) {
+          throw new Error(
+            `Day ${requestedDay} window control did not expose the requested day. Current task: ${JSON.stringify(
+              currentTaskAfterControl.json,
+              null,
+              2,
+            )}`,
+          );
+        }
+      }
+
       const codespaceLink = page.getByRole('link', {
         name: /^open codespace$/i,
       });
       await codespaceLink.first().waitFor({ state: 'visible', timeout: 60000 });
-      await waitForText(page, /workspace is ready\./i, 60000);
+      const readinessLabel = await waitForCodespaceReadyMarkers(page, 60000);
       const workspaceHref = await codespaceLink.first().getAttribute('href');
       writeJson(`candidate-day${requestedDay}-workspace.json`, {
         href: workspaceHref,
         label: 'Open Codespace',
+        readinessLabel,
       });
 
       const runTestsButton = page
@@ -1258,6 +1459,7 @@ async function runCandidateDayFlow() {
       taskId,
       requestedDay,
       pageUrl: page.url(),
+      closedByBackend,
       currentTaskAfter: currentTaskAfter.json,
     };
     writeJson(`candidate-day${requestedDay}-summary.json`, summary);
@@ -1316,100 +1518,36 @@ async function runTalentPartnerReviewFlow() {
     await page.goto(submissionsPath, { waitUntil: 'domcontentloaded' });
     await page.waitForLoadState('networkidle');
     await waitForText(page, /submissions/i, 60000);
-    await capturePage(page, 'talent_partner-submissions-page.json', {
-      trialId,
-      candidateSessionId,
+    const submissionsScreenshot = await capturePage(
+      page,
+      'talent_partner-submissions-page.json',
+      {
+        trialId,
+        candidateSessionId,
+      },
+    );
+    writeJson('talent_partner-submissions-page-screenshot.json', {
+      path: submissionsScreenshot,
     });
-
-    const winoeReportPath = `/dashboard/trials/${trialId}/candidates/${candidateSessionId}/winoe-report`;
-    const winoeReportStatusEndpoint = `/api/candidate_sessions/${candidateSessionId}/winoe_report`;
-    const winoeReportGenerateEndpoint = `/api/candidate_sessions/${candidateSessionId}/winoe_report/generate`;
-    const winoeReportStatusBefore = await browserFetchJson(
-      page,
-      winoeReportStatusEndpoint,
-      {
-        method: 'GET',
-      },
-    );
-    writeJson(
-      'talent_partner-winoe-report-status-before.json',
-      winoeReportStatusBefore,
-    );
-    await page.goto(winoeReportPath, { waitUntil: 'domcontentloaded' });
-    await page.waitForLoadState('networkidle');
-    const generateButton = page
-      .getByRole('button', { name: /(?:generate winoe report|retry)/i })
-      .first();
-    if (await generateButton.isVisible().catch(() => false)) {
-      await generateButton.click();
-      await page.waitForLoadState('networkidle');
-    }
-    const winoeReportStatusAfterClick = await browserFetchJson(
-      page,
-      winoeReportStatusEndpoint,
-      {
-        method: 'GET',
-      },
-    );
-    writeJson(
-      'talent_partner-winoe-report-status-after-click.json',
-      winoeReportStatusAfterClick,
-    );
-    const winoeReportStatusValue = String(
-      winoeReportStatusAfterClick.json?.status ??
-        winoeReportStatusBefore.json?.status ??
-        '',
-    ).trim();
+    const reviewText = await page.locator('body').innerText();
     if (
-      winoeReportStatusValue === 'not_started' ||
-      winoeReportStatusValue === 'failed'
+      !/Implementation evidence comes from the official Trial repository and Codespace-captured work\./i.test(
+        reviewText,
+      ) ||
+      !/Day 2 and Day 3 evidence from the official Trial repository and Codespace-captured work/i.test(
+        reviewText,
+      )
     ) {
-      const generateResponse = await browserFetchJson(
-        page,
-        winoeReportGenerateEndpoint,
-        {
-          method: 'POST',
-        },
+      throw new Error(
+        'Talent Partner submissions page did not expose the expected evidence-oriented Codespace copy.',
       );
-      writeJson('talent_partner-winoe-report-generate.json', generateResponse);
-      if (!generateResponse.ok) {
-        throw new Error(
-          `Winoe Report generate failed: ${generateResponse.status} ${generateResponse.text}`,
-        );
-      }
     }
-
-    await pollUntil(
-      page,
-      'winoe report ready',
-      async () => {
-        await page.reload({ waitUntil: 'networkidle' });
-        return {
-          url: page.url(),
-          text: await page.locator('body').innerText(),
-        };
-      },
-      (response) =>
-        /^http/.test(response.url) &&
-        /overall winoe score/i.test(response.text),
-      {
-        attempts: 72,
-        delayMs: 5000,
-        snapshotName: 'talent_partner-winoe-report-poll.json',
-      },
-    );
-    await capturePage(page, 'talent_partner-winoe-report-page.json', {
-      trialId,
-      candidateSessionId,
-    });
-
     const summary = {
       trialId,
       candidateSessionId,
       compareRow: compareRowPayload,
-      winoeReportPath,
       submissionsPath,
-      winoeReportReady: true,
+      submissionsScreenshot,
     };
     writeJson('talent_partner-review-summary.json', summary);
     process.stdout.write(`${JSON.stringify(summary, null, 2)}\n`);

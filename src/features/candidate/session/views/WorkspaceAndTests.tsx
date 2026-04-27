@@ -38,7 +38,7 @@ export function WorkspaceAndTests({
   const closedByCutoff = isPastTaskCutoff(task.cutoffAt);
   const workspaceReadOnly = actionGate.isReadOnly || closedByCutoff;
   const cutoffDisabledReason = closedByCutoff
-    ? 'Day closed. Work after cutoff will not be considered.'
+    ? 'Day closed. The Codespace is read-only after cutoff.'
     : null;
   const disabledReason = actionGate.disabledReason ?? cutoffDisabledReason;
 

@@ -20,7 +20,9 @@ describe('WorkspacePanel read-only and cutoff', () => {
       readOnly: true,
       readOnlyReason: 'Day closed for this task.',
     });
-    expect(await screen.findByText(/Workspace is ready/i)).toBeInTheDocument();
+    expect(
+      await screen.findByText(/GitHub Codespace ready/i),
+    ).toBeInTheDocument();
     expect(
       screen.getByText(/Workspace actions are paused/i),
     ).toBeInTheDocument();
@@ -40,7 +42,7 @@ describe('WorkspacePanel read-only and cutoff', () => {
     });
     renderPanel({
       readOnly: true,
-      readOnlyReason: 'Day closed. Work after cutoff will not be considered.',
+      readOnlyReason: 'Day closed. The Codespace is read-only after cutoff.',
       cutoffCommitSha: 'abc123def456',
       cutoffAt: '2026-03-08T17:45:00.000Z',
       isClosed: true,
@@ -59,7 +61,7 @@ describe('WorkspacePanel read-only and cutoff', () => {
     });
     renderPanel({
       readOnly: true,
-      readOnlyReason: 'Day closed. Work after cutoff will not be considered.',
+      readOnlyReason: 'Day closed. The Codespace is read-only after cutoff.',
       isClosed: true,
     });
     expect(await screen.findByText(/^Day closed$/i)).toBeInTheDocument();

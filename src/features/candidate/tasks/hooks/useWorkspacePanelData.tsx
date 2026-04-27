@@ -56,6 +56,7 @@ export function useWorkspacePanelData(props: WorkspacePanelProps) {
 
   const integrityCallout = props.integrityCallout ?? (
     <IntegrityCallout
+      audience="candidate"
       codespaceUrl={derived.effectiveWorkspace?.codespaceUrl ?? null}
       cutoffCommitSha={derived.effectiveCutoffCommitSha}
       cutoffAt={derived.effectiveCutoffAt}
