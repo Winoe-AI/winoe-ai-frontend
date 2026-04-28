@@ -9,6 +9,7 @@ type TaskActionsProps = {
   onSaveDraft?: () => void;
   onSubmit: () => void | Promise<unknown>;
   requireSubmitConfirmation?: boolean;
+  submitLabel?: string;
 };
 
 export const TaskActions = memo(function TaskActions({
@@ -19,6 +20,7 @@ export const TaskActions = memo(function TaskActions({
   onSaveDraft,
   onSubmit,
   requireSubmitConfirmation = false,
+  submitLabel: idleSubmitLabel = 'Submit & Continue',
 }: TaskActionsProps) {
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [confirmPending, setConfirmPending] = useState(false);
@@ -27,7 +29,7 @@ export const TaskActions = memo(function TaskActions({
       ? 'Submitting…'
       : displayStatus === 'submitted'
         ? 'Submitted ✓'
-        : 'Submit & Continue';
+        : idleSubmitLabel;
   const handleSubmitClick = () => {
     if (disabled || displayStatus !== 'idle') return;
     if (requireSubmitConfirmation) {

@@ -1,109 +1,138 @@
-# PR: Complete Day 1 design document workspace
-
-## Linked Issue
-
-- Winoe-AI/winoe-ai-frontend issue #182
+# PR: Fix Day 3 Implementation Wrap-Up UI
 
 ## Summary
 
-This PR implements the Day 1 candidate design document workspace for the v4 from-scratch Tech Trial model. Day 1 is now Project Brief-first: candidates plan from scratch, choose their tech stack, make architecture and dependency decisions, define project organization, set a testing strategy, document risks and tradeoffs, and outline their Days 2-3 implementation plan.
+- Reframed Day 3 candidate UI from stale debugging exercise language to `Implementation Wrap-Up`.
+- Normalized stale Day 3 backend task copy client-side so candidate-facing UI always shows the correct v4 from-scratch model.
+- Preserved same Codespace/repository continuation from Day 2.
+- Preserved existing submit/final SHA behavior.
+- Added/updated focused tests for Day 3 copy, CTA, stale `debug` leakage, and submit feedback.
 
-The stale GitHub issue criterion for a read-only repository exploration link is intentionally not implemented because it was superseded by the v4 pivot. There is no pre-populated codebase to explore on Day 1.
+## Product Behavior
 
-## Implementation Summary
-
-- Added a Day 1-specific design document workspace.
-- Displayed Project Brief / prestart context prominently above the editor.
-- Added from-scratch design guidance and starter content covering tech stack, architecture, project structure, testing strategy, risks, tradeoffs, and Days 2-3 plan.
-- Added side-by-side markdown editor and live preview.
-- Added responsive layout behavior for narrower screens.
-- Added autosave states: `Saving...`, `Saved`, and `Save failed`.
-- Added submit confirmation dialog before final Day 1 submission.
-- Added deadline card / countdown using existing `task.cutoffAt`.
-- Added deadline-triggered autosave.
-- Added immutable closed/submitted Day 1 view.
-- Preserved saved draft artifact restoration after cutoff when no finalized submission exists.
-- Prevented starter content from being written before restore settles.
-- Kept finalized submitted content authoritative over draft restore.
-- Hardened submit confirmation against disabled/pending duplicate submission states.
+- Day 3 now shows `Implementation Wrap-Up`.
+- Day 3 displays safe task type/copy instead of stale `debug`.
+- Day 3 guides candidates to finish the build, improve tests, handle edge cases, optimize, document, and prepare for handoff.
+- Day 3 reinforces Codespace-only implementation work.
+- Day 3 submit uses `Submit Implementation Wrap-Up`.
+- Progress remains X/5.
 
 ## Files Changed
 
+- `src/features/candidate/tasks/utils/day3ImplementationWrapUpUtils.ts`
+- `src/features/candidate/session/api/tasksNormalizeApi.ts`
+- `src/features/candidate/session/utils/taskTransformsUtils.ts`
 - `src/features/candidate/tasks/CandidateTaskViewInner.tsx`
-- `src/features/candidate/tasks/components/Day1DesignDocWorkspace.tsx`
-- `src/features/candidate/tasks/components/Day1DeadlineCard.tsx`
 - `src/features/candidate/tasks/components/TaskActions.tsx`
 - `src/features/candidate/tasks/components/TaskWorkArea.tsx`
-- `src/features/candidate/tasks/components/DraftSaveStatus.tsx`
-- `src/features/candidate/tasks/hooks/useTaskSubmitController.ts`
-- `src/features/candidate/tasks/hooks/useTaskSubmitController.types.ts`
-- `src/features/candidate/tasks/hooks/useTaskDraftAutosave.ts`
-- `src/features/candidate/tasks/hooks/useTaskDraftAutosave.types.ts`
-- `src/features/candidate/tasks/utils/day1DesignDocUtils.ts`
-- Focused Day 1/task autosave/submit tests
+- `src/features/candidate/tasks/components/progress/daySummaries.ts`
+- `tests/e2e/flow-qa/candidate-day3.spec.ts`
+- `tests/unit/features/candidate/tasks/CandidateTaskProgress.test.tsx`
+- `tests/unit/features/candidate/tasks/components/TaskActions.test.tsx`
+- `tests/unit/features/candidate/tasks/CandidateTaskView.day3ImplementationWrapUp.test.tsx`
+- `tests/unit/features/candidate/tasks/CandidateTaskView.submitFeedback.test.tsx`
 
 ## QA Evidence
 
-### Manual QA
+### Environment
 
-- QA PASSED - ready for pr.md update
-- Frontend URL used: `http://localhost:3000`
-- Backend URL used: `http://localhost:8000`
-- Candidate QA account used: candidate account only; credentials are not included here.
-- Controlled Day 1 fixture:
-  - token `qa-day1`
-  - candidateSessionId `77`
-  - taskId `1`
-- `FRONTEND_QA_PLAYBOOK.md` was not present, so QA followed repo README/run scripts and documented QA fixtures.
+Backend:
 
-### Manual QA Scenarios Passed
+- PASS `./runBackend.sh migrate`
+- PASS `./runBackend.sh bootstrap-local`
+- Runtime: `WINOE_SCENARIO_GENERATION_RUNTIME_MODE=demo WINOE_DEMO_MODE=1 ./runBackend.sh`
 
-- Candidate login and active Day 1 workspace
-- Project Brief displayed prominently above editor
-- No repository exploration link/copy
-- From-scratch design prompts present
-- Markdown editor and live preview work
-- Responsive layout checked
-- Autosave success checked
-- Autosave failure forced via mocked `PUT /api/backend/tasks/1/draft` returning 500
-- Submit confirmation cancel/confirm checked
-- Submitted Day 1 locks read-only
-- Deadline countdown checked
-- Deadline reached while page open checked
-- Reload after cutoff with saved draft checked
-- Reload after cutoff with finalized submission checked
-- Reload after cutoff with no saved content checked
-- Forbidden-term scan passed
+Frontend:
+
+- Runtime: `./runFrontend.sh`
+
+URLs:
+
+- Frontend: `http://localhost:3000`
+- Backend: `http://localhost:8000`
+
+Health:
+
+- PASS backend `/health`
+- PASS frontend `/api/health`
+
+Browser/tool:
+
+- Playwright Chromium
+
+### Account / Session
+
+- Candidate account used: `robiemelaku@gmail.com`
+- Talent Partner account used for local Trial API setup: `robel.kebede@bison.howard.edu`
+- QA Trial: `Issue 184 Day 3 QA Trial Demo`
+- Trial id: `3`
+- Candidate session id: `1`
+
+### Acceptance Criteria Evidence
+
+AC1 Day 3 title: PASS
+
+- Visible text: `Day 3 • code`
+- Visible title: `Implementation Wrap-Up`
+- No `Debugging Exercise`
+
+AC2 same Codespace/repo: PASS
+
+- Day 2 and Day 3 both showed repo `winoe-ai-repos/winoe-ws-1`
+- Day 2 and Day 3 both showed Codespace `https://vigilant-orbit-jjwrrq6r467j2j7ww.github.dev`
+
+AC3 wrap-up guidance: PASS
+
+- Copy includes finish core build, improve test coverage, handle edge cases, optimize, add/improve documentation, and prepare for handoff.
+
+AC4 Codespace-only constraints: PASS
+
+- Visible copy includes `Day 2 and Day 3 implementation work must happen in GitHub Codespaces only`
+- Visible copy includes `All coding work must happen inside the Codespace`
+
+AC5 submit/final SHA behavior: PASS
+
+- Day 3 submit returned `finalSha: "68b2650911ea1dedd050c2360e34096b74f3dc23"`
+- Progress advanced to `3/5`
+
+AC6 forbidden terminology absent: PASS for candidate-facing Day 3 DOM
+
+- DOM scan found none of the forbidden Day 3 terms.
+- Code scan found only internal/test compatibility occurrences.
+
+AC7 5-day Trial framing: PASS
+
+- UI showed `2/5 complete` before Day 3 submit.
+- UI showed `3/5 complete` after Day 3 submit.
+- No X/10 task framing.
 
 ### QA Artifacts
 
-The issue #182 manual QA artifact directory is tracked in this repo. The latest contract-live Playwright result path is ignored by `.gitignore`, so it is referenced as local evidence and should not be added unless repo convention changes.
-
-- `qa_verifications/issue182-day1-manual-qa/2026-04-27T20-00-18-214Z/`
-- `qa_verifications/issue182-day1-manual-qa/2026-04-27T20-00-18-214Z/manual-qa-results.json`
-- `qa_verifications/Contract-Live-QA/contract_live_qa_latest/artifacts/2026-04-27T19-55-37-266Z/playwright/results.json`
+- `/tmp/winoe-issue-184-day3-qa/09-day3-active-ui.png`
+- `/tmp/winoe-issue-184-day3-qa/10-day3-after-submit.png`
+- `/tmp/winoe-issue-184-day3-qa/day3-active-network-responses.json`
+- `/tmp/winoe-issue-184-day3-qa/day3-submit-responses.json`
 
 ## Automated Checks
 
-- PASS `npm run typecheck`
+- PASS `npm test -- CandidateTaskView.submitFeedback.test.tsx --runInBand`
+- PASS `npm test -- CandidateTaskView.day3ImplementationWrapUp.test.tsx --runInBand`
 - PASS `npm run lint`
-- PASS `npm test -- --runInBand` - 499 suites / 1550 tests
-- PASS `npm test -- --runInBand tests/unit/features/candidate/tasks/CandidateTaskView.day1DesignDoc.test.tsx` - 13 tests
-- PASS `npm test -- --runInBand tests/unit/features/candidate/tasks/components/TaskActions.test.tsx` - 3 tests
-- PASS `npm test -- --runInBand tests/unit/features/candidate/tasks/hooks/useTaskDraftAutosave.test.tsx` - 4 tests
-- PASS `npm test -- --runInBand tests/unit/features/candidate/tasks/hooks/useTaskDraftAutosave.extra.test.tsx` - 4 tests
+- PASS `npm run typecheck`
+- PASS `npm run lint:prettier`
+- PASS `./precommit.sh`
+  - 500 Jest suites passed
+  - 1552 tests passed
+  - coverage gate passed
+  - typecheck passed
+  - production build passed
 
-### Forbidden-Term Scan
+## Risk / Rollback
 
-```bash
-rg -n "Tenon|SimuHire|recruiter|simulation|Fit Profile|Fit Score|template|precommit|Specializor|existing codebase|starter code|read-only repository|offline|local work" src/features/candidate/tasks tests/unit/components/candidate tests/unit/features/candidate/tasks
-```
+- Risk is low.
+- The frontend still accepts stale backend Day 3 payloads, including `type: "debug"`, but normalizes candidate-facing Day 3 display to the correct Implementation Wrap-Up model.
+- No backend contract changes.
+- Existing final SHA behavior preserved.
+- Rollback: revert the Day 3 normalization/copy changes and test updates.
 
-Result: PASS, no matches.
-
-## Risks / Assumptions
-
-- Deadline behavior depends on backend providing accurate `task.cutoffAt`.
-- `FRONTEND_QA_PLAYBOOK.md` was not present locally; QA used repo README/run scripts.
-- Cutoff edge cases were verified with controlled Playwright fixtures.
-- Downstream Talent Partner review surfaces, Evidence Trail entries, Winoe Report content, and Winoe Score calculations depend on existing backend/reporting flows consuming the finalized Day 1 artifact correctly.
+Fixes #184

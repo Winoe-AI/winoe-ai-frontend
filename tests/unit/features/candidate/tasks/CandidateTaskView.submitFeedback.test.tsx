@@ -44,7 +44,7 @@ describe('CandidateTaskView submit feedback statuses', () => {
     expect(screen.getByText(/Checkpoint recorded/i)).toBeInTheDocument();
   });
 
-  it('shows final feedback with commit fallback for day3 debug submit', async () => {
+  it('shows final feedback with commit fallback for Day 3 implementation wrap-up submit', async () => {
     const onSubmit = jest.fn().mockResolvedValue({
       submissionId: 301,
       taskId: 3,
@@ -66,7 +66,9 @@ describe('CandidateTaskView submit feedback statuses', () => {
       },
       onSubmit,
     });
-    fireEvent.click(screen.getByRole('button', { name: /submit & continue/i }));
+    fireEvent.click(
+      screen.getByRole('button', { name: /submit implementation wrap-up/i }),
+    );
     await waitFor(() =>
       expect(screen.getByText(/Final recorded/i)).toBeInTheDocument(),
     );

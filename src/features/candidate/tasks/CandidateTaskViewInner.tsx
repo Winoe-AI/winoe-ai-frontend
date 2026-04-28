@@ -9,6 +9,7 @@ import { TaskActions } from './components/TaskActions';
 import { TaskDraftStatusSlots } from './components/TaskDraftStatusSlots';
 import { TaskWorkArea } from './components/TaskWorkArea';
 import { useTaskSubmitController } from './hooks/useTaskSubmitController';
+import { withDay3ImplementationWrapUpCopy } from './utils/day3ImplementationWrapUpUtils';
 import {
   DEFAULT_ACTION_GATE,
   type CandidateTaskViewProps,
@@ -23,6 +24,7 @@ export function CandidateTaskViewInner({
   actionGate,
   onTaskWindowClosed,
 }: CandidateTaskViewProps) {
+  const displayTask = withDay3ImplementationWrapUpCopy(task);
   const controller = useTaskSubmitController({
     candidateSessionId,
     task,
@@ -49,13 +51,16 @@ export function CandidateTaskViewInner({
 
   return (
     <TaskContainer>
-      <TaskHeader task={task} statusSlot={draftStatus.headerStatusSlot} />
+      <TaskHeader
+        task={displayTask}
+        statusSlot={draftStatus.headerStatusSlot}
+      />
       {isDay1DesignDoc ? null : (
-        <TaskDescription description={task.description} />
+        <TaskDescription description={displayTask.description} />
       )}
       <TaskWorkArea
         dayIndex={task.dayIndex}
-        projectBrief={task.description}
+        projectBrief={displayTask.description}
         cutoffAt={task.cutoffAt}
         githubNative={controller.githubNative}
         readOnly={controller.readOnly}
@@ -86,6 +91,9 @@ export function CandidateTaskViewInner({
           }
           onSubmit={controller.saveAndSubmit}
           requireSubmitConfirmation={isDay1DesignDoc}
+          submitLabel={
+            task.dayIndex === 3 ? 'Submit Implementation Wrap-Up' : undefined
+          }
         />
       )}
     </TaskContainer>
