@@ -59,4 +59,22 @@ body {
     break-inside: avoid;
     page-break-inside: avoid;
   }
+
+  body.winoe-report-print-mode .winoe-report-hero {
+    background: #fff !important;
+    color: #111827 !important;
+    border-color: #d1d5db !important;
+  }
+
+  body.winoe-report-print-mode .winoe-report-hero *,
+  body.winoe-report-print-mode .winoe-report-hero *::before,
+  body.winoe-report-print-mode .winoe-report-hero *::after {
+    background: transparent !important;
+    color: #111827 !important;
+    box-shadow: none !important;
+  }
+
+  body.winoe-report-print-mode .winoe-report-hero [class*='border'] {
+    border-color: #d1d5db !important;
+  }
 }

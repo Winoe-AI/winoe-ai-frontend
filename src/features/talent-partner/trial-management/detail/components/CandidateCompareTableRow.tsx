@@ -5,7 +5,7 @@ import Button from '@/shared/ui/Button';
 import { StatusPill } from '@/shared/ui/StatusPill';
 import { statusMeta } from '@/shared/status/statusMeta';
 import {
-  formatRecommendationLabel,
+  formatRecommendationEvidenceLanguage,
   formatScorePercent,
 } from '@/features/talent-partner/winoe-report/winoeReportFormatting';
 import type { CandidateCompareRow } from '@/features/talent-partner/api/candidatesCompareApi';
@@ -64,7 +64,7 @@ export function CandidateCompareTableRow({
       </td>
       <td className="px-4 py-3 align-top text-gray-700">
         {row.recommendation
-          ? formatRecommendationLabel(row.recommendation)
+          ? formatRecommendationEvidenceLanguage(row.recommendation)
           : '—'}
       </td>
       <td className="px-4 py-3 align-top">

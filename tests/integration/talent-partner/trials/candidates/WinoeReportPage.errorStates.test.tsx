@@ -35,7 +35,11 @@ describe('WinoeReportPage error states', () => {
         : textResponse('Not found', 404),
     );
     renderWinoeReportPage();
-    expect(await screen.findByText(/Access denied/i)).toBeInTheDocument();
+    expect(
+      await screen.findByText(
+        /Access denied\. You do not have permission to view this Winoe Report\./i,
+      ),
+    ).toBeInTheDocument();
   });
 
   it('maps generic request failures to error panel', async () => {

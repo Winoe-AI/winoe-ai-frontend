@@ -66,11 +66,33 @@ describe('WinoeReportPage print-proof artifact', () => {
       </div>,
     );
 
-    expect(await screen.findByText('78%')).toBeInTheDocument();
+    expect(await screen.findAllByText('78 / 100')).toHaveLength(2);
+    expect(screen.getByText(/Winoe Report/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/Winoe Score/i).length).toBeGreaterThan(0);
+    expect(screen.getByText(/Dimensional sub-scores/i)).toBeInTheDocument();
+    expect(screen.getByText(/Evidence Trail drill-down/i)).toBeInTheDocument();
+    expect(screen.getByText(/Per-day scores/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/Reviewer sub-agent summaries/i),
+    ).toBeInTheDocument();
+    expect(screen.getAllByText(/Day 1/i).length).toBeGreaterThan(0);
+    expect(screen.getByText(/Design Doc Reviewer/i)).toBeInTheDocument();
+    expect(screen.getAllByText(/Winoe synthesis/i).length).toBeGreaterThan(0);
+    expect(
+      screen.getByText(/Winoe provides evidence, context, and calibration\./i),
+    ).toBeInTheDocument();
+    expect(
+      container.querySelector('[data-winoe-report-no-print="true"]'),
+    ).not.toBeNull();
     expect(screen.getByText(/URL:/)).toHaveTextContent(
       'https://github.com/org/repo/commit/abc123',
     );
     expect(screen.getByText(/URL:/)).not.toHaveTextContent('token=');
+    expect(
+      screen.getAllByText(
+        /No linked artifacts were returned for this dimension yet\./i,
+      ).length,
+    ).toBeGreaterThan(0);
 
     const cssPath = path.join(process.cwd(), 'src/app/globals.css');
     const fullCss = fs

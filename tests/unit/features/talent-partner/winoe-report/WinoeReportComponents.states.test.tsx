@@ -20,7 +20,7 @@ describe('Winoe Report components states', () => {
       />,
     );
     expect(screen.getByText('Day 4')).toBeInTheDocument();
-    expect(screen.getByText('AI Evaluation: Disabled')).toBeInTheDocument();
+    expect(screen.getByText('AI evaluation disabled')).toBeInTheDocument();
     expect(
       screen.getByText(/AI evaluation disabled for this day./i),
     ).toBeInTheDocument();

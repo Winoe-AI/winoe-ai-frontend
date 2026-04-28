@@ -5,10 +5,12 @@ import type {
 import {
   asRecord,
   normalizeStatus,
+  toNullableString,
   toNumberOrNull,
   toUnitIntervalOrNull,
 } from './winoeReport.normalize.base';
 import { normalizeEvidence } from './winoeReport.normalizeEvidence';
+import { formatDayLabel } from './winoeReport.catalog';
 
 export function normalizeDayEvaluationStatus(
   record: Record<string, unknown>,
@@ -65,7 +67,12 @@ export function normalizeDayScore(
   const rubricBreakdown = asRecord(
     record.rubricBreakdown ?? record.rubric_breakdown,
   );
-  const evidenceRaw = Array.isArray(record.evidence) ? record.evidence : [];
+  const evidenceRaw =
+    (Array.isArray(record.evidence) ? record.evidence : null) ??
+    (Array.isArray(record.artifacts) ? record.artifacts : null) ??
+    (Array.isArray(record.evidenceItems) ? record.evidenceItems : null) ??
+    (Array.isArray(record.evidence_items) ? record.evidence_items : null) ??
+    [];
   const evidence = evidenceRaw
     .map(normalizeEvidence)
     .filter((item): item is WinoeReportEvidence => Boolean(item));
@@ -81,11 +88,34 @@ export function normalizeDayScore(
       : (normalizedScore ?? 0);
   return {
     dayIndex: normalizedDayIndex,
+    dayLabel: formatDayLabel(normalizedDayIndex),
     score,
     rubricBreakdown: rubricBreakdown ?? {},
     evidence,
     evaluationStatus,
     reason,
     aiEvaluationEnabled,
+    summary:
+      toNullableString(
+        record.summary ??
+          record.daySummary ??
+          record.day_summary ??
+          record.overview ??
+          record.notes,
+      ) ?? null,
+    statusLabel:
+      toNullableString(
+        record.statusLabel ??
+          record.status_label ??
+          record.evaluationLabel ??
+          record.evaluation_label,
+      ) ?? null,
+    reviewerSummary:
+      toNullableString(
+        record.reviewerSummary ??
+          record.reviewer_summary ??
+          record.subAgentSummary ??
+          record.sub_agent_summary,
+      ) ?? null,
   };
 }
