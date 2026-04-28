@@ -33,7 +33,7 @@ export function HandoffUploadActionButtons({
             onClick={openFilePicker}
             disabled={uploadDisabled}
           >
-            Upload video
+            Upload demo video
           </Button>
         </div>
       ) : (
@@ -42,8 +42,9 @@ export function HandoffUploadActionButtons({
             variant="secondary"
             onClick={openFilePicker}
             disabled={uploadDisabled}
+            aria-label="Replace upload: resubmit demo video"
           >
-            Replace upload
+            Resubmit demo video
           </Button>
           <Button
             variant="ghost"

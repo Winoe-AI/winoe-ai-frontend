@@ -25,7 +25,7 @@ export function StartView({ title, role, onStart, onDashboard }: Props) {
             <b>Days 2–3:</b> build from scratch in the GitHub Codespace only.
           </li>
           <li>
-            <b>Day 4:</b> demo presentation.
+            <b>Day 4:</b> Handoff + Demo.
           </li>
           <li>
             <b>Day 5:</b> reflection essay.

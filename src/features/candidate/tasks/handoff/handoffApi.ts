@@ -2,6 +2,7 @@ export type {
   HandoffConsentPayload,
   HandoffDeleteResponse,
   HandoffStatusResponse,
+  HandoffSupplementalMaterial,
   HandoffTranscriptSegment,
   HandoffUploadCompleteResponse,
   HandoffUploadInitResponse,

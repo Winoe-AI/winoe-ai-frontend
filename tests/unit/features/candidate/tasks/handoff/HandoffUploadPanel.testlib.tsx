@@ -51,6 +51,12 @@ export const closedGate: ActionGate = {
 const emptyStatus = makeStatus();
 const originalCreateObjectUrl = URL.createObjectURL;
 const originalRevokeObjectUrl = URL.revokeObjectURL;
+const originalCreateElement = document.createElement.bind(document);
+let mockVideoDurationSeconds = 120;
+
+export function setMockVideoDuration(seconds: number) {
+  mockVideoDurationSeconds = seconds;
+}
 
 beforeEach(() => {
   jest.useFakeTimers();
@@ -61,6 +67,31 @@ beforeEach(() => {
   getHandoffStatusMock.mockReset();
   URL.createObjectURL = jest.fn(() => 'blob://handoff-preview');
   URL.revokeObjectURL = jest.fn();
+  mockVideoDurationSeconds = 120;
+  document.createElement = ((
+    tagName: string,
+    options?: ElementCreationOptions,
+  ) => {
+    const element = originalCreateElement(tagName, options);
+    if (tagName.toLowerCase() !== 'video') return element;
+    Object.defineProperty(element, 'duration', {
+      configurable: true,
+      get: () => mockVideoDurationSeconds,
+    });
+    Object.defineProperty(element, 'src', {
+      configurable: true,
+      set: () => {
+        queueMicrotask(() => {
+          const video = element as HTMLVideoElement;
+          video.onloadedmetadata?.(new Event('loadedmetadata'));
+        });
+      },
+    });
+    const video = element as HTMLVideoElement;
+    video.removeAttribute = jest.fn();
+    video.load = jest.fn();
+    return element;
+  }) as typeof document.createElement;
   getHandoffStatusMock.mockResolvedValue(emptyStatus);
   initHandoffUploadMock.mockResolvedValue({
     recordingId: 'rec_123',
@@ -85,6 +116,7 @@ afterEach(() => {
 afterAll(() => {
   URL.createObjectURL = originalCreateObjectUrl;
   URL.revokeObjectURL = originalRevokeObjectUrl;
+  document.createElement = originalCreateElement;
 });
 
 export const renderPanel = (actionGate: ActionGate = openGate) =>

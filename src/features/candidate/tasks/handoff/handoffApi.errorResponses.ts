@@ -5,7 +5,7 @@ export function scopeFallback(scope: RequestScope): string {
   if (scope === 'complete') return 'Unable to finalize upload right now.';
   if (scope === 'consent') return 'Unable to save consent right now.';
   if (scope === 'delete') return 'Unable to delete upload right now.';
-  return 'Unable to load presentation status right now.';
+  return 'Unable to load Handoff + Demo status right now.';
 }
 
 export function isEndpointUnavailableStatus(

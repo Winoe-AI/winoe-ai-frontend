@@ -1,10 +1,12 @@
 import type {
   HandoffStatusResponse,
+  HandoffSupplementalMaterial,
   HandoffTranscriptSegment,
 } from './handoffApi';
 
 export type HandoffPanelPhase =
   | 'idle'
+  | 'validating'
   | 'uploading'
   | 'uploaded'
   | 'processing'
@@ -16,6 +18,9 @@ export type HandoffPanelPhase =
 export type HandoffUploadState = {
   phase: HandoffPanelPhase;
   uploadProgressPct: number;
+  selectedFileName: string | null;
+  selectedFileSizeBytes: number | null;
+  selectedVideoDurationSeconds: number | null;
   recordingId: string | null;
   recordingStatus: string | null;
   previewUrl: string | null;
@@ -24,6 +29,7 @@ export type HandoffUploadState = {
   transcriptProgressPct: number | null;
   transcriptText: string | null;
   transcriptSegments: HandoffTranscriptSegment[] | null;
+  supplementalMaterials: HandoffSupplementalMaterial[] | null;
   consentStatus: boolean | null;
   consentedAt: string | null;
   isDeleted: boolean;
@@ -39,6 +45,12 @@ export type HandoffUploadState = {
 
 export type HandoffUploadAction =
   | { type: 'STATUS_SYNCED'; payload: HandoffStatusResponse }
+  | {
+      type: 'VIDEO_VALIDATION_STARTED';
+      fileName: string;
+      fileSizeBytes: number;
+    }
+  | { type: 'VIDEO_VALIDATION_SUCCEEDED'; durationSeconds: number }
   | { type: 'UPLOAD_STARTED' }
   | { type: 'UPLOAD_PROGRESS'; progressPct: number }
   | { type: 'UPLOAD_SUCCEEDED'; recordingId: string; previewUrl: string }
@@ -52,6 +64,9 @@ export type HandoffUploadAction =
 export const initialHandoffUploadState: HandoffUploadState = {
   phase: 'idle',
   uploadProgressPct: 0,
+  selectedFileName: null,
+  selectedFileSizeBytes: null,
+  selectedVideoDurationSeconds: null,
   recordingId: null,
   recordingStatus: null,
   previewUrl: null,
@@ -60,6 +75,7 @@ export const initialHandoffUploadState: HandoffUploadState = {
   transcriptProgressPct: null,
   transcriptText: null,
   transcriptSegments: null,
+  supplementalMaterials: null,
   consentStatus: null,
   consentedAt: null,
   isDeleted: false,

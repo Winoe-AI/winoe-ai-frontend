@@ -8,7 +8,7 @@ import { type HandoffUploadState } from './handoffUploadMachine';
 
 export function deriveHandoffNoticeState(state: HandoffUploadState) {
   return {
-    uploadHint: `Accepted: MP4, WebM, MOV. Use this video to demo your work, decisions, tradeoffs, and outcomes. Recommended under ${formatBytes(DEFAULT_RECOMMENDED_VIDEO_BYTES)}; backend enforces the exact upload-size limit.`,
+    uploadHint: `Accepted: MP4, WebM, MOV. Demo videos must be 15 minutes or shorter. Use this Handoff + Demo to explain what you built, decisions, tradeoffs, challenges, and what you would improve with more time. Recommended under ${formatBytes(DEFAULT_RECOMMENDED_VIDEO_BYTES)}; backend enforces the exact upload-size limit.`,
     aiNoticeVersion: state.aiNoticeVersion ?? DEFAULT_NOTICE_VERSION,
     aiNoticeEnabled: state.aiNoticeEnabled !== false,
     aiNoticeSummaryUrl:
@@ -20,6 +20,7 @@ export function deriveFinalizeDisabled(params: {
   completingUpload: boolean;
   deletingUpload: boolean;
   uploading: boolean;
+  validating?: boolean;
   windowClosed: boolean;
   candidateSessionId: number | null;
   consentChecked: boolean;
@@ -29,6 +30,7 @@ export function deriveFinalizeDisabled(params: {
     params.completingUpload ||
     params.deletingUpload ||
     params.uploading ||
+    Boolean(params.validating) ||
     params.windowClosed ||
     params.candidateSessionId === null ||
     !params.consentChecked ||

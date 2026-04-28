@@ -19,6 +19,7 @@ export function isRecordingUnavailable(
 }
 
 type StatusToneState = {
+  validating?: boolean;
   uploading: boolean;
   completing: boolean;
   deleting: boolean;
@@ -39,6 +40,7 @@ export function describeStatusTone(state: StatusToneState): {
   if (state.windowClosed) return { label: 'Window closed', tone: 'warning' };
   if (state.deleting) return { label: 'Deleting upload', tone: 'warning' };
   if (state.isDeleted) return { label: 'Deleted', tone: 'muted' };
+  if (state.validating) return { label: 'Checking video', tone: 'info' };
   if (state.uploading) return { label: 'Uploading', tone: 'info' };
   if (state.completing) return { label: 'Finalizing upload', tone: 'info' };
   if (state.pendingFinalize)

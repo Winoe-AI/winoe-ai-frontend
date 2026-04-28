@@ -3,7 +3,11 @@ import {
   extractTaskWindowClosedOverride,
   formatComeBackMessage,
 } from '@/features/candidate/session/lib/windowState';
-import { completeHandoffUpload } from './handoffApi';
+import {
+  completeHandoffUpload,
+  initHandoffUpload,
+  uploadFileToSignedUrl,
+} from './handoffApi';
 import { toUploadErrorMessage } from './panelUtils';
 import type { HandoffUploadAction } from './handoffUploadMachine';
 
@@ -11,6 +15,7 @@ type Params = {
   candidateSessionId: number | null;
   taskId: number;
   pendingCompleteRecordingId: string | null;
+  supplementalFiles: File[];
   consentChecked: boolean;
   aiNoticeVersion: string;
   windowClosed: boolean;
@@ -20,14 +25,46 @@ type Params = {
   refreshStatus: () => Promise<unknown> | unknown;
   setCompletingUpload: (value: boolean) => void;
   setPendingCompleteRecordingId: (value: string | null) => void;
+  setSupplementalFiles: (value: File[]) => void;
   setConsentChecked: (value: boolean) => void;
   setConsentValidation: (value: string | null) => void;
 };
+
+async function uploadSupplementalMaterials({
+  taskId,
+  candidateSessionId,
+  files,
+}: {
+  taskId: number;
+  candidateSessionId: number;
+  files: File[];
+}) {
+  for (const file of files) {
+    const init = await initHandoffUpload({
+      taskId,
+      candidateSessionId,
+      contentType: file.type || 'application/octet-stream',
+      sizeBytes: file.size,
+      filename: file.name,
+      assetType: 'supplemental',
+    });
+    await uploadFileToSignedUrl({
+      uploadUrl: init.uploadUrl,
+      file,
+    });
+    await completeHandoffUpload({
+      taskId,
+      candidateSessionId,
+      recordingId: init.recordingId,
+    });
+  }
+}
 
 export async function runHandoffUploadCompletion({
   candidateSessionId,
   taskId,
   pendingCompleteRecordingId,
+  supplementalFiles,
   consentChecked,
   aiNoticeVersion,
   windowClosed,
@@ -37,6 +74,7 @@ export async function runHandoffUploadCompletion({
   refreshStatus,
   setCompletingUpload,
   setPendingCompleteRecordingId,
+  setSupplementalFiles,
   setConsentChecked,
   setConsentValidation,
 }: Params) {
@@ -68,7 +106,13 @@ export async function runHandoffUploadCompletion({
       recordingId: pendingCompleteRecordingId,
       consent: { consented: true, aiNoticeVersion },
     });
+    await uploadSupplementalMaterials({
+      taskId,
+      candidateSessionId,
+      files: supplementalFiles,
+    });
     setPendingCompleteRecordingId(null);
+    setSupplementalFiles([]);
     setConsentChecked(false);
     void refreshStatus();
   } catch (err) {
@@ -85,7 +129,7 @@ export async function runHandoffUploadCompletion({
       type: 'UPLOAD_FAILED',
       message: toUploadErrorMessage(
         err,
-        'Unable to complete upload right now. Please retry.',
+        'Unable to save the final submission right now. Please retry.',
       ),
     });
   } finally {

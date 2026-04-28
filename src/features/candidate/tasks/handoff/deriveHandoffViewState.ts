@@ -34,11 +34,13 @@ export function deriveHandoffViewState({
   windowClosed,
   windowClosedMessage,
 }: Params) {
+  const validating = state.phase === 'validating';
   const uploading = state.phase === 'uploading';
   const hasRecording = hasHandoffRecording(state);
   const hasPreview = hasHandoffPreview(state);
   const statusPill = describeStatusTone({
     uploading,
+    validating,
     completing: completingUpload,
     deleting: deletingUpload,
     pendingFinalize,
@@ -51,6 +53,7 @@ export function deriveHandoffViewState({
   });
   const replaceDisabled =
     windowClosed ||
+    validating ||
     uploading ||
     completingUpload ||
     deletingUpload ||
@@ -79,12 +82,14 @@ export function deriveHandoffViewState({
     completingUpload,
     deletingUpload,
     uploading,
+    validating,
     windowClosed,
     candidateSessionId,
     consentChecked,
     pendingFinalize,
   });
   return {
+    validating,
     uploading,
     hasRecording,
     hasPreview,

@@ -87,6 +87,9 @@ export function nextDataState(
       : action.payload.transcriptProgressPct,
     transcriptText: isDeleted ? null : action.payload.transcriptText,
     transcriptSegments: isDeleted ? null : action.payload.transcriptSegments,
+    supplementalMaterials: isDeleted
+      ? null
+      : action.payload.supplementalMaterials,
     consentStatus: action.payload.consentStatus,
     consentedAt: action.payload.consentedAt,
     isDeleted,

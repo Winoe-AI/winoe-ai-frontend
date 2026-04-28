@@ -1,4 +1,4 @@
-import { useCallback, type Dispatch } from 'react';
+import { useCallback, type ChangeEvent, type Dispatch } from 'react';
 import type {
   HandoffUploadAction,
   HandoffUploadState,
@@ -53,6 +53,7 @@ export function useHandoffUploadActions({
     candidateSessionId,
     taskId,
     pendingCompleteRecordingId: actionState.pendingCompleteRecordingId,
+    supplementalFiles: actionState.supplementalFiles,
     consentChecked: actionState.consentChecked,
     aiNoticeVersion,
     windowClosed,
@@ -62,6 +63,7 @@ export function useHandoffUploadActions({
     refreshStatus,
     setCompletingUpload: actionState.setCompletingUpload,
     setPendingCompleteRecordingId: actionState.setPendingCompleteRecordingId,
+    setSupplementalFiles: actionState.setSupplementalFiles,
     setConsentChecked: actionState.setConsentChecked,
     setConsentValidation: actionState.setConsentValidation,
   });
@@ -89,8 +91,24 @@ export function useHandoffUploadActions({
     dispatch({ type: 'CLEAR_ERROR' });
   };
 
+  const openSupplementalFilePicker = useCallback(() => {
+    actionState.supplementalInputRef.current?.click();
+  }, [actionState.supplementalInputRef]);
+
+  const onSupplementalInputChange = useCallback(
+    (event: ChangeEvent<HTMLInputElement>) => {
+      const files = Array.from(event.target.files ?? []);
+      event.target.value = '';
+      actionState.setSupplementalFiles(files);
+    },
+    [actionState],
+  );
+
   return {
     fileInputRef: actionState.fileInputRef,
+    supplementalInputRef: actionState.supplementalInputRef,
+    supplementalFiles: actionState.supplementalFiles,
+    setSupplementalFiles: actionState.setSupplementalFiles,
     pendingFinalize: actionState.pendingCompleteRecordingId !== null,
     consentChecked: actionState.consentChecked,
     setConsentChecked: actionState.setConsentChecked,
@@ -106,5 +124,7 @@ export function useHandoffUploadActions({
     onConfirmDelete,
     clearErrorAndRefresh,
     onOpenDeleteConfirm,
+    openSupplementalFilePicker,
+    onSupplementalInputChange,
   };
 }

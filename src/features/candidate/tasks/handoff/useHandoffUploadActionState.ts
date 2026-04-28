@@ -12,8 +12,10 @@ export function useHandoffUploadActionState(state: HandoffUploadState) {
   const [completingUpload, setCompletingUpload] = useState(false);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [deletingUpload, setDeletingUpload] = useState(false);
+  const [supplementalFiles, setSupplementalFiles] = useState<File[]>([]);
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const supplementalInputRef = useRef<HTMLInputElement | null>(null);
   const uploadAbortRef = useRef<AbortController | null>(null);
   const uploadAttemptRef = useRef(0);
   const ownedPreviewUrlRef = useRef<string | null>(null);
@@ -69,7 +71,10 @@ export function useHandoffUploadActionState(state: HandoffUploadState) {
     setDeleteConfirmOpen,
     deletingUpload,
     setDeletingUpload,
+    supplementalFiles,
+    setSupplementalFiles,
     fileInputRef,
+    supplementalInputRef,
     uploadAbortRef,
     uploadAttemptRef,
     ownedPreviewUrlRef,

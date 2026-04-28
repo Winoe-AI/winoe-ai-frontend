@@ -31,6 +31,7 @@ describe('handoffApi init and complete', () => {
       contentType: 'video/mp4',
       sizeBytes: 2048,
       filename: 'demo.mp4',
+      durationSeconds: 600,
     });
     expect(result).toEqual({
       recordingId: 'rec_123',
@@ -38,7 +39,7 @@ describe('handoffApi init and complete', () => {
       expiresInSeconds: 1200,
     });
     expect(fetchMock).toHaveBeenCalledWith(
-      '/api/backend/tasks/9/presentation/upload/init',
+      '/api/backend/tasks/9/handoff/upload/init',
       expect.objectContaining({
         method: 'POST',
         headers: expect.objectContaining({ 'x-candidate-session-id': '44' }),
@@ -49,6 +50,7 @@ describe('handoffApi init and complete', () => {
       contentType: 'video/mp4',
       sizeBytes: 2048,
       filename: 'demo.mp4',
+      durationSeconds: 600,
     });
   });
 
@@ -68,6 +70,34 @@ describe('handoffApi init and complete', () => {
     const [, requestInit] = fetchMock.mock.calls[0] as [string, RequestInit];
     expect(JSON.parse(String(requestInit.body ?? '{}'))).toEqual({
       recordingId: 'rec_22',
+    });
+  });
+
+  it('initializes supplemental material upload with backend asset type', async () => {
+    const fetchMock = jest.fn() as FetchMock;
+    fetchMock.mockResolvedValue(
+      jsonRes({
+        recordingId: 'rec_supplemental',
+        uploadUrl: 'https://storage.example.com/supplemental',
+        expiresInSeconds: 1200,
+      }),
+    );
+    global.fetch = fetchMock as unknown as typeof fetch;
+    const { initHandoffUpload } = await importHandoffApi();
+    await initHandoffUpload({
+      taskId: 9,
+      candidateSessionId: 44,
+      contentType: 'application/pdf',
+      sizeBytes: 512,
+      filename: 'slides.pdf',
+      assetType: 'supplemental',
+    });
+    const [, requestInit] = fetchMock.mock.calls[0] as [string, RequestInit];
+    expect(JSON.parse(String(requestInit.body ?? '{}'))).toEqual({
+      contentType: 'application/pdf',
+      sizeBytes: 512,
+      filename: 'slides.pdf',
+      assetType: 'supplemental',
     });
   });
 

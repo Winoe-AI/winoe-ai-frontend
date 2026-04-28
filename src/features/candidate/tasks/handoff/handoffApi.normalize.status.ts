@@ -1,4 +1,5 @@
 import { toStringOrNull } from '@/features/candidate/session/api/baseApi';
+import { normalizeSupplementalMaterials } from './handoffApi.normalize.supplemental';
 import { normalizeTranscriptSegments } from './handoffApi.normalize.transcript';
 import {
   normalizeProgressPct,
@@ -56,6 +57,11 @@ export function normalizeStatusResponse(raw: unknown): HandoffStatusResponse {
       transcriptRecord?.segments ??
         record?.transcriptSegments ??
         record?.transcript_segments,
+    ),
+    supplementalMaterials: normalizeSupplementalMaterials(
+      record?.supplementalMaterials ??
+        record?.supplemental_materials ??
+        record?.materials,
     ),
     consentStatus:
       toBooleanOrNull(

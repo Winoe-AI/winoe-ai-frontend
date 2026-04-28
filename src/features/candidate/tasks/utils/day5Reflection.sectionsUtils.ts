@@ -4,7 +4,7 @@ const SECTION_LABELS: Record<Day5ReflectionSectionKey, string> = {
   challenges: 'Challenges',
   decisions: 'Decisions',
   tradeoffs: 'Tradeoffs',
-  communication: 'Communication / presentation',
+  communication: 'Communication / handoff',
   next: 'What you would do next',
 };
 
@@ -12,7 +12,7 @@ const SECTION_MARKDOWN_HEADINGS: Record<Day5ReflectionSectionKey, string> = {
   challenges: 'Challenges',
   decisions: 'Decisions',
   tradeoffs: 'Tradeoffs',
-  communication: 'Communication / Presentation',
+  communication: 'Communication / Handoff',
   next: 'What I Would Do Next',
 };
 

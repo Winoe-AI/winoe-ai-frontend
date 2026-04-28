@@ -1,5 +1,6 @@
 export const POLL_INTERVAL_MS = 4000;
 export const DEFAULT_RECOMMENDED_VIDEO_BYTES = 100 * 1024 * 1024;
+export const MAX_DEMO_VIDEO_DURATION_SECONDS = 15 * 60;
 export const ACCEPTED_VIDEO_TYPES = [
   'video/mp4',
   'video/webm',

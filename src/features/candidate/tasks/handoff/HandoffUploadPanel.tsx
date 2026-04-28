@@ -11,10 +11,13 @@ import type { Task } from '../types';
 import { HandoffDeleteCard } from './HandoffDeleteCard';
 import { HandoffFinalizeCard } from './HandoffFinalizeCard';
 import { HandoffPreviewCard } from './HandoffPreviewCard';
+import { HandoffSupplementalMaterials } from './HandoffSupplementalMaterials';
+import { HandoffTranscriptFailure } from './HandoffTranscriptFailure';
 import { HandoffTranscriptPanel } from './HandoffTranscriptPanel';
 import { HandoffTranscriptProcessing } from './HandoffTranscriptProcessing';
 import { HandoffUploadCard } from './HandoffUploadCard';
 import { HandoffUploadProgress } from './HandoffUploadProgress';
+import { HandoffWindowStatus } from './HandoffWindowStatus';
 import { useHandoffUploadController } from './useHandoffUploadController';
 
 type Props = {
@@ -52,11 +55,7 @@ export function HandoffUploadPanel({
 
       <div className="mt-6 space-y-4">
         <TaskPanelErrorBanner message={controller.combinedError} />
-        {controller.windowClosed ? (
-          <div className="rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-900">
-            {controller.windowClosedMessage}
-          </div>
-        ) : null}
+        <HandoffWindowStatus task={task} controller={controller} />
         {controller.aiNoticeEnabled ? (
           <AiNoticeCard
             version={controller.aiNoticeVersion}
@@ -70,11 +69,21 @@ export function HandoffUploadPanel({
           controller={controller}
           candidateSessionId={candidateSessionId}
         />
+        <HandoffSupplementalMaterials
+          files={controller.supplementalFiles}
+          existingMaterials={controller.state.supplementalMaterials ?? []}
+          inputRef={controller.supplementalInputRef}
+          disabled={controller.replaceDisabled}
+          onOpenFilePicker={controller.openSupplementalFilePicker}
+          onInputChange={controller.onSupplementalInputChange}
+          onClearFiles={() => controller.setSupplementalFiles([])}
+        />
         <HandoffFinalizeCard controller={controller} />
         <HandoffDeleteCard controller={controller} />
         <HandoffUploadProgress controller={controller} />
         <HandoffPreviewCard controller={controller} />
         <HandoffTranscriptProcessing controller={controller} />
+        <HandoffTranscriptFailure controller={controller} />
         <HandoffTranscriptPanel controller={controller} />
       </div>
     </TaskContainer>

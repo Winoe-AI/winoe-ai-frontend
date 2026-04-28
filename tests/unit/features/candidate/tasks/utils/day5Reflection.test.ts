@@ -43,7 +43,7 @@ describe('day5Reflection utils', () => {
     expect(markdown).toMatch(/^## Challenges\n/);
     expect(markdown).toContain('\n\n## Decisions\n');
     expect(markdown).toContain('\n\n## Tradeoffs\n');
-    expect(markdown).toContain('\n\n## Communication / Presentation\n');
+    expect(markdown).toContain('\n\n## Communication / Handoff\n');
     expect(markdown).toContain('\n\n## What I Would Do Next\n');
   });
 

@@ -27,6 +27,15 @@ export type HandoffTranscriptSegment = {
   text: string;
 };
 
+export type HandoffSupplementalMaterial = {
+  id: string | null;
+  filename: string;
+  downloadUrl: string | null;
+  contentType: string | null;
+  sizeBytes: number | null;
+  uploadedAt: string | null;
+};
+
 export type HandoffStatusResponse = {
   recordingId: string | null;
   recordingStatus: string | null;
@@ -35,6 +44,7 @@ export type HandoffStatusResponse = {
   transcriptProgressPct: number | null;
   transcriptText: string | null;
   transcriptSegments: HandoffTranscriptSegment[] | null;
+  supplementalMaterials: HandoffSupplementalMaterial[] | null;
   consentStatus: boolean | null;
   consentedAt: string | null;
   isDeleted: boolean;
