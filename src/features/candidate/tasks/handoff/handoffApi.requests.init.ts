@@ -12,16 +12,31 @@ export async function initHandoffUpload(params: {
   contentType: string;
   sizeBytes: number;
   filename?: string | null;
+  assetType?: 'recording' | 'supplemental';
+  durationSeconds?: number | null;
 }): Promise<HandoffUploadInitResponse> {
-  const { taskId, candidateSessionId, contentType, sizeBytes, filename } =
-    params;
+  const {
+    taskId,
+    candidateSessionId,
+    contentType,
+    sizeBytes,
+    filename,
+    assetType,
+    durationSeconds,
+  } = params;
   try {
     const { data } = await requestWithMeta<unknown>(
-      `/tasks/${String(taskId)}/presentation/upload/init`,
+      `/tasks/${String(taskId)}/handoff/upload/init`,
       {
         method: 'POST',
         cache: 'no-store',
-        body: { contentType, sizeBytes, filename: filename ?? undefined },
+        body: {
+          contentType,
+          sizeBytes,
+          filename: filename ?? undefined,
+          assetType: assetType ?? undefined,
+          durationSeconds: durationSeconds ?? undefined,
+        },
         headers: candidateJsonHeaders(candidateSessionId),
       },
       candidateClientOptions,

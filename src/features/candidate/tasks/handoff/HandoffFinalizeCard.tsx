@@ -12,8 +12,8 @@ export function HandoffFinalizeCard({ controller }: Props) {
         Finalize Day 4 submission
       </div>
       <p className="mt-1 text-sm text-blue-900">
-        Your demo video is uploaded. Finalize it to lock in the latest attempt
-        for Day 4.
+        Your demo video is uploaded. Preview it, then finalize it to save the
+        latest Handoff + Demo attempt for Day 4.
       </p>
       {controller.consentValidation ? (
         <p className="mt-2 text-sm text-red-700">
@@ -31,8 +31,9 @@ export function HandoffFinalizeCard({ controller }: Props) {
           }}
           loading={controller.completingUpload}
           disabled={controller.finalizeDisabled}
+          aria-label="Finalize demo: finalize Handoff + Demo"
         >
-          Finalize demo
+          Finalize Handoff + Demo
         </Button>
       </div>
     </div>

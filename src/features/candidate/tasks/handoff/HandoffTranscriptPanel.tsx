@@ -8,7 +8,9 @@ export function HandoffTranscriptPanel({ controller }: Props) {
 
   return (
     <div className="rounded-md border border-gray-200 bg-white p-4">
-      <div className="text-sm font-semibold text-gray-900">Transcript</div>
+      <div className="text-sm font-semibold text-gray-900">
+        Transcript status: ready
+      </div>
       <div className="mt-3 max-h-72 space-y-4 overflow-auto rounded border border-gray-100 bg-gray-50 p-3">
         {controller.hasTranscriptText ? (
           <div>

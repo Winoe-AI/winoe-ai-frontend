@@ -11,7 +11,7 @@ export function HandoffTranscriptProcessing({ controller }: Props) {
       role="status"
       aria-live="polite"
     >
-      Transcript processing...
+      Your demo was received. Transcript processing...
       {controller.state.transcriptProgressPct !== null ? (
         <span className="ml-1">
           ({String(controller.state.transcriptProgressPct)}%)

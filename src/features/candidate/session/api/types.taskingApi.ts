@@ -23,6 +23,13 @@ export type CandidateCurrentTaskResponse = {
   completedTaskIds?: number[];
   progress?: { completedTaskIds?: number[] };
   currentTask: CandidateTask | null;
+  currentWindow?: {
+    windowStartAt?: string | null;
+    windowEndAt?: string | null;
+    nextOpenAt?: string | null;
+    isOpen?: boolean | null;
+    now?: string | null;
+  } | null;
 };
 
 export type CandidateTaskSubmitResponse = {

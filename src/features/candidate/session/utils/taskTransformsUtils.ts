@@ -15,6 +15,7 @@ export function normalizeCompletedTaskIds(
 
 export function toTask(
   dtoTask: CandidateCurrentTaskResponse['currentTask'],
+  currentWindow?: CandidateCurrentTaskResponse['currentWindow'],
 ): Task | null {
   if (!dtoTask) return null;
   return withDay3ImplementationWrapUpCopy({
@@ -25,7 +26,7 @@ export function toTask(
     description: dtoTask.description,
     recordedSubmission: dtoTask.recordedSubmission ?? null,
     cutoffCommitSha: dtoTask.cutoffCommitSha ?? null,
-    cutoffAt: dtoTask.cutoffAt ?? null,
+    cutoffAt: dtoTask.cutoffAt ?? currentWindow?.windowEndAt ?? null,
   });
 }
 

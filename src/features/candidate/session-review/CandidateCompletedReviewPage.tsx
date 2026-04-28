@@ -251,7 +251,7 @@ function PresentationArtifact({
       {artifact.recording?.downloadUrl ? (
         <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
           <div className="text-sm font-medium text-slate-900">
-            Demo presentation recording
+            Handoff + Demo recording
           </div>
           <video
             className="mt-3 w-full rounded-lg bg-black"

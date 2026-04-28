@@ -12,6 +12,7 @@ export function makeStatus(
     transcriptProgressPct: null,
     transcriptText: null,
     transcriptSegments: null,
+    supplementalMaterials: null,
     consentStatus: null,
     consentedAt: null,
     isDeleted: false,

@@ -7,7 +7,9 @@ export function HandoffPreviewCard({ controller }: Props) {
 
   return (
     <div className="rounded-md border border-gray-200 bg-white p-4">
-      <div className="text-sm font-semibold text-gray-900">Preview</div>
+      <div className="text-sm font-semibold text-gray-900">
+        Preview your demo video
+      </div>
       <video
         className="mt-3 max-h-96 w-full rounded bg-black"
         controls

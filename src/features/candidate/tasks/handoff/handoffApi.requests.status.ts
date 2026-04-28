@@ -12,7 +12,7 @@ export async function getHandoffStatus(params: {
   const { taskId, candidateSessionId } = params;
   try {
     const { data } = await requestWithMeta<unknown>(
-      `/tasks/${String(taskId)}/presentation/upload/status`,
+      `/tasks/${String(taskId)}/handoff/status`,
       {
         cache: 'no-store',
         headers: candidateSessionHeaders(candidateSessionId),

@@ -71,6 +71,7 @@ describe('handoffApi status and delete', () => {
       transcriptSegments: [
         { id: null, startMs: 0, endMs: 1250, text: 'Hello' },
       ],
+      supplementalMaterials: null,
       consentStatus: null,
       consentedAt: null,
       isDeleted: false,

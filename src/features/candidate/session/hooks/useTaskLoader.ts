@@ -53,7 +53,7 @@ export function useTaskLoader({
         setTaskLoaded({
           isComplete: Boolean(dto.isComplete),
           completedTaskIds: normalizeCompletedTaskIds(dto),
-          currentTask: toTask(dto.currentTask),
+          currentTask: toTask(dto.currentTask, dto.currentWindow),
         });
         markEnd('candidate:task:fetch', { sessionId, result: 'success' });
       } catch (err) {

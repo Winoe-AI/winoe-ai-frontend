@@ -4,7 +4,11 @@ import {
   formatComeBackMessage,
 } from '@/features/candidate/session/lib/windowState';
 import { initHandoffUpload, uploadFileToSignedUrl } from './handoffApi';
-import { toUploadErrorMessage, validateVideoFile } from './panelUtils';
+import {
+  toUploadErrorMessage,
+  validateVideoDuration,
+  validateVideoFile,
+} from './panelUtils';
 import type { HandoffUploadAction } from './handoffUploadMachine';
 
 type Params = {
@@ -63,21 +67,34 @@ export async function runHandoffUploadSelection({
     return;
   }
 
-  dispatch({ type: 'UPLOAD_STARTED' });
   const uploadAttempt = uploadAttemptRef.current + 1;
   uploadAttemptRef.current = uploadAttempt;
   const controller = new AbortController();
   uploadAbortRef.current?.abort();
   uploadAbortRef.current = controller;
   const isStaleAttempt = () => uploadAttemptRef.current !== uploadAttempt;
+  clearOwnedPreviewUrl();
+  const previewUrl = URL.createObjectURL(file);
+  ownedPreviewUrlRef.current = previewUrl;
 
   try {
+    dispatch({
+      type: 'VIDEO_VALIDATION_STARTED',
+      fileName: file.name,
+      fileSizeBytes: file.size,
+    });
+    const durationSeconds = await validateVideoDuration(file, previewUrl);
+    if (isStaleAttempt()) return;
+    dispatch({ type: 'VIDEO_VALIDATION_SUCCEEDED', durationSeconds });
+    dispatch({ type: 'UPLOAD_STARTED' });
+
     const init = await initHandoffUpload({
       taskId,
       candidateSessionId,
       contentType: file.type,
       sizeBytes: file.size,
       filename: file.name,
+      durationSeconds,
     });
     if (isStaleAttempt()) return;
 
@@ -90,9 +107,6 @@ export async function runHandoffUploadSelection({
     });
     if (isStaleAttempt()) return;
 
-    clearOwnedPreviewUrl();
-    const previewUrl = URL.createObjectURL(file);
-    ownedPreviewUrlRef.current = previewUrl;
     dispatch({
       type: 'UPLOAD_SUCCEEDED',
       recordingId: init.recordingId,
@@ -103,6 +117,7 @@ export async function runHandoffUploadSelection({
     void refreshStatus();
   } catch (err) {
     if (isStaleAttempt()) return;
+    clearOwnedPreviewUrl();
     const windowOverride = extractTaskWindowClosedOverride(err);
     if (windowOverride) {
       onTaskWindowClosed?.(err);

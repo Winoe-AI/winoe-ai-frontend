@@ -3,7 +3,23 @@ import type { HandoffUploadPanelController } from './handoffUploadPanelTypes';
 type Props = { controller: HandoffUploadPanelController };
 
 export function HandoffUploadProgress({ controller }: Props) {
-  if (!controller.uploading) return null;
+  if (!controller.uploading && !controller.validating) return null;
+
+  if (controller.validating) {
+    return (
+      <div
+        className="rounded-md border border-blue-200 bg-blue-50 p-3 text-sm text-blue-900"
+        role="status"
+        aria-live="polite"
+      >
+        <div className="font-medium">Checking video metadata...</div>
+        <div className="mt-1 text-xs">
+          Upload starts after this browser confirms the demo video is 15 minutes
+          or shorter.
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div

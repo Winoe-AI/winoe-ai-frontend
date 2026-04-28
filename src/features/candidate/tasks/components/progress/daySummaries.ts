@@ -17,9 +17,9 @@ export const DAY_SUMMARIES = [
     hint: 'Workspace + tests.',
   },
   {
-    title: 'Demo presentation',
+    title: 'Handoff + Demo',
     detail: 'Upload a short walkthrough of your work and decisions.',
-    hint: 'Video demo.',
+    hint: 'Demo video.',
   },
   {
     title: 'Reflection essay',

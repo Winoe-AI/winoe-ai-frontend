@@ -9,6 +9,24 @@ export function handoffUploadReducer(
   state: HandoffUploadState,
   action: HandoffUploadAction,
 ): HandoffUploadState {
+  if (action.type === 'VIDEO_VALIDATION_STARTED') {
+    return {
+      ...state,
+      phase: 'validating',
+      uploadProgressPct: 0,
+      selectedFileName: action.fileName,
+      selectedFileSizeBytes: action.fileSizeBytes,
+      selectedVideoDurationSeconds: null,
+      errorMessage: null,
+    };
+  }
+  if (action.type === 'VIDEO_VALIDATION_SUCCEEDED') {
+    return {
+      ...state,
+      selectedVideoDurationSeconds: action.durationSeconds,
+      errorMessage: null,
+    };
+  }
   if (action.type === 'UPLOAD_STARTED') {
     return {
       ...state,
@@ -40,6 +58,7 @@ export function handoffUploadReducer(
       transcriptProgressPct: null,
       transcriptText: null,
       transcriptSegments: null,
+      supplementalMaterials: null,
       isDeleted: false,
       deletedAt: null,
       errorMessage: null,
@@ -85,6 +104,7 @@ export function handoffUploadReducer(
       transcriptProgressPct: null,
       transcriptText: null,
       transcriptSegments: null,
+      supplementalMaterials: null,
       isDeleted: true,
       deletedAt: action.deletedAt,
       errorMessage: null,
