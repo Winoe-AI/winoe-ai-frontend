@@ -33,6 +33,7 @@ let anchorClickSpy: jest.SpyInstance | null = null;
 const originalDebugErrors = process.env.NEXT_PUBLIC_WINOE_DEBUG_ERRORS;
 
 beforeEach(() => {
+  jest.useRealTimers();
   __resetCandidateCache();
   __resetHttpClientCache();
 });

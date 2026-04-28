@@ -86,7 +86,11 @@ describe('TalentPartnerTrialDetailPage - compare states', () => {
 
     const row22 = screen.getByTestId('candidate-compare-row-22');
     expect(within(row22).getByText('84%')).toBeInTheDocument();
-    expect(within(row22).getByText('Hire')).toBeInTheDocument();
+    expect(
+      within(row22).getByText(
+        'Evidence suggests strong alignment with this Trial.',
+      ),
+    ).toBeInTheDocument();
   });
 
   it('shows talent_partner-scoped compare denial on compare 403 responses', async () => {

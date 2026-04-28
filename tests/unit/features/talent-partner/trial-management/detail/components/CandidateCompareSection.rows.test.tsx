@@ -78,7 +78,25 @@ describe('CandidateCompareSection row rendering', () => {
 
     const row = screen.getByTestId('candidate-compare-row-cand-9');
     expect(within(row).getByText('84%')).toBeInTheDocument();
-    expect(within(row).getByText('Hire')).toBeInTheDocument();
+    expect(
+      within(row).getByText(
+        'Evidence suggests strong alignment with this Trial.',
+      ),
+    ).toBeInTheDocument();
+    expect(within(row).queryByText(/^Hire$/i)).not.toBeInTheDocument();
+    expect(within(row).queryByText(/^Reject$/i)).not.toBeInTheDocument();
+    expect(within(row).queryByText(/^Pass$/i)).not.toBeInTheDocument();
+    expect(within(row).queryByText(/^Fail$/i)).not.toBeInTheDocument();
+    expect(within(row).queryByText(/^Proceed$/i)).not.toBeInTheDocument();
+    expect(
+      within(row).queryByText(/^Do not proceed$/i),
+    ).not.toBeInTheDocument();
+    expect(
+      within(row).queryByText(/^Recommended hire$/i),
+    ).not.toBeInTheDocument();
+    expect(
+      within(row).queryByText(/^Not recommended$/i),
+    ).not.toBeInTheDocument();
     expect(
       within(row).getByText('Strength: Clear API communication'),
     ).toBeInTheDocument();

@@ -1,168 +1,199 @@
-# Complete Day 4 Handoff + Demo upload flow
+# Stabilize Winoe Report page with dimensional sub-scores, Evidence Trail drill-down, and persona compliance
 
 ## Summary
 
-This PR completes the Day 4 candidate Handoff + Demo UI for issue #185.
+This PR stabilizes the Talent Partner Winoe Report page into a demo-ready artifact for issue #188.
 
-Core implementation:
+It delivers the full report experience expected for YC-demo readiness:
 
-- Max 15-minute demo video duration validation before upload.
-- Browser preview before finalization.
-- Resubmit flow before cutoff, with the latest valid submission used.
-- Optional supplemental materials upload through the backend signed URL flow.
-- Transcript status rendering for not-started, processing, ready, and failed states.
-- Day 4 9 AM-5 PM local window messaging and countdown.
-- Handoff + Demo terminology cleanup.
-- Backend endpoint alignment from stale `/presentation/upload/*` paths to current `/handoff/*` paths.
-- Countdown fallback from `currentWindow.windowEndAt` when `currentTask.cutoffAt` is unavailable.
+- prominent Winoe Score hero
+- canonical dimensional sub-scores
+- from-scratch dimensions visible
+- Evidence Trail drill-down
+- per-day scores
+- reviewer sub-agent summaries
+- persona-compliant narrative language
+- print-to-PDF support
+- evidence-first recommendation language
+- backend evidence linkage preservation
 
-## Product / Terminology Notes
+The report now reads as a trustworthy evidence review surface rather than a thin placeholder view.
 
-User-facing copy follows Winoe AI terminology:
+## Product / UX Changes
 
-- Trial
-- Candidate
-- Handoff + Demo
-- demo video
-- supplemental materials
-- Evidence Trail
-- Winoe Score / Winoe Report only where relevant
+- Winoe Score now displays prominently as `X / 100`.
+- Dimensional breakdown always includes the canonical from-scratch dimensions:
+  - Project scaffolding quality
+  - Architectural coherence
+  - Development process
+  - Code quality
+  - Testing discipline
+  - Communication / Handoff + Demo
+  - Reflection & self-awareness
+- Dimension cards are clickable and keyboard-accessible.
+- The drill-down panel shows linked Evidence Trail artifacts for each selected dimension.
+- Dimensions without returned artifacts show honest empty states instead of fabricated content.
+- Per-day scores show Day 1 through Day 5 with correct labels.
+- Day 4 user-facing copy says `Handoff + Demo`.
+- Reviewer sub-agent summaries are visible in the report.
+- The Winoe narrative is evidence-first and non-determinative.
+- The print-to-PDF layout is demo-safe.
 
-Touched candidate-facing Day 4 surfaces avoid retired terms:
+## Backend Changes
 
-- presentation
-- recruiter
-- simulation
-- Fit Profile
-- Fit Score
-- Tenon
-- SimuHire
-- template
-- starter code
-- precommit
-- Specializor
-- existing codebase
-- offline/local work
+Real QA initially failed because backend evidence sanitization stripped linkage fields needed for frontend association.
 
-Backend route/function names or internal component names may still have legacy words only where they are not candidate-facing and are outside this issue's scope.
+Root cause:
 
-## Acceptance Criteria Checklist
+- Evidence artifacts existed in the DB and in report composition.
+- The backend report composer/schema stripped the fields needed by the frontend to map evidence into dimensions.
+- This caused all dimensions to render `0 linked artifacts`.
 
-- [x] Video upload with max 15-minute duration enforcement
-- [x] Preview capability before final submission
-- [x] Resubmit allowed until Day 4 cutoff, with most recent submission used
-- [x] Optional supplemental materials upload
-- [x] Transcript processing status indicator
-- [x] All copy uses Handoff + Demo, not presentation, in touched Day 4 candidate-facing surfaces
-- [x] Day 4 window: 9 AM-5 PM local with countdown
+Backend fix:
+
+- Preserve evidence linkage fields in the Winoe Report API payload:
+  - `dimensionKey`
+  - `dimensionLabel`
+  - `dayLabel`
+  - `sourceLabel`
+  - `label`
+  - `title`
+  - `description`
+  - `anchor`
+- Extend the backend Winoe Report evidence schema.
+- Add backend tests proving evidence linkage survives the sanitizer/composer/API shape.
+
+## Frontend Changes
+
+- Report normalization now handles older and newer payload aliases.
+- Explicit backend dimensions override derived dimensions when both are present.
+- Derived day-level rubric and evidence fill gaps where the backend response is partial.
+- Canonical fallback dimensions remain visible with truthful pending/empty states.
+- Evidence rendering supports:
+  - commits
+  - commit ranges
+  - docs
+  - transcript timestamps
+  - file timelines
+  - code structure
+  - tests
+  - coverage
+  - reflection excerpts
+  - reviewer excerpts
+- Deterministic recommendation helpers were removed and replaced with evidence-language formatting.
+- Candidate compare row recommendation copy now uses evidence-language copy.
+
+## Persona / Terminology Compliance
+
+Confirmed user-facing copy avoids these retired or disallowed terms:
+
+- `Tenon`
+- `SimuHire`
+- `recruiter`
+- `simulation`
+- `Fit Profile`
+- `Fit Score`
+- `template`
+- `precommit`
+- `Specializor`
+
+Confirmed the UI does not use deterministic recommendation labels like:
+
+- `Hire`
+- `Reject`
+- `Pass`
+- `Fail`
+- `Proceed`
+- `Do not proceed`
+- `Recommended hire`
+- `Not recommended`
+
+Confirmed the UI uses the intended Winoe vocabulary:
+
+- `Winoe`
+- `Winoe AI`
+- `Trial`
+- `Winoe Report`
+- `Winoe Score`
+- `Evidence Trail`
+- `Talent Partner`
+- `Handoff + Demo`
 
 ## QA Evidence
 
-### Manual QA Environment
+### Local E2E QA
 
-- Frontend branch/commit: `feature/complete-day4-handoff-demo-ui-video-upload-preview-resubmit-and-transcript-status`, base `7513383c2acd20b958d784afa25b6301ddd840f1` plus local QA fixes
-- Backend branch/commit: `main`, `7cefc1f213b1b5e0b8b547ad615c8b390d92eef3`
 - Frontend URL: `http://localhost:3000`
 - Backend URL: `http://localhost:8000`
-- Browser: Playwright Chromium, headless
-- Backend startup:
-  - `bash scripts/local_qa_backend.sh migrate`
-  - `bash scripts/local_qa_backend.sh`
-  - `curl -sS http://localhost:8000/health`
-  - `curl -sS http://localhost:8000/ready`
-- Frontend startup:
-  - `./runFrontend.sh`
-- Note: `FRONTEND_QA_PLAYBOOK.md` was not found under `/Users/robelmelaku/Desktop/Winoe-AI`; README/run scripts were used as fallback.
+- Route tested: `http://localhost:3000/dashboard/trials/1/candidates/1/winoe-report`
+- Account used: `robel.kebede@bison.howard.edu`
+- Auth confirmed via `/api/debug/auth`
+  - `roles: ["talent_partner"]`
+  - `permissions: ["talent_partner:access"]`
+- Onboarding completed for:
+  - `companyId: 1`
+  - `companyName: "Winoe Demo Company"`
+- Live payload endpoint: `/api/candidate_sessions/1/winoe_report`
+- Live payload status: `ready`
+- Evidence linkage present in payload and rendered in UI.
+- Winoe Score observed: `81 / 100`
+- QA target note: the original Iteration 5 note referenced `trial 2`, but the current local seed snapshot contains the valid ready report at `trial 1 / candidate session 1`.
 
-### Manual QA Test Data
+### Artifacts
 
-- Candidate account used: `robiemelaku@gmail.com`
-- Talent Partner local DB user: `robel.kebede@bison.howard.edu`
-- Trial/session: Trial `13`, candidate session `12`, token `issue185-day4-qa-final-20260428`, Day 4 task `64`
-- Setup: local backend DB setup created Trial, CandidateSession, Day 1-3 submissions, Day 4 windows, and transcript/window states for scenario coverage
-- Media fixtures:
-  - `/tmp/winoe-day4-valid-demo.mp4` - `5.000000s`
-  - `/tmp/winoe-day4-valid-demo-2.mp4` - `6.000000s`
-  - `/tmp/winoe-day4-too-long-demo.mp4` - `901.000000s`
-  - `/tmp/winoe-day4-architecture-notes.pdf` - valid 1-page PDF
+```text
+test-results/iteration-7-winoe-report.png
+test-results/iteration-7-evidence-drilldown.png
+test-results/iteration-7-winoe-report.pdf
+test-results/iteration-7-browser-qa.json
+```
 
-### Manual QA Results
+## Validation Commands
 
-- PASS: Candidate reached Day 4 Handoff + Demo open state.
-- PASS: Long 901s video was blocked before upload/init.
-- PASS: Valid video uploaded after browser duration validation.
-- PASS: Preview appeared before finalization.
-- PASS: Supplemental PDF uploaded via signed URL and persisted.
-- PASS: Resubmit before cutoff worked; latest DB submission pointed to second recording.
-- PASS: Transcript not-started, processing, ready, and failed states rendered.
-- PASS: Closed and before-open states blocked upload/resubmit.
-- PASS: Runtime terminology scan was clean.
-- PASS: Candidate progress remained X/5, not X/10.
-- PASS: No failed network requests or console errors during the final happy path.
+### Frontend
 
-Key backend/network evidence:
+```bash
+npm run lint
+npm run typecheck
+npx jest --runInBand tests/unit/features/talent-partner/winoe-report tests/integration/talent-partner/trials/candidates/WinoeReportPage.rendering.test.tsx tests/integration/talent-partner/trials/candidates/WinoeReportPage.interactions.test.tsx tests/integration/talent-partner/trials/candidates/WinoeReportPage.printProof.test.tsx tests/integration/talent-partner/trials/candidates/WinoeReportPage.errorStates.test.tsx tests/integration/talent-partner/trials/candidates/WinoeReportPage.pollingGenerate.test.tsx
+npx jest --runInBand tests/unit/features/talent-partner/trial-management/detail/components/CandidateCompareSection.rows.test.tsx tests/integration/talent-partner/TrialDetailPageClient.compareStates.test.tsx
+./precommit.sh
+```
 
-- Demo init body: `{"contentType":"video/mp4","sizeBytes":5992,"filename":"winoe-day4-valid-demo.mp4","durationSeconds":5}`
-- Demo signed upload: `PUT http://localhost:8000/api/recordings/storage/fake/upload?...durationSeconds=5` -> `204`
-- Demo complete: `POST /api/backend/tasks/64/handoff/upload/complete`, body `{"recordingId":"rec_17"}` -> `200`
-- Supplemental init body: `{"contentType":"application/pdf","sizeBytes":378,"filename":"winoe-day4-architecture-notes.pdf","assetType":"supplemental"}`
-- Supplemental signed upload -> `204`
-- Supplemental complete: `{"recordingId":"rec_18"}` -> `200`
-- Resubmit complete: `{"recordingId":"rec_19"}` -> `200`
-- Latest DB evidence: recordings `17` and `19`; task submission points to `19`; supplemental material `18` persisted
+Results:
 
-Screenshots/evidence paths:
+- `npm run lint` — pass
+- `npm run typecheck` — pass
+- Winoe Report focused tests — pass
+- Compare regression tests — failed once, then passed on rerun in a fresh Jest process
+- `./precommit.sh` — pass
+- Full frontend gate — `502/502` test suites passed, `1565/1565` tests passed, build passed
 
-- `qa_verifications/issue185/final-a-open.png`
-- `qa_verifications/issue185/final-b-invalid.png`
-- `qa_verifications/issue185/final-c-preview.png`
-- `qa_verifications/issue185/final-d-after-finalize.png`
-- `qa_verifications/issue185/final-e-after-resubmit.png`
-- `qa_verifications/issue185/final-f-processing.png`
-- `qa_verifications/issue185/final-f-ready.png`
-- `qa_verifications/issue185/final-f-failed.png`
-- `qa_verifications/issue185/final-g-closed.png`
-- `qa_verifications/issue185/final-g-before-open.png`
-- `qa_verifications/issue185/final-countdown-after-fix.png`
-- `qa_verifications/issue185/final-manual-qa-evidence.json`
+### Backend
 
-## Bugs Found and Fixed During QA
+```bash
+set -a && source .env && set +a && PYTHONPATH=. ./.venv/bin/pytest -q --no-cov tests/evaluations/services/test_evaluations_winoe_report_composer_sanitize_evidence_service.py tests/evaluations/services/test_evaluations_winoe_report_composer_service.py tests/shared/http/routes/test_shared_http_routes_winoe_report_and_jobs_routes.py
 
-1. BLOCKING - fixed
-   - Frontend was calling stale `/presentation/upload/*` endpoints.
-   - Backend returned 404 for status/init.
-   - Fixed to current `/handoff/status` and `/handoff/upload/{init,complete}` endpoints.
+set -a && source .env && set +a && PYTHONPATH=. ./.venv/bin/pytest -q --no-cov tests/evaluations/services/test_evaluations_winoe_report_api_fetch_service.py
+```
 
-2. NON-BLOCKING - fixed
-   - Completed-review copy said `Demo presentation recording`.
-   - Changed to `Handoff + Demo recording`.
+Results:
 
-3. NON-BLOCKING - fixed
-   - Handoff panel did not use `currentWindow.windowEndAt` when `currentTask.cutoffAt` was null.
-   - Added fallback during task transform so countdown appears from the backend window end.
+- backend Winoe Report composer/sanitizer/routes tests — pass
+- backend API fetch service tests — pass
+- `./runBackend.sh migrate` — pass
+- `./runBackend.sh bootstrap-local` — pass
+- `./runBackend.sh` — pass
+- `curl -i http://localhost:8000/health` — pass
+- `curl -i http://localhost:8000/ready` — pass
 
-## Backend Boundary / Risks
+## Risks / Notes
 
-- Backend #290 remains the broader media/transcript pipeline dependency, but this frontend now uses the available backend signed-upload contract for demo and supplemental materials.
-- Backend #287 enforcement is backend-side. Frontend renders failed transcript status and retry guidance; it does not own Winoe scoring enforcement.
-- QA set transcript processing/ready/failed states through local DB setup to cover state rendering, then verified through the real backend/frontend.
+- The compare regression test showed one transient flake, then passed on rerun and passed in full precommit.
+- Local seed data currently validates against `trial 1 / candidate session 1`, not stale `trial 2`.
+- Backend evidence linkage is preserved now, but future backend taxonomy changes may require frontend alias updates.
+- No remaining blocker for #188.
 
-## Automated Validation
+## Ready Status
 
-- PASS `npm test -- --runInBand tests/unit/features/candidate/tasks/handoff`
-- PASS `npm test -- --runInBand tests/unit/features/candidate/tasks/utils/day5Reflection.test.ts`
-- PASS `npm run typecheck`
-- PASS `npm run lint:eslint`
-- PASS `npm run lint:prettier`
-- PASS `npm run build`
-- PASS `./precommit.sh`
-
-Precommit summary:
-
-- 501 suites passed
-- 1558 tests passed
-- Coverage check passed
-- Typecheck passed
-- Build passed
-
-QA PASS — issue #185 is ready for PR review.
+Fixes #188

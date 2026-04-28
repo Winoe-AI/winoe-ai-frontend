@@ -34,8 +34,11 @@ export function normalizeWinoeReportPayload(
 
   const reportCandidate =
     asRecord(record.report) ??
+    asRecord(record.reportData) ??
     (record.overallWinoeScore !== undefined ? record : null) ??
-    (record.overall_winoe_score !== undefined ? record : null);
+    (record.overall_winoe_score !== undefined ? record : null) ??
+    (record.dimensionScores !== undefined ? record : null) ??
+    (record.dimension_scores !== undefined ? record : null);
   if (status === 'ready' || reportCandidate) {
     const report = normalizeReport(reportCandidate);
     if (!report) {

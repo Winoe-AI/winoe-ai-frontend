@@ -14,18 +14,33 @@ export type WinoeReportEvidence = {
   excerpt: string | null;
   startMs: number | null;
   endMs: number | null;
+  label?: string | null;
+  title?: string | null;
+  description?: string | null;
+  dayIndex?: number | null;
+  dayLabel?: string | null;
+  sourceDay?: number | null;
+  sourceType?: string | null;
+  sourceLabel?: string | null;
+  dimensionKey?: string | null;
+  dimensionLabel?: string | null;
+  anchor?: string | null;
 };
 
 export type WinoeReportDayEvaluationStatus = 'evaluated' | 'not_evaluated';
 
 export type WinoeReportDayScore = {
   dayIndex: number;
+  dayLabel?: string | null;
   score: number | null;
   rubricBreakdown: Record<string, unknown>;
   evidence: WinoeReportEvidence[];
   evaluationStatus: WinoeReportDayEvaluationStatus;
   reason: string | null;
   aiEvaluationEnabled: boolean;
+  summary?: string | null;
+  statusLabel?: string | null;
+  reviewerSummary?: string | null;
 };
 
 export type WinoeReportVersion = {
@@ -35,11 +50,40 @@ export type WinoeReportVersion = {
   modelVersion: string | null;
 };
 
+export type WinoeReportDimension = {
+  key: string;
+  label: string;
+  score: number | null;
+  summary: string | null;
+  evidence: WinoeReportEvidence[];
+  evidenceCount: number;
+  linkedArtifactCount: number;
+  sourceKeys: string[];
+  emptyStateMessage: string | null;
+  description?: string | null;
+};
+
+export type WinoeReportReviewerSummary = {
+  reviewerName: string;
+  dayIndexes: number[];
+  score: number | null;
+  summary: string | null;
+  strengths: string[];
+  concerns: string[];
+  evidence: WinoeReportEvidence[];
+  sourceLabel: string | null;
+};
+
 export type WinoeReportReport = {
   overallWinoeScore: number;
   recommendation: string;
   confidence: number | null;
   calibrationText: string | null;
+  narrativeAssessment: string | null;
+  personaVoice: string | null;
+  summary: string | null;
+  dimensionScores: WinoeReportDimension[];
+  reviewerSummaries: WinoeReportReviewerSummary[];
   dayScores: WinoeReportDayScore[];
   disabledDayIndexes: number[];
   version: WinoeReportVersion | null;
