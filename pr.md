@@ -117,4 +117,3 @@ Observed QA result:
 - If the backend omits row-level Trial IDs, the UI relies on the Trial-scoped endpoint contract: `/api/trials/:trialId/candidates/compare`.
 - The live backend uses `evaluated` as a terminal compare status, so the frontend treats both `completed` and `evaluated` as eligible terminal states.
 - The final diff is scoped to #189; unrelated Jest/global timeout changes were removed.
-
