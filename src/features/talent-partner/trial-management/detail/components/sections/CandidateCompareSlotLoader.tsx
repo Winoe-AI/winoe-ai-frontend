@@ -5,7 +5,7 @@ import type { CandidateCompareSlotProps } from './CandidateCompareSlot';
 function CompareLoadingState() {
   return (
     <section className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
-      <p className="text-sm text-gray-600">Loading candidate comparison...</p>
+      <p className="text-sm text-gray-600">Loading Benchmarks...</p>
     </section>
   );
 }
@@ -13,7 +13,7 @@ function CompareLoadingState() {
 export function ComparePreparingState() {
   return (
     <section className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
-      <p className="text-sm text-gray-600">Preparing candidate comparison...</p>
+      <p className="text-sm text-gray-600">Preparing Benchmarks...</p>
     </section>
   );
 }

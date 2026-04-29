@@ -36,11 +36,12 @@ describe('TalentPartnerTrialDetailPage - compare retry', () => {
         return jsonResponse([
           {
             candidateSessionId: '11',
+            trialId: 'trial-1',
             candidate: { name: 'Alex', email: 'a@example.com' },
             status: 'completed',
             winoeReportStatus: 'ready',
             overallWinoeScore: 0.81,
-            recommendation: 'hire',
+            recommendation: 'strong_hire',
             keyStrengths: ['Strong ownership'],
             keyRisks: [],
           },
@@ -50,7 +51,7 @@ describe('TalentPartnerTrialDetailPage - compare retry', () => {
 
     renderPage();
 
-    expect(await screen.findByText('Compare candidates')).toBeInTheDocument();
+    expect(await screen.findByText('Benchmarks')).toBeInTheDocument();
     expect(
       await screen.findByText('Request failed with status 500'),
     ).toBeInTheDocument();

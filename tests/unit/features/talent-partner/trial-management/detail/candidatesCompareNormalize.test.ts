@@ -1,4 +1,6 @@
 import {
+  filterCandidateCompareRowsForTrial,
+  isCandidateCompareRowEligibleForBenchmarks,
   normalizeCandidateCompareList,
   normalizeCandidateCompareRow,
 } from '@/features/talent-partner/api/candidatesCompareNormalizeApi';
@@ -25,6 +27,7 @@ describe('candidate compare normalization', () => {
     });
 
     expect(row.candidateSessionId).toBe('42');
+    expect(row.trialId).toBeNull();
     expect(row.candidateLabel).toBe('Alex Doe');
     expect(row.winoeReportStatus).toBe('ready');
     expect(row.overallWinoeScore).toBe(0.82);
@@ -76,6 +79,7 @@ describe('candidate compare normalization', () => {
 
   it('normalizes list payload shapes', () => {
     const list = normalizeCandidateCompareList({
+      trialId: 'trial-1',
       items: [
         { candidateSessionId: 1, candidateName: 'A' },
         { candidateSessionId: 2, candidateName: 'B' },
@@ -83,5 +87,102 @@ describe('candidate compare normalization', () => {
     });
 
     expect(list.map((item) => item.candidateSessionId)).toEqual(['1', '2']);
+    expect(list.every((item) => item.trialId === 'trial-1')).toBe(true);
+  });
+
+  it('filters unrelated compare rows when trial identifiers are present', () => {
+    const rows = filterCandidateCompareRowsForTrial(
+      [
+        {
+          candidateSessionId: '1',
+          trialId: 'trial-1',
+          candidateName: 'A',
+          candidateEmail: null,
+          candidateLabel: 'A',
+          status: 'completed',
+          winoeReportStatus: 'ready',
+          overallWinoeScore: 0.8,
+          recommendation: 'strong_hire',
+          updatedAt: null,
+          strengths: [],
+          risks: [],
+          dayCompletion: [],
+        },
+        {
+          candidateSessionId: '2',
+          trialId: 'trial-2',
+          candidateName: 'B',
+          candidateEmail: null,
+          candidateLabel: 'B',
+          status: 'completed',
+          winoeReportStatus: 'ready',
+          overallWinoeScore: 0.9,
+          recommendation: 'strong_hire',
+          updatedAt: null,
+          strengths: [],
+          risks: [],
+          dayCompletion: [],
+        },
+      ],
+      'trial-1',
+    );
+
+    expect(rows.map((row) => row.candidateSessionId)).toEqual(['1']);
+  });
+
+  it('requires completed or evaluated ready candidates for Benchmarks rendering', () => {
+    expect(
+      isCandidateCompareRowEligibleForBenchmarks({
+        candidateSessionId: '1',
+        trialId: 'trial-1',
+        candidateName: 'A',
+        candidateEmail: null,
+        candidateLabel: 'A',
+        status: 'in_progress',
+        winoeReportStatus: 'ready',
+        overallWinoeScore: 0.8,
+        recommendation: 'strong_hire',
+        updatedAt: null,
+        strengths: [],
+        risks: [],
+        dayCompletion: [],
+      }),
+    ).toBe(false);
+
+    expect(
+      isCandidateCompareRowEligibleForBenchmarks({
+        candidateSessionId: '2',
+        trialId: 'trial-1',
+        candidateName: 'B',
+        candidateEmail: null,
+        candidateLabel: 'B',
+        status: 'completed',
+        winoeReportStatus: 'ready',
+        overallWinoeScore: 0.9,
+        recommendation: 'strong_hire',
+        updatedAt: null,
+        strengths: [],
+        risks: [],
+        dayCompletion: [],
+      }),
+    ).toBe(true);
+
+    expect(
+      isCandidateCompareRowEligibleForBenchmarks({
+        candidateSessionId: '3',
+        trialId: 'trial-1',
+        candidateName: 'C',
+        candidateEmail: null,
+        candidateLabel: 'C',
+        status: 'evaluated',
+        winoeReportStatus: 'ready',
+        overallWinoeScore: 0.77,
+        recommendation: 'lean_hire',
+        updatedAt: null,
+        strengths: [],
+        risks: [],
+        dayCompletion: [],
+      }),
+    ).toBe(true);
   });
 });

@@ -17,9 +17,7 @@ type Props = {
   compareLoading: boolean;
   compareError: string | null;
   rows: CandidateCompareRow[];
-  generatingIds: Record<string, boolean>;
   onRetry: () => void;
-  onGenerate: (candidateSessionId: string) => void;
 };
 
 export function CandidateCompareSection({
@@ -29,9 +27,7 @@ export function CandidateCompareSection({
   compareLoading,
   compareError,
   rows,
-  generatingIds,
   onRetry,
-  onGenerate,
 }: Props) {
   const [sort, setSort] = useState<SortState | null>(null);
 
@@ -40,11 +36,7 @@ export function CandidateCompareSection({
     return [...rows].sort((a, b) => compareByColumn(a, b, sort));
   }, [rows, sort]);
 
-  const readyCount = useMemo(
-    () => rows.filter((row) => row.winoeReportStatus === 'ready').length,
-    [rows],
-  );
-
+  const cohortCount = sortedRows.length;
   const showLoading =
     candidatesLoading || (candidateCount > 0 && compareLoading);
 
@@ -52,33 +44,42 @@ export function CandidateCompareSection({
     <section className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div>
-          <h2 className="text-lg font-semibold text-gray-900">
-            Compare candidates
-          </h2>
-          <p className="text-sm text-gray-600">
-            Decision-ready Winoe Score summary with quick links to Winoe Report
-            and Evidence Trail submissions.
+          <h2 className="text-lg font-semibold text-gray-900">Benchmarks</h2>
+          <p className="max-w-3xl text-sm text-gray-600">
+            Compare completed candidates from this Trial using the same Winoe
+            evaluation lens.
+          </p>
+          {cohortCount > 0 ? (
+            <div className="mt-2 space-y-1 text-sm text-gray-600">
+              <p>
+                Comparing {cohortCount} candidate
+                {cohortCount === 1 ? '' : 's'} for this Trial
+              </p>
+              {cohortCount < 3 ? (
+                <p className="text-amber-700">
+                  Limited comparison &mdash; results are more meaningful with
+                  additional candidates.
+                </p>
+              ) : null}
+            </div>
+          ) : null}
+          <p className="mt-2 text-sm text-gray-600">
+            Winoe surfaces evidence from each Trial. The Talent Partner makes
+            the hiring decision.
           </p>
         </div>
-        {rows.length > 0 ? (
-          <span className="rounded bg-gray-100 px-2 py-1 text-xs text-gray-700">
-            Winoe Report ready: {readyCount} / {rows.length}
-          </span>
-        ) : null}
       </div>
 
       <div className="mt-4">
         <CandidateCompareSectionBody
           showLoading={showLoading}
           compareError={compareError}
-          candidateCount={candidateCount}
+          cohortCount={cohortCount}
           sortedRows={sortedRows}
           trialId={trialId}
           sort={sort}
           setSort={setSort}
-          generatingIds={generatingIds}
           onRetry={onRetry}
-          onGenerate={onGenerate}
         />
       </div>
     </section>

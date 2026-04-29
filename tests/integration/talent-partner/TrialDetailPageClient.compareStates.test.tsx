@@ -7,7 +7,7 @@ import {
 } from './TrialDetailPageClient.testlib';
 
 describe('TalentPartnerTrialDetailPage - compare states', () => {
-  it('renders compare candidates rows with winoe report actions', async () => {
+  it('renders same-Trial benchmark rows and excludes unrelated candidates', async () => {
     mockFetchHandlers({
       '/api/trials': jsonResponse([
         {
@@ -39,22 +39,46 @@ describe('TalentPartnerTrialDetailPage - compare states', () => {
       '/api/trials/trial-1/candidates/compare': jsonResponse([
         {
           candidateSessionId: '11',
+          trialId: 'trial-1',
           candidate: { name: 'Alex', email: 'a@example.com' },
           status: 'in_progress',
-          winoeReportStatus: 'not_generated',
-          overallWinoeScore: null,
-          recommendation: null,
+          winoeReportStatus: 'ready',
+          overallWinoeScore: 0.71,
+          recommendation: 'lean_hire',
           keyStrengths: ['Clear communication'],
           keyRisks: ['Needs more tests'],
         },
         {
           candidateSessionId: '22',
+          trialId: 'trial-1',
           candidate: { name: 'Blake', email: 'b@example.com' },
-          status: 'completed',
+          status: 'evaluated',
           winoeReportStatus: 'ready',
           overallWinoeScore: 0.84,
-          recommendation: 'hire',
+          recommendation: 'strong_hire',
           keyStrengths: ['Fast delivery'],
+          keyRisks: [],
+        },
+        {
+          candidateSessionId: '44',
+          trialId: 'trial-1',
+          candidate: { name: 'Casey', email: 'c@example.com' },
+          status: 'evaluated',
+          winoeReportStatus: 'ready',
+          overallWinoeScore: 0.76,
+          recommendation: 'lean_hire',
+          keyStrengths: ['Strong analysis'],
+          keyRisks: ['Needs more context switching'],
+        },
+        {
+          candidateSessionId: '33',
+          trialId: 'trial-2',
+          candidate: { name: 'Cross Trial', email: 'x@example.com' },
+          status: 'evaluated',
+          winoeReportStatus: 'ready',
+          overallWinoeScore: 0.98,
+          recommendation: 'strong_hire',
+          keyStrengths: ['Should be filtered'],
           keyRisks: [],
         },
       ]),
@@ -62,35 +86,68 @@ describe('TalentPartnerTrialDetailPage - compare states', () => {
 
     renderPage();
 
-    expect(await screen.findByText('Compare candidates')).toBeInTheDocument();
     expect(
-      await screen.findByTestId('candidate-compare-row-11'),
+      await screen.findByTestId('candidate-compare-row-22', undefined, {
+        timeout: 5000,
+      }),
     ).toBeInTheDocument();
     expect(
-      await screen.findByTestId('candidate-compare-row-22'),
+      await screen.findByTestId('candidate-compare-row-44', undefined, {
+        timeout: 5000,
+      }),
     ).toBeInTheDocument();
-
-    const row11 = screen.getByTestId('candidate-compare-row-11');
+    expect(screen.getByText('Benchmarks')).toBeInTheDocument();
     expect(
-      within(row11).getByRole('button', { name: /Generate Winoe Report/i }),
-    ).toBeEnabled();
+      screen.getByText('Comparing 2 candidates for this Trial'),
+    ).toBeInTheDocument();
     expect(
-      within(row11).getByRole('link', { name: /View Submissions/i }),
-    ).toHaveAttribute('href', '/dashboard/trials/trial-1/candidates/11');
+      screen.getByText(
+        'Limited comparison — results are more meaningful with additional candidates.',
+      ),
+    ).toBeInTheDocument();
     expect(
-      within(row11).getByRole('link', { name: /View Winoe Report/i }),
-    ).toHaveAttribute(
-      'href',
-      '/dashboard/trials/trial-1/candidates/11/winoe-report',
-    );
+      screen.getByText(
+        'Winoe surfaces evidence from each Trial. The Talent Partner makes the hiring decision.',
+      ),
+    ).toBeInTheDocument();
+    expect(
+      await screen.findByTestId('candidate-compare-row-22', undefined, {
+        timeout: 5000,
+      }),
+    ).toBeInTheDocument();
+    expect(
+      await screen.findByTestId('candidate-compare-row-44', undefined, {
+        timeout: 5000,
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByTestId('candidate-compare-row-11'),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId('candidate-compare-row-33'),
+    ).not.toBeInTheDocument();
 
     const row22 = screen.getByTestId('candidate-compare-row-22');
+    const row44 = screen.getByTestId('candidate-compare-row-44');
     expect(within(row22).getByText('84%')).toBeInTheDocument();
     expect(
       within(row22).getByText(
         'Evidence suggests strong alignment with this Trial.',
       ),
     ).toBeInTheDocument();
+    expect(within(row44).getByText('76%')).toBeInTheDocument();
+    expect(
+      within(row44).getByText('Evidence shows meaningful strengths.'),
+    ).toBeInTheDocument();
+    expect(
+      within(row44).getByText('Strength: Strong analysis'),
+    ).toBeInTheDocument();
+    expect(
+      within(row44).getByRole('link', { name: /View Winoe Report/i }),
+    ).toHaveAttribute(
+      'href',
+      '/dashboard/trials/trial-1/candidates/44/winoe-report',
+    );
   });
 
   it('shows talent_partner-scoped compare denial on compare 403 responses', async () => {
@@ -121,10 +178,10 @@ describe('TalentPartnerTrialDetailPage - compare states', () => {
 
     renderPage();
 
-    expect(await screen.findByText('Compare candidates')).toBeInTheDocument();
+    expect(await screen.findByText('Benchmarks')).toBeInTheDocument();
     expect(
       await screen.findByText(
-        'You are not authorized to compare candidates for this trial.',
+        'You are not authorized to view Benchmarks for this trial.',
       ),
     ).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Retry/i })).toBeInTheDocument();
@@ -159,10 +216,10 @@ describe('TalentPartnerTrialDetailPage - compare states', () => {
 
     renderPage();
 
-    expect(await screen.findByText('Compare candidates')).toBeInTheDocument();
+    expect(await screen.findByText('Benchmarks')).toBeInTheDocument();
     expect(
       await screen.findByText(
-        'Compare candidates unavailable for this trial right now.',
+        'Benchmarks unavailable for this trial right now.',
       ),
     ).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Retry/i })).toBeInTheDocument();

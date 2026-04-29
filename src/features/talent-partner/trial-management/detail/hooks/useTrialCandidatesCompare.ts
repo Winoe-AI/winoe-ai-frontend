@@ -1,6 +1,10 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { type CandidateCompareRow } from '@/features/talent-partner/api';
+import {
+  filterCandidateCompareRowsForTrial,
+  isCandidateCompareRowEligibleForBenchmarks,
+} from '@/features/talent-partner/api/candidatesCompareNormalizeApi';
 import { queryKeys } from '@/shared/query';
 import {
   fetchTrialCompareQuery,
@@ -29,6 +33,9 @@ export function useTrialCandidatesCompare({ trialId, enabled }: Params) {
   const [localError, setLocalError] = useState<string | null>(null);
 
   useEffect(() => {
+    if (!enabled) {
+      return;
+    }
     const timerId = window.setTimeout(() => {
       setGeneratingIds({});
       setLocalError(null);
@@ -36,7 +43,7 @@ export function useTrialCandidatesCompare({ trialId, enabled }: Params) {
     return () => {
       window.clearTimeout(timerId);
     };
-  }, [trialId]);
+  }, [enabled, trialId]);
 
   const compareQuery = useQuery({
     queryKey: queryKeys.talentPartner.trialCompare(trialId),
@@ -52,6 +59,15 @@ export function useTrialCandidatesCompare({ trialId, enabled }: Params) {
       return enabled && hasGeneratingRows ? COMPARE_POLL_INTERVAL_MS : false;
     },
   });
+
+  const visibleRows = useMemo(
+    () =>
+      filterCandidateCompareRowsForTrial(
+        compareQuery.data ?? [],
+        trialId,
+      ).filter(isCandidateCompareRowEligibleForBenchmarks),
+    [compareQuery.data, trialId],
+  );
 
   const error = useMemo(() => {
     return deriveTrialCandidatesCompareError(compareQuery.error, localError);
@@ -76,7 +92,7 @@ export function useTrialCandidatesCompare({ trialId, enabled }: Params) {
   });
 
   return {
-    rows: compareQuery.data ?? [],
+    rows: visibleRows,
     loading:
       enabled &&
       compareReady &&
