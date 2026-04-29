@@ -11,6 +11,7 @@ export type CandidateCompareDayCompletion = {
 
 export type CandidateCompareRow = {
   candidateSessionId: string;
+  trialId: string | null;
   candidateName: string | null;
   candidateEmail: string | null;
   candidateLabel: string;

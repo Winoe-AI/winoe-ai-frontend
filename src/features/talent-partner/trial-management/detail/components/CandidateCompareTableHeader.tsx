@@ -51,31 +51,19 @@ export function CandidateCompareTableHeader({ sort, setSort }: Props) {
           setSort={setSort}
         />
         <SortHeaderCell
-          column="status"
-          label="Status"
-          sort={sort}
-          setSort={setSort}
-        />
-        <SortHeaderCell
-          column="winoe_report"
-          label="Winoe Report"
-          sort={sort}
-          setSort={setSort}
-        />
-        <SortHeaderCell
           column="winoe_score"
           label="Winoe Score"
           sort={sort}
           setSort={setSort}
         />
         <th scope="col" className="px-4 py-3">
-          Recommendation
+          Dimensional summary
         </th>
         <th scope="col" className="px-4 py-3">
-          Strengths / Risks
+          Evidence summary
         </th>
         <th scope="col" className="px-4 py-3">
-          Actions
+          Winoe Report
         </th>
       </tr>
     </thead>

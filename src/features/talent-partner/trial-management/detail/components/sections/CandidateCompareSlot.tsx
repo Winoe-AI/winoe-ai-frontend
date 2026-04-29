@@ -20,9 +20,7 @@ export function CandidateCompareSlot({
     rows: compareRows,
     loading: compareLoading,
     error: compareError,
-    generatingIds,
     reload: reloadCompare,
-    generateWinoeReport,
   } = useTrialCandidatesCompare({
     trialId,
     enabled,
@@ -36,9 +34,7 @@ export function CandidateCompareSlot({
       compareLoading={compareLoading}
       compareError={compareError}
       rows={compareRows}
-      generatingIds={generatingIds}
       onRetry={reloadCompare}
-      onGenerate={generateWinoeReport}
     />
   );
 }

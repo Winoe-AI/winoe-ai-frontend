@@ -9,16 +9,12 @@ export function deriveTrialCandidatesCompareError(
 
   const status = toStatus(queryError);
   if (status === 403) {
-    return 'You are not authorized to compare candidates for this trial.';
+    return 'You are not authorized to view Benchmarks for this trial.';
   }
   if (status === 404) {
-    return 'Compare candidates unavailable for this trial right now.';
+    return 'Benchmarks unavailable for this trial right now.';
   }
-  return toUserMessage(
-    queryError,
-    'Unable to load candidate comparison right now.',
-    {
-      includeDetail: false,
-    },
-  );
+  return toUserMessage(queryError, 'Unable to load Benchmarks right now.', {
+    includeDetail: false,
+  });
 }

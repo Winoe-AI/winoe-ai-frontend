@@ -1,22 +1,8 @@
-import type {
-  CandidateCompareWinoeReportStatus,
-  CandidateCompareRow,
-} from '@/features/talent-partner/api/candidatesCompareApi';
+import type { CandidateCompareRow } from '@/features/talent-partner/api/candidatesCompareApi';
 
-export type SortColumn =
-  | 'candidate'
-  | 'status'
-  | 'winoe_report'
-  | 'winoe_score';
+export type SortColumn = 'candidate' | 'winoe_score';
 export type SortDirection = 'asc' | 'desc';
 export type SortState = { column: SortColumn; direction: SortDirection };
-
-const WINOE_REPORT_ORDER: Record<CandidateCompareWinoeReportStatus, number> = {
-  ready: 0,
-  generating: 1,
-  failed: 2,
-  not_generated: 3,
-};
 
 function toTimestamp(value: string | null): number {
   if (!value) return 0;
@@ -28,10 +14,6 @@ export function compareDefault(
   a: CandidateCompareRow,
   b: CandidateCompareRow,
 ): number {
-  const winoeReportDelta =
-    WINOE_REPORT_ORDER[a.winoeReportStatus] -
-    WINOE_REPORT_ORDER[b.winoeReportStatus];
-  if (winoeReportDelta !== 0) return winoeReportDelta;
   const scoreA = a.overallWinoeScore ?? -1;
   const scoreB = b.overallWinoeScore ?? -1;
   if (scoreA !== scoreB) return scoreB - scoreA;
@@ -48,13 +30,7 @@ export function compareByColumn(
   let base = 0;
   if (sort.column === 'candidate')
     base = a.candidateLabel.localeCompare(b.candidateLabel);
-  else if (sort.column === 'status')
-    base = (a.status ?? '').localeCompare(b.status ?? '');
-  else if (sort.column === 'winoe_report') {
-    base =
-      WINOE_REPORT_ORDER[a.winoeReportStatus] -
-      WINOE_REPORT_ORDER[b.winoeReportStatus];
-  } else if (sort.column === 'winoe_score') {
+  else if (sort.column === 'winoe_score') {
     base = (a.overallWinoeScore ?? -1) - (b.overallWinoeScore ?? -1);
   }
   if (base === 0) return compareDefault(a, b);

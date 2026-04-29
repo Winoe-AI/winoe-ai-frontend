@@ -9,8 +9,6 @@ type Props = {
   sortedRows: CandidateCompareRow[];
   sort: SortState | null;
   setSort: Dispatch<SetStateAction<SortState | null>>;
-  generatingIds: Record<string, boolean>;
-  onGenerate: (candidateSessionId: string) => void;
 };
 
 export function CandidateCompareTable({
@@ -18,8 +16,6 @@ export function CandidateCompareTable({
   sortedRows,
   sort,
   setSort,
-  generatingIds,
-  onGenerate,
 }: Props) {
   return (
     <div className="overflow-hidden rounded border border-gray-200">
@@ -31,8 +27,6 @@ export function CandidateCompareTable({
               key={row.candidateSessionId}
               trialId={trialId}
               row={row}
-              generatingIds={generatingIds}
-              onGenerate={onGenerate}
             />
           ))}
         </tbody>

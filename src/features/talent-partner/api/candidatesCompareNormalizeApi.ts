@@ -13,6 +13,30 @@ import {
 } from './candidatesCompareNormalize.textApi';
 import type { CandidateCompareRow } from './candidatesCompareNormalize.typesApi';
 
+function resolveTrialId(
+  record: Record<string, unknown>,
+  inheritedTrialId: string | null,
+): string | null {
+  const candidateRecord = asRecord(record.candidate);
+  const rawTrialId =
+    sanitizeText(
+      record.trialId ??
+        record.trial_id ??
+        record.selectedTrialId ??
+        record.selected_trial_id ??
+        record.inviteTrialId ??
+        record.invite_trial_id ??
+        record.candidateTrialId ??
+        record.candidate_trial_id ??
+        record.sessionTrialId ??
+        record.session_trial_id ??
+        candidateRecord?.trialId ??
+        candidateRecord?.trial_id,
+      96,
+    ) ?? inheritedTrialId;
+  return rawTrialId ?? null;
+}
+
 export type {
   CandidateCompareDayCompletion,
   CandidateCompareWinoeReportStatus,
@@ -21,9 +45,11 @@ export type {
 
 export function normalizeCandidateCompareRow(
   raw: unknown,
+  inheritedTrialId: string | null = null,
 ): CandidateCompareRow {
   const record = asRecord(raw) ?? {};
   const candidateSessionId = resolveCandidateSessionId(record);
+  const trialId = resolveTrialId(record, inheritedTrialId);
 
   const overallWinoeScore = toUnitIntervalOrNull(
     record.overallWinoeScore ?? record.overall_winoe_score,
@@ -36,6 +62,7 @@ export function normalizeCandidateCompareRow(
 
   return {
     candidateSessionId,
+    trialId,
     candidateName: identity.candidateName,
     candidateEmail: identity.candidateEmail,
     candidateLabel: identity.candidateLabel,
@@ -67,6 +94,14 @@ export function normalizeCandidateCompareList(
   payload: unknown,
 ): CandidateCompareRow[] {
   const records = asRecord(payload);
+  const inheritedTrialId =
+    sanitizeText(
+      records?.trialId ??
+        records?.trial_id ??
+        records?.selectedTrialId ??
+        records?.selected_trial_id,
+      96,
+    ) ?? null;
   const list =
     (Array.isArray(payload)
       ? payload
@@ -79,6 +114,33 @@ export function normalizeCandidateCompareList(
             : []) ?? [];
 
   return list
-    .map((row) => normalizeCandidateCompareRow(row))
+    .map((row) => normalizeCandidateCompareRow(row, inheritedTrialId))
     .filter((row) => row.candidateSessionId.length > 0);
+}
+
+export function isCandidateCompareRowForTrial(
+  row: CandidateCompareRow,
+  trialId: string,
+): boolean {
+  const selectedTrialId = sanitizeText(trialId, 96);
+  if (!selectedTrialId) return true;
+  if (!row.trialId) return true;
+  return row.trialId === selectedTrialId;
+}
+
+export function isCandidateCompareRowEligibleForBenchmarks(
+  row: CandidateCompareRow,
+): boolean {
+  const normalizedStatus = normalizeStatus(row.status);
+  return (
+    (normalizedStatus === 'completed' || normalizedStatus === 'evaluated') &&
+    row.winoeReportStatus === 'ready'
+  );
+}
+
+export function filterCandidateCompareRowsForTrial(
+  rows: CandidateCompareRow[],
+  trialId: string,
+): CandidateCompareRow[] {
+  return rows.filter((row) => isCandidateCompareRowForTrial(row, trialId));
 }

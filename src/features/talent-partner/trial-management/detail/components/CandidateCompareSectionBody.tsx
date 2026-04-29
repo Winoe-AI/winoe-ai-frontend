@@ -9,30 +9,26 @@ import { CandidateCompareTable } from './CandidateCompareTable';
 type Props = {
   showLoading: boolean;
   compareError: string | null;
-  candidateCount: number;
+  cohortCount: number;
   sortedRows: CandidateCompareRow[];
   trialId: string;
   sort: SortState | null;
   setSort: Dispatch<SetStateAction<SortState | null>>;
-  generatingIds: Record<string, boolean>;
   onRetry: () => void;
-  onGenerate: (candidateSessionId: string) => void;
 };
 
 export function CandidateCompareSectionBody({
   showLoading,
   compareError,
-  candidateCount,
+  cohortCount,
   sortedRows,
   trialId,
   sort,
   setSort,
-  generatingIds,
   onRetry,
-  onGenerate,
 }: Props) {
   if (showLoading) {
-    return <TableSkeleton columns={7} rows={3} className="bg-white" />;
+    return <TableSkeleton columns={5} rows={3} className="bg-white" />;
   }
   if (compareError) {
     return (
@@ -49,19 +45,12 @@ export function CandidateCompareSectionBody({
       </div>
     );
   }
-  if (candidateCount === 0) {
+  if (cohortCount === 0) {
     return (
       <EmptyState
-        title="No comparison data yet"
-        description="Invite candidates to this trial to unlock side-by-side Winoe Score comparisons."
+        title="No completed candidates yet"
+        description="Benchmarks will appear once candidates complete this Trial and Winoe Reports are available."
       />
-    );
-  }
-  if (sortedRows.length === 0) {
-    return (
-      <div className="rounded border border-gray-200 bg-gray-50 p-3 text-sm text-gray-700">
-        Comparison data is not available yet.
-      </div>
     );
   }
   return (
@@ -70,8 +59,6 @@ export function CandidateCompareSectionBody({
       sortedRows={sortedRows}
       sort={sort}
       setSort={setSort}
-      generatingIds={generatingIds}
-      onGenerate={onGenerate}
     />
   );
 }
