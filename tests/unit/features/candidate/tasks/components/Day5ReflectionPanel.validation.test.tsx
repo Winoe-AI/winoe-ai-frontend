@@ -1,7 +1,7 @@
 import { fireEvent, screen, waitFor, within } from '@testing-library/react';
 import {
   baseTask,
-  fillAllSections,
+  fillDay5Markdown,
   renderPanel,
   resetDay5PanelMocks,
 } from './Day5ReflectionPanel.testlib';
@@ -15,7 +15,7 @@ describe('Day5ReflectionPanel validation and read-only states', () => {
     jest.useRealTimers();
   });
 
-  it('maps backend validation errors to inline section fields', async () => {
+  it('surfaces backend validation errors for the markdown essay', async () => {
     const onSubmit = jest.fn().mockRejectedValue({
       status: 422,
       details: {
@@ -28,20 +28,28 @@ describe('Day5ReflectionPanel validation and read-only states', () => {
       onSubmit,
     });
 
-    fillAllSections();
-    fireEvent.click(screen.getByRole('button', { name: /submit & continue/i }));
+    fillDay5Markdown();
+    fireEvent.click(
+      screen.getByRole('button', { name: /submit reflection essay/i }),
+    );
+    fireEvent.click(
+      within(
+        screen.getByRole('dialog', {
+          name: /submit your reflection essay/i,
+        }),
+      ).getByRole('button', { name: /submit reflection essay/i }),
+    );
 
     await waitFor(() => {
-      const communicationField = screen.getByLabelText(/communication/i);
-      const section = communicationField.closest('section');
-      expect(section).not.toBeNull();
       expect(
-        within(section as HTMLElement).getByText(/add at least 20 characters/i),
+        screen.getByText(
+          /please complete the reflection essay before submitting/i,
+        ),
       ).toBeInTheDocument();
     });
   });
 
-  it('renders canonical read-only markdown when day is closed', () => {
+  it('renders congratulations when the backend reports completion', () => {
     renderPanel({
       task: {
         ...baseTask,
@@ -49,7 +57,7 @@ describe('Day5ReflectionPanel validation and read-only states', () => {
           submissionId: 99,
           submittedAt: '2026-03-08T15:20:00.000Z',
           contentText:
-            '## Challenges\nCanonical finalized markdown from backend',
+            '## Experience & Challenges\nCanonical finalized markdown from backend',
           contentJson: {
             kind: 'day5_reflection',
             sections: {
@@ -72,16 +80,15 @@ describe('Day5ReflectionPanel validation and read-only states', () => {
       },
     });
 
-    expect(screen.getByText(/day closed/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/congratulations - your 5-day trial is complete/i),
+    ).toBeInTheDocument();
     expect(screen.queryByRole('textbox')).toBeNull();
     expect(
-      screen.queryByRole('button', { name: /submit & continue/i }),
+      screen.queryByRole('button', { name: /submit reflection essay/i }),
     ).toBeNull();
     expect(
-      screen.getByText(/canonical finalized markdown from backend/i),
+      screen.getByText(/day 1: planning & design doc/i),
     ).toBeInTheDocument();
-    expect(
-      screen.queryByText(/structured challenges should not be preferred/i),
-    ).toBeNull();
   });
 });

@@ -8,6 +8,26 @@ import {
 } from './fixtures/candidateMocks';
 import { CandidateSessionQaPage } from './pages';
 
+const sampleDay5Markdown = `## Experience & Challenges
+
+Handled ambiguous requirements by validating assumptions early in the flow.
+
+## Decisions & Tradeoffs
+
+I chose deterministic contracts first so UI and backend validation stayed aligned.
+
+## Learnings & Growth
+
+I traded breadth for reliability and learned to keep the evaluation path simple.
+
+## Collaboration & Communication
+
+I documented risks, handoff notes, and verification steps for reviewers.
+
+## What I Would Do Differently
+
+Next I would add stronger evidence links and broader failure-mode tests.`;
+
 test.describe('Candidate Critical Journey (flow-qa mocked)', () => {
   test.use({ storageState: storageStates.candidateOnly });
 
@@ -27,8 +47,8 @@ test.describe('Candidate Critical Journey (flow-qa mocked)', () => {
         id: 5,
         dayIndex: 5,
         type: 'documentation',
-        title: 'Final reflection',
-        description: 'Document your decisions and next steps.',
+        title: 'Reflection Essay',
+        description: 'Reflect on your full Trial experience.',
       }),
       completedTaskIds: [],
       completedTaskIdsAfterSubmit: [1, 2, 3, 4],
@@ -57,9 +77,18 @@ test.describe('Candidate Critical Journey (flow-qa mocked)', () => {
     await submitResponsePromise;
 
     await sessionPage.expectDay(5);
-    await expect(page.getByText(/^day 5 • documentation$/i)).toBeVisible();
-    await expect(page.getByLabel(/^challenges$/i)).toBeVisible();
-    await expect(page.getByLabel(/^what you would do next$/i)).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: /reflection essay editor/i }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole('textbox', { name: /markdown editor/i }),
+    ).toBeVisible();
+    await page
+      .getByRole('textbox', { name: /markdown editor/i })
+      .fill(sampleDay5Markdown);
+    await expect(
+      page.getByRole('button', { name: /^preview$/i }),
+    ).toBeVisible();
   });
 
   test('Day4 upload state checkpoint', async ({ page }) => {
@@ -107,8 +136,8 @@ test.describe('Candidate Critical Journey (flow-qa mocked)', () => {
         id: 5,
         dayIndex: 5,
         type: 'documentation',
-        title: 'Final reflection',
-        description: 'Document your decisions and next steps.',
+        title: 'Reflection Essay',
+        description: 'Reflect on your full Trial experience.',
       }),
       nextTaskAfterSubmit: null,
       completedTaskIds: [1, 2, 3, 4],
@@ -122,30 +151,8 @@ test.describe('Candidate Critical Journey (flow-qa mocked)', () => {
     await sessionPage.expectDay(5);
 
     await page
-      .getByLabel(/^challenges$/i)
-      .fill(
-        'I balanced speed, correctness, and clear communication with tradeoffs.',
-      );
-    await page
-      .getByLabel(/^decisions$/i)
-      .fill(
-        'I prioritized deterministic behavior and test coverage for critical user journeys.',
-      );
-    await page
-      .getByLabel(/^tradeoffs$/i)
-      .fill(
-        'I deferred optional polish to keep key flows stable and observable.',
-      );
-    await page
-      .getByLabel(/^communication \/ handoff$/i)
-      .fill(
-        'I documented release steps, known risks, and fallback plans for reviewers.',
-      );
-    await page
-      .getByLabel(/^what you would do next$/i)
-      .fill(
-        'Next, I would improve diagnostics around flaky transitions and artifact retries.',
-      );
+      .getByRole('textbox', { name: /markdown editor/i })
+      .fill(sampleDay5Markdown);
 
     const submitResponsePromise = page.waitForResponse(
       (resp) =>
@@ -153,9 +160,15 @@ test.describe('Candidate Critical Journey (flow-qa mocked)', () => {
         resp.request().method() === 'POST' &&
         resp.status() === 200,
     );
-    await page.getByRole('button', { name: /submit & continue/i }).click();
+    await page
+      .getByRole('button', { name: /submit reflection essay/i })
+      .click();
+    await page
+      .getByRole('dialog', { name: /submit your reflection essay/i })
+      .getByRole('button', { name: /submit reflection essay/i })
+      .click();
     await submitResponsePromise;
 
-    await expect(page.getByText(/trial complete/i)).toBeVisible();
+    await expect(page.getByText(/congratulations/i)).toBeVisible();
   });
 });

@@ -5,7 +5,16 @@ import { chromium } from 'playwright';
 const command = process.argv[2]?.trim() || '';
 const baseURL =
   process.env.CONTRACT_LIVE_BASE_URL?.trim() || 'http://localhost:3000';
+const backendBaseURL =
+  process.env.CONTRACT_LIVE_BACKEND_URL?.trim() || 'http://127.0.0.1:8000';
 const artifactsDir = process.env.CONTRACT_LIVE_ARTIFACTS_DIR?.trim();
+const LOCAL_DEV_USER_EMAILS = {
+  talent_partner: 'talent_partner1@local.test',
+  candidate: 'candidate1@local.test',
+};
+let activeDevUserEmail = null;
+let activeDevUserRole = null;
+let activeCandidateSessionId = null;
 
 if (!artifactsDir) {
   throw new Error('CONTRACT_LIVE_ARTIFACTS_DIR is required.');
@@ -76,6 +85,23 @@ function trimToNull(value) {
   if (typeof value !== 'string') return null;
   const trimmed = value.trim();
   return trimmed || null;
+}
+
+function resolveActiveDevUserEmail(role, overrideEmail = null) {
+  const explicitEmail = trimToNull(overrideEmail);
+  if (explicitEmail) return explicitEmail;
+  if (role === 'talent_partner') {
+    return (
+      trimToNull(process.env.CONTRACT_LIVE_TALENT_PARTNER_EMAIL) ||
+      trimToNull(process.env.QA_E2E_TALENT_PARTNER_EMAIL) ||
+      LOCAL_DEV_USER_EMAILS.talent_partner
+    );
+  }
+  return (
+    trimToNull(process.env.CONTRACT_LIVE_CANDIDATE_EMAIL) ||
+    trimToNull(process.env.QA_E2E_CANDIDATE_EMAIL) ||
+    LOCAL_DEV_USER_EMAILS.candidate
+  );
 }
 
 function parseDateInput(dateInput) {
@@ -241,64 +267,122 @@ async function sleep(ms) {
   await new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-async function withPage(role, work) {
+async function withPage(
+  role,
+  work,
+  candidateSessionId = null,
+  devUserEmailOverride = null,
+) {
   const browser = await chromium.launch({ headless: true });
+  const activeEmail = resolveActiveDevUserEmail(role, devUserEmailOverride);
+  const extraHTTPHeaders = {};
+  if (activeEmail) {
+    extraHTTPHeaders['x-dev-user-email'] = activeEmail;
+    extraHTTPHeaders['authorization'] = `Bearer ${role}:${activeEmail}`;
+  }
+  if (candidateSessionId != null) {
+    extraHTTPHeaders['x-candidate-session-id'] = String(candidateSessionId);
+  }
   const context = await browser.newContext({
     baseURL,
     storageState: requireStorageState(role),
+    extraHTTPHeaders,
   });
   const page = await context.newPage();
+  activeDevUserEmail = activeEmail;
+  activeDevUserRole = role;
+  activeCandidateSessionId = candidateSessionId;
+  await page.route('**/api/backend/**', async (route) => {
+    const headers = {
+      ...route.request().headers(),
+    };
+    if (activeDevUserEmail) {
+      headers['x-dev-user-email'] = activeDevUserEmail;
+      headers['authorization'] = `Bearer ${role}:${activeDevUserEmail}`;
+    }
+    if (activeCandidateSessionId != null) {
+      headers['x-candidate-session-id'] = String(activeCandidateSessionId);
+    }
+    await route.continue({ headers });
+  });
   try {
-    await page.goto(
-      role === 'talent_partner' ? '/dashboard' : '/candidate/dashboard',
-      {
+    if (role === 'talent_partner') {
+      await page.goto('/dashboard', {
         waitUntil: 'domcontentloaded',
-      },
-    );
-    await page.waitForLoadState('domcontentloaded');
+      });
+      await page.waitForLoadState('domcontentloaded');
+    }
     return await work(page);
   } finally {
+    activeDevUserEmail = null;
+    activeDevUserRole = null;
+    activeCandidateSessionId = null;
     await browser.close();
   }
 }
 
 async function browserFetchJson(page, url, options = {}) {
-  return await page.evaluate(
-    async ({ url: innerUrl, options: innerOptions }) => {
-      const headers = {
-        ...(innerOptions.headers || {}),
-      };
-      if (
-        innerOptions.body != null &&
-        !Object.keys(headers).some(
-          (key) => key.toLowerCase() === 'content-type',
-        )
-      ) {
-        headers['content-type'] = 'application/json';
-      }
-      const res = await fetch(innerUrl, {
-        ...innerOptions,
-        headers,
-        body: innerOptions.body ?? undefined,
-      });
-      const text = await res.text();
-      let json = null;
-      try {
-        json = text ? JSON.parse(text) : null;
-      } catch {
-        json = { raw: text };
-      }
-      return {
-        ok: res.ok,
-        status: res.status,
-        statusText: res.statusText,
-        url: res.url,
-        text,
-        json,
-      };
-    },
-    { url, options },
-  );
+  const cookieJar = await page.context().cookies(baseURL);
+  const cookieHeader = cookieJar
+    .map((cookie) => `${cookie.name}=${cookie.value}`)
+    .join('; ');
+  const headers = {
+    ...(activeDevUserEmail ? { 'x-dev-user-email': activeDevUserEmail } : {}),
+    ...(activeDevUserEmail && activeDevUserRole
+      ? {
+          authorization: `Bearer ${activeDevUserRole}:${activeDevUserEmail}`,
+        }
+      : {}),
+    ...(activeCandidateSessionId != null
+      ? {
+          'x-candidate-session-id': String(activeCandidateSessionId),
+        }
+      : {}),
+    ...(url.startsWith('/api/backend/') ? { origin: baseURL } : {}),
+    ...(cookieHeader ? { cookie: cookieHeader } : {}),
+    ...(options.headers || {}),
+  };
+  const requestOptions = {
+    ...options,
+    headers,
+  };
+  if (options.body != null) {
+    if (
+      !Object.keys(headers).some((key) => key.toLowerCase() === 'content-type')
+    ) {
+      headers['content-type'] = 'application/json';
+    }
+    const rawBody = String(options.body);
+    try {
+      requestOptions.data = JSON.parse(rawBody);
+    } catch {
+      requestOptions.data = rawBody;
+    }
+    delete requestOptions.body;
+  }
+
+  const absoluteUrl = new URL(
+    url.startsWith('/api/backend/')
+      ? url.replace(/^\/api\/backend/, '/api')
+      : url,
+    url.startsWith('/api/backend/') ? backendBaseURL : baseURL,
+  ).toString();
+  const res = await page.request.fetch(absoluteUrl, requestOptions);
+  const text = await res.text();
+  let json = null;
+  try {
+    json = text ? JSON.parse(text) : null;
+  } catch {
+    json = { raw: text };
+  }
+  return {
+    ok: res.ok(),
+    status: res.status(),
+    statusText: res.statusText(),
+    url: res.url(),
+    text,
+    json,
+  };
 }
 
 async function pollUntil(
@@ -465,15 +549,24 @@ async function clickFirstVisible(locator) {
   return true;
 }
 
-async function gotoCandidateSession(page, inviteToken) {
+async function gotoCandidateSession(
+  page,
+  inviteToken,
+  options = { waitForReady: true },
+) {
   await page.goto(`/candidate/session/${inviteToken}`, {
-    waitUntil: 'domcontentloaded',
+    waitUntil: 'commit',
+    timeout: 60000,
   });
-  await page.waitForLoadState('networkidle');
+  await page
+    .waitForLoadState('domcontentloaded', { timeout: 60000 })
+    .catch(() => {});
   if (page.url().includes('/auth/login')) {
     throw new Error(`Candidate session redirected to login: ${page.url()}`);
   }
-  await waitForCandidateSessionReady(page, 60000);
+  if (options.waitForReady !== false) {
+    await waitForCandidateSessionReady(page, 60000);
+  }
 }
 
 async function ensureDayVisible(page, day) {
@@ -628,12 +721,12 @@ async function controlCandidateSessionDayWindow(
     );
   }
 
-  const response = await browserFetchJson(
-    page,
-    `/api/backend/admin/candidate_sessions/${candidateSessionId}/day_windows/control`,
+  const response = await fetch(
+    `${backendBaseURL}/api/admin/candidate_sessions/${candidateSessionId}/day_windows/control`,
     {
       method: 'POST',
       headers: {
+        'Content-Type': 'application/json',
         'X-Admin-Key': adminKey,
       },
       body: JSON.stringify({
@@ -643,13 +736,28 @@ async function controlCandidateSessionDayWindow(
       }),
     },
   );
-  writeJson(`candidate-day${targetDayIndex}-day-window-control.json`, response);
+  const text = await response.text();
+  let json = null;
+  try {
+    json = text ? JSON.parse(text) : null;
+  } catch {
+    json = { raw: text };
+  }
+  const result = {
+    ok: response.ok,
+    status: response.status,
+    statusText: response.statusText,
+    url: response.url,
+    text,
+    json,
+  };
+  writeJson(`candidate-day${targetDayIndex}-day-window-control.json`, result);
   if (!response.ok) {
     throw new Error(
-      `Candidate day-window control failed for day ${targetDayIndex}: ${response.status} ${response.text}`,
+      `Candidate day-window control failed for day ${targetDayIndex}: ${response.status} ${text}`,
     );
   }
-  return response;
+  return result;
 }
 
 async function submitCandidateTaskViaApi(
@@ -781,9 +889,8 @@ async function runTalentPartnerFreshFlow() {
     const createPayload = {
       title,
       role: 'Backend Engineer',
-      techStack: 'Python, FastAPI, pytest',
-      seniority: 'mid',
-      templateKey: 'python-fastapi',
+      seniority: 'Mid',
+      preferredLanguageFramework: 'Python, FastAPI, pytest',
       focus: 'Fresh end-to-end proof after live bundle/runtime repairs',
       companyContext: {
         domain: 'B2B developer tooling',
@@ -848,7 +955,7 @@ async function runTalentPartnerFreshFlow() {
 
     const approve = await browserFetchJson(
       page,
-      `/api/backend/trials/${trialId}/scenario/${scenarioVersionId}/approve`,
+      `/api/trials/${trialId}/scenario/${scenarioVersionId}/approve`,
       { method: 'POST' },
     );
     writeJson(`trial-${trialId}-approve.json`, approve);
@@ -860,7 +967,7 @@ async function runTalentPartnerFreshFlow() {
 
     const activate = await browserFetchJson(
       page,
-      `/api/backend/trials/${trialId}/activate`,
+      `/api/trials/${trialId}/activate`,
       {
         method: 'POST',
         body: JSON.stringify({ confirm: true }),
@@ -958,118 +1065,145 @@ async function runCandidateScheduleFlow() {
     );
   }
 
-  return await withPage('candidate', async (page) => {
-    await gotoCandidateSession(page, inviteToken);
-    const bootstrapBefore = await fetchCandidateBootstrap(
-      page,
-      inviteToken,
-      'candidate-bootstrap-before-schedule.json',
-    );
-    if (!bootstrapBefore.ok) {
-      throw new Error(
-        `Candidate bootstrap failed before scheduling: ${bootstrapBefore.status} ${bootstrapBefore.text}`,
+  return await withPage(
+    'candidate',
+    async (page) => {
+      await gotoCandidateSession(page, inviteToken, { waitForReady: false });
+      const bootstrapBefore = await fetchCandidateBootstrap(
+        page,
+        inviteToken,
+        'candidate-bootstrap-before-schedule.json',
       );
-    }
-    await capturePage(page, 'candidate-schedule-landing.json', {
-      inviteToken,
-      scheduleDate,
-      candidateTimezone,
-    });
-
-    const startButton = page.getByRole('button', { name: /start trial/i });
-    const scheduleStartDate = page.getByLabel(/start date/i);
-    if ((await startButton.count()) > 0) {
-      await startButton.first().waitFor({ state: 'visible', timeout: 60000 });
-      const startButtonClicked = await clickFirstVisible(startButton);
-      if (startButtonClicked) {
-        await page.waitForLoadState('networkidle');
+      if (!bootstrapBefore.ok) {
+        throw new Error(
+          `Candidate bootstrap failed before scheduling: ${bootstrapBefore.status} ${bootstrapBefore.text}`,
+        );
       }
-    }
-    await scheduleStartDate.waitFor({ state: 'visible', timeout: 60000 });
-
-    await scheduleStartDate.fill(scheduleDate);
-    const timezoneInput = page.getByLabel(/timezone/i);
-    if ((await timezoneInput.count()) > 0) {
-      await timezoneInput.fill(candidateTimezone);
-      await timezoneInput.press('Tab').catch(() => {});
-    }
-    await capturePage(page, 'candidate-schedule-draft.json', {
-      inviteToken,
-      scheduleDate,
-      candidateTimezone,
-    });
-
-    const continueButton = page.getByRole('button', { name: /^continue$/i });
-    await continueButton.click();
-    await page.waitForTimeout(500);
-    const githubValidationVisible = await page
-      .getByText(/enter your github username/i)
-      .first()
-      .isVisible()
-      .catch(() => false);
-    if (!githubValidationVisible) {
-      throw new Error(
-        'Candidate schedule should block empty GitHub username before continuing.',
-      );
-    }
-
-    await page.getByLabel(/github username/i).fill(githubUsername);
-
-    await page.getByRole('button', { name: /^continue$/i }).click();
-    const scheduledStartAtUtc = localDateAtHourToUtcIso({
-      dateInput: scheduleDate,
-      timezone: candidateTimezone,
-    });
-    const scheduleResponse = await scheduleCandidateSessionViaApi(
-      page,
-      inviteToken,
-      {
-        scheduledStartAt: scheduledStartAtUtc,
+      await capturePage(page, 'candidate-schedule-landing.json', {
+        inviteToken,
+        scheduleDate,
         candidateTimezone,
-        githubUsername,
-      },
-    );
-    const scheduleJson = scheduleResponse.json;
+      });
 
-    await page.waitForLoadState('networkidle');
-    await page.reload({ waitUntil: 'networkidle' });
-    const bootstrapAfter = await fetchCandidateBootstrap(
-      page,
-      inviteToken,
-      'candidate-bootstrap-after-schedule.json',
-    );
-    await capturePage(page, 'candidate-schedule-post-confirm.json', {
-      inviteToken,
-      scheduleDate,
-      candidateTimezone,
-    });
+      const startButton = page.getByRole('button', { name: /start trial/i });
+      const scheduleStartDate = page.getByLabel(/start date/i);
+      if ((await startButton.count()) > 0) {
+        await startButton.first().waitFor({ state: 'visible', timeout: 60000 });
+        const startButtonClicked = await clickFirstVisible(startButton);
+        if (startButtonClicked) {
+          await page.waitForLoadState('networkidle');
+        }
+      }
+      await scheduleStartDate.waitFor({ state: 'visible', timeout: 60000 });
 
-    const summary = {
-      inviteToken,
-      candidateSessionId:
-        bootstrapAfter.json?.candidateSessionId ?? context.candidateSessionId,
-      scheduledStartAt:
-        scheduleJson?.scheduledStartAt ??
-        bootstrapAfter.json?.scheduledStartAt ??
-        null,
-      candidateTimezone:
-        scheduleJson?.candidateTimezone ??
-        bootstrapAfter.json?.candidateTimezone ??
-        null,
-      githubUsername:
-        scheduleJson?.githubUsername ??
-        bootstrapAfter.json?.githubUsername ??
-        null,
-      scheduleLockedAt:
-        scheduleJson?.scheduleLockedAt ??
-        bootstrapAfter.json?.scheduleLockedAt ??
-        null,
-      currentDayWindow: bootstrapAfter.json?.currentDayWindow ?? null,
-      pageUrl: page.url(),
-    };
-    writeJson('candidate-schedule-summary.json', summary);
-    process.stdout.write(`${JSON.stringify(summary, null, 2)}\n`);
-  });
+      await scheduleStartDate.fill(scheduleDate);
+      const timezoneInput = page.getByLabel(/timezone/i);
+      if ((await timezoneInput.count()) > 0) {
+        await timezoneInput.fill(candidateTimezone);
+        await timezoneInput.press('Tab').catch(() => {});
+      }
+      await capturePage(page, 'candidate-schedule-draft.json', {
+        inviteToken,
+        scheduleDate,
+        candidateTimezone,
+      });
+
+      const continueButton = page.getByRole('button', { name: /^continue$/i });
+      await continueButton.click();
+      await page.waitForTimeout(500);
+      const githubValidationVisible = await page
+        .getByText(/enter your github username/i)
+        .first()
+        .isVisible()
+        .catch(() => false);
+      if (!githubValidationVisible) {
+        throw new Error(
+          'Candidate schedule should block empty GitHub username before continuing.',
+        );
+      }
+
+      await page.getByLabel(/github username/i).fill(githubUsername);
+
+      await page.getByRole('button', { name: /^continue$/i }).click();
+      const confirmButton = page.getByRole('button', {
+        name: /confirm schedule/i,
+      });
+      await confirmButton.waitFor({ state: 'visible', timeout: 60000 });
+      const scheduleResponsePromise = page.waitForResponse(
+        (response) =>
+          response
+            .url()
+            .includes(
+              `/api/backend/candidate/session/${encodeURIComponent(inviteToken)}/schedule`,
+            ) && response.request().method() === 'POST',
+        { timeout: 120000 },
+      );
+      await confirmButton.click();
+      const scheduleResponse = await scheduleResponsePromise;
+      const scheduleResponseText = await scheduleResponse.text();
+      let scheduleJson = null;
+      try {
+        scheduleJson = scheduleResponseText
+          ? JSON.parse(scheduleResponseText)
+          : null;
+      } catch {
+        scheduleJson = { raw: scheduleResponseText };
+      }
+      writeJson('candidate-schedule-response.json', {
+        ok: scheduleResponse.ok(),
+        status: scheduleResponse.status(),
+        statusText: scheduleResponse.statusText(),
+        url: scheduleResponse.url(),
+        text: scheduleResponseText,
+        json: scheduleJson,
+      });
+      if (!scheduleResponse.ok()) {
+        throw new Error(
+          `Candidate schedule failed: ${scheduleResponse.status()} ${scheduleResponseText}`,
+        );
+      }
+
+      await page.waitForLoadState('networkidle');
+      await page.reload({ waitUntil: 'networkidle' });
+      const bootstrapAfter = await fetchCandidateBootstrap(
+        page,
+        inviteToken,
+        'candidate-bootstrap-after-schedule.json',
+      );
+      await capturePage(page, 'candidate-schedule-post-confirm.json', {
+        inviteToken,
+        scheduleDate,
+        candidateTimezone,
+      });
+
+      const summary = {
+        inviteToken,
+        candidateSessionId:
+          bootstrapAfter.json?.candidateSessionId ?? context.candidateSessionId,
+        scheduledStartAt:
+          scheduleJson?.scheduledStartAt ??
+          bootstrapAfter.json?.scheduledStartAt ??
+          null,
+        candidateTimezone:
+          scheduleJson?.candidateTimezone ??
+          bootstrapAfter.json?.candidateTimezone ??
+          null,
+        githubUsername:
+          scheduleJson?.githubUsername ??
+          bootstrapAfter.json?.githubUsername ??
+          null,
+        scheduleLockedAt:
+          scheduleJson?.scheduleLockedAt ??
+          bootstrapAfter.json?.scheduleLockedAt ??
+          null,
+        currentDayWindow: bootstrapAfter.json?.currentDayWindow ?? null,
+        pageUrl: page.url(),
+      };
+      writeJson('candidate-schedule-summary.json', summary);
+      process.stdout.write(`${JSON.stringify(summary, null, 2)}\n`);
+    },
+    context.candidateSessionId,
+  );
 }
 
 async function runCandidateDayFlow() {
@@ -1089,154 +1223,18 @@ async function runCandidateDayFlow() {
     throw new Error('candidate-day requires CONTRACT_LIVE_DAY=1..5.');
   }
 
-  return await withPage('candidate', async (page) => {
-    await gotoCandidateSession(page, inviteToken);
-    const startTrialButton = page.getByRole('button', { name: /start trial/i });
-    const startTrialVisible = await startTrialButton
-      .first()
-      .isVisible()
-      .catch(() => false);
-    if (!startTrialVisible) {
-      await controlCandidateSessionDayWindow(
-        page,
-        candidateSessionId,
-        requestedDay,
-        candidateTimezone,
-      );
-      await page.reload({ waitUntil: 'networkidle' });
-      await waitForCandidateSessionReady(page, 60000);
-    }
-    await clickFirstVisible(startTrialButton);
-    await page.waitForLoadState('networkidle');
-    await ensureDayVisible(page, requestedDay);
-
-    const currentTaskBefore = await fetchCandidateCurrentTask(
-      page,
-      candidateSessionId,
-      `candidate-day${requestedDay}-current-task-before.json`,
-    );
-    if (!currentTaskBefore.ok) {
-      throw new Error(
-        `Unable to load current task for day ${requestedDay}: ${currentTaskBefore.status} ${currentTaskBefore.text}`,
-      );
-    }
-    const currentTask = extractCurrentTask(currentTaskBefore);
-    const taskId = Number(currentTask?.id);
-    const actualDayIndex = Number(currentTask?.dayIndex);
-    const closedByBackend =
-      currentTaskBefore.json?.currentWindow?.isOpen === false ||
-      currentTaskBefore.json?.currentWindow?.state === 'closed';
-    if (!Number.isFinite(taskId)) {
-      throw new Error(
-        `Current task for day ${requestedDay} did not include a task id: ${JSON.stringify(
-          currentTaskBefore.json,
-          null,
-          2,
-        )}`,
-      );
-    }
-    if (requestedDay === 1 && actualDayIndex > requestedDay) {
-      writeJson(`candidate-day${requestedDay}-already-advanced.json`, {
-        requestedDay,
-        actualDayIndex,
-        currentTask: currentTaskBefore.json?.currentTask ?? null,
-        completedTaskIds: currentTaskBefore.json?.completedTaskIds ?? null,
-        note: 'Day 1 was already advanced in the live session state, so the driver records the current task and continues with later phases.',
+  return await withPage(
+    'candidate',
+    async (page) => {
+      await gotoCandidateSession(page, inviteToken);
+      const startTrialButton = page.getByRole('button', {
+        name: /start trial/i,
       });
-      const summary = {
-        inviteToken,
-        candidateSessionId,
-        taskId,
-        requestedDay,
-        pageUrl: page.url(),
-        closedByBackend,
-        currentTaskAfter: currentTaskBefore.json,
-        skippedAlreadyAdvanced: true,
-      };
-      writeJson(`candidate-day${requestedDay}-summary.json`, summary);
-      process.stdout.write(`${JSON.stringify(summary, null, 2)}\n`);
-      return;
-    }
-    if (actualDayIndex !== requestedDay) {
-      throw new Error(
-        `Expected day ${requestedDay} but current task is day ${actualDayIndex}: ${JSON.stringify(
-          currentTaskBefore.json,
-          null,
-          2,
-        )}`,
-      );
-    }
-
-    await capturePage(page, `candidate-day${requestedDay}-before.json`, {
-      inviteToken,
-      candidateSessionId,
-      taskId,
-    });
-
-    if (requestedDay === 1) {
-      const textArea = page.locator('textarea').first();
-      const textAreaVisible = await textArea
-        .isVisible({ timeout: 5000 })
+      const startTrialVisible = await startTrialButton
+        .first()
+        .isVisible()
         .catch(() => false);
-      if (textAreaVisible) {
-        await textArea.fill(defaultDay1Response());
-        await clickFirstVisible(
-          page.getByRole('button', { name: /save draft/i }),
-        );
-        const submitResponsePromise = page.waitForResponse(
-          (response) =>
-            response.url().includes(`/tasks/${taskId}/submit`) &&
-            response.request().method() === 'POST',
-          { timeout: 120000 },
-        );
-        await page.getByRole('button', { name: /submit & continue/i }).click();
-        const submitResponse = await submitResponsePromise;
-        writeJson(`candidate-day${requestedDay}-submit.json`, {
-          ok: submitResponse.ok(),
-          status: submitResponse.status(),
-          url: submitResponse.url(),
-          text: await submitResponse.text(),
-          mode: 'ui',
-        });
-        if (!submitResponse.ok()) {
-          throw new Error(
-            `Day ${requestedDay} submit failed with status ${submitResponse.status()}.`,
-          );
-        }
-      } else {
-        const submitResponse = await submitCandidateTaskViaApi(
-          page,
-          taskId,
-          candidateSessionId,
-          { contentText: defaultDay1Response() },
-          `candidate-day${requestedDay}-submit-api.json`,
-        );
-        writeJson(`candidate-day${requestedDay}-submit.json`, {
-          ok: submitResponse.ok,
-          status: submitResponse.status,
-          url: submitResponse.url,
-          text: submitResponse.text,
-          mode: 'api',
-        });
-      }
-      await page.waitForTimeout(1000);
-      const currentTaskAfter = await fetchCandidateCurrentTask(
-        page,
-        candidateSessionId,
-        `candidate-day${requestedDay}-current-task-after.json`,
-      );
-      const nextDayIndex = Number(currentTaskAfter.json?.currentTask?.dayIndex);
-      if (!Number.isFinite(nextDayIndex) || nextDayIndex !== requestedDay + 1) {
-        throw new Error(
-          `Day ${requestedDay} submit did not advance to the next task. Current task: ${JSON.stringify(
-            currentTaskAfter.json,
-            null,
-            2,
-          )}`,
-        );
-      }
-    } else if (requestedDay === 2 || requestedDay === 3) {
-      if (closedByBackend) {
+      if (!startTrialVisible) {
         await controlCandidateSessionDayWindow(
           page,
           candidateSessionId,
@@ -1244,18 +1242,93 @@ async function runCandidateDayFlow() {
           candidateTimezone,
         );
         await page.reload({ waitUntil: 'networkidle' });
-        const currentTaskAfterControl = await fetchCandidateCurrentTask(
-          page,
+        await waitForCandidateSessionReady(page, 60000);
+      }
+      await clickFirstVisible(startTrialButton);
+      await page.waitForLoadState('networkidle');
+      await ensureDayVisible(page, requestedDay);
+
+      const currentTaskBefore = await fetchCandidateCurrentTask(
+        page,
+        candidateSessionId,
+        `candidate-day${requestedDay}-current-task-before.json`,
+      );
+      if (!currentTaskBefore.ok) {
+        throw new Error(
+          `Unable to load current task for day ${requestedDay}: ${currentTaskBefore.status} ${currentTaskBefore.text}`,
+        );
+      }
+      const currentTask = extractCurrentTask(currentTaskBefore);
+      const taskId = Number(currentTask?.id);
+      const actualDayIndex = Number(currentTask?.dayIndex);
+      const closedByBackend =
+        currentTaskBefore.json?.currentWindow?.isOpen === false ||
+        currentTaskBefore.json?.currentWindow?.state === 'closed';
+      if (!Number.isFinite(taskId)) {
+        throw new Error(
+          `Current task for day ${requestedDay} did not include a task id: ${JSON.stringify(
+            currentTaskBefore.json,
+            null,
+            2,
+          )}`,
+        );
+      }
+      if (requestedDay === 1 && actualDayIndex > requestedDay) {
+        writeJson(`candidate-day${requestedDay}-already-advanced.json`, {
+          requestedDay,
+          actualDayIndex,
+          currentTask: currentTaskBefore.json?.currentTask ?? null,
+          completedTaskIds: currentTaskBefore.json?.completedTaskIds ?? null,
+          note: 'Day 1 was already advanced in the live session state, so the driver records the current task and continues with later phases.',
+        });
+        const summary = {
+          inviteToken,
           candidateSessionId,
-          `candidate-day${requestedDay}-current-task-after-control.json`,
-        );
-        const reopenedDayIndex = Number(
-          currentTaskAfterControl.json?.currentTask?.dayIndex,
-        );
-        if (reopenedDayIndex !== requestedDay) {
+          taskId,
+          requestedDay,
+          pageUrl: page.url(),
+          closedByBackend,
+          currentTaskAfter: currentTaskBefore.json,
+          skippedAlreadyAdvanced: true,
+        };
+        writeJson(`candidate-day${requestedDay}-summary.json`, summary);
+        process.stdout.write(`${JSON.stringify(summary, null, 2)}\n`);
+        return;
+      }
+      if (actualDayIndex !== requestedDay) {
+        if (
+          requestedDay >= 4 &&
+          Number.isFinite(actualDayIndex) &&
+          actualDayIndex < requestedDay
+        ) {
+          await controlCandidateSessionDayWindow(
+            page,
+            candidateSessionId,
+            requestedDay,
+            candidateTimezone,
+          );
+          await page.reload({ waitUntil: 'networkidle' });
+          const currentTaskAfterControl = await fetchCandidateCurrentTask(
+            page,
+            candidateSessionId,
+            `candidate-day${requestedDay}-current-task-after-control.json`,
+          );
+          const reopenedDayIndex = Number(
+            currentTaskAfterControl.json?.currentTask?.dayIndex,
+          );
+          if (reopenedDayIndex !== requestedDay) {
+            throw new Error(
+              `Day ${requestedDay} window control did not expose the requested day. Current task: ${JSON.stringify(
+                currentTaskAfterControl.json,
+                null,
+                2,
+              )}`,
+            );
+          }
+        } else {
           throw new Error(
-            `Day ${requestedDay} window control did not expose the requested day. Current task: ${JSON.stringify(
-              currentTaskAfterControl.json,
+            `Expected day ${requestedDay} but current task is day ${actualDayIndex}: ${JSON.stringify(
+              currentTaskBefore.json,
               null,
               2,
             )}`,
@@ -1263,128 +1336,167 @@ async function runCandidateDayFlow() {
         }
       }
 
-      const codespaceLink = page.getByRole('link', {
-        name: /^open codespace$/i,
-      });
-      await codespaceLink.first().waitFor({ state: 'visible', timeout: 60000 });
-      const readinessLabel = await waitForCodespaceReadyMarkers(page, 60000);
-      const workspaceHref = await codespaceLink.first().getAttribute('href');
-      writeJson(`candidate-day${requestedDay}-workspace.json`, {
-        href: workspaceHref,
-        label: 'Open Codespace',
-        readinessLabel,
-      });
-
-      const runTestsButton = page
-        .getByRole('button', { name: /^run tests$/i })
-        .first();
-      await runTestsButton.waitFor({ state: 'visible', timeout: 60000 });
-
-      const runResponsePromise = page.waitForResponse(
-        (response) =>
-          response.url().includes(`/tasks/${taskId}/run`) &&
-          response.request().method() === 'POST',
-        { timeout: 120000 },
-      );
-      await runTestsButton.click();
-      const runResponse = await runResponsePromise;
-      const runResponseText = await runResponse.text();
-      writeJson(`candidate-day${requestedDay}-run-start.json`, {
-        ok: runResponse.ok(),
-        status: runResponse.status(),
-        url: runResponse.url(),
-        text: runResponseText,
-      });
-      if (!runResponse.ok()) {
-        throw new Error(
-          `Day ${requestedDay} run-tests start failed: ${runResponse.status()} ${runResponseText}`,
-        );
-      }
-
-      await waitForText(page, /running tests/i, 30000);
-      const runResult = await waitForRunTestsTerminalState(page, requestedDay);
-      writeJson(`candidate-day${requestedDay}-run-result.json`, runResult);
-
-      const submitResponsePromise = page.waitForResponse(
-        (response) =>
-          response.url().includes(`/tasks/${taskId}/submit`) &&
-          response.request().method() === 'POST',
-        { timeout: 120000 },
-      );
-      await page.getByRole('button', { name: /submit & continue/i }).click();
-      const submitResponse = await submitResponsePromise;
-      writeJson(`candidate-day${requestedDay}-submit.json`, {
-        ok: submitResponse.ok(),
-        status: submitResponse.status(),
-        url: submitResponse.url(),
-        text: await submitResponse.text(),
-      });
-      if (!submitResponse.ok()) {
-        throw new Error(
-          `Day ${requestedDay} submit failed with status ${submitResponse.status()}.`,
-        );
-      }
-    } else if (requestedDay === 4) {
-      const transcriptReadyText = page.getByText(/full transcript/i).first();
-      const transcriptAlreadyReady = await transcriptReadyText
-        .isVisible({ timeout: 1000 })
-        .catch(() => false);
-      if (!transcriptAlreadyReady) {
-        const day4DemoFile = resolveDay4DemoFile();
-        const consentCheckbox = page
-          .getByLabel(
-            /I consent to submission and processing of my demo video and transcript for evaluation/i,
-          )
-          .first();
-        await consentCheckbox.check();
-        await page.locator('input[type="file"]').setInputFiles(day4DemoFile);
-        writeJson('candidate-day4-upload-fixture.json', {
-          path: day4DemoFile,
-          bytes: fs.statSync(day4DemoFile).size,
-        });
-        await page
-          .getByRole('button', { name: /finalize demo/i })
-          .waitFor({ state: 'visible', timeout: 30000 });
-        await page.getByRole('button', { name: /finalize demo/i }).click();
-        await waitForTranscriptReady(page);
-      }
-      await capturePage(page, 'candidate-day4-transcript-ready.json', {
+      await capturePage(page, `candidate-day${requestedDay}-before.json`, {
         inviteToken,
         candidateSessionId,
         taskId,
       });
-    } else if (requestedDay === 5) {
-      const reflection = defaultDay5Reflection();
-      const reflectionMarkdown = buildDay5ReflectionMarkdown(reflection);
-      await clickFirstVisible(page.getByRole('button', { name: /^write$/i }));
-      const editorVisible = await page
-        .locator('#reflection-challenges')
-        .isVisible({ timeout: 5000 })
-        .catch(() => false);
-      if (editorVisible) {
-        await page
-          .locator('#reflection-challenges')
-          .fill(reflection.challenges);
-        await page.locator('#reflection-decisions').fill(reflection.decisions);
-        await page.locator('#reflection-tradeoffs').fill(reflection.tradeoffs);
-        await page
-          .locator('#reflection-communication')
-          .fill(reflection.communication);
-        await page.locator('#reflection-next').fill(reflection.next);
-        await clickFirstVisible(
-          page.getByRole('button', { name: /^preview$/i }),
+
+      if (requestedDay === 1) {
+        const textArea = page.locator('textarea').first();
+        const textAreaVisible = await textArea
+          .isVisible({ timeout: 5000 })
+          .catch(() => false);
+        if (textAreaVisible) {
+          await textArea.fill(defaultDay1Response());
+          await clickFirstVisible(
+            page.getByRole('button', { name: /save draft/i }),
+          );
+          const submitResponsePromise = page.waitForResponse(
+            (response) =>
+              response.url().includes(`/tasks/${taskId}/submit`) &&
+              response.request().method() === 'POST',
+            { timeout: 120000 },
+          );
+          await page
+            .getByRole('button', { name: /submit & continue/i })
+            .click();
+          const submitResponse = await submitResponsePromise;
+          writeJson(`candidate-day${requestedDay}-submit.json`, {
+            ok: submitResponse.ok(),
+            status: submitResponse.status(),
+            url: submitResponse.url(),
+            text: await submitResponse.text(),
+            mode: 'ui',
+          });
+          if (!submitResponse.ok()) {
+            throw new Error(
+              `Day ${requestedDay} submit failed with status ${submitResponse.status()}.`,
+            );
+          }
+        } else {
+          const submitResponse = await submitCandidateTaskViaApi(
+            page,
+            taskId,
+            candidateSessionId,
+            { contentText: defaultDay1Response() },
+            `candidate-day${requestedDay}-submit-api.json`,
+          );
+          writeJson(`candidate-day${requestedDay}-submit.json`, {
+            ok: submitResponse.ok,
+            status: submitResponse.status,
+            url: submitResponse.url,
+            text: submitResponse.text,
+            mode: 'api',
+          });
+        }
+        await page.waitForTimeout(1000);
+        const currentTaskAfter = await fetchCandidateCurrentTask(
+          page,
+          candidateSessionId,
+          `candidate-day${requestedDay}-current-task-after.json`,
         );
-        await clickFirstVisible(page.getByRole('button', { name: /^write$/i }));
-        await clickFirstVisible(
-          page.getByRole('button', { name: /save draft/i }),
+        const nextDayIndex = Number(
+          currentTaskAfter.json?.currentTask?.dayIndex,
         );
+        if (
+          !Number.isFinite(nextDayIndex) ||
+          nextDayIndex !== requestedDay + 1
+        ) {
+          throw new Error(
+            `Day ${requestedDay} submit did not advance to the next task. Current task: ${JSON.stringify(
+              currentTaskAfter.json,
+              null,
+              2,
+            )}`,
+          );
+        }
+      } else if (requestedDay === 2 || requestedDay === 3) {
+        if (closedByBackend) {
+          await controlCandidateSessionDayWindow(
+            page,
+            candidateSessionId,
+            requestedDay,
+            candidateTimezone,
+          );
+          await page.reload({ waitUntil: 'networkidle' });
+          const currentTaskAfterControl = await fetchCandidateCurrentTask(
+            page,
+            candidateSessionId,
+            `candidate-day${requestedDay}-current-task-after-control.json`,
+          );
+          const reopenedDayIndex = Number(
+            currentTaskAfterControl.json?.currentTask?.dayIndex,
+          );
+          if (reopenedDayIndex !== requestedDay) {
+            throw new Error(
+              `Day ${requestedDay} window control did not expose the requested day. Current task: ${JSON.stringify(
+                currentTaskAfterControl.json,
+                null,
+                2,
+              )}`,
+            );
+          }
+        }
+
+        const codespaceLink = page.getByRole('link', {
+          name: /^open codespace$/i,
+        });
+        await codespaceLink
+          .first()
+          .waitFor({ state: 'visible', timeout: 60000 });
+        const readinessLabel = await waitForCodespaceReadyMarkers(page, 60000);
+        const workspaceHref = await codespaceLink.first().getAttribute('href');
+        writeJson(`candidate-day${requestedDay}-workspace.json`, {
+          href: workspaceHref,
+          label: 'Open Codespace',
+          readinessLabel,
+        });
+
+        const runTestsButton = page
+          .getByRole('button', { name: /^run tests$/i })
+          .first();
+        await runTestsButton.waitFor({ state: 'visible', timeout: 60000 });
+
+        const runResponsePromise = page.waitForResponse(
+          (response) =>
+            response.url().includes(`/tasks/${taskId}/run`) &&
+            response.request().method() === 'POST',
+          { timeout: 120000 },
+        );
+        await runTestsButton.click();
+        const runResponse = await runResponsePromise;
+        const runResponseText = await runResponse.text();
+        writeJson(`candidate-day${requestedDay}-run-start.json`, {
+          ok: runResponse.ok(),
+          status: runResponse.status(),
+          url: runResponse.url(),
+          text: runResponseText,
+        });
+        if (!runResponse.ok()) {
+          throw new Error(
+            `Day ${requestedDay} run-tests start failed: ${runResponse.status()} ${runResponseText}`,
+          );
+        }
+
+        await waitForText(page, /running tests/i, 30000);
+        const runResult = await waitForRunTestsTerminalState(
+          page,
+          requestedDay,
+        );
+        writeJson(`candidate-day${requestedDay}-run-result.json`, runResult);
+
+        const submitButtonName =
+          requestedDay === 3
+            ? /submit implementation wrap-up/i
+            : /submit & continue/i;
         const submitResponsePromise = page.waitForResponse(
           (response) =>
             response.url().includes(`/tasks/${taskId}/submit`) &&
             response.request().method() === 'POST',
           { timeout: 120000 },
         );
-        await page.getByRole('button', { name: /submit & continue/i }).click();
+        await page.getByRole('button', { name: submitButtonName }).click();
         const submitResponse = await submitResponsePromise;
         writeJson(`candidate-day${requestedDay}-submit.json`, {
           ok: submitResponse.ok(),
@@ -1397,74 +1509,205 @@ async function runCandidateDayFlow() {
             `Day ${requestedDay} submit failed with status ${submitResponse.status()}.`,
           );
         }
-      } else {
-        const draftResponse = await browserFetchJson(
-          page,
-          `/api/backend/tasks/${taskId}/draft`,
-          {
-            method: 'PUT',
-            headers: { 'x-candidate-session-id': String(candidateSessionId) },
-            body: JSON.stringify({
-              contentText: reflectionMarkdown,
-              contentJson: { reflection },
-            }),
-          },
-        );
-        writeJson(
-          `candidate-day${requestedDay}-draft-upsert.json`,
-          draftResponse,
-        );
-        if (!draftResponse.ok) {
-          throw new Error(
-            `Day ${requestedDay} draft upsert failed: ${draftResponse.status} ${draftResponse.text}`,
+      } else if (requestedDay === 4) {
+        const transcriptReadyText = page.getByText(/full transcript/i).first();
+        const transcriptAlreadyReady = await transcriptReadyText
+          .isVisible({ timeout: 1000 })
+          .catch(() => false);
+        if (!transcriptAlreadyReady) {
+          const day4DemoFile = resolveDay4DemoFile();
+          const consentCheckbox = page
+            .getByLabel(
+              /I consent to submission and processing of my demo video and transcript for evaluation/i,
+            )
+            .first();
+          await consentCheckbox.check();
+          await page
+            .locator('input[type="file"][accept*="video"]')
+            .first()
+            .setInputFiles({
+              name: path.basename(day4DemoFile),
+              mimeType: 'video/mp4',
+              path: day4DemoFile,
+            });
+          writeJson('candidate-day4-upload-fixture.json', {
+            path: day4DemoFile,
+            bytes: fs.statSync(day4DemoFile).size,
+            mimeType: 'video/mp4',
+          });
+          const uploadInitRequestPromise = page.waitForRequest(
+            (request) =>
+              request.url().includes(`/tasks/${taskId}/handoff/upload/init`) &&
+              request.method() === 'POST',
+            { timeout: 120000 },
           );
-        }
-        const submitResponse = await browserFetchJson(
-          page,
-          `/api/backend/tasks/${taskId}/submit`,
-          {
-            method: 'POST',
-            headers: { 'x-candidate-session-id': String(candidateSessionId) },
-            body: JSON.stringify({
-              reflection,
-              contentText: reflectionMarkdown,
-            }),
-          },
-        );
-        writeJson(`candidate-day${requestedDay}-submit.json`, submitResponse);
-        if (!submitResponse.ok) {
-          throw new Error(
-            `Day ${requestedDay} submit failed: ${submitResponse.status} ${submitResponse.text}`,
+          const uploadInitResponsePromise = page.waitForResponse(
+            (response) =>
+              response.url().includes(`/tasks/${taskId}/handoff/upload/init`) &&
+              response.request().method() === 'POST',
+            { timeout: 120000 },
           );
+          await page
+            .getByRole('button', { name: /finalize demo/i })
+            .waitFor({ state: 'visible', timeout: 30000 });
+          await page.getByRole('button', { name: /finalize demo/i }).click();
+          const uploadInitRequest = await uploadInitRequestPromise;
+          const uploadInitResponse = await uploadInitResponsePromise;
+          let uploadInitRequestBody = null;
+          try {
+            uploadInitRequestBody = uploadInitRequest.postDataJSON();
+          } catch {
+            uploadInitRequestBody = uploadInitRequest.postData();
+          }
+          writeJson(`candidate-day${requestedDay}-upload-init.json`, {
+            request: {
+              url: uploadInitRequest.url(),
+              method: uploadInitRequest.method(),
+              headers: uploadInitRequest.headers(),
+              body: uploadInitRequestBody,
+            },
+            response: {
+              ok: uploadInitResponse.ok(),
+              status: uploadInitResponse.status(),
+              url: uploadInitResponse.url(),
+              text: await uploadInitResponse.text(),
+            },
+          });
+          if (!uploadInitResponse.ok()) {
+            throw new Error(
+              `Day ${requestedDay} upload init failed with status ${uploadInitResponse.status()}.`,
+            );
+          }
+          await waitForTranscriptReady(page);
         }
+        await capturePage(page, 'candidate-day4-transcript-ready.json', {
+          inviteToken,
+          candidateSessionId,
+          taskId,
+        });
+      } else if (requestedDay === 5) {
+        const reflection = defaultDay5Reflection();
+        const reflectionMarkdown = buildDay5ReflectionMarkdown(reflection);
+        await clickFirstVisible(page.getByRole('button', { name: /^write$/i }));
+        const editorVisible = await page
+          .locator('#reflection-challenges')
+          .isVisible({ timeout: 5000 })
+          .catch(() => false);
+        if (editorVisible) {
+          await page
+            .locator('#reflection-challenges')
+            .fill(reflection.challenges);
+          await page
+            .locator('#reflection-decisions')
+            .fill(reflection.decisions);
+          await page
+            .locator('#reflection-tradeoffs')
+            .fill(reflection.tradeoffs);
+          await page
+            .locator('#reflection-communication')
+            .fill(reflection.communication);
+          await page.locator('#reflection-next').fill(reflection.next);
+          await clickFirstVisible(
+            page.getByRole('button', { name: /^preview$/i }),
+          );
+          await clickFirstVisible(
+            page.getByRole('button', { name: /^write$/i }),
+          );
+          await clickFirstVisible(
+            page.getByRole('button', { name: /save draft/i }),
+          );
+          const submitResponsePromise = page.waitForResponse(
+            (response) =>
+              response.url().includes(`/tasks/${taskId}/submit`) &&
+              response.request().method() === 'POST',
+            { timeout: 120000 },
+          );
+          await page
+            .getByRole('button', { name: /submit & continue/i })
+            .click();
+          const submitResponse = await submitResponsePromise;
+          writeJson(`candidate-day${requestedDay}-submit.json`, {
+            ok: submitResponse.ok(),
+            status: submitResponse.status(),
+            url: submitResponse.url(),
+            text: await submitResponse.text(),
+          });
+          if (!submitResponse.ok()) {
+            throw new Error(
+              `Day ${requestedDay} submit failed with status ${submitResponse.status()}.`,
+            );
+          }
+        } else {
+          const draftResponse = await browserFetchJson(
+            page,
+            `/api/backend/tasks/${taskId}/draft`,
+            {
+              method: 'PUT',
+              headers: { 'x-candidate-session-id': String(candidateSessionId) },
+              body: JSON.stringify({
+                contentText: reflectionMarkdown,
+                contentJson: { reflection },
+              }),
+            },
+          );
+          writeJson(
+            `candidate-day${requestedDay}-draft-upsert.json`,
+            draftResponse,
+          );
+          if (!draftResponse.ok) {
+            throw new Error(
+              `Day ${requestedDay} draft upsert failed: ${draftResponse.status} ${draftResponse.text}`,
+            );
+          }
+          const submitResponse = await browserFetchJson(
+            page,
+            `/api/backend/tasks/${taskId}/submit`,
+            {
+              method: 'POST',
+              headers: { 'x-candidate-session-id': String(candidateSessionId) },
+              body: JSON.stringify({
+                reflection,
+                contentText: reflectionMarkdown,
+              }),
+            },
+          );
+          writeJson(`candidate-day${requestedDay}-submit.json`, submitResponse);
+          if (!submitResponse.ok) {
+            throw new Error(
+              `Day ${requestedDay} submit failed: ${submitResponse.status} ${submitResponse.text}`,
+            );
+          }
+        }
+        await page.reload({ waitUntil: 'networkidle' });
+        await waitForText(page, /trial complete/i, 60000);
       }
-      await page.reload({ waitUntil: 'networkidle' });
-      await waitForText(page, /trial complete/i, 60000);
-    }
 
-    await page.waitForLoadState('networkidle');
-    await capturePage(page, `candidate-day${requestedDay}-after.json`, {
-      inviteToken,
-      candidateSessionId,
-      taskId,
-    });
-    const currentTaskAfter = await fetchCandidateCurrentTask(
-      page,
-      candidateSessionId,
-      `candidate-day${requestedDay}-current-task-after.json`,
-    );
-    const summary = {
-      inviteToken,
-      candidateSessionId,
-      taskId,
-      requestedDay,
-      pageUrl: page.url(),
-      closedByBackend,
-      currentTaskAfter: currentTaskAfter.json,
-    };
-    writeJson(`candidate-day${requestedDay}-summary.json`, summary);
-    process.stdout.write(`${JSON.stringify(summary, null, 2)}\n`);
-  });
+      await page.waitForLoadState('networkidle');
+      await capturePage(page, `candidate-day${requestedDay}-after.json`, {
+        inviteToken,
+        candidateSessionId,
+        taskId,
+      });
+      const currentTaskAfter = await fetchCandidateCurrentTask(
+        page,
+        candidateSessionId,
+        `candidate-day${requestedDay}-current-task-after.json`,
+      );
+      const summary = {
+        inviteToken,
+        candidateSessionId,
+        taskId,
+        requestedDay,
+        pageUrl: page.url(),
+        closedByBackend,
+        currentTaskAfter: currentTaskAfter.json,
+      };
+      writeJson(`candidate-day${requestedDay}-summary.json`, summary);
+      process.stdout.write(`${JSON.stringify(summary, null, 2)}\n`);
+    },
+    candidateSessionId,
+    context.summary?.candidateEmail ?? null,
+  );
 }
 
 function extractCompareRows(responseJson) {
@@ -1703,6 +1946,12 @@ async function runTalentPartnerTerminateFlow() {
 switch (command) {
   case 'talent_partner-fresh':
     await runTalentPartnerFreshFlow();
+    break;
+  case 'candidate-day5':
+    if (!trimToNull(process.env.CONTRACT_LIVE_DAY)) {
+      process.env.CONTRACT_LIVE_DAY = '5';
+    }
+    await runCandidateDayFlow();
     break;
   case 'candidate-schedule':
     await runCandidateScheduleFlow();

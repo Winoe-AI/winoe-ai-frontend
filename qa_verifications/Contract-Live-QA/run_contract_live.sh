@@ -296,7 +296,11 @@ echo "Evidence directory: $EVIDENCE_DIR" | tee -a "$RUNNER_LOG"
 echo "Storage states: $STORAGE_DIR" | tee -a "$RUNNER_LOG"
 echo "Base URL: $CONTRACT_LIVE_BASE_URL" | tee -a "$RUNNER_LOG"
 echo "WINOE_EMAIL_PROVIDER: $WINOE_EMAIL_PROVIDER" | tee -a "$RUNNER_LOG"
-echo "Auth bootstrap: real Auth0 browser login" | tee -a "$RUNNER_LOG"
+if [[ -n "${QA_E2E_TALENT_PARTNER_EMAIL:-}" && -n "${QA_E2E_TALENT_PARTNER_PASSWORD:-}" && -n "${QA_E2E_CANDIDATE_EMAIL:-}" && -n "${QA_E2E_CANDIDATE_PASSWORD:-}" ]]; then
+  echo "Auth bootstrap: real Auth0 browser login" | tee -a "$RUNNER_LOG"
+else
+  echo "Auth bootstrap: local dev storage-state fallback" | tee -a "$RUNNER_LOG"
+fi
 echo "Driver sequence: ${DRIVER_SEQUENCE_RAW:-<none>}" | tee -a "$RUNNER_LOG"
 echo | tee -a "$RUNNER_LOG"
 

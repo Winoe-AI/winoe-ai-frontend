@@ -11,7 +11,7 @@ describe('CandidateTaskView finalized day5 reflection rendering', () => {
     primeDraftMocks();
   });
 
-  it('renders structured finalized reflection sections in read-only mode', async () => {
+  it('renders congratulations when day 5 is finalized', async () => {
     renderTaskView({
       task: {
         ...baseTask,
@@ -41,13 +41,18 @@ describe('CandidateTaskView finalized day5 reflection rendering', () => {
       },
     });
     await waitFor(() =>
-      expect(screen.getByText(/Final challenges/i)).toBeInTheDocument(),
+      expect(
+        screen.getByText(/congratulations - your 5-day trial is complete/i),
+      ).toBeInTheDocument(),
     );
     expect(screen.queryByRole('textbox')).toBeNull();
+    expect(
+      screen.getByText(/your 5-day trial is complete/i),
+    ).toBeInTheDocument();
     expect(getCandidateTaskDraftMock).not.toHaveBeenCalled();
   });
 
-  it('prefers finalized contentText when both text and structured content exist', async () => {
+  it('keeps the congratulations screen when both text and structured content exist', async () => {
     renderTaskView({
       task: {
         ...baseTask,
@@ -77,9 +82,10 @@ describe('CandidateTaskView finalized day5 reflection rendering', () => {
       },
     });
     await waitFor(() =>
-      expect(screen.getByText(/Finalized text body/i)).toBeInTheDocument(),
+      expect(
+        screen.getByText(/your 5-day trial is complete/i),
+      ).toBeInTheDocument(),
     );
-    expect(screen.queryByText(/Structured challenges body/i)).toBeNull();
     expect(screen.queryByRole('textbox')).toBeNull();
     expect(getCandidateTaskDraftMock).not.toHaveBeenCalled();
   });

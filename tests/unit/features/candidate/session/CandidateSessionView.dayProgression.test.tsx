@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { CandidateSessionView } from '@/features/candidate/session/CandidateSessionView';
 import { buildCandidateSessionViewProps } from './CandidateSessionView.windowGating.testProps';
 
@@ -38,14 +38,14 @@ describe('CandidateSessionView day progression checkpoints', () => {
     ).not.toBeInTheDocument();
   });
 
-  it('renders Day 5 reflection fields in editable mode', () => {
+  it('renders Day 5 reflection markdown editor in editable mode', () => {
     const props = buildCandidateSessionViewProps();
     props.currentTask = {
       id: 15,
       dayIndex: 5,
       type: 'documentation',
-      title: 'Final reflection',
-      description: 'Summarize your decisions and next steps.',
+      title: 'Reflection Essay',
+      description: 'Reflect on your full Trial experience.',
     };
     props.currentDayIndex = 5;
     props.actionGate = {
@@ -64,13 +64,20 @@ describe('CandidateSessionView day progression checkpoints', () => {
 
     render(<CandidateSessionView {...props} />);
 
-    fireEvent.click(screen.getByRole('button', { name: /^Write$/i }));
     expect(
-      screen.getByPlaceholderText(/Write your response here/i),
+      screen.getByRole('heading', { name: /reflection essay editor/i }),
     ).toBeInTheDocument();
-    expect(screen.getByText(/Markdown is supported/i)).toBeInTheDocument();
+    expect(
+      screen.getAllByText(/9:00 AM–9:00 PM your local time/i).length,
+    ).toBeGreaterThan(0);
+    expect(
+      screen.getByRole('textbox', { name: /markdown editor/i }),
+    ).toBeInTheDocument();
     expect(
       screen.getByRole('button', { name: /^Preview$/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /submit reflection essay/i }),
     ).toBeInTheDocument();
   });
 
@@ -80,13 +87,13 @@ describe('CandidateSessionView day progression checkpoints', () => {
       id: 15,
       dayIndex: 5,
       type: 'documentation',
-      title: 'Final reflection',
-      description: 'Summarize your decisions and next steps.',
+      title: 'Reflection Essay',
+      description: 'Reflect on your full Trial experience.',
     };
     props.currentDayIndex = 5;
     props.actionGate = {
       isReadOnly: true,
-      disabledReason: 'Day 5 locked until the active window opens.',
+      disabledReason: null,
       comeBackAt: '2099-01-05T14:00:00Z',
     };
     props.windowState = {
@@ -104,10 +111,13 @@ describe('CandidateSessionView day progression checkpoints', () => {
 
     expect(screen.getByText(/^Day 5 is not open yet$/i)).toBeInTheDocument();
     expect(
-      screen.getAllByText(/Day 5 locked until the active window opens\./i),
-    ).toHaveLength(2);
+      screen.getByRole('heading', {
+        name: /day 5 opens at 9:00 am local time/i,
+      }),
+    ).toBeInTheDocument();
+    expect(screen.getByText(/come back at/i)).toBeInTheDocument();
     expect(
-      screen.getByRole('button', { name: /Submit & Continue/i }),
-    ).toBeDisabled();
+      screen.queryByRole('button', { name: /submit reflection essay/i }),
+    ).toBeNull();
   });
 });

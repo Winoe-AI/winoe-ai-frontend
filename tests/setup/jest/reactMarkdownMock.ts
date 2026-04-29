@@ -53,13 +53,15 @@ jest.mock('react-markdown', () => {
     };
 
     lines.forEach((line, idx) => {
-      if (line.startsWith('# ')) {
+      const headingMatch = line.match(/^(#{1,3})\s+(.+)$/);
+      if (headingMatch) {
         flushList();
+        const headingLevel = Math.min(headingMatch[1].length, 3);
         elements.push(
           React.createElement(
-            'h1',
-            { key: `h1-${idx}` },
-            parseInline(line.slice(2)),
+            `h${headingLevel}`,
+            { key: `h${headingLevel}-${idx}` },
+            parseInline(headingMatch[2]),
           ),
         );
         return;

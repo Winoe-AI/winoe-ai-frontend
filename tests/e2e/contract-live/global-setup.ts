@@ -1,15 +1,23 @@
 import fs from 'fs/promises';
 import path from 'path';
 import { chromium, type FullConfig, type Page } from '@playwright/test';
+import { generateSessionCookie } from '@auth0/nextjs-auth0/testing';
 import {
   parseEnvFile,
   readEnv,
+  resolveClaimNamespace,
   type EnvMap,
 } from '../flow-qa/global-setup.env';
 import {
   resolveBaseURL,
   resolveStorageDir,
 } from '../flow-qa/global-setup.paths';
+import {
+  buildSession,
+  resolveDevIdentity,
+  toStorageStateCookie,
+  writeStorageState,
+} from '../flow-qa/global-setup.session';
 
 type LiveRole = 'talent_partner' | 'candidate';
 
@@ -28,6 +36,10 @@ const REQUIRED_QA_AUTH_ENV_KEYS = [
   'QA_E2E_CANDIDATE_EMAIL',
   'QA_E2E_CANDIDATE_PASSWORD',
 ] as const;
+const LOCAL_DEV_ROLE_EMAILS = {
+  talent_partner: 'talent_partner1@local.test',
+  candidate: 'candidate1@local.test',
+} as const;
 
 async function loadEnvMapFrom(paths: string[]): Promise<EnvMap> {
   const merged: EnvMap = {};
@@ -68,6 +80,42 @@ function validateRequiredQaAuthEnv(envMap: EnvMap): void {
   );
 }
 
+function hasRequiredQaAuthEnv(envMap: EnvMap): boolean {
+  return REQUIRED_QA_AUTH_ENV_KEYS.every((key) =>
+    Boolean(readEnv(key, envMap)),
+  );
+}
+
+async function createLocalDevStorageState(params: {
+  baseURL: string;
+  envMap: EnvMap;
+  identity: LiveIdentity;
+  storagePath: string;
+}): Promise<void> {
+  const secret = requireEnv('WINOE_AUTH0_SECRET', params.envMap);
+  const claimNamespace = resolveClaimNamespace(params.envMap);
+  const roles =
+    params.identity.mode === 'candidate' ? ['candidate'] : ['talent_partner'];
+  const identity = resolveDevIdentity(roles);
+  const session = buildSession({
+    permissions:
+      params.identity.mode === 'candidate'
+        ? ['candidate:access']
+        : ['talent_partner:access'],
+    roles,
+    claimNamespace,
+    accessToken: identity.accessToken,
+    email: identity.email,
+    sub: identity.sub,
+  });
+  const encrypted = await generateSessionCookie(session, { secret });
+  const cookie = toStorageStateCookie({
+    value: encrypted,
+    baseURL: params.baseURL,
+  });
+  await writeStorageState(params.storagePath, cookie);
+}
+
 function resolveIdentity(role: LiveRole, envMap: EnvMap): LiveIdentity {
   if (role === 'talent_partner') {
     return {
@@ -91,6 +139,31 @@ function resolveIdentity(role: LiveRole, envMap: EnvMap): LiveIdentity {
     fileName: 'candidate-only.json',
     mode: 'candidate',
     password: requireEnv('QA_E2E_CANDIDATE_PASSWORD', envMap),
+    returnTo: '/candidate/dashboard',
+  };
+}
+
+function resolveLocalDevIdentity(role: LiveRole, envMap: EnvMap): LiveIdentity {
+  if (role === 'talent_partner') {
+    return {
+      connection: 'local-dev',
+      email:
+        readEnv('QA_E2E_TALENT_PARTNER_EMAIL', envMap) ||
+        LOCAL_DEV_ROLE_EMAILS.talent_partner,
+      fileName: 'talent-partner-only.json',
+      mode: 'talent_partner',
+      password: 'local-dev',
+      returnTo: '/dashboard',
+    };
+  }
+  return {
+    connection: 'local-dev',
+    email:
+      readEnv('QA_E2E_CANDIDATE_EMAIL', envMap) ||
+      LOCAL_DEV_ROLE_EMAILS.candidate,
+    fileName: 'candidate-only.json',
+    mode: 'candidate',
+    password: 'local-dev',
     returnTo: '/candidate/dashboard',
   };
 }
@@ -262,23 +335,40 @@ export default async function globalSetup(config: FullConfig) {
   const storageDir = resolveStorageDir(repoRoot);
 
   await fs.mkdir(storageDir, { recursive: true });
-  validateRequiredQaAuthEnv(envMap);
+
+  const useRealAuthBootstrap = hasRequiredQaAuthEnv(envMap);
+  if (useRealAuthBootstrap) {
+    validateRequiredQaAuthEnv(envMap);
+  }
 
   for (const role of ['talent_partner', 'candidate'] as const) {
-    const identity = resolveIdentity(role, envMap);
-    const sourcePath =
-      role === 'talent_partner'
-        ? readEnv('CONTRACT_LIVE_TALENT_PARTNER_STORAGE_STATE', envMap)
-        : readEnv('CONTRACT_LIVE_CANDIDATE_STORAGE_STATE', envMap);
-    const reused = await reuseStorageStateIfAvailable({
-      storagePath: path.join(storageDir, identity.fileName),
-      sourcePath,
-    });
-    if (reused) {
+    const identity = useRealAuthBootstrap
+      ? resolveIdentity(role, envMap)
+      : resolveLocalDevIdentity(role, envMap);
+    if (useRealAuthBootstrap) {
+      const sourcePath =
+        role === 'talent_partner'
+          ? readEnv('CONTRACT_LIVE_TALENT_PARTNER_STORAGE_STATE', envMap)
+          : readEnv('CONTRACT_LIVE_CANDIDATE_STORAGE_STATE', envMap);
+      const reused = await reuseStorageStateIfAvailable({
+        storagePath: path.join(storageDir, identity.fileName),
+        sourcePath,
+      });
+      if (reused) {
+        continue;
+      }
+      await createStorageState({
+        baseURL,
+        identity,
+        storagePath: path.join(storageDir, identity.fileName),
+      });
       continue;
     }
-    await createStorageState({
+    // Local-dev auth cookies are cheap to recreate and can go stale when the
+    // auth secret or generated session payload changes between runs.
+    await createLocalDevStorageState({
       baseURL,
+      envMap,
       identity,
       storagePath: path.join(storageDir, identity.fileName),
     });

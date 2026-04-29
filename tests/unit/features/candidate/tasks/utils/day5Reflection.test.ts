@@ -1,8 +1,10 @@
 import {
   buildDay5ReflectionContentText,
+  buildDay5ReflectionPayloadFromMarkdown,
   buildDay5ReflectionPayload,
   DAY5_REFLECTION_MIN_SECTION_CHARS,
   extractDay5SectionsFromContentJson,
+  hasMeaningfulDay5ReflectionMarkdown,
   isDay5ReflectionTask,
   mapDay5BackendValidationErrors,
   validateDay5ReflectionSections,
@@ -40,11 +42,40 @@ describe('day5Reflection utils', () => {
     const markdown = buildDay5ReflectionContentText(
       buildDay5ReflectionPayload(buildSections()),
     );
-    expect(markdown).toMatch(/^## Challenges\n/);
-    expect(markdown).toContain('\n\n## Decisions\n');
-    expect(markdown).toContain('\n\n## Tradeoffs\n');
-    expect(markdown).toContain('\n\n## Communication / Handoff\n');
-    expect(markdown).toContain('\n\n## What I Would Do Next\n');
+    expect(markdown).toMatch(/^## Experience & Challenges\n/);
+    expect(markdown).toContain('\n\n## Decisions & Tradeoffs\n');
+    expect(markdown).toContain('\n\n## Learnings & Growth\n');
+    expect(markdown).toContain('\n\n## Collaboration & Communication\n');
+    expect(markdown).toContain('\n\n## What I Would Do Differently\n');
+    expect(markdown).not.toContain('Tool Usage');
+  });
+
+  it('treats scaffold-only markdown as meaningless', () => {
+    const scaffold = `## Experience & Challenges\n\n## Decisions & Tradeoffs\n\n## Learnings & Growth\n`;
+    expect(hasMeaningfulDay5ReflectionMarkdown(scaffold)).toBe(false);
+    expect(buildDay5ReflectionPayloadFromMarkdown(scaffold)).toEqual(
+      buildDay5ReflectionPayload({
+        challenges: '',
+        decisions: '',
+        tradeoffs: '',
+        communication: '',
+        next: '',
+      }),
+    );
+  });
+
+  it('accepts freeform markdown without headings only when it has body text', () => {
+    const freeform = `I focused on shipping the core flow, documented risks, and tightened the review loop.`;
+    expect(hasMeaningfulDay5ReflectionMarkdown(freeform)).toBe(true);
+    expect(buildDay5ReflectionPayloadFromMarkdown(freeform)).toEqual(
+      buildDay5ReflectionPayload({
+        challenges: freeform,
+        decisions: freeform,
+        tradeoffs: freeform,
+        communication: freeform,
+        next: freeform,
+      }),
+    );
   });
 
   it('extracts structured reflection sections from contentJson', () => {
@@ -81,7 +112,9 @@ describe('day5Reflection utils', () => {
       String(DAY5_REFLECTION_MIN_SECTION_CHARS),
     );
     expect(mapped.fieldErrors.decisions).toMatch(/required/i);
-    expect(mapped.formError).toMatch(/complete all reflection sections/i);
+    expect(mapped.formError).toBe(
+      'Please complete the reflection essay before submitting.',
+    );
   });
 
   it('detects day 5 reflection task without matching non-day5 docs', () => {

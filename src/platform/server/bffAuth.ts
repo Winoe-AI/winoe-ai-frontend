@@ -11,6 +11,54 @@ import {
   buildNotAuthenticatedResult,
 } from './bffAuth.helpers';
 
+function resolveLocalDevAuthFallback(req: NextRequest) {
+  if (!allowLocalTokenFallback()) return null;
+
+  const authorization = req.headers?.get('authorization') ?? '';
+  const match = authorization.match(/^Bearer\s+(.+)$/i);
+  const accessToken = normalizeAccessToken(match?.[1]);
+  if (!accessToken) return null;
+
+  const devUserEmail = req.headers?.get('x-dev-user-email')?.trim() ?? '';
+  const tokenUserEmail = accessToken.includes(':')
+    ? accessToken.slice(accessToken.indexOf(':') + 1)
+    : '';
+  const email = devUserEmail || tokenUserEmail || undefined;
+  const roles = accessToken.startsWith('talent_partner:')
+    ? ['talent_partner']
+    : ['candidate'];
+  const permissions = roles.includes('talent_partner')
+    ? ['talent_partner:access']
+    : ['candidate:access'];
+
+  return {
+    accessToken,
+    permissions,
+    session: {
+      user: {
+        sub: email ?? 'local-dev',
+        name: email ?? 'Local Dev User',
+        email,
+        email_verified: true,
+        roles,
+        permissions,
+      },
+      tokenSet: {
+        accessToken,
+        token_type: 'Bearer',
+        scope: '',
+        audience: '',
+        expiresAt: 0,
+      },
+      internal: {
+        sid: 'local-dev',
+        createdAt: 0,
+      },
+      accessToken,
+    },
+  };
+}
+
 export function mergeResponseCookies(
   from: NextResponse | null | undefined,
   into: NextResponse,
@@ -36,6 +84,17 @@ export async function requireBffAuth(
       `[perf:bff-auth] permission=${options?.requirePermission ?? 'any'} status=${status} ${Date.now() - start}ms`,
     );
   };
+
+  const localDevFallback = resolveLocalDevAuthFallback(req);
+  if (localDevFallback) {
+    logPerf('local-dev-fallback');
+    return buildAuthSuccessResult({
+      accessToken: localDevFallback.accessToken,
+      permissions: localDevFallback.permissions,
+      session: localDevFallback.session,
+      cookies: cookieCarrier,
+    });
+  }
 
   const session = await getSessionNormalized();
   if (!session) {

@@ -25,6 +25,17 @@ export const Day5ReflectionSectionField = memo(
   }: Props) {
     const fieldId = `reflection-${section}`;
     const length = value.trim().length;
+    const placeholderBySection: Record<Day5ReflectionSectionKey, string> = {
+      challenges:
+        'Describe your overall Trial experience, the hardest challenges, and how you worked through them.',
+      decisions:
+        'Explain the decisions that mattered most and why you made them.',
+      tradeoffs:
+        'Describe the tradeoffs you made, what you learned, and how your thinking changed.',
+      communication:
+        'Explain how you collaborated, communicated, and prepared the work for others.',
+      next: 'Reflect on what you would do differently, including how you used tools or AI assistants.',
+    };
 
     return (
       <section className="space-y-2">
@@ -40,7 +51,7 @@ export const Day5ReflectionSectionField = memo(
           onChange={(event) => onChange(section, event.target.value)}
           onBlur={() => onBlur(section)}
           className="min-h-[120px] w-full resize-y rounded-md border p-3 text-sm leading-6"
-          placeholder={`Write your ${day5SectionLabel(section).toLowerCase()} reflection…`}
+          placeholder={placeholderBySection[section]}
           disabled={disabled}
         />
         <div className="flex items-center justify-between text-xs text-gray-500">

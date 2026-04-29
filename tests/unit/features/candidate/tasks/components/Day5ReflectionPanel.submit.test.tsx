@@ -1,8 +1,9 @@
-import { fireEvent, screen, waitFor } from '@testing-library/react';
+import { fireEvent, screen, waitFor, within } from '@testing-library/react';
 import {
-  fillAllSections,
+  fillDay5Markdown,
   renderPanel,
   resetDay5PanelMocks,
+  sampleDay5Markdown,
 } from './Day5ReflectionPanel.testlib';
 
 describe('Day5ReflectionPanel submit flow', () => {
@@ -14,17 +15,43 @@ describe('Day5ReflectionPanel submit flow', () => {
     jest.useRealTimers();
   });
 
-  it('keeps submit disabled until all sections are valid', async () => {
+  it('shows a single markdown editor and keeps submit disabled for scaffold-only content', () => {
     renderPanel();
-    const submitButton = screen.getByRole('button', {
-      name: /submit & continue/i,
-    });
-    expect(submitButton).toBeDisabled();
-    fillAllSections();
-    expect(submitButton).toBeEnabled();
+    expect(
+      screen.getByRole('textbox', { name: /markdown editor/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /submit reflection essay/i }),
+    ).toBeDisabled();
+    expect(
+      screen.getByText(/add reflection text before submitting/i),
+    ).toBeInTheDocument();
   });
 
-  it('submits structured reflection payload with markdown contentText', async () => {
+  it('enables submit after body content is written and opens confirmation', () => {
+    renderPanel();
+    fireEvent.change(
+      screen.getByRole('textbox', { name: /markdown editor/i }),
+      {
+        target: {
+          value: sampleDay5Markdown,
+        },
+      },
+    );
+    expect(
+      screen.getByRole('button', { name: /submit reflection essay/i }),
+    ).toBeEnabled();
+    fireEvent.click(
+      screen.getByRole('button', { name: /submit reflection essay/i }),
+    );
+    expect(
+      screen.getByRole('dialog', {
+        name: /submit your reflection essay/i,
+      }),
+    ).toBeInTheDocument();
+  });
+
+  it('submits structured reflection payload with exact markdown contentText', async () => {
     const onSubmit = jest.fn().mockResolvedValue({
       submissionId: 10,
       taskId: 5,
@@ -35,8 +62,16 @@ describe('Day5ReflectionPanel submit flow', () => {
     });
     renderPanel({ onSubmit });
 
-    fillAllSections();
-    fireEvent.click(screen.getByRole('button', { name: /submit & continue/i }));
+    fillDay5Markdown();
+    fireEvent.click(
+      screen.getByRole('button', { name: /submit reflection essay/i }),
+    );
+    const dialog = screen.getByRole('dialog', {
+      name: /submit your reflection essay/i,
+    });
+    fireEvent.click(
+      within(dialog).getByRole('button', { name: /submit reflection essay/i }),
+    );
 
     await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1));
     expect(onSubmit).toHaveBeenCalledWith(
@@ -48,16 +83,14 @@ describe('Day5ReflectionPanel submit flow', () => {
           communication: expect.any(String),
           next: expect.any(String),
         }),
-        contentText: expect.stringContaining('## Challenges'),
+        contentText: sampleDay5Markdown,
       }),
     );
     expect(
-      await screen.findByText(
-        /submitted\. your day 5 reflection is finalized/i,
-      ),
+      await screen.findByText(/your 5-day trial is complete/i),
     ).toBeInTheDocument();
     expect(
-      screen.queryByRole('button', { name: /submit & continue/i }),
+      screen.queryByRole('button', { name: /submit reflection essay/i }),
     ).toBeNull();
   });
 });

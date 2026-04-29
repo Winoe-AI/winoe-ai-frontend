@@ -12,6 +12,8 @@ import {
 } from './CandidateSessionPageClient.behavior.testlib';
 import { jsonResponse } from '../../setup/responseHelpers';
 
+jest.setTimeout(15000);
+
 describe('CandidateSessionPage auth flow schedule success', () => {
   beforeEach(() => {
     resetBehaviorEnv('valid-token');

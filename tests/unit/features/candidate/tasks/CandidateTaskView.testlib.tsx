@@ -48,6 +48,28 @@ export const baseTask: Task = {
   description: 'Write a design doc',
 };
 
+export const sampleDay5Markdown = `## Experience & Challenges
+
+Handled ambiguous requirements by validating assumptions early in the flow.
+
+The hardest part was keeping the essay focused while preserving enough detail.
+
+## Decisions & Tradeoffs
+
+Chose deterministic contracts so UI and backend validation align.
+
+## Learnings & Growth
+
+Accepted stricter rules to improve evaluation consistency across candidates.
+
+## Collaboration & Communication
+
+Documented risks and handoff notes clearly at each implementation milestone.
+
+## What I Would Do Differently
+
+Next I would add rubric-linked evidence references and quality checks.`;
+
 export const primeDraftMocks = () => {
   jest.clearAllMocks();
   getCandidateTaskDraftMock.mockResolvedValue(null);
@@ -74,35 +96,10 @@ export const renderTaskView = (
   return { onSubmit };
 };
 
-export const fillAllReflectionSections = () => {
-  fireEvent.change(screen.getByLabelText(/challenges/i), {
+export const fillDay5Markdown = () => {
+  fireEvent.change(screen.getByRole('textbox', { name: /markdown editor/i }), {
     target: {
-      value:
-        'Handled ambiguous requirements by validating assumptions early in the flow.',
-    },
-  });
-  fireEvent.change(screen.getByLabelText(/^decisions$/i), {
-    target: {
-      value:
-        'Chose deterministic contracts so UI and backend validation align.',
-    },
-  });
-  fireEvent.change(screen.getByLabelText(/tradeoffs/i), {
-    target: {
-      value:
-        'Accepted stricter rules to improve evaluation consistency across candidates.',
-    },
-  });
-  fireEvent.change(screen.getByLabelText(/communication/i), {
-    target: {
-      value:
-        'Documented risks and handoff notes clearly at each implementation milestone.',
-    },
-  });
-  fireEvent.change(screen.getByLabelText(/what you would do next/i), {
-    target: {
-      value:
-        'Next I would add rubric-linked evidence references and quality checks.',
+      value: sampleDay5Markdown,
     },
   });
 };

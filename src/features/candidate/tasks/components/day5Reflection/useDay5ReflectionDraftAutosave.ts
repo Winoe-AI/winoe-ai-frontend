@@ -3,60 +3,62 @@ import { useTaskDraftAutosave } from '../../hooks/useTaskDraftAutosave';
 import { markTextDraftSavedAt } from '../../utils/draftStorageUtils';
 import {
   buildDay5ReflectionContentText,
-  buildDay5ReflectionPayload,
+  buildDay5ReflectionMarkdownTemplate,
   extractDay5SectionsFromContentJson,
   hasDay5SectionContent,
-  type Day5ReflectionSections,
 } from '../../utils/day5ReflectionUtils';
-import {
-  emptyTouchedMap,
-  type Day5FormSetters,
-} from './day5ReflectionForm.types';
 
 type UseDay5ReflectionDraftAutosaveArgs = {
   taskId: number;
   candidateSessionId: number | null;
   readOnly: boolean;
-  sections: Day5ReflectionSections;
+  markdown: string;
   onTaskWindowClosed?: (err: unknown) => void;
-  setters: Day5FormSetters;
+  onRestore: (markdown: string) => void;
 };
 
 export function useDay5ReflectionDraftAutosave({
   taskId,
   candidateSessionId,
   readOnly,
-  sections,
+  markdown,
   onTaskWindowClosed,
-  setters,
+  onRestore,
 }: UseDay5ReflectionDraftAutosaveArgs) {
-  return useTaskDraftAutosave<Day5ReflectionSections>({
+  return useTaskDraftAutosave<string>({
     taskId,
     candidateSessionId,
     isEditable: !readOnly,
     hasFinalizedContent: readOnly,
-    value: sections,
+    value: markdown,
     serialize: useCallback((value) => {
-      const reflection = buildDay5ReflectionPayload(value);
       return {
-        contentText: buildDay5ReflectionContentText(reflection),
-        contentJson: { reflection },
+        contentText: value,
+        contentJson: {
+          reflectionMarkdown: value,
+          reflection: extractDay5SectionsFromContentJson({
+            reflectionMarkdown: value,
+          }),
+        },
       };
     }, []),
     deserialize: useCallback((draft) => {
-      const fromJson = extractDay5SectionsFromContentJson(draft.contentJson);
-      if (hasDay5SectionContent(fromJson)) return fromJson;
-      return null;
+      const contentText =
+        typeof draft.contentText === 'string' ? draft.contentText : '';
+      if (contentText.trim()) return contentText;
+      const structured = extractDay5SectionsFromContentJson(draft.contentJson);
+      if (hasDay5SectionContent(structured)) {
+        const markdown = buildDay5ReflectionContentText(structured).trim();
+        if (markdown) return markdown;
+      }
+      const template = buildDay5ReflectionMarkdownTemplate().trim();
+      return template || null;
     }, []),
     onRestore: useCallback(
       (restored) => {
-        setters.setSections(restored);
-        setters.setTouched(emptyTouchedMap());
-        setters.setSubmitAttempted(false);
-        setters.setBackendFieldErrors({});
-        setters.setLocalFormError(null);
+        onRestore(restored);
       },
-      [setters],
+      [onRestore],
     ),
     onTaskWindowClosed,
     onSavedAt: useCallback(

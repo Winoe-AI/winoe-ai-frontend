@@ -64,20 +64,20 @@ export function mapDay5BackendValidationErrors(
     normalizeCodeList(fieldMap.reflection).length > 0;
   const hasContentTextError =
     normalizeCodeList(fieldMap.contentText).length > 0;
+  const hasSectionFieldErrors = DAY5_REFLECTION_SECTIONS.some((section) =>
+    Boolean(fieldErrors[section]),
+  );
 
   const hasValidationErrors =
-    hasRootReflectionError ||
-    hasContentTextError ||
-    DAY5_REFLECTION_SECTIONS.some((section) => Boolean(fieldErrors[section]));
+    hasRootReflectionError || hasContentTextError || hasSectionFieldErrors;
 
   if (!hasValidationErrors) {
     return { fieldErrors: {}, formError: null, hasValidationErrors: false };
   }
 
   let formError: string | null = null;
-  if (hasContentTextError) {
-    formError =
-      'Please complete all reflection sections before submitting your reflection.';
+  if (hasSectionFieldErrors || hasContentTextError) {
+    formError = 'Please complete the reflection essay before submitting.';
   } else if (hasRootReflectionError) {
     formError = 'Reflection payload is invalid. Refresh and try again.';
   }

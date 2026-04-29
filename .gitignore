@@ -58,6 +58,7 @@ ai_flow_boot_script.sh
 
 # Contract-live generated artifacts
 /qa_verifications/Contract-Live-QA/contract_live_qa_latest
+/qa_verifications/Contract-Live-QA/iteration*-live-evidence/
 
 # Code Quality generated artifacts
 /code-quality

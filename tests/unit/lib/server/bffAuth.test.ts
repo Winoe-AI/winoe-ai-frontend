@@ -59,12 +59,19 @@ jest.mock('@/platform/auth0/claims', () => {
 });
 
 describe('bffAuth utilities', () => {
+  const originalNodeEnv = process.env.NODE_ENV;
+
   beforeEach(() => {
     jest.clearAllMocks();
     delete process.env.WINOE_DEBUG_PERF;
+    process.env.NODE_ENV = 'development';
     auth0Mock = jest.requireMock('@/platform/auth0').auth0 as {
       getAccessToken: jest.Mock;
     };
+  });
+
+  afterAll(() => {
+    process.env.NODE_ENV = originalNodeEnv;
   });
 
   it('merges response cookies', () => {
@@ -80,6 +87,44 @@ describe('bffAuth utilities', () => {
     const res = await requireBffAuth(new NextRequest('http://x'));
     expect(res.ok).toBe(false);
     if (!res.ok) expect(res.response.status).toBe(401);
+  });
+
+  it('uses local-dev bearer headers when Auth0 session is unavailable', async () => {
+    getSessionNormalizedMock.mockResolvedValue(null);
+    const req = {
+      headers: new Headers({
+        authorization: 'Bearer candidate:alice@example.com',
+        'x-dev-user-email': 'alice@example.com',
+      }),
+    } as unknown as NextRequest;
+
+    const res = await requireBffAuth(req);
+    expect(res.ok).toBe(true);
+    if (res.ok) {
+      expect(res.accessToken).toBe('candidate:alice@example.com');
+      expect(res.session?.user?.email).toBe('alice@example.com');
+    }
+  });
+
+  it('prefers local-dev bearer headers over a stale Auth0 session', async () => {
+    getSessionNormalizedMock.mockResolvedValue({
+      user: { email: 'candidate1@local.test' },
+      accessToken: 'candidate:candidate1@local.test',
+    });
+    const req = {
+      headers: new Headers({
+        authorization: 'Bearer candidate:alice@example.com',
+        'x-dev-user-email': 'alice@example.com',
+      }),
+    } as unknown as NextRequest;
+
+    const res = await requireBffAuth(req);
+    expect(res.ok).toBe(true);
+    if (res.ok) {
+      expect(res.accessToken).toBe('candidate:alice@example.com');
+      expect(res.session?.user?.email).toBe('alice@example.com');
+    }
+    expect(getSessionNormalizedMock).not.toHaveBeenCalled();
   });
 
   it('returns 403 when permission missing', async () => {

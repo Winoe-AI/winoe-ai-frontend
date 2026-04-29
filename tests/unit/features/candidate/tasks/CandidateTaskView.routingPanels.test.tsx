@@ -11,7 +11,7 @@ describe('CandidateTaskView task-type panel routing', () => {
     primeDraftMocks();
   });
 
-  it('routes day 5 documentation to the markdown reflection editor', async () => {
+  it('routes day 5 documentation to the reflection panel', async () => {
     getCandidateTaskDraftMock.mockResolvedValue({
       taskId: 5,
       contentText: null,
@@ -34,16 +34,36 @@ describe('CandidateTaskView task-type panel routing', () => {
     });
     await waitFor(() =>
       expect(
-        (screen.getByRole('textbox') as HTMLTextAreaElement).value,
-      ).toContain('Recovered challenge notes'),
+        screen.getByRole('heading', { name: /reflection essay editor/i }),
+      ).toBeInTheDocument(),
     );
     expect(
-      (screen.getByRole('textbox') as HTMLTextAreaElement).value,
-    ).toContain('Recovered tradeoff notes');
-    expect(
-      screen.queryByRole('button', { name: /preview/i }),
+      screen.getByRole('textbox', { name: /markdown editor/i }),
     ).toBeInTheDocument();
-    expect(screen.queryByLabelText(/challenges/i)).toBeNull();
+    expect(
+      screen.getByRole('button', { name: /preview/i }),
+    ).toBeInTheDocument();
+    expect(screen.getAllByRole('textbox').length).toBe(1);
+  });
+
+  it('routes day 5 reflection tasks to the reflection panel', async () => {
+    renderTaskView({
+      task: {
+        ...baseTask,
+        id: 5,
+        dayIndex: 5,
+        type: 'reflection',
+        title: 'Reflection',
+      },
+    });
+    await waitFor(() =>
+      expect(
+        screen.getByRole('heading', { name: /reflection essay editor/i }),
+      ).toBeInTheDocument(),
+    );
+    expect(
+      screen.getByRole('button', { name: /submit reflection essay/i }),
+    ).toBeInTheDocument();
   });
 
   it('keeps non-day5 docs on generic text panel', () => {

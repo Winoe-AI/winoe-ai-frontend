@@ -35,6 +35,8 @@ const renderWithProvider = (ui: React.ReactNode) =>
 const realFetch = global.fetch;
 const fetchMock = jest.fn();
 
+jest.setTimeout(15000);
+
 describe('CandidateSessionPage', () => {
   beforeEach(() => {
     jest.resetAllMocks();

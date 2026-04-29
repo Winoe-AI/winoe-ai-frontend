@@ -116,5 +116,5 @@ export async function validateVideoDuration(
       )}.`,
     );
   }
-  return durationSeconds;
+  return Math.max(1, Math.round(durationSeconds));
 }
