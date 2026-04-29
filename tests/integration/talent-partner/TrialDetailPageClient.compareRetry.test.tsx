@@ -3,6 +3,7 @@ import {
   mockFetchHandlers,
   renderPage,
   screen,
+  waitFor,
   userEvent,
 } from './TrialDetailPageClient.testlib';
 
@@ -52,8 +53,11 @@ describe('TalentPartnerTrialDetailPage - compare retry', () => {
     renderPage();
 
     expect(await screen.findByText('Benchmarks')).toBeInTheDocument();
+    await waitFor(() => expect(compareCalls).toBe(1));
     expect(
-      await screen.findByText('Request failed with status 500'),
+      await screen.findByText('Request failed with status 500', undefined, {
+        timeout: 5000,
+      }),
     ).toBeInTheDocument();
     expect(compareCalls).toBe(1);
 

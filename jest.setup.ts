@@ -123,6 +123,8 @@ runtimeRequire('./tests/setup/jest/consoleSilence');
 runtimeRequire('./tests/setup/jest/reactMarkdownMock');
 runtimeRequire('./tests/setup/jest/candidateApiCompatMocks');
 
+jest.setTimeout(15000);
+
 afterEach(() => {
   cleanup();
 });

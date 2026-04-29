@@ -8,6 +8,6 @@ export function isDay5ReflectionTask(task: Task): boolean {
   const type = String(task.type ?? '')
     .trim()
     .toLowerCase();
-  if (type !== DAY5_REFLECTION_TASK_TYPE) return false;
+  if (type !== DAY5_REFLECTION_TASK_TYPE && type !== 'reflection') return false;
   return task.dayIndex === DAY5_REFLECTION_DAY_INDEX;
 }

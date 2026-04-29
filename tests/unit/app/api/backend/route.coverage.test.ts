@@ -48,6 +48,12 @@ jest.mock('@/platform/server/bff', () => ({
     body: null,
   }),
 }));
+jest.mock('@/platform/auth0', () => ({
+  getSessionNormalized: jest.fn(async () => ({
+    user: { email: 'candidate@example.com' },
+    accessToken: 'token',
+  })),
+}));
 describe('api/backend/route.ts coverage completion', () => {
   it('imports route', async () => {
     const mod = await import('@/app/api/backend/[...path]/route');

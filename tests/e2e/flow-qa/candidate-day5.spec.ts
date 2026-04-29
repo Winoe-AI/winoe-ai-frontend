@@ -7,10 +7,30 @@ import {
 } from './fixtures/candidateMocks';
 import { CandidateSessionQaPage } from './pages';
 
+const sampleDay5Markdown = `## Experience & Challenges
+
+Handled ambiguous requirements by validating assumptions early in the flow.
+
+## Decisions & Tradeoffs
+
+I chose deterministic contracts first so UI and backend validation stayed aligned.
+
+## Learnings & Growth
+
+I traded breadth for reliability and learned to keep the evaluation path simple.
+
+## Collaboration & Communication
+
+I documented risks, handoff notes, and verification steps for reviewers.
+
+## What I Would Do Differently
+
+Next I would add stronger evidence links and broader failure-mode tests.`;
+
 test.describe('Candidate Day 5 Flow', () => {
   test.use({ storageState: storageStates.candidateOnly });
 
-  test('day 5 reflection validates fields, supports preview, and submits to completion', async ({
+  test('day 5 reflection markdown editor supports preview and submits to completion', async ({
     page,
   }) => {
     await installCandidateSessionMocks(page, {
@@ -19,8 +39,8 @@ test.describe('Candidate Day 5 Flow', () => {
         id: 5,
         dayIndex: 5,
         type: 'documentation',
-        title: 'Final reflection',
-        description: 'Document your decisions and next steps.',
+        title: 'Reflection Essay',
+        description: 'Reflect on your full Trial experience.',
       }),
       nextTaskAfterSubmit: null,
       completedTaskIds: [1, 2, 3, 4],
@@ -31,52 +51,31 @@ test.describe('Candidate Day 5 Flow', () => {
     await sessionPage.gotoWithToken(QA_INVITE_TOKEN);
     await sessionPage.startTrial();
     await sessionPage.expectDay(5);
-    await expect(page.getByText(/^day 5 • documentation$/i)).toBeVisible();
-    const submitButton = page.getByRole('button', {
-      name: /submit & continue/i,
-    });
-    await expect(submitButton).toBeDisabled();
+
     await expect(
-      page.getByText(
-        /complete all sections with at least 20 characters to submit\./i,
-      ),
+      page.getByRole('heading', { name: /reflection essay editor/i }),
+    ).toBeVisible();
+    await expect(
+      page.getByText(/9:00 AM–9:00 PM your local time/i),
     ).toBeVisible();
 
-    const challengesField = page.getByLabel(/^challenges$/i);
-    await challengesField.focus();
-    await page.keyboard.press('Tab');
-    await expect(
-      page.getByText(/this section is required\./i).first(),
-    ).toBeVisible();
+    const editor = page.getByRole('textbox', { name: /markdown editor/i });
+    await editor.fill(sampleDay5Markdown);
 
-    await challengesField.fill(
-      'The hardest challenge was sequencing Day 2 and Day 3 work while preserving test stability.',
-    );
-    await page
-      .getByLabel(/^decisions$/i)
-      .fill(
-        'I chose a typed API layer first so behavior changes were safer and easier to validate.',
-      );
-    await page
-      .getByLabel(/^tradeoffs$/i)
-      .fill(
-        'I traded breadth for reliability, prioritizing deterministic workflows over optional enhancements.',
-      );
-    await page
-      .getByLabel(/^communication \/ handoff$/i)
-      .fill(
-        'I documented release notes, risks, and verification steps to make execution transparent for reviewers.',
-      );
-    await page
-      .getByLabel(/^what you would do next$/i)
-      .fill(
-        'Next I would add failure-mode tests, telemetry for flaky transitions, and improve regression dashboards.',
-      );
     await page.getByRole('button', { name: /^preview$/i }).click();
-    await expect(page.getByText(/what i would do next/i)).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: /experience & challenges/i }),
+    ).toBeVisible();
+    await expect(
+      page.getByRole('heading', { name: /what i would do differently/i }),
+    ).toBeVisible();
     await page.getByRole('button', { name: /^write$/i }).click();
+
+    const submitButton = page.getByRole('button', {
+      name: /submit reflection essay/i,
+    });
     await expect(submitButton).toBeEnabled();
-    await page.getByRole('button', { name: /save draft/i }).click();
+
     const submitResponsePromise = page.waitForResponse(
       (resp) =>
         resp.url().includes('/api/backend/tasks/5/submit') &&
@@ -84,9 +83,13 @@ test.describe('Candidate Day 5 Flow', () => {
         resp.status() === 200,
     );
     await submitButton.click();
+    await page
+      .getByRole('dialog', { name: /submit your reflection essay/i })
+      .getByRole('button', { name: /submit reflection essay/i })
+      .click();
     const submitResponse = await submitResponsePromise;
     expect(submitResponse.status()).toBe(200);
-    await expect(page.getByText(/trial complete/i)).toBeVisible({
+    await expect(page.getByText(/congratulations/i)).toBeVisible({
       timeout: 8000,
     });
   });

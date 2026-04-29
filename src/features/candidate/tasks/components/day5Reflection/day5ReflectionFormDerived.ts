@@ -7,16 +7,23 @@ import {
 export function deriveReadOnlyReason(params: {
   actionGateReadOnly: boolean;
   actionGateReason: string | null;
+  comeBackAt: string | null;
   submittedTerminal: boolean;
 }) {
   if (params.actionGateReadOnly) {
+    if (params.comeBackAt) {
+      return (
+        params.actionGateReason ??
+        'Day 5 opens at 9:00 AM local time. This reflection window is not open yet.'
+      );
+    }
     return (
       params.actionGateReason ??
-      'Day closed. Reflection is read-only outside the scheduled window.'
+      'The Day 5 reflection window has closed for the day.'
     );
   }
   if (params.submittedTerminal)
-    return 'Submitted. Reflection is now read-only.';
+    return 'Submitted. Your Reflection Essay is now finalized.';
   return null;
 }
 

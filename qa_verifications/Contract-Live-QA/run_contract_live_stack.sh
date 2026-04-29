@@ -27,6 +27,27 @@ FRONTEND_PORT="${CONTRACT_LIVE_FRONTEND_PORT:-3000}"
 
 load_contract_live_local_env "$FRONTEND_DIR/.env.local" "$BACKEND_DIR/.env"
 
+USE_LOCAL_DEV_AUTH=0
+if [[ -z "${QA_E2E_TALENT_PARTNER_EMAIL:-}" || -z "${QA_E2E_TALENT_PARTNER_PASSWORD:-}" || -z "${QA_E2E_CANDIDATE_EMAIL:-}" || -z "${QA_E2E_CANDIDATE_PASSWORD:-}" ]]; then
+  USE_LOCAL_DEV_AUTH=1
+fi
+if [[ "$USE_LOCAL_DEV_AUTH" -eq 1 ]]; then
+  export CONTRACT_LIVE_DEV_AUTH_BYPASS=1
+fi
+
+apply_local_dev_auth_env() {
+  if [[ "$USE_LOCAL_DEV_AUTH" -eq 1 ]]; then
+    export DEV_AUTH_BYPASS=1
+    export WINOE_DEV_AUTH_BYPASS=1
+    export CONTRACT_LIVE_DEV_AUTH_BYPASS=1
+    return 0
+  fi
+
+  export DEV_AUTH_BYPASS="${DEV_AUTH_BYPASS:-0}"
+  export WINOE_DEV_AUTH_BYPASS="${WINOE_DEV_AUTH_BYPASS:-0}"
+  export CONTRACT_LIVE_DEV_AUTH_BYPASS="${CONTRACT_LIVE_DEV_AUTH_BYPASS:-0}"
+}
+
 if command -v gh >/dev/null 2>&1; then
   GH_AUTH_TOKEN="$(gh auth token 2>/dev/null || true)"
   if [[ -n "${GH_AUTH_TOKEN:-}" ]] && [[ "${CONTRACT_LIVE_PREFER_GH_TOKEN:-1}" != "0" ]]; then
@@ -92,6 +113,11 @@ echo "Contract-live fake UTC: $FAKE_TIME_UTC"
 echo "Contract-live scenario generation runtime mode: $SCENARIO_GENERATION_RUNTIME_MODE"
 echo "Contract-live scenario generation provider: $SCENARIO_GENERATION_PROVIDER"
 echo "Contract-live scenario generation model: $SCENARIO_GENERATION_MODEL"
+if [[ "$USE_LOCAL_DEV_AUTH" -eq 1 ]]; then
+  echo "Contract-live auth bootstrap mode: local dev auth bypass"
+else
+  echo "Contract-live auth bootstrap mode: real Auth0"
+fi
 if [[ -n "${STACK_LABEL// }" ]]; then
   echo "Contract-live stack label: $STACK_LABEL"
 fi
@@ -202,8 +228,7 @@ bootstrap_local_database() {
     export WINOE_SCENARIO_GENERATION_PROVIDER="$SCENARIO_GENERATION_PROVIDER"
     export WINOE_SCENARIO_GENERATION_MODEL="$SCENARIO_GENERATION_MODEL"
     export WINOE_AUTH0_LEEWAY_SECONDS="$AUTH0_LEEWAY_SECONDS"
-    export DEV_AUTH_BYPASS=0
-    export WINOE_DEV_AUTH_BYPASS=0
+    apply_local_dev_auth_env
     export CONTRACT_LIVE_FAKE_TIME_UTC="$FAKE_TIME_UTC"
     export WINOE_TEST_NOW_UTC="$FAKE_TIME_UTC"
     export WINOE_BACKEND_BASE_URL="http://$BACKEND_HOST:$BACKEND_PORT"
@@ -241,8 +266,7 @@ wait_for_url() {
   export WINOE_SCENARIO_GENERATION_PROVIDER="$SCENARIO_GENERATION_PROVIDER"
   export WINOE_SCENARIO_GENERATION_MODEL="$SCENARIO_GENERATION_MODEL"
   export WINOE_AUTH0_LEEWAY_SECONDS="$AUTH0_LEEWAY_SECONDS"
-  export DEV_AUTH_BYPASS="${DEV_AUTH_BYPASS:-0}"
-  export WINOE_DEV_AUTH_BYPASS="${WINOE_DEV_AUTH_BYPASS:-0}"
+  apply_local_dev_auth_env
   export CONTRACT_LIVE_FAKE_TIME_UTC="$FAKE_TIME_UTC"
   export WINOE_TEST_NOW_UTC="$FAKE_TIME_UTC"
   export WINOE_BACKEND_BASE_URL="http://$BACKEND_HOST:$BACKEND_PORT"
@@ -259,8 +283,7 @@ BACKEND_PID=$!
   export WINOE_SCENARIO_GENERATION_PROVIDER="$SCENARIO_GENERATION_PROVIDER"
   export WINOE_SCENARIO_GENERATION_MODEL="$SCENARIO_GENERATION_MODEL"
   export WINOE_AUTH0_LEEWAY_SECONDS="$AUTH0_LEEWAY_SECONDS"
-  export DEV_AUTH_BYPASS="${DEV_AUTH_BYPASS:-0}"
-  export WINOE_DEV_AUTH_BYPASS="${WINOE_DEV_AUTH_BYPASS:-0}"
+  apply_local_dev_auth_env
   export CONTRACT_LIVE_FAKE_TIME_UTC="$FAKE_TIME_UTC"
   export WINOE_TEST_NOW_UTC="$FAKE_TIME_UTC"
   export WINOE_BACKEND_BASE_URL="http://$BACKEND_HOST:$BACKEND_PORT"
@@ -270,12 +293,13 @@ WORKER_PID=$!
 
   (
     cd "$FRONTEND_DIR"
-    export WINOE_EMAIL_PROVIDER="$EMAIL_PROVIDER"
-    export WINOE_DEMO_MODE=1
-    export WINOE_SCENARIO_DEMO_MODE=1
-    export CONTRACT_LIVE_FAKE_TIME_UTC="$FAKE_TIME_UTC"
-    export WINOE_TEST_NOW_UTC="$FAKE_TIME_UTC"
-    export NEXT_PUBLIC_WINOE_TEST_NOW_UTC="$FAKE_TIME_UTC"
+  export WINOE_EMAIL_PROVIDER="$EMAIL_PROVIDER"
+  export WINOE_DEMO_MODE=1
+  export WINOE_SCENARIO_DEMO_MODE=1
+  export CONTRACT_LIVE_FAKE_TIME_UTC="$FAKE_TIME_UTC"
+  export WINOE_TEST_NOW_UTC="$FAKE_TIME_UTC"
+  export NEXT_PUBLIC_WINOE_TEST_NOW_UTC="$FAKE_TIME_UTC"
+  apply_local_dev_auth_env
   export WINOE_BACKEND_BASE_URL="http://$BACKEND_HOST:$BACKEND_PORT"
   exec npm run dev -- --hostname "$FRONTEND_HOST" --port "$FRONTEND_PORT"
 ) >"$FRONTEND_LOG" 2>&1 &

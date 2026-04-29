@@ -4,13 +4,15 @@ import { TaskContainer } from './TaskContainer';
 import { TaskDescription } from './TaskDescription';
 import { TaskHeader } from './TaskHeader';
 import { TaskPanelErrorBanner } from './TaskPanelErrorBanner';
-import { TaskStatus } from './TaskStatus';
 import { Day5ReflectionActions } from './day5Reflection/Day5ReflectionActions';
+import { Day5ReflectionClosedView } from './day5Reflection/Day5ReflectionClosedView';
+import { Day5ReflectionCompletionView } from './day5Reflection/Day5ReflectionCompletionView';
+import { Day5ReflectionGuidance } from './day5Reflection/Day5ReflectionGuidance';
 import { Day5ReflectionEditableView } from './day5Reflection/Day5ReflectionEditableView';
 import { Day5ReflectionMarkdownPreview } from './day5Reflection/Day5ReflectionMarkdownPreview';
-import { Day5ReflectionReadOnlyView } from './day5Reflection/Day5ReflectionReadOnlyView';
 import type { Day5ReflectionPanelProps } from './day5Reflection/day5ReflectionPanel.types';
 import { useDay5ReflectionFormState } from './day5Reflection/useDay5ReflectionFormState';
+import { withDay5ReflectionCopy } from '../utils/day5Reflection.taskCopyUtils';
 
 export function Day5ReflectionPanel({
   candidateSessionId,
@@ -30,61 +32,57 @@ export function Day5ReflectionPanel({
     onTaskWindowClosed,
     onSubmit,
   });
+  const displayTask = withDay5ReflectionCopy(task);
+  const completed =
+    reflection.submittedTerminal ||
+    Boolean(task.recordedSubmission?.submittedAt);
+  const notYetOpen =
+    reflection.readOnly && Boolean(actionGate.comeBackAt) && !completed;
+  const closedAfterDeadline = reflection.readOnly && !notYetOpen && !completed;
 
   return (
     <TaskContainer>
-      <TaskHeader task={task} />
-      <TaskDescription description={task.description} />
+      <TaskHeader task={displayTask} />
 
-      {reflection.readOnly ? (
-        <Day5ReflectionReadOnlyView
-          readOnlyReason={reflection.readOnlyReason}
-          readOnlySections={reflection.readOnlySections}
-          readOnlyFallbackMarkdown={reflection.readOnlyFallbackMarkdown}
-          PreviewComponent={Day5ReflectionMarkdownPreview}
+      {completed ? (
+        <Day5ReflectionCompletionView />
+      ) : notYetOpen ? (
+        <Day5ReflectionClosedView
+          variant="not_open"
+          reason={reflection.readOnlyReason}
+        />
+      ) : closedAfterDeadline ? (
+        <Day5ReflectionClosedView
+          variant="closed"
+          reason={reflection.readOnlyReason}
         />
       ) : (
-        <Day5ReflectionEditableView
-          mode={reflection.mode}
-          previewPending={reflection.previewPending}
-          markdownPreview={reflection.markdownPreview}
-          submitAttempted={reflection.submitAttempted}
-          touched={reflection.touched}
-          backendFieldErrors={reflection.backendFieldErrors}
-          clientFieldMessages={reflection.clientFieldMessages}
-          sections={reflection.sections}
-          displayStatus={reflection.displayStatus}
-          submitting={submitting}
-          draftAutosave={reflection.draftAutosave}
-          PreviewComponent={Day5ReflectionMarkdownPreview}
-          onModeChange={reflection.handleModeChange}
-          onSectionChange={reflection.handleSectionChange}
-          onSectionBlur={reflection.handleSectionBlur}
-        />
+        <>
+          <TaskDescription description={displayTask.description} />
+          <Day5ReflectionGuidance />
+          <Day5ReflectionEditableView
+            mode={reflection.mode}
+            previewPending={reflection.previewPending}
+            markdown={reflection.markdown}
+            markdownPreview={reflection.markdownPreview}
+            displayStatus={reflection.displayStatus}
+            submitting={submitting}
+            draftAutosave={reflection.draftAutosave}
+            PreviewComponent={Day5ReflectionMarkdownPreview}
+            onModeChange={reflection.handleModeChange}
+            onMarkdownChange={reflection.handleMarkdownChange}
+          />
+          <TaskPanelErrorBanner message={reflection.errorToShow} />
+          <Day5ReflectionActions
+            displayStatus={reflection.displayStatus}
+            submitting={submitting}
+            submitDisabled={reflection.submitDisabled}
+            hasClientValidationErrors={reflection.hasClientValidationErrors}
+            onSaveDraft={reflection.onSaveDraft}
+            onSubmitReflection={reflection.onSubmitReflection}
+          />
+        </>
       )}
-
-      {reflection.submittedTerminal ? (
-        <div className="mt-4 rounded-md border border-green-300 bg-green-50 p-3 text-sm text-green-900">
-          Submitted. Your Day 5 reflection is finalized.
-        </div>
-      ) : null}
-
-      <TaskStatus
-        displayStatus={reflection.displayStatus}
-        progress={reflection.lastProgress}
-      />
-      <TaskPanelErrorBanner message={reflection.errorToShow} />
-
-      {!reflection.readOnly ? (
-        <Day5ReflectionActions
-          displayStatus={reflection.displayStatus}
-          submitting={submitting}
-          submitDisabled={reflection.submitDisabled}
-          hasClientValidationErrors={reflection.hasClientValidationErrors}
-          onSaveDraft={reflection.onSaveDraft}
-          onSubmitReflection={reflection.onSubmitReflection}
-        />
-      ) : null}
     </TaskContainer>
   );
 }

@@ -35,10 +35,13 @@ describe('CandidateSessionPage view - completion and start state', () => {
     );
     render(<CandidateSessionPage token="inv" />);
     await waitFor(() =>
-      expect(screen.getByTestId('state-message')).toHaveTextContent(
-        'Trial complete',
-      ),
+      expect(
+        screen.getByText(/congratulations - your 5-day trial is complete/i),
+      ).toBeInTheDocument(),
     );
+    expect(
+      screen.getByText(/day 1: planning & design doc/i),
+    ).toBeInTheDocument();
   });
 
   it('renders start view and triggers start fetch when not started', async () => {

@@ -42,10 +42,6 @@ export async function proxyToBackend(
   }
   const headers = forwardHeaders(req);
   headers.Authorization = `Bearer ${auth.accessToken}`;
-  const devUserEmail = req.headers.get('x-dev-user-email') ?? undefined;
-  if (devUserEmail) {
-    headers['x-dev-user-email'] = devUserEmail;
-  }
 
   try {
     if (DEBUG_PROXY) {

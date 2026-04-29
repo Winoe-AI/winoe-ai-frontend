@@ -26,10 +26,10 @@ export function ResourceSections({
       {showDocs ? (
         <ResourcePanel
           title="Day 5 reflection essay"
-          description="Write your final markdown reflection essay in the editor below."
+          description="Use the final markdown editor below to reflect on your full Trial experience."
           linkUrl={resourceLink}
           linkLabel="Open reference"
-          emptyMessage="Use the markdown editor below to write your reflection essay."
+          emptyMessage="Day 5 is open from 9:00 AM–9:00 PM your local time. Use the markdown editor below to write your reflection essay."
         />
       ) : null}
     </>

@@ -7,10 +7,14 @@ export {
 } from './day5Reflection.constantsUtils';
 export {
   buildDay5ReflectionContentText,
+  buildDay5ReflectionMarkdownTemplate,
+  buildDay5ReflectionPayloadFromMarkdown,
   buildDay5ReflectionPayload,
   emptyDay5ReflectionSections,
   extractDay5SectionsFromContentJson,
+  extractDay5SectionsFromMarkdown,
   hasDay5SectionContent,
+  hasMeaningfulDay5ReflectionMarkdown,
 } from './day5Reflection.contentUtils';
 export { mapDay5BackendValidationErrors } from './day5Reflection.backendValidationUtils';
 export {
@@ -23,6 +27,7 @@ export {
   day5SectionMarkdownHeading,
 } from './day5Reflection.sectionsUtils';
 export { isDay5ReflectionTask } from './day5Reflection.taskUtils';
+export { withDay5ReflectionCopy } from './day5Reflection.taskCopyUtils';
 export type {
   Day5BackendValidationMapping,
   Day5FieldErrors,

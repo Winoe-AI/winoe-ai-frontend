@@ -2,6 +2,8 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import type { ComponentProps } from 'react';
 import { Day5ReflectionPanel } from '@/features/candidate/tasks/components/Day5ReflectionPanel';
 import type { Task } from '@/features/candidate/tasks/types';
+import { sampleDay5Markdown } from '../CandidateTaskView.testlib';
+export { sampleDay5Markdown } from '../CandidateTaskView.testlib';
 
 export const getCandidateTaskDraftMock = jest.fn();
 export const putCandidateTaskDraftMock = jest.fn();
@@ -21,39 +23,14 @@ export const baseTask: Task = {
   id: 5,
   dayIndex: 5,
   type: 'documentation',
-  title: 'Reflection',
-  description: 'Submit your structured reflection.',
+  title: 'Reflection Essay',
+  description: 'Reflect on your full Trial experience.',
 };
 
-export function fillAllSections() {
-  fireEvent.change(screen.getByLabelText(/challenges/i), {
+export function fillDay5Markdown() {
+  fireEvent.change(screen.getByRole('textbox', { name: /markdown editor/i }), {
     target: {
-      value:
-        'Handled ambiguous requirements by validating assumptions early in the flow.',
-    },
-  });
-  fireEvent.change(screen.getByLabelText(/^decisions$/i), {
-    target: {
-      value:
-        'Chose deterministic contracts so UI and backend validation align.',
-    },
-  });
-  fireEvent.change(screen.getByLabelText(/tradeoffs/i), {
-    target: {
-      value:
-        'Accepted stricter rules to improve evaluation consistency across candidates.',
-    },
-  });
-  fireEvent.change(screen.getByLabelText(/communication/i), {
-    target: {
-      value:
-        'Documented risks and handoff notes clearly at each implementation milestone.',
-    },
-  });
-  fireEvent.change(screen.getByLabelText(/what you would do next/i), {
-    target: {
-      value:
-        'Next I would add rubric-linked evidence references and quality checks.',
+      value: sampleDay5Markdown,
     },
   });
 }

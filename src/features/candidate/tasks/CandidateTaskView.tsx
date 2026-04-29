@@ -1,11 +1,15 @@
 'use client';
 
 import { CandidateTaskViewInner } from './CandidateTaskViewInner';
-import { HandoffUploadPanelComponent } from './CandidateTaskViewPanels';
+import {
+  Day5ReflectionPanelComponent,
+  HandoffUploadPanelComponent,
+} from './CandidateTaskViewPanels';
 import {
   DEFAULT_ACTION_GATE,
   type CandidateTaskViewProps,
 } from './CandidateTaskView.types';
+import { isDay5ReflectionTask } from './utils/day5ReflectionUtils';
 
 export default function CandidateTaskView(props: CandidateTaskViewProps) {
   const actionGate = props.actionGate ?? DEFAULT_ACTION_GATE;
@@ -18,6 +22,21 @@ export default function CandidateTaskView(props: CandidateTaskViewProps) {
         task={props.task}
         actionGate={actionGate}
         onTaskWindowClosed={props.onTaskWindowClosed}
+      />
+    );
+  }
+
+  if (isDay5ReflectionTask(props.task)) {
+    return (
+      <Day5ReflectionPanelComponent
+        key={props.task.id}
+        candidateSessionId={props.candidateSessionId}
+        task={props.task}
+        submitting={props.submitting}
+        submitError={props.submitError}
+        actionGate={actionGate}
+        onTaskWindowClosed={props.onTaskWindowClosed}
+        onSubmit={props.onSubmit}
       />
     );
   }

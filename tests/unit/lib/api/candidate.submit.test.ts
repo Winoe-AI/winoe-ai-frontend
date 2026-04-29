@@ -74,7 +74,8 @@ describe('candidate api submit-task helpers', () => {
     await submitCandidateTask({
       taskId: 10,
       candidateSessionId: 10,
-      contentText: '## Challenges\n...\n## Decisions\n...',
+      contentText:
+        '## Experience & Challenges\n...\n## Decisions & Tradeoffs\n...',
       reflection: {
         challenges: 'a',
         decisions: 'b',
@@ -86,7 +87,7 @@ describe('candidate api submit-task helpers', () => {
     expect(mockPost).toHaveBeenCalledWith(
       '/tasks/10/submit',
       expect.objectContaining({
-        contentText: expect.stringContaining('## Challenges'),
+        contentText: expect.stringContaining('## Experience & Challenges'),
         reflection: expect.objectContaining({
           challenges: expect.any(String),
           decisions: expect.any(String),

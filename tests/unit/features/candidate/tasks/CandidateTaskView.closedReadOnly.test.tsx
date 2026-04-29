@@ -23,7 +23,7 @@ describe('CandidateTaskView closed/read-only states', () => {
       },
       actionGate: {
         isReadOnly: true,
-        disabledReason: 'Day closed.',
+        disabledReason: null,
         comeBackAt: null,
       },
     });
@@ -36,15 +36,15 @@ describe('CandidateTaskView closed/read-only states', () => {
     expect(getCandidateTaskDraftMock).not.toHaveBeenCalled();
   });
 
-  it('shows placeholder when no finalized reflection content exists', async () => {
+  it('shows the closed Day 5 copy when the deadline has passed', async () => {
     renderTaskView({
       task: {
         ...baseTask,
         id: 5,
         dayIndex: 5,
         type: 'documentation',
-        title: 'Reflection',
-        description: 'Submit your structured reflection.',
+        title: 'Reflection Essay',
+        description: 'Reflect on your full Trial experience.',
       },
       actionGate: {
         isReadOnly: true,
@@ -53,15 +53,15 @@ describe('CandidateTaskView closed/read-only states', () => {
       },
     });
     await waitFor(() =>
-      expect(screen.getAllByText(/day closed/i)).toHaveLength(2),
+      expect(
+        screen.getByText(/the day 5 reflection window has closed/i),
+      ).toBeInTheDocument(),
     );
-    expect(
-      screen.getByText(/no finalized submission is available for this day\./i),
-    ).toBeInTheDocument();
+    expect(screen.getByText(/day closed/i)).toBeInTheDocument();
     expect(screen.queryByRole('textbox')).toBeNull();
     expect(
-      screen.getByRole('button', { name: /submit & continue/i }),
-    ).toBeDisabled();
+      screen.queryByRole('button', { name: /submit reflection essay/i }),
+    ).toBeNull();
     expect(getCandidateTaskDraftMock).not.toHaveBeenCalled();
   });
 

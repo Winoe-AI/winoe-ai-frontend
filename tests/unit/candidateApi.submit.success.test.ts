@@ -84,7 +84,8 @@ describe('candidateApi submit success paths', () => {
     await submitCandidateTask({
       taskId: 5,
       candidateSessionId: 1,
-      contentText: '## Challenges\n...\n## Decisions\n...',
+      contentText:
+        '## Experience & Challenges\n...\n## Decisions & Tradeoffs\n...',
       reflection: {
         challenges: 'a',
         decisions: 'b',
@@ -99,7 +100,7 @@ describe('candidateApi submit success paths', () => {
       unknown
     >;
     expect(body).toMatchObject({
-      contentText: expect.stringContaining('## Challenges'),
+      contentText: expect.stringContaining('## Experience & Challenges'),
       reflection: expect.objectContaining({
         challenges: expect.any(String),
         decisions: expect.any(String),

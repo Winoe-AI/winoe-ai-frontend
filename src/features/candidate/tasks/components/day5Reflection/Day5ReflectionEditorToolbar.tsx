@@ -11,7 +11,9 @@ export function Day5ReflectionEditorToolbar({ mode, onModeChange }: Props) {
       <div className="flex items-center gap-2">
         <span className="leading-5">
           Each section is required and must include at least{' '}
-          {String(DAY5_REFLECTION_MIN_SECTION_CHARS)} characters.
+          {String(DAY5_REFLECTION_MIN_SECTION_CHARS)} characters. Use the
+          prompts to reflect on your Trial, your growth, and how you used your
+          tools.
         </span>
       </div>
       <div className="inline-flex overflow-hidden rounded-md border border-gray-200 bg-white text-xs font-medium">

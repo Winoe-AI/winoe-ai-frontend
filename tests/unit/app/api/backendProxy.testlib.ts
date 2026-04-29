@@ -19,6 +19,12 @@ jest.mock('@/platform/server/bff', () => ({
   getBackendBaseUrl: () => getBackendBaseUrlMock(),
   resolveRequestId: () => resolveRequestIdMock(),
 }));
+jest.mock('@/platform/auth0', () => ({
+  getSessionNormalized: jest.fn(async () => ({
+    user: { email: 'candidate@example.com' },
+    accessToken: 'token',
+  })),
+}));
 
 const modulePath = '@/app/api/backend/[...path]/route';
 const originalEnv = { ...process.env };
