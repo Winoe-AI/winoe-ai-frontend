@@ -40,8 +40,8 @@ export function ArtifactDay4VideoPanel({
   return (
     <div className="rounded border border-dashed border-gray-200 bg-white p-3 text-sm text-gray-700">
       {deleted
-        ? 'Video deleted or unavailable.'
-        : 'Video unavailable right now.'}
+        ? 'Handoff + Demo video deleted or unavailable.'
+        : 'Handoff + Demo video unavailable right now.'}
     </div>
   );
 }

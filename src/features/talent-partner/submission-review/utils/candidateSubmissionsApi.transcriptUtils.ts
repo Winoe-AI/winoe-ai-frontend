@@ -10,8 +10,10 @@ function normalizeTranscriptSegment(
 ): HandoffTranscriptSegment | null {
   const record = asRecord(value);
   if (!record) return null;
-  const startMs = toNullableNumber(record.startMs ?? record.start_ms);
-  const endMs = toNullableNumber(record.endMs ?? record.end_ms);
+  const startMs = toNullableNumber(
+    record.startMs ?? record.start_ms ?? record.start,
+  );
+  const endMs = toNullableNumber(record.endMs ?? record.end_ms ?? record.end);
   const text = toNullableString(record.text);
   if (startMs === null || endMs === null || text === null) return null;
   const roundedStartMs = Math.max(0, Math.round(startMs));

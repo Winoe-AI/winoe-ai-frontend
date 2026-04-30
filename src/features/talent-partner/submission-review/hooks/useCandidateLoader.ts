@@ -2,7 +2,8 @@ import {
   fetchCandidateSubmissions,
   verifyCandidate,
 } from '../utils/candidateSubmissionsApiUtils';
-import { pickLatestByDay } from '../utils/pickLatestUtils';
+import { isHandoffSubmissionItem } from '../utils/handoffUtils';
+import { pickLatestByDay, pickLatestWhere } from '../utils/pickLatestUtils';
 import type { SubmissionListItem } from '../types';
 import type { CandidateSession } from '@/features/talent-partner/types';
 
@@ -55,9 +56,11 @@ export async function loadCandidateAndSubmissions({
     );
     const latest2 = pickLatestByDay(ordered, 2);
     const latest3 = pickLatestByDay(ordered, 3);
+    const latestDay4 = pickLatestWhere(ordered, isHandoffSubmissionItem);
     const ids = [
       ...(latest2 ? [latest2.submissionId] : []),
       ...(latest3 ? [latest3.submissionId] : []),
+      ...(latestDay4 ? [latestDay4.submissionId] : []),
     ];
     if (includePageItems && pageSize) {
       ids.push(...ordered.slice(0, pageSize).map((it) => it.submissionId));

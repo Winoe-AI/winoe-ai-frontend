@@ -1,119 +1,74 @@
-# PR: Fix Trial-scoped Benchmarks comparison
+# PR: Fix Talent Partner Day 4 Handoff + Demo playback
 
 ## Summary
 
-Closes #189.
+- Replaced Talent Partner Day 4 playback/evidence copy with `Handoff + Demo`.
+- Preserved video playback through backend-provided handoff media/download URLs.
+- Added clear transcript states, including failed transcription handling.
+- Preserved searchable transcript behavior and timestamp seeking.
+- Ensured latest Day 4 handoff artifacts can be fetched/rendered for the submission review page.
+- Normalized backend transcript segment payloads that use `start` / `end` fields.
 
-This PR fixes the Talent Partner Trial detail Benchmarks panel so it only renders eligible candidates from the selected Trial and displays the required Benchmarks framing, cohort context, and Winoe Report links.
+## Issue
 
-## What changed
+Closes #190
 
-- Renamed the Trial detail comparison surface to `Benchmarks`.
-- Added cohort-size copy, for example `Comparing 2 candidates for this Trial`.
-- Added the limited-comparison note when the rendered cohort has fewer than 3 candidates.
-- Added decision-boundary copy clarifying that Winoe surfaces evidence and the Talent Partner makes the hiring decision.
-- Preserved Trial identifiers during compare normalization.
-- Added defensive same-Trial filtering when row-level Trial identifiers are present.
-- Restricted Benchmarks rows to terminal/report-ready candidates:
-  - `completed + ready`
-  - `evaluated + ready`
-- Excluded in-progress, non-ready, and unrelated-Trial rows.
-- Simplified the Benchmarks table to the required fields:
-  - candidate name
-  - Winoe Score
-  - dimensional summary
-  - evidence/recommendation summary
-  - Winoe Report link
-- Kept the Benchmarks surface read-only; Winoe Report generation remains on the dedicated Winoe Report page.
-- Avoided retired terminology and deterministic hiring language.
+## Acceptance Criteria
 
-## Why
+- [x] All Day 4 labels: Handoff + Demo, not presentation
+- [x] Video playback works with correct media URLs
+- [x] Transcript viewer with searchable text
+- [x] Failed transcription state clearly shown
 
-Benchmarks are only trustworthy if they compare candidates from the same Trial, under the same Winoe instance and same evaluation lens. The previous comparison surface could show unrelated candidates, which broke the trust model for Talent Partners.
+## Files Changed
 
-This PR makes the UI match the product promise: same-Trial Benchmarks with evidence-backed, non-deterministic framing.
+- `src/features/talent-partner/submission-review/components/ArtifactCard/ArtifactDay4Handoff.tsx` - Updated the Day 4 playback heading, passed transcript status through to the transcript panel, and kept playback wired to the handoff artifact.
+- `src/features/talent-partner/submission-review/components/ArtifactCard/ArtifactDay4TranscriptPanel.tsx` - Added transcript failed/processing states and the searchable transcript fallback copy for Handoff + Demo.
+- `src/features/talent-partner/submission-review/components/ArtifactCard/ArtifactDay4VideoPanel.tsx` - Updated unavailable/deleted playback messaging to use Handoff + Demo terminology.
+- `src/features/talent-partner/submission-review/components/ArtifactCard/artifactDay4Status.ts` - Added transcript processing and failed-status helpers plus normalization support.
+- `src/features/talent-partner/submission-review/components/LatestDay4Handoff.tsx` - Updated the latest Day 4 evidence panel copy to Handoff + Demo and preserved artifact rendering.
+- `src/features/talent-partner/submission-review/hooks/useCandidateLoader.ts` - Included the latest Day 4 handoff submission when preloading submission IDs.
+- `src/features/talent-partner/submission-review/hooks/useDeferredLatestDay4Artifact.ts` - Deferred loading only when the cached Day 4 artifact is incomplete.
+- `src/features/talent-partner/submission-review/utils/candidateSubmissionsApi.transcriptUtils.ts` - Normalized backend transcript segments that use `start` / `end` fields.
+- `tests/integration/talent-partner/trials/candidates/CandidateSubmissionsContent.day4Handoff.test.tsx` - Updated the integration assertion to the new Handoff + Demo playback label.
+- `tests/unit/features/talent-partner/submission-review/ArtifactDay4Handoff.test.tsx` - Covered playback URL wiring, searchable transcript behavior, timestamp seeking, unavailable playback, and failed transcription states.
+- `tests/unit/features/talent-partner/submission-review/LatestDay4Handoff.test.tsx` - Added coverage for the latest Day 4 Handoff + Demo evidence copy and fallback states.
+- `tests/unit/features/talent-partner/submission-review/day4Transcript.test.ts` - Added transcript normalization coverage for backend `start` / `end` segment payloads.
 
-## Acceptance criteria
+## QA
 
-- [x] Benchmarks table only shows candidates invited to / associated with the selected Trial.
-- [x] Each row shows candidate name, Winoe Score, dimensional summary, evidence/recommendation summary, and Winoe Report link.
-- [x] No-data state appears when no eligible completed/report-ready candidates exist.
-- [x] Primary label is `Benchmarks`, not just `Compare`.
-- [x] Copy avoids implying Winoe makes the hiring decision.
-- [x] Header displays cohort size.
-- [x] Limited-comparison note appears when rendered cohort size is less than 3.
-- [x] Verified with at least 2 same-Trial candidates rendering as distinct rows with distinct Winoe Scores.
-- [x] `in_progress + ready` rows are excluded.
-- [x] `evaluated + ready` rows from the live backend payload are included.
-- [x] No retired terminology introduced.
+Commands and verified results:
 
-## Testing
+- `npm run lint` - PASS
+- `npm run typecheck` - PASS
+- `npm test -- --runInBand tests/unit/features/talent-partner/submission-review/ArtifactDay4Handoff.test.tsx tests/unit/features/talent-partner/submission-review/LatestDay4Handoff.test.tsx tests/integration/talent-partner/trials/candidates/CandidateSubmissionsContent.day4Handoff.test.tsx tests/unit/features/talent-partner/submission-review/day4Transcript.test.ts` - PASS
+- `npx playwright test tests/e2e/flow-qa/tmp-day4-talent-partner-browser-qa.spec.ts -c tests/e2e/flow-qa/playwright.config.ts --project=chromium --workers=1` - PASS
+- `./precommit.sh` - PASS
 
-Automated checks run:
+Final precommit block:
 
-```bash
-npx jest tests/unit/features/talent-partner/trial-management/detail/TalentPartnerTrialDetailPage.component.interactions.test.tsx --runInBand
-npx jest tests/unit/features/talent-partner/trial-management/detail/TalentPartnerTrialDetailPage.component.interactions.test.tsx --runInBand --detectOpenHandles
-npx jest tests/unit/features/talent-partner/trial-management/detail/candidatesCompareNormalize.test.ts tests/unit/features/talent-partner/trial-management/detail/components/CandidateCompareSection.rows.test.tsx tests/unit/features/talent-partner/trial-management/detail/components/CandidateCompareSection.states.test.tsx tests/integration/talent-partner/TrialDetailPageClient.compareStates.test.tsx tests/integration/talent-partner/TrialDetailPageClient.compareRetry.test.tsx --runInBand
-npm run typecheck
-npm run lint:eslint
-npm run lint:prettier
-./precommit.sh
-```
-
-All passed.
-
-Full precommit result:
-
-- Test Suites: 502 passed, 502 total
-- Tests: 1566 passed, 1566 total
+- Test Suites: 503 passed, 503 total
+- Tests: 1570 passed, 1570 total
 - Snapshots: 3 passed, 3 total
-- Typecheck: pass
-- Build: pass
-- Precommit: pass
+- Typecheck passed
+- Production build passed
+- precommit checks passed
 
-## Manual QA
+## Browser QA Evidence
 
-Manual QA was performed against the local frontend and backend.
+- Route tested: `/dashboard/trials/:trialId/candidates/:candidateSessionId`
+- `Day 4 Handoff + Demo evidence` visible
+- `Day 4 Handoff + Demo playback` visible
+- No visible Day 4 playback/evidence copy used `presentation`
+- Video `src` and download `href` matched backend-provided media/download URL
+- Transcript search updated match count and highlighted matching text
+- Timestamp click exercised seek behavior
+- Failed transcript state showed:
+  - `Transcript unavailable`
+  - `Transcript generation failed. The Handoff + Demo video is still available above when media access is permitted.`
 
-Environment:
+## Notes / Follow-ups
 
-- Backend: local backend via `./runBackend.sh up`
-- Frontend: local frontend via `npm run dev`
-- Talent Partner account used for login
-- Trial tested: seeded Trial 1 because Trial 2 was unavailable in the local DB after reseeding
-
-Evidence saved under:
-
-```txt
-.ai_flow/qa/issue-189/
-```
-
-Artifacts:
-
-- `01-dashboard.png`
-- `02-trial-detail.png`
-- `03-benchmarks-panel.png`
-- `04-winoe-report.png`
-- `summary.json`
-
-Observed QA result:
-
-- Compare endpoint observed: `/api/trials/1/candidates/compare`
-- Rendered rows:
-  - `Avery Chen — 91%`
-  - `Jordan Patel — 74%`
-- Header rendered: `Comparing 2 candidates for this Trial`
-- Limited-comparison note rendered: `Limited comparison — results are more meaningful with additional candidates.`
-- Decision-boundary copy rendered: `Winoe surfaces evidence from each Trial. The Talent Partner makes the hiring decision.`
-- Winoe Report link navigation checked.
-- Empty state did not render when eligible rows existed.
-- No retired terminology observed.
-- No deterministic hiring language observed.
-
-## Notes / risks
-
-- Frontend same-Trial filtering is defensive when row-level Trial IDs are present.
-- If the backend omits row-level Trial IDs, the UI relies on the Trial-scoped endpoint contract: `/api/trials/:trialId/candidates/compare`.
-- The live backend uses `evaluated` as a terminal compare status, so the frontend treats both `completed` and `evaluated` as eligible terminal states.
-- The final diff is scoped to #189; unrelated Jest/global timeout changes were removed.
+- Backend issues `winoe-ai-backend#290` and `winoe-ai-backend#294` remain the broader end-to-end reliability dependencies for Day 4 upload/transcription/media retention.
+- Candidate-side `candidate-day4.spec.ts` stale locator expecting `Upload video` while UI shows `Upload demo video` is unrelated to #190 and should be handled separately if still relevant.
+- No scoped user-facing Day 4 playback/evidence copy uses `presentation`; any remaining `presentation` match is a negative assertion in tests.

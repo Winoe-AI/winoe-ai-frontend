@@ -1,6 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ArtifactCard } from '@/features/talent-partner/submission-review/CandidateSubmissionsPage';
+import { ArtifactDay4Handoff } from '@/features/talent-partner/submission-review/components/ArtifactCard/ArtifactDay4Handoff';
 import {
   buildDay4Artifact,
   buildNonHandoffDay4Artifact,
@@ -14,38 +15,29 @@ describe('ArtifactDay4Handoff', () => {
     });
   });
 
-  it('renders processing state and missing video fallback', () => {
-    render(
-      <ArtifactCard
-        artifact={buildDay4Artifact({
-          handoff: {
-            recordingId: 'rec_999',
-            downloadUrl: null,
-            transcript: { status: 'processing', text: null, segments: [] },
-          },
-        })}
-      />,
+  it('renders Day 4 Handoff + Demo playback with the backend media URL', () => {
+    const { container } = render(
+      <ArtifactDay4Handoff artifact={buildDay4Artifact()} />,
     );
+    const video = container.querySelector('video');
 
     expect(
-      screen.getByText(/Day 4 presentation playback/i),
+      screen.getByText(/Day 4 Handoff \+ Demo playback/i),
     ).toBeInTheDocument();
+    expect(video).toHaveAttribute('src', 'https://cdn.example.com/rec_123.mp4');
     expect(
-      screen.getByText(/Video unavailable right now/i),
-    ).toBeInTheDocument();
-    expect(screen.getByText(/Processing transcript/i)).toBeInTheDocument();
+      screen.getByRole('link', { name: /Download video/i }),
+    ).toHaveAttribute('href', 'https://cdn.example.com/rec_123.mp4');
+    expect(container.querySelector('video')).toBeInTheDocument();
   });
 
   it('renders transcript search, highlights matches, and exposes match count', async () => {
     const user = userEvent.setup();
     const { container } = render(
-      <ArtifactCard artifact={buildDay4Artifact()} />,
+      <ArtifactDay4Handoff artifact={buildDay4Artifact()} />,
     );
 
-    expect(
-      screen.getByRole('link', { name: /Download video/i }),
-    ).toBeInTheDocument();
-    await user.type(screen.getByPlaceholderText(/Search transcript/i), 'WORLD');
+    await user.type(screen.getByLabelText(/Search transcript/i), 'WORLD');
 
     expect(await screen.findByText('2 matches')).toBeInTheDocument();
     expect(container.querySelectorAll('mark').length).toBeGreaterThan(0);
@@ -58,7 +50,7 @@ describe('ArtifactDay4Handoff', () => {
   it('seeks video timestamp clicks and remains safe when player is unavailable', async () => {
     const user = userEvent.setup();
     const { container, rerender } = render(
-      <ArtifactCard artifact={buildDay4Artifact()} />,
+      <ArtifactDay4Handoff artifact={buildDay4Artifact()} />,
     );
 
     const video = container.querySelector('video') as HTMLVideoElement;
@@ -73,7 +65,7 @@ describe('ArtifactDay4Handoff', () => {
     expect(video.currentTime).toBe(5);
 
     rerender(
-      <ArtifactCard
+      <ArtifactDay4Handoff
         artifact={buildDay4Artifact({
           handoff: {
             recordingId: 'rec_123',
@@ -97,20 +89,63 @@ describe('ArtifactDay4Handoff', () => {
 
   it('shows unavailable fallback when playback fails to load', () => {
     const { container } = render(
-      <ArtifactCard artifact={buildDay4Artifact()} />,
+      <ArtifactDay4Handoff artifact={buildDay4Artifact()} />,
     );
     const video = container.querySelector('video');
     expect(video).toBeTruthy();
     fireEvent.error(video as HTMLVideoElement);
     expect(
-      screen.getByText(/Video unavailable right now/i),
+      screen.getByText(/Handoff \+ Demo video unavailable right now/i),
     ).toBeInTheDocument();
+  });
+
+  it('renders a failed transcription state for failed and error-like statuses', () => {
+    const { rerender } = render(
+      <ArtifactDay4Handoff
+        artifact={buildDay4Artifact({
+          handoff: {
+            recordingId: 'rec_123',
+            downloadUrl: 'https://cdn.example.com/rec_123.mp4',
+            transcript: {
+              status: 'failed',
+              text: null,
+              segments: [],
+            },
+          },
+        })}
+      />,
+    );
+
+    expect(screen.getByText(/Transcript unavailable/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        /The Handoff \+ Demo video is still available above when media access is permitted\./i,
+      ),
+    ).toBeInTheDocument();
+
+    rerender(
+      <ArtifactDay4Handoff
+        artifact={buildDay4Artifact({
+          handoff: {
+            recordingId: 'rec_123',
+            downloadUrl: 'https://cdn.example.com/rec_123.mp4',
+            transcript: {
+              status: 'errored',
+              text: null,
+              segments: [],
+            },
+          },
+        })}
+      />,
+    );
+
+    expect(screen.getByText(/Transcript unavailable/i)).toBeInTheDocument();
   });
 
   it('does not render handoff playback UI for non-handoff Day 4 artifacts', () => {
     render(<ArtifactCard artifact={buildNonHandoffDay4Artifact()} />);
     expect(
-      screen.queryByText(/Day 4 presentation playback/i),
+      screen.queryByText(/Day 4 Handoff \+ Demo playback/i),
     ).not.toBeInTheDocument();
     expect(screen.getByText(/No text answer submitted/i)).toBeInTheDocument();
   });
