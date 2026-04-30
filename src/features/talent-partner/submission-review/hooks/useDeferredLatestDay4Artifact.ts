@@ -4,6 +4,16 @@ import { queryKeys } from '@/shared/query';
 import type { SubmissionArtifact } from '../types';
 import { fetchArtifactsWithLimit } from '../utils/candidateSubmissionsApiUtils';
 
+function hasCompleteDay4Artifact(artifact: SubmissionArtifact | undefined) {
+  const handoff = artifact?.handoff ?? null;
+  const transcript = handoff?.transcript ?? null;
+  return Boolean(
+    handoff?.downloadUrl &&
+    transcript?.status &&
+    (transcript.text !== undefined || transcript.segments !== undefined),
+  );
+}
+
 type UseDeferredLatestDay4ArtifactArgs = {
   trialId: string;
   candidateSessionId: string;
@@ -31,7 +41,7 @@ export function useDeferredLatestDay4Artifact({
 
   useEffect(() => {
     if (loading || showAll || latestDay4SubmissionId == null) return;
-    if (artifacts[latestDay4SubmissionId]) return;
+    if (hasCompleteDay4Artifact(artifacts[latestDay4SubmissionId])) return;
 
     const timer = window.setTimeout(() => {
       setLatestDay4Loading(true);

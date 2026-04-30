@@ -3,6 +3,7 @@ import {
   formatTranscriptTimestamp,
   highlightTranscriptText,
 } from '@/features/talent-partner/submission-review/components/ArtifactCard/day4Transcript';
+import { normalizeTranscript } from '@/features/talent-partner/submission-review/utils/candidateSubmissionsApi.transcriptUtils';
 
 describe('day4Transcript helpers', () => {
   it('formats transcript timestamps for mm:ss and hh:mm:ss', () => {
@@ -33,5 +34,21 @@ describe('day4Transcript helpers', () => {
 
     expect(tokens.some((token) => token.isMatch)).toBe(true);
     expect(tokens.map((token) => token.text).join('')).toContain('<script>');
+  });
+
+  it('normalizes backend transcript segments that use start/end fields', () => {
+    const transcript = normalizeTranscript({
+      transcript: {
+        status: 'ready',
+        text: 'Ready transcript',
+        segments: [{ start: 0, end: 60000, text: 'Segment text' }],
+      },
+    });
+
+    expect(transcript).toEqual({
+      status: 'ready',
+      text: 'Ready transcript',
+      segments: [{ id: null, startMs: 0, endMs: 60000, text: 'Segment text' }],
+    });
   });
 });

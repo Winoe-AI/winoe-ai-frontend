@@ -4,14 +4,21 @@ import {
   buildTranscriptSearchResults,
   formatTranscriptTimestamp,
 } from './day4Transcript';
+import {
+  isTranscriptFailed,
+  isTranscriptProcessing,
+  normalizeHandoffStatus,
+} from './artifactDay4Status';
 type ArtifactDay4TranscriptPanelProps = {
   submissionId: number;
+  transcriptStatus: string | null;
   transcriptIsReady: boolean;
   transcriptSegments: HandoffTranscriptSegment[];
   onSeek: (startMs: number) => void;
 };
 export function ArtifactDay4TranscriptPanel({
   submissionId,
+  transcriptStatus,
   transcriptIsReady,
   transcriptSegments,
   onSeek,
@@ -31,10 +38,28 @@ export function ArtifactDay4TranscriptPanel({
     if (!firstMatchKey) return;
     segmentRefs.current[firstMatchKey]?.scrollIntoView({ block: 'center' });
   }, [firstMatchKey]);
+  const normalizedStatus = normalizeHandoffStatus(transcriptStatus);
+  const transcriptFailed = isTranscriptFailed(normalizedStatus);
+  const transcriptProcessing = isTranscriptProcessing(normalizedStatus);
+
+  if (transcriptFailed) {
+    return (
+      <div className="mt-2 rounded border border-rose-200 bg-rose-50 p-3 text-sm text-rose-900">
+        <div className="font-semibold">Transcript unavailable</div>
+        <p className="mt-1">
+          Transcript generation failed. The Handoff + Demo video is still
+          available above when media access is permitted.
+        </p>
+      </div>
+    );
+  }
+
   if (!transcriptIsReady) {
     return (
       <div className="mt-2 text-sm text-gray-700">
-        Processing transcript. Refresh shortly for searchable segments.
+        {transcriptProcessing
+          ? 'Processing Handoff + Demo transcript. Refresh shortly for searchable segments.'
+          : 'Handoff + Demo transcript is not available yet.'}
       </div>
     );
   }

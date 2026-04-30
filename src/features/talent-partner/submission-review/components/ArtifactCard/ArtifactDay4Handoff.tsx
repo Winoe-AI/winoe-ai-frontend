@@ -21,7 +21,7 @@ export function ArtifactDay4Handoff({ artifact }: Props) {
   const [failedVideoUrl, setFailedVideoUrl] = useState<string | null>(null);
   const downloadUrl = handoff?.downloadUrl ?? null;
   const transcript = handoff?.transcript ?? null;
-  const transcriptStatus = transcript?.status ?? 'processing';
+  const transcriptStatus = transcript?.status ?? null;
   const transcriptSegments = transcript?.segments ?? EMPTY_TRANSCRIPT_SEGMENTS;
   const transcriptIsReady =
     isTranscriptReady(transcriptStatus) && transcriptSegments.length > 0;
@@ -47,7 +47,7 @@ export function ArtifactDay4Handoff({ artifact }: Props) {
   return (
     <div className="mt-3 rounded border border-slate-200 bg-slate-50 p-3">
       <div className="text-sm font-semibold text-gray-900">
-        Day 4 presentation playback
+        Day 4 Handoff + Demo playback
       </div>
       <div className="mt-2">
         <ArtifactDay4VideoPanel
@@ -63,6 +63,7 @@ export function ArtifactDay4Handoff({ artifact }: Props) {
         <div className="text-sm font-semibold text-gray-900">Transcript</div>
         <ArtifactDay4TranscriptPanel
           submissionId={artifact.submissionId}
+          transcriptStatus={transcriptStatus}
           transcriptIsReady={transcriptIsReady}
           transcriptSegments={transcriptSegments}
           onSeek={onSeek}
