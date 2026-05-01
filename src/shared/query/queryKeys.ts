@@ -32,7 +32,7 @@ export const queryKeys = {
         'talent_partner',
         'trials',
         keyPart(trialId),
-        'candidate-sessions',
+        'candidate-session',
         keyPart(candidateSessionId),
         'submissions',
       ] as const,
@@ -45,7 +45,7 @@ export const queryKeys = {
         'talent_partner',
         'trials',
         keyPart(trialId),
-        'candidate-sessions',
+        'candidate-session',
         keyPart(candidateSessionId),
         'submission-artifacts',
         ...submissionIds,
@@ -53,7 +53,7 @@ export const queryKeys = {
     winoeReportStatus: (candidateSessionId: string | number) =>
       [
         'talent_partner',
-        'candidate-sessions',
+        'candidate-session',
         keyPart(candidateSessionId),
         'winoe-report-status',
       ] as const,

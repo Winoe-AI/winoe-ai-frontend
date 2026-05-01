@@ -1,10 +1,7 @@
 import type { Metadata } from 'next';
 import CandidateSessionPage from '@/features/candidate/session/CandidateSessionPage';
 import { BRAND_NAME } from '@/platform/config/brand';
-import {
-  requireCandidateToken,
-  type TokenParams,
-} from '../../../(legacy)/candidate-sessions/token-params';
+import { requireCandidateToken, type TokenParams } from '../token-params';
 
 export const metadata: Metadata = {
   title: `Candidate trial | ${BRAND_NAME}`,

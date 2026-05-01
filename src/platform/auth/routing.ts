@@ -2,9 +2,16 @@ import type { NextRequest } from 'next/server';
 
 export type LoginMode = 'candidate' | 'talent_partner';
 
-const CANDIDATE_PREFIXES = ['/candidate-sessions', '/candidate'];
+const CANDIDATE_PREFIXES = ['/candidate'];
 const AUTH_PREFIXES = ['/auth', '/api/auth'];
 const DEFAULT_RETURN_TO = '/';
+
+export function pathnameMatchesPrefix(
+  pathname: string,
+  prefix: string,
+): boolean {
+  return pathname === prefix || pathname.startsWith(`${prefix}/`);
+}
 
 export function sanitizeReturnTo(value: string | null | undefined): string {
   if (!value || typeof value !== 'string') return DEFAULT_RETURN_TO;
@@ -55,7 +62,9 @@ export function sanitizeReturnTo(value: string | null | undefined): string {
 }
 
 export function modeForPath(pathname: string): LoginMode {
-  return CANDIDATE_PREFIXES.some((prefix) => pathname.startsWith(prefix))
+  return CANDIDATE_PREFIXES.some((prefix) =>
+    pathnameMatchesPrefix(pathname, prefix),
+  )
     ? 'candidate'
     : 'talent_partner';
 }

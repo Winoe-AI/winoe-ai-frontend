@@ -53,13 +53,13 @@ describe('LoginPage', () => {
     );
   });
 
-  it('still treats legacy candidate-sessions returnTo as candidate mode', () => {
+  it('does not treat legacy candidate-sessions returnTo as primary candidate mode', () => {
     render(<LoginPage returnTo="/candidate-sessions/tok_legacy" />);
 
     const authLink = screen.getByRole('link', { name: 'Continue with Auth0' });
     expect(authLink).toHaveAttribute(
       'href',
-      '/auth/start?returnTo=%2Fcandidate-sessions%2Ftok_legacy&mode=candidate',
+      '/auth/start?returnTo=%2Fcandidate-sessions%2Ftok_legacy&mode=talent_partner',
     );
   });
 });

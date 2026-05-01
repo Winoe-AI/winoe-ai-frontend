@@ -49,4 +49,17 @@ describe('proxy - candidate route access', () => {
     expect(res?.status).toBe(200);
     expect(res?.headers.get('location')).toBeNull();
   });
+
+  it('lets the legacy candidate-sessions redirect route reach the app layer', async () => {
+    getSessionNormalizedMock.mockResolvedValue(null);
+
+    const res = await proxy(
+      new NextRequest(
+        new URL('http://localhost/candidate-sessions/tok_123?source=legacy'),
+      ),
+    );
+
+    expect(res?.status).toBe(200);
+    expect(res?.headers.get('location')).toBeNull();
+  });
 });

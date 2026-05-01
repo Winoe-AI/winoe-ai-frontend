@@ -21,6 +21,12 @@ export const config = {
 
 export async function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
+  if (
+    pathname === '/candidate-sessions' ||
+    pathname.startsWith('/candidate-sessions/')
+  ) {
+    return NextResponse.next();
+  }
   const isStaticAsset =
     pathname.startsWith('/_next/') ||
     pathname.startsWith('/.well-known/') ||

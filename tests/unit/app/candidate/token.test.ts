@@ -1,4 +1,4 @@
-import { requireCandidateToken } from '@/app/(candidate)/(legacy)/candidate-sessions/token-params';
+import { requireCandidateToken } from '@/app/(candidate)/candidate/session/token-params';
 
 jest.mock('next/navigation', () => ({
   notFound: jest.fn(() => {

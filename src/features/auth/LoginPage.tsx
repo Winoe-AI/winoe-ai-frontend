@@ -1,5 +1,6 @@
 import Button from '@/shared/ui/Button';
 import AuthStartLink from '@/features/auth/AuthStartLink';
+import { modeForPath } from '@/platform/auth/routing';
 import { BRAND_NAME } from '@/platform/config/brand';
 import { AuthPageLayout } from './AuthPageLayout';
 import {
@@ -15,11 +16,9 @@ export default function LoginPage({
   returnTo?: string;
   mode?: LoginMode;
 }) {
+  const returnToPath = (returnTo ?? '').split(/[?#]/)[0] || '';
   const isCandidate =
-    mode === 'candidate' ||
-    (returnTo ?? '').startsWith('/candidate/session') ||
-    (returnTo ?? '').startsWith('/candidate-sessions') ||
-    (returnTo ?? '').startsWith('/candidate/');
+    mode === 'candidate' || modeForPath(returnToPath) === 'candidate';
   const title = isCandidate
     ? 'Sign in to continue your trial'
     : 'Talent Partner login';

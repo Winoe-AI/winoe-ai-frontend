@@ -69,9 +69,9 @@ jest.mock('@/platform/auth0', () => ({
   getSessionNormalized: getSessionNormalizedMock,
   getCachedSessionNormalized: getCachedSessionNormalizedMock,
 }));
-jest.mock('@/app/(candidate)/(legacy)/candidate-sessions/token-params', () => {
+jest.mock('@/app/(candidate)/candidate/session/token-params', () => {
   const actual = jest.requireActual(
-    '@/app/(candidate)/(legacy)/candidate-sessions/token-params',
+    '@/app/(candidate)/candidate/session/token-params',
   );
   return { ...actual, requireCandidateToken: requireCandidateTokenMock };
 });
