@@ -9,13 +9,13 @@ import {
 } from '@/platform/auth/routing';
 describe('auth/routing extra coverage', () => {
   describe('modeForPath', () => {
-    it('returns candidate for /candidate-sessions paths', () => {
-      expect(modeForPath('/candidate-sessions/123')).toBe('candidate');
-      expect(modeForPath('/candidate-sessions')).toBe('candidate');
-    });
     it('returns candidate for /candidate paths', () => {
       expect(modeForPath('/candidate/dashboard')).toBe('candidate');
       expect(modeForPath('/candidate')).toBe('candidate');
+    });
+    it('returns talent_partner for legacy candidate session paths', () => {
+      expect(modeForPath('/candidate-sessions/123')).toBe('talent_partner');
+      expect(modeForPath('/candidate-sessions')).toBe('talent_partner');
     });
     it('returns talent_partner for other paths', () => {
       expect(modeForPath('/dashboard')).toBe('talent_partner');

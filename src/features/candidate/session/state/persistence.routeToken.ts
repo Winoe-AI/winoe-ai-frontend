@@ -1,5 +1,4 @@
 const SESSION_PATH_PREFIX = '/candidate/session/';
-const LEGACY_SESSION_PATH_PREFIX = '/candidate-sessions/';
 
 function decodePathToken(rawToken: string): string | null {
   const trimmed = rawToken.trim();
@@ -13,13 +12,10 @@ function decodePathToken(rawToken: string): string | null {
 }
 
 function routeTokenFromPathname(pathname: string): string | null {
-  const prefixes = [SESSION_PATH_PREFIX, LEGACY_SESSION_PATH_PREFIX];
-  for (const prefix of prefixes) {
-    if (!pathname.startsWith(prefix)) continue;
-    const rawToken = pathname.slice(prefix.length).split('/')[0] ?? '';
-    return decodePathToken(rawToken);
-  }
-  return null;
+  if (!pathname.startsWith(SESSION_PATH_PREFIX)) return null;
+  const rawToken =
+    pathname.slice(SESSION_PATH_PREFIX.length).split('/')[0] ?? '';
+  return decodePathToken(rawToken);
 }
 
 export function activeRouteToken(): string | null {

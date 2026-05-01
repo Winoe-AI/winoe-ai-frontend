@@ -1,6 +1,11 @@
 import type { NextRequest, NextResponse } from 'next/server';
 import { NextResponse as Next } from 'next/server';
-import { buildLoginUrl, buildNotAuthorizedUrl, modeForPath } from './routing';
+import {
+  buildLoginUrl,
+  buildNotAuthorizedUrl,
+  modeForPath,
+  pathnameMatchesPrefix,
+} from './routing';
 
 export const PUBLIC_PATHS = new Set([
   '/',
@@ -10,7 +15,7 @@ export const PUBLIC_PATHS = new Set([
   '/talent-partner-onboarding',
 ]);
 export const PUBLIC_PREFIXES = ['/auth'];
-export const CANDIDATE_PREFIXES = ['/candidate-sessions', '/candidate'];
+export const CANDIDATE_PREFIXES = ['/candidate'];
 export const TALENT_PARTNER_PREFIXES = ['/dashboard'];
 
 export const isPublicPath = (pathname: string) =>
@@ -39,7 +44,7 @@ export const redirectNotAuthorized = (
 
 export const shouldSkipAuth = (pathname: string) => isPublicPath(pathname);
 export const requiresCandidateAccess = (pathname: string) =>
-  CANDIDATE_PREFIXES.some((p) => pathname.startsWith(p));
+  CANDIDATE_PREFIXES.some((p) => pathnameMatchesPrefix(pathname, p));
 export const requiresTalentPartnerAccess = (pathname: string) =>
   TALENT_PARTNER_PREFIXES.some((p) => pathname.startsWith(p));
 

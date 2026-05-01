@@ -61,7 +61,7 @@ jest.mock('@/platform/auth0', () => ({
     user: { email: 'user@example.com' },
   })),
 }));
-jest.mock('@/app/(candidate)/(legacy)/candidate-sessions/token-params', () => ({
+jest.mock('@/app/(candidate)/candidate/session/token-params', () => ({
   requireCandidateToken: jest.fn(
     async (params: { token: string }) => params.token,
   ),

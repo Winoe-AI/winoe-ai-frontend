@@ -59,7 +59,7 @@ export function useCandidateSubmissions(
         'talent_partner',
         'trials',
         trialId,
-        'candidate-sessions',
+        'candidate-session',
         candidateSessionId,
         'submission-artifacts',
       ],
