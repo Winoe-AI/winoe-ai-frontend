@@ -47,7 +47,7 @@ export function ArtifactDay4Handoff({ artifact }: Props) {
   return (
     <div className="mt-3 rounded border border-slate-200 bg-slate-50 p-3">
       <div className="text-sm font-semibold text-gray-900">
-        Day 4 presentation playback
+        Day 4 Handoff + Demo playback
       </div>
       <div className="mt-2">
         <ArtifactDay4VideoPanel
