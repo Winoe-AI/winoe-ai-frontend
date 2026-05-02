@@ -35,6 +35,12 @@ if [[ "$USE_LOCAL_DEV_AUTH" -eq 1 ]]; then
   export CONTRACT_LIVE_DEV_AUTH_BYPASS=1
 fi
 
+# Contract-live should stay local and deterministic. Use the console email
+# provider so schedule confirmation does not block on the external Resend API.
+export WINOE_EMAIL_PROVIDER=console
+export WINOE_CORS_ALLOW_ORIGINS='["http://localhost:3000","http://127.0.0.1:3000"]'
+export WINOE_CSRF_ALLOWED_ORIGINS='["http://localhost:3000","http://127.0.0.1:3000"]'
+
 apply_local_dev_auth_env() {
   if [[ "$USE_LOCAL_DEV_AUTH" -eq 1 ]]; then
     export DEV_AUTH_BYPASS=1

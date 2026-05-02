@@ -16,7 +16,9 @@ export type InviteInitParams = {
   setInviteContactName: (name: string | null) => void;
   setInviteContactEmail: (email: string | null) => void;
   redirectToLogin: () => void;
-  fetchTask: (opts?: { sessionId?: number }) => Promise<void>;
+  fetchTask: (opts?: { sessionId?: number }) => Promise<{
+    completedAt?: string | null;
+  } | void>;
   markStart: (label: string) => void;
   markEnd: (label: string, extra?: Record<string, unknown>) => void;
 };

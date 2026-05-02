@@ -65,6 +65,7 @@ describe('useCurrentTask', () => {
     expect(getTaskMock).toHaveBeenCalledWith(99);
     expect(setTaskLoaded).toHaveBeenCalledWith({
       isComplete: false,
+      completedAt: null,
       completedTaskIds: [1],
       currentTask: {
         id: 7,

@@ -57,7 +57,8 @@ export function useSubmissionTracking({
   const lastDraftSavedAt =
     currentTaskId !== null ? loadTextDraftSavedAt(currentTaskId) : null;
   const inMemorySubmission =
-    currentTaskId !== null && lastSubmission.taskId === currentTaskId
+    lastSubmission.taskId !== null &&
+    (currentTaskId === null || lastSubmission.taskId === currentTaskId)
       ? {
           submittedAt: lastSubmission.submittedAt,
           submissionId: lastSubmission.submissionId,

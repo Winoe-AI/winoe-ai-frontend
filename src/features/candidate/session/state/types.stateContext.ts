@@ -16,6 +16,7 @@ export type Action =
       type: 'TASK_LOADED';
       payload: {
         isComplete: boolean;
+        completedAt?: string | null;
         completedTaskIds: number[];
         currentTask: CandidateTask | null;
       };
@@ -37,6 +38,7 @@ export type Ctx = {
   setTaskLoading: () => void;
   setTaskLoaded: (p: {
     isComplete: boolean;
+    completedAt?: string | null;
     completedTaskIds: number[];
     currentTask: CandidateTask | null;
   }) => void;
@@ -51,6 +53,7 @@ export type PersistedState = {
   started: boolean;
   taskState: {
     isComplete: boolean;
+    completedAt?: string | null;
     completedTaskIds: number[];
     currentTask: CandidateTask | null;
   };

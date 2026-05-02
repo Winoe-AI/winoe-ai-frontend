@@ -15,7 +15,9 @@ type Params = {
   setInviteErrorState: (state: InviteErrorState | null) => void;
   setInviteContactName: (name: string | null) => void;
   setInviteContactEmail: (email: string | null) => void;
-  fetchCurrentTask: (overrides?: { sessionId?: number }) => Promise<void>;
+  fetchCurrentTask: (overrides?: {
+    sessionId?: number;
+  }) => Promise<{ completedAt?: string | null } | void>;
   markStart: (label: string) => void;
   markEnd: (label: string, extra?: Record<string, unknown>) => void;
 };

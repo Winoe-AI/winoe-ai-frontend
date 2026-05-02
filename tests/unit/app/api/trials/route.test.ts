@@ -42,6 +42,7 @@ jest.mock('next/server', () => {
 import { NextRequest, NextResponse } from 'next/server';
 import * as bffAuth from '@/platform/server/bffAuth';
 import * as bff from '@/platform/server/bff';
+import { LONG_PROXY_TIMEOUT_MS } from '@/platform/server/backendProxy/constants';
 import { GET, POST } from '@/app/api/trials/route';
 
 jest.mock('@/platform/server/bffAuth', () => ({
@@ -104,7 +105,12 @@ describe('api/trials route', () => {
     );
     expect(res.status).toBe(201);
     expect(res.headers.get('x-winoe-bff')).toBe('trials-create');
-    expect(forwardJson).toHaveBeenCalled();
+    expect(forwardJson).toHaveBeenCalledWith(
+      expect.objectContaining({
+        timeoutMs: LONG_PROXY_TIMEOUT_MS,
+        maxTotalTimeMs: LONG_PROXY_TIMEOUT_MS,
+      }),
+    );
   });
 
   it('enforces auth on GET', async () => {

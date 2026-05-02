@@ -31,6 +31,7 @@ export function useSessionActions(dispatch: ReducerPair['dispatch']) {
   const setTaskLoaded = useCallback(
     (payload: {
       isComplete: boolean;
+      completedAt?: string | null;
       completedTaskIds: number[];
       currentTask: CandidateSessionState['taskState']['currentTask'];
     }) => dispatch({ type: 'TASK_LOADED', payload }),

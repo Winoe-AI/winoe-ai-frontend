@@ -87,4 +87,31 @@ describe('candidate schedule utilities', () => {
       isScheduleLocked(bootstrap, Date.parse('2026-03-10T13:00:00Z')),
     ).toBe(false);
   });
+
+  it('trusts backend active currentDayWindow even when local clock is early', () => {
+    const bootstrap = {
+      candidateSessionId: 9,
+      status: 'in_progress' as const,
+      trial: { title: 'Sim', role: 'Backend' },
+      scheduledStartAt: '2026-03-10T13:00:00Z',
+      candidateTimezone: 'America/New_York',
+      dayWindows: [
+        {
+          dayIndex: 1,
+          windowStartAt: '2026-03-10T13:00:00Z',
+          windowEndAt: '2026-03-10T21:00:00Z',
+        },
+      ],
+      currentDayWindow: {
+        dayIndex: 1,
+        windowStartAt: '2026-03-10T13:00:00Z',
+        windowEndAt: '2026-03-10T21:00:00Z',
+        state: 'active' as const,
+      },
+    };
+
+    expect(
+      isScheduleLocked(bootstrap, Date.parse('2026-03-10T12:00:00Z')),
+    ).toBe(false);
+  });
 });

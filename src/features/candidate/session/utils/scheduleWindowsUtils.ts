@@ -49,6 +49,9 @@ export function isScheduleLocked(
   nowMs = resolveNowMs(),
 ): boolean {
   if (!hasScheduleConfigured(bootstrap)) return false;
+  if (bootstrap?.currentDayWindow?.state === 'active') return false;
+  if (bootstrap?.currentDayWindow?.state === 'upcoming') return true;
+  if (bootstrap?.currentDayWindow?.state === 'closed') return false;
   const target = firstWindowStartAt(bootstrap);
   if (!target) return false;
   const targetMs = Date.parse(target);

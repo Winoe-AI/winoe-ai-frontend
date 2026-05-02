@@ -4,6 +4,7 @@ import {
   mockForwardJson,
   mockTalentPartnerAuthSuccess,
 } from './withTalentPartnerAuthRoute.testlib';
+import { LONG_PROXY_TIMEOUT_MS } from '@/platform/server/backendProxy/constants';
 
 describe('/api/trials route POST', () => {
   beforeEach(() => {
@@ -31,6 +32,8 @@ describe('/api/trials route POST', () => {
       body: { title: 'New Trial', templateId: 'template-1' },
       accessToken: 'token',
       requestId: 'req-456',
+      timeoutMs: LONG_PROXY_TIMEOUT_MS,
+      maxTotalTimeMs: LONG_PROXY_TIMEOUT_MS,
     });
   });
 

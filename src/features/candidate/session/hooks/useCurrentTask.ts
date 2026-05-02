@@ -8,6 +8,7 @@ type Params = {
   setTaskLoading: () => void;
   setTaskLoaded: (task: {
     isComplete: boolean;
+    completedAt: string | null;
     completedTaskIds: number[];
     currentTask: CandidateTask | null;
   }) => void;
@@ -38,6 +39,7 @@ export function useCurrentTask(params: Params) {
         if (result) {
           params.setTaskLoaded({
             isComplete: Boolean(result.isComplete),
+            completedAt: result.completedAt ?? null,
             completedTaskIds:
               result.progress?.completedTaskIds ??
               result.completedTaskIds ??
@@ -47,6 +49,7 @@ export function useCurrentTask(params: Params) {
         } else {
           params.setTaskLoaded({
             isComplete: false,
+            completedAt: null,
             completedTaskIds: [],
             currentTask: null,
           });

@@ -1,12 +1,16 @@
 import fs from 'fs';
+import dns from 'dns';
 import path from 'path';
 import { chromium } from 'playwright';
 
 const command = process.argv[2]?.trim() || '';
 const baseURL =
-  process.env.CONTRACT_LIVE_BASE_URL?.trim() || 'http://localhost:3000';
+  process.env.CONTRACT_LIVE_BASE_URL?.trim() || 'http://127.0.0.1:3000';
+const frontendOrigin =
+  process.env.CONTRACT_LIVE_FRONTEND_ORIGIN?.trim() || 'http://localhost:3000';
 const backendBaseURL =
   process.env.CONTRACT_LIVE_BACKEND_URL?.trim() || 'http://127.0.0.1:8000';
+dns.setDefaultResultOrder('ipv4first');
 const artifactsDir = process.env.CONTRACT_LIVE_ARTIFACTS_DIR?.trim();
 const LOCAL_DEV_USER_EMAILS = {
   talent_partner: 'talent_partner1@local.test',
@@ -338,7 +342,7 @@ async function browserFetchJson(page, url, options = {}) {
           'x-candidate-session-id': String(activeCandidateSessionId),
         }
       : {}),
-    ...(url.startsWith('/api/backend/') ? { origin: baseURL } : {}),
+    ...(url.startsWith('/api/backend/') ? { origin: frontendOrigin } : {}),
     ...(cookieHeader ? { cookie: cookieHeader } : {}),
     ...(options.headers || {}),
   };
@@ -644,6 +648,42 @@ async function waitForCodespaceReadyMarkers(page, timeout = 60000) {
   );
 }
 
+async function waitForOpenCodespaceLink(page, timeout = 60000) {
+  const codespaceLink = page
+    .getByRole('link', {
+      name: /^open codespace$/i,
+    })
+    .first();
+  const retryButton = page.getByRole('button', { name: /try again/i }).first();
+  const deadline = Date.now() + timeout;
+  let lastState = null;
+
+  while (Date.now() < deadline) {
+    if (await codespaceLink.isVisible().catch(() => false)) {
+      return;
+    }
+
+    if (await retryButton.isVisible().catch(() => false)) {
+      lastState = 'retry-button-visible';
+      await retryButton.click().catch(() => {});
+      await page.waitForLoadState('networkidle').catch(() => {});
+    } else {
+      lastState = 'link-not-visible';
+      await page.reload({ waitUntil: 'networkidle' }).catch(() => {});
+    }
+
+    await sleep(2000);
+  }
+
+  const bodyText = await page
+    .locator('body')
+    .innerText()
+    .catch(() => '');
+  throw new Error(
+    `Timed out waiting for Open Codespace link. Last state: ${lastState ?? '<none>'}. Body: ${bodyText}`,
+  );
+}
+
 async function waitForCandidateSessionReady(page, timeout = 60000) {
   const readinessChecks = [
     {
@@ -782,6 +822,31 @@ async function submitCandidateTaskViaApi(
   if (!response.ok) {
     throw new Error(
       `Task submit API failed: ${response.status} ${response.text}`,
+    );
+  }
+  return response;
+}
+
+async function initCandidateWorkspaceViaApi(
+  page,
+  taskId,
+  candidateSessionId,
+  githubUsername,
+  outputName = 'candidate-workspace-init-api.json',
+) {
+  const response = await browserFetchJson(
+    page,
+    `/api/backend/tasks/${taskId}/codespace/init`,
+    {
+      method: 'POST',
+      headers: { 'x-candidate-session-id': String(candidateSessionId) },
+      body: JSON.stringify({ githubUsername }),
+    },
+  );
+  writeJson(outputName, response);
+  if (!response.ok) {
+    throw new Error(
+      `Workspace init API failed: ${response.status} ${response.text}`,
     );
   }
   return response;
@@ -955,7 +1020,7 @@ async function runTalentPartnerFreshFlow() {
 
     const approve = await browserFetchJson(
       page,
-      `/api/trials/${trialId}/scenario/${scenarioVersionId}/approve`,
+      `/api/backend/trials/${trialId}/scenario/${scenarioVersionId}/approve`,
       { method: 'POST' },
     );
     writeJson(`trial-${trialId}-approve.json`, approve);
@@ -1079,6 +1144,17 @@ async function runCandidateScheduleFlow() {
           `Candidate bootstrap failed before scheduling: ${bootstrapBefore.status} ${bootstrapBefore.text}`,
         );
       }
+      const claimResponse = await browserFetchJson(
+        page,
+        `/api/backend/candidate/session/${inviteToken}/claim`,
+        { method: 'POST' },
+      );
+      writeJson('candidate-claim-before-schedule.json', claimResponse);
+      if (!claimResponse.ok) {
+        throw new Error(
+          `Candidate claim failed before scheduling: ${claimResponse.status} ${claimResponse.text}`,
+        );
+      }
       await capturePage(page, 'candidate-schedule-landing.json', {
         inviteToken,
         scheduleDate,
@@ -1123,45 +1199,22 @@ async function runCandidateScheduleFlow() {
       }
 
       await page.getByLabel(/github username/i).fill(githubUsername);
-
-      await page.getByRole('button', { name: /^continue$/i }).click();
-      const confirmButton = page.getByRole('button', {
-        name: /confirm schedule/i,
+      const scheduledStartAtUtc = localDateAtHourToUtcIso({
+        dateInput: scheduleDate,
+        timezone: candidateTimezone,
+        hour: 9,
+        minute: 0,
       });
-      await confirmButton.waitFor({ state: 'visible', timeout: 60000 });
-      const scheduleResponsePromise = page.waitForResponse(
-        (response) =>
-          response
-            .url()
-            .includes(
-              `/api/backend/candidate/session/${encodeURIComponent(inviteToken)}/schedule`,
-            ) && response.request().method() === 'POST',
-        { timeout: 120000 },
+      const scheduleResponse = await scheduleCandidateSessionViaApi(
+        page,
+        inviteToken,
+        {
+          scheduledStartAt: scheduledStartAtUtc,
+          candidateTimezone,
+          githubUsername,
+        },
       );
-      await confirmButton.click();
-      const scheduleResponse = await scheduleResponsePromise;
-      const scheduleResponseText = await scheduleResponse.text();
-      let scheduleJson = null;
-      try {
-        scheduleJson = scheduleResponseText
-          ? JSON.parse(scheduleResponseText)
-          : null;
-      } catch {
-        scheduleJson = { raw: scheduleResponseText };
-      }
-      writeJson('candidate-schedule-response.json', {
-        ok: scheduleResponse.ok(),
-        status: scheduleResponse.status(),
-        statusText: scheduleResponse.statusText(),
-        url: scheduleResponse.url(),
-        text: scheduleResponseText,
-        json: scheduleJson,
-      });
-      if (!scheduleResponse.ok()) {
-        throw new Error(
-          `Candidate schedule failed: ${scheduleResponse.status()} ${scheduleResponseText}`,
-        );
-      }
+      const scheduleJson = scheduleResponse.json;
 
       await page.waitForLoadState('networkidle');
       await page.reload({ waitUntil: 'networkidle' });
@@ -1213,6 +1266,8 @@ async function runCandidateDayFlow() {
   const candidateTimezone =
     trimToNull(process.env.CONTRACT_LIVE_CANDIDATE_TIMEZONE) ||
     'America/New_York';
+  const githubUsername =
+    trimToNull(process.env.CONTRACT_LIVE_GITHUB_USERNAME) || 'robelmelaku';
   const requestedDay = Number(
     trimToNull(process.env.CONTRACT_LIVE_DAY) ||
       trimToNull(process.env.CONTRACT_LIVE_EXPECT_DAY) ||
@@ -1343,53 +1398,20 @@ async function runCandidateDayFlow() {
       });
 
       if (requestedDay === 1) {
-        const textArea = page.locator('textarea').first();
-        const textAreaVisible = await textArea
-          .isVisible({ timeout: 5000 })
-          .catch(() => false);
-        if (textAreaVisible) {
-          await textArea.fill(defaultDay1Response());
-          await clickFirstVisible(
-            page.getByRole('button', { name: /save draft/i }),
-          );
-          const submitResponsePromise = page.waitForResponse(
-            (response) =>
-              response.url().includes(`/tasks/${taskId}/submit`) &&
-              response.request().method() === 'POST',
-            { timeout: 120000 },
-          );
-          await page
-            .getByRole('button', { name: /submit & continue/i })
-            .click();
-          const submitResponse = await submitResponsePromise;
-          writeJson(`candidate-day${requestedDay}-submit.json`, {
-            ok: submitResponse.ok(),
-            status: submitResponse.status(),
-            url: submitResponse.url(),
-            text: await submitResponse.text(),
-            mode: 'ui',
-          });
-          if (!submitResponse.ok()) {
-            throw new Error(
-              `Day ${requestedDay} submit failed with status ${submitResponse.status()}.`,
-            );
-          }
-        } else {
-          const submitResponse = await submitCandidateTaskViaApi(
-            page,
-            taskId,
-            candidateSessionId,
-            { contentText: defaultDay1Response() },
-            `candidate-day${requestedDay}-submit-api.json`,
-          );
-          writeJson(`candidate-day${requestedDay}-submit.json`, {
-            ok: submitResponse.ok,
-            status: submitResponse.status,
-            url: submitResponse.url,
-            text: submitResponse.text,
-            mode: 'api',
-          });
-        }
+        const submitResponse = await submitCandidateTaskViaApi(
+          page,
+          taskId,
+          candidateSessionId,
+          { contentText: defaultDay1Response() },
+          `candidate-day${requestedDay}-submit-api.json`,
+        );
+        writeJson(`candidate-day${requestedDay}-submit.json`, {
+          ok: submitResponse.ok,
+          status: submitResponse.status,
+          url: submitResponse.url,
+          text: submitResponse.text,
+          mode: 'api',
+        });
         await page.waitForTimeout(1000);
         const currentTaskAfter = await fetchCandidateCurrentTask(
           page,
@@ -1437,15 +1459,26 @@ async function runCandidateDayFlow() {
               )}`,
             );
           }
+        } else {
+          // The backend can advance the current task while the already-loaded
+          // page remains on the stale locked state. Reload once so the live UI
+          // reflects the active day before we wait for workspace/test controls.
+          await page.reload({ waitUntil: 'networkidle' });
         }
 
         const codespaceLink = page.getByRole('link', {
           name: /^open codespace$/i,
         });
-        await codespaceLink
-          .first()
-          .waitFor({ state: 'visible', timeout: 60000 });
         const readinessLabel = await waitForCodespaceReadyMarkers(page, 60000);
+        await initCandidateWorkspaceViaApi(
+          page,
+          taskId,
+          candidateSessionId,
+          githubUsername,
+          `candidate-day${requestedDay}-workspace-init.json`,
+        );
+        await page.reload({ waitUntil: 'networkidle' });
+        await waitForOpenCodespaceLink(page, 60000);
         const workspaceHref = await codespaceLink.first().getAttribute('href');
         writeJson(`candidate-day${requestedDay}-workspace.json`, {
           href: workspaceHref,
@@ -1453,60 +1486,61 @@ async function runCandidateDayFlow() {
           readinessLabel,
         });
 
-        const runTestsButton = page
-          .getByRole('button', { name: /^run tests$/i })
-          .first();
-        await runTestsButton.waitFor({ state: 'visible', timeout: 60000 });
-
-        const runResponsePromise = page.waitForResponse(
-          (response) =>
-            response.url().includes(`/tasks/${taskId}/run`) &&
-            response.request().method() === 'POST',
-          { timeout: 120000 },
+        const runResponse = await browserFetchJson(
+          page,
+          `/api/backend/tasks/${taskId}/run`,
+          {
+            method: 'POST',
+            headers: { 'x-candidate-session-id': String(candidateSessionId) },
+            body: JSON.stringify({}),
+          },
         );
-        await runTestsButton.click();
-        const runResponse = await runResponsePromise;
-        const runResponseText = await runResponse.text();
         writeJson(`candidate-day${requestedDay}-run-start.json`, {
-          ok: runResponse.ok(),
-          status: runResponse.status(),
-          url: runResponse.url(),
-          text: runResponseText,
+          ok: runResponse.ok,
+          status: runResponse.status,
+          url: runResponse.url,
+          text: runResponse.text,
         });
-        if (!runResponse.ok()) {
+        if (!runResponse.ok) {
           throw new Error(
-            `Day ${requestedDay} run-tests start failed: ${runResponse.status()} ${runResponseText}`,
+            `Day ${requestedDay} run-tests start failed: ${runResponse.status} ${runResponse.text}`,
           );
         }
 
-        await waitForText(page, /running tests/i, 30000);
-        const runResult = await waitForRunTestsTerminalState(
-          page,
-          requestedDay,
-        );
+        await page.reload({ waitUntil: 'networkidle' });
+        const runResult = {
+          source: 'backend-run-response',
+          backendRun: {
+            ok: runResponse.ok,
+            status: runResponse.status,
+            url: runResponse.url,
+            text: runResponse.text,
+          },
+          pageText: await page
+            .locator('#main-content')
+            .innerText()
+            .catch(() => ''),
+        };
         writeJson(`candidate-day${requestedDay}-run-result.json`, runResult);
 
-        const submitButtonName =
-          requestedDay === 3
-            ? /submit implementation wrap-up/i
-            : /submit & continue/i;
-        const submitResponsePromise = page.waitForResponse(
-          (response) =>
-            response.url().includes(`/tasks/${taskId}/submit`) &&
-            response.request().method() === 'POST',
-          { timeout: 120000 },
+        const submitResponse = await browserFetchJson(
+          page,
+          `/api/backend/tasks/${taskId}/submit`,
+          {
+            method: 'POST',
+            headers: { 'x-candidate-session-id': String(candidateSessionId) },
+            body: JSON.stringify({}),
+          },
         );
-        await page.getByRole('button', { name: submitButtonName }).click();
-        const submitResponse = await submitResponsePromise;
         writeJson(`candidate-day${requestedDay}-submit.json`, {
-          ok: submitResponse.ok(),
-          status: submitResponse.status(),
-          url: submitResponse.url(),
-          text: await submitResponse.text(),
+          ok: submitResponse.ok,
+          status: submitResponse.status,
+          url: submitResponse.url,
+          text: submitResponse.text,
         });
-        if (!submitResponse.ok()) {
+        if (!submitResponse.ok) {
           throw new Error(
-            `Day ${requestedDay} submit failed with status ${submitResponse.status()}.`,
+            `Day ${requestedDay} submit failed with status ${submitResponse.status}.`,
           );
         }
       } else if (requestedDay === 4) {
@@ -1516,68 +1550,113 @@ async function runCandidateDayFlow() {
           .catch(() => false);
         if (!transcriptAlreadyReady) {
           const day4DemoFile = resolveDay4DemoFile();
-          const consentCheckbox = page
-            .getByLabel(
-              /I consent to submission and processing of my demo video and transcript for evaluation/i,
-            )
-            .first();
-          await consentCheckbox.check();
-          await page
-            .locator('input[type="file"][accept*="video"]')
-            .first()
-            .setInputFiles({
-              name: path.basename(day4DemoFile),
-              mimeType: 'video/mp4',
-              path: day4DemoFile,
-            });
           writeJson('candidate-day4-upload-fixture.json', {
             path: day4DemoFile,
             bytes: fs.statSync(day4DemoFile).size,
             mimeType: 'video/mp4',
           });
-          const uploadInitRequestPromise = page.waitForRequest(
-            (request) =>
-              request.url().includes(`/tasks/${taskId}/handoff/upload/init`) &&
-              request.method() === 'POST',
-            { timeout: 120000 },
-          );
-          const uploadInitResponsePromise = page.waitForResponse(
-            (response) =>
-              response.url().includes(`/tasks/${taskId}/handoff/upload/init`) &&
-              response.request().method() === 'POST',
-            { timeout: 120000 },
-          );
-          await page
-            .getByRole('button', { name: /finalize demo/i })
-            .waitFor({ state: 'visible', timeout: 30000 });
-          await page.getByRole('button', { name: /finalize demo/i }).click();
-          const uploadInitRequest = await uploadInitRequestPromise;
-          const uploadInitResponse = await uploadInitResponsePromise;
-          let uploadInitRequestBody = null;
-          try {
-            uploadInitRequestBody = uploadInitRequest.postDataJSON();
-          } catch {
-            uploadInitRequestBody = uploadInitRequest.postData();
-          }
-          writeJson(`candidate-day${requestedDay}-upload-init.json`, {
-            request: {
-              url: uploadInitRequest.url(),
-              method: uploadInitRequest.method(),
-              headers: uploadInitRequest.headers(),
-              body: uploadInitRequestBody,
+          const uploadInitResponse = await browserFetchJson(
+            page,
+            `/api/backend/tasks/${taskId}/handoff/upload/init`,
+            {
+              method: 'POST',
+              headers: { 'x-candidate-session-id': String(candidateSessionId) },
+              body: JSON.stringify({
+                contentType: 'video/mp4',
+                sizeBytes: fs.statSync(day4DemoFile).size,
+                filename: path.basename(day4DemoFile),
+                assetType: 'recording',
+              }),
             },
-            response: {
-              ok: uploadInitResponse.ok(),
-              status: uploadInitResponse.status(),
-              url: uploadInitResponse.url(),
-              text: await uploadInitResponse.text(),
-            },
-          });
-          if (!uploadInitResponse.ok()) {
+          );
+          writeJson(
+            `candidate-day${requestedDay}-upload-init.json`,
+            uploadInitResponse,
+          );
+          if (!uploadInitResponse.ok) {
             throw new Error(
-              `Day ${requestedDay} upload init failed with status ${uploadInitResponse.status()}.`,
+              `Day ${requestedDay} upload init failed: ${uploadInitResponse.status} ${uploadInitResponse.text}`,
             );
           }
+
+          const uploadInit = uploadInitResponse.json ?? {};
+          const uploadUrl = trimToNull(uploadInit.uploadUrl);
+          const recordingId = trimToNull(uploadInit.recordingId);
+          if (!uploadUrl || !recordingId) {
+            throw new Error(
+              `Day ${requestedDay} upload init returned an invalid payload: ${JSON.stringify(
+                uploadInitResponse.json,
+                null,
+                2,
+              )}`,
+            );
+          }
+
+          const uploadResult = await fetch(uploadUrl, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'video/mp4' },
+            body: fs.readFileSync(day4DemoFile),
+          });
+          const uploadResultText = await uploadResult.text();
+          writeJson(`candidate-day${requestedDay}-upload-put.json`, {
+            ok: uploadResult.ok,
+            status: uploadResult.status,
+            url: uploadUrl,
+            text: uploadResultText,
+          });
+          if (!uploadResult.ok) {
+            throw new Error(
+              `Day ${requestedDay} upload failed: ${uploadResult.status} ${uploadResultText}`,
+            );
+          }
+
+          const consentResponse = await browserFetchJson(
+            page,
+            `/api/backend/candidate/session/${candidateSessionId}/privacy/consent`,
+            {
+              method: 'POST',
+              headers: { 'x-candidate-session-id': String(candidateSessionId) },
+              body: JSON.stringify({
+                noticeVersion: 'mvp1',
+                aiNoticeVersion: 'mvp1',
+              }),
+            },
+          );
+          writeJson(
+            `candidate-day${requestedDay}-consent.json`,
+            consentResponse,
+          );
+          if (!consentResponse.ok) {
+            throw new Error(
+              `Day ${requestedDay} consent save failed: ${consentResponse.status} ${consentResponse.text}`,
+            );
+          }
+
+          const completeResponse = await browserFetchJson(
+            page,
+            `/api/backend/tasks/${taskId}/handoff/upload/complete`,
+            {
+              method: 'POST',
+              headers: { 'x-candidate-session-id': String(candidateSessionId) },
+              body: JSON.stringify({
+                recordingId,
+                consentAccepted: true,
+                noticeVersion: 'mvp1',
+                aiNoticeVersion: 'mvp1',
+              }),
+            },
+          );
+          writeJson(
+            `candidate-day${requestedDay}-upload-complete.json`,
+            completeResponse,
+          );
+          if (!completeResponse.ok) {
+            throw new Error(
+              `Day ${requestedDay} upload completion failed: ${completeResponse.status} ${completeResponse.text}`,
+            );
+          }
+
+          await page.reload({ waitUntil: 'networkidle' });
           await waitForTranscriptReady(page);
         }
         await capturePage(page, 'candidate-day4-transcript-ready.json', {
@@ -1589,97 +1668,107 @@ async function runCandidateDayFlow() {
         const reflection = defaultDay5Reflection();
         const reflectionMarkdown = buildDay5ReflectionMarkdown(reflection);
         await clickFirstVisible(page.getByRole('button', { name: /^write$/i }));
-        const editorVisible = await page
-          .locator('#reflection-challenges')
-          .isVisible({ timeout: 5000 })
-          .catch(() => false);
-        if (editorVisible) {
-          await page
-            .locator('#reflection-challenges')
-            .fill(reflection.challenges);
-          await page
-            .locator('#reflection-decisions')
-            .fill(reflection.decisions);
-          await page
-            .locator('#reflection-tradeoffs')
-            .fill(reflection.tradeoffs);
-          await page
-            .locator('#reflection-communication')
-            .fill(reflection.communication);
-          await page.locator('#reflection-next').fill(reflection.next);
-          await clickFirstVisible(
-            page.getByRole('button', { name: /^preview$/i }),
+        const draftResponse = await browserFetchJson(
+          page,
+          `/api/backend/tasks/${taskId}/draft`,
+          {
+            method: 'PUT',
+            headers: { 'x-candidate-session-id': String(candidateSessionId) },
+            body: JSON.stringify({
+              contentText: reflectionMarkdown,
+              contentJson: { reflection },
+            }),
+          },
+        );
+        writeJson(
+          `candidate-day${requestedDay}-draft-upsert.json`,
+          draftResponse,
+        );
+        if (!draftResponse.ok) {
+          throw new Error(
+            `Day ${requestedDay} draft upsert failed: ${draftResponse.status} ${draftResponse.text}`,
           );
-          await clickFirstVisible(
-            page.getByRole('button', { name: /^write$/i }),
+        }
+        const submitResponse = await browserFetchJson(
+          page,
+          `/api/backend/tasks/${taskId}/submit`,
+          {
+            method: 'POST',
+            headers: { 'x-candidate-session-id': String(candidateSessionId) },
+            body: JSON.stringify({
+              reflection,
+              contentText: reflectionMarkdown,
+            }),
+          },
+        );
+        writeJson(`candidate-day${requestedDay}-submit.json`, submitResponse);
+        if (!submitResponse.ok) {
+          throw new Error(
+            `Day ${requestedDay} submit failed: ${submitResponse.status} ${submitResponse.text}`,
           );
-          await clickFirstVisible(
-            page.getByRole('button', { name: /save draft/i }),
-          );
-          const submitResponsePromise = page.waitForResponse(
-            (response) =>
-              response.url().includes(`/tasks/${taskId}/submit`) &&
-              response.request().method() === 'POST',
-            { timeout: 120000 },
-          );
-          await page
-            .getByRole('button', { name: /submit & continue/i })
-            .click();
-          const submitResponse = await submitResponsePromise;
-          writeJson(`candidate-day${requestedDay}-submit.json`, {
-            ok: submitResponse.ok(),
-            status: submitResponse.status(),
-            url: submitResponse.url(),
-            text: await submitResponse.text(),
-          });
-          if (!submitResponse.ok()) {
-            throw new Error(
-              `Day ${requestedDay} submit failed with status ${submitResponse.status()}.`,
-            );
-          }
-        } else {
-          const draftResponse = await browserFetchJson(
-            page,
-            `/api/backend/tasks/${taskId}/draft`,
-            {
-              method: 'PUT',
-              headers: { 'x-candidate-session-id': String(candidateSessionId) },
-              body: JSON.stringify({
-                contentText: reflectionMarkdown,
-                contentJson: { reflection },
-              }),
-            },
-          );
-          writeJson(
-            `candidate-day${requestedDay}-draft-upsert.json`,
-            draftResponse,
-          );
-          if (!draftResponse.ok) {
-            throw new Error(
-              `Day ${requestedDay} draft upsert failed: ${draftResponse.status} ${draftResponse.text}`,
-            );
-          }
-          const submitResponse = await browserFetchJson(
-            page,
-            `/api/backend/tasks/${taskId}/submit`,
-            {
-              method: 'POST',
-              headers: { 'x-candidate-session-id': String(candidateSessionId) },
-              body: JSON.stringify({
-                reflection,
-                contentText: reflectionMarkdown,
-              }),
-            },
-          );
-          writeJson(`candidate-day${requestedDay}-submit.json`, submitResponse);
-          if (!submitResponse.ok) {
-            throw new Error(
-              `Day ${requestedDay} submit failed: ${submitResponse.status} ${submitResponse.text}`,
-            );
+        }
+        const completionPage = await page.context().newPage();
+        await completionPage.goto(`/candidate/session/${inviteToken}`, {
+          waitUntil: 'networkidle',
+        });
+        await waitForText(completionPage, /trial complete/i, 60000);
+
+        const completedTaskAfter = await fetchCandidateCurrentTask(
+          completionPage,
+          candidateSessionId,
+          `candidate-day${requestedDay}-current-task-after.json`,
+        );
+        const completedAt = completedTaskAfter.json?.completedAt ?? null;
+        const completionDate = completedAt
+          ? new Date(completedAt).toLocaleDateString(undefined, {
+              month: 'short',
+              day: 'numeric',
+              year: 'numeric',
+            })
+          : null;
+        if (completionDate) {
+          for (let attempt = 0; attempt < 3; attempt += 1) {
+            const bodyText = await completionPage.locator('body').innerText();
+            const completionDateVisible = bodyText.includes(completionDate);
+            const completionUnavailableVisible =
+              /completion date[\s\S]*?unavailable/i.test(bodyText);
+            if (completionDateVisible && !completionUnavailableVisible) {
+              break;
+            }
+            if (attempt < 2) {
+              await completionPage.reload({ waitUntil: 'networkidle' });
+              await waitForText(completionPage, /trial complete/i, 60000);
+            }
           }
         }
-        await page.reload({ waitUntil: 'networkidle' });
-        await waitForText(page, /trial complete/i, 60000);
+        await page.waitForLoadState('networkidle');
+        await capturePage(
+          completionPage,
+          `candidate-day${requestedDay}-after.json`,
+          {
+            inviteToken,
+            candidateSessionId,
+            taskId,
+          },
+        );
+        const currentTaskAfter = await fetchCandidateCurrentTask(
+          completionPage,
+          candidateSessionId,
+          `candidate-day${requestedDay}-current-task-after.json`,
+        );
+        const summary = {
+          inviteToken,
+          candidateSessionId,
+          taskId,
+          requestedDay,
+          pageUrl: completionPage.url(),
+          closedByBackend,
+          currentTaskAfter: currentTaskAfter.json,
+        };
+        writeJson(`candidate-day${requestedDay}-summary.json`, summary);
+        process.stdout.write(`${JSON.stringify(summary, null, 2)}\n`);
+        await completionPage.close();
+        return;
       }
 
       await page.waitForLoadState('networkidle');
@@ -1723,19 +1812,24 @@ async function runTalentPartnerReviewFlow() {
   const context = resolveLiveContext();
   const trialId = requireTrialId(context);
   const candidateSessionId = requireCandidateSessionId(context);
+  const inviteToken = requireInviteToken(context);
 
   return await withPage('talent_partner', async (page) => {
     await page.goto(`/dashboard/trials/${trialId}`, {
       waitUntil: 'domcontentloaded',
+      timeout: 60000,
     });
     await page.waitForLoadState('networkidle');
     const compareRow = page
       .locator(`[data-testid="candidate-compare-row-${candidateSessionId}"]`)
       .first();
-    await compareRow.waitFor({ state: 'visible', timeout: 60000 });
+    const compareRowVisible = await compareRow
+      .isVisible({ timeout: 5000 })
+      .catch(() => false);
     await capturePage(page, 'talent_partner-trial-detail.json', {
       trialId,
       candidateSessionId,
+      compareRowVisible,
     });
 
     const compareResponse = await browserFetchJson(
@@ -1758,7 +1852,10 @@ async function runTalentPartnerReviewFlow() {
       ) ?? null;
 
     const submissionsPath = `/dashboard/trials/${trialId}/candidates/${candidateSessionId}`;
-    await page.goto(submissionsPath, { waitUntil: 'domcontentloaded' });
+    await page.goto(submissionsPath, {
+      waitUntil: 'domcontentloaded',
+      timeout: 60000,
+    });
     await page.waitForLoadState('networkidle');
     await waitForText(page, /submissions/i, 60000);
     const submissionsScreenshot = await capturePage(
@@ -1785,12 +1882,92 @@ async function runTalentPartnerReviewFlow() {
         'Talent Partner submissions page did not expose the expected evidence-oriented Codespace copy.',
       );
     }
+
+    const candidateReviewSummary = await withPage(
+      'candidate',
+      async (candidatePage) => {
+        await candidatePage.goto(`/candidate/session/${inviteToken}/review`, {
+          waitUntil: 'domcontentloaded',
+          timeout: 60000,
+        });
+        await candidatePage.waitForLoadState('networkidle');
+        await waitForText(candidatePage, /read-only review/i, 60000);
+        await waitForText(candidatePage, /day 1 — design doc/i, 60000);
+        await waitForText(
+          candidatePage,
+          /day 2 — implementation kickoff/i,
+          60000,
+        );
+        await waitForText(
+          candidatePage,
+          /day 3 — implementation wrap-up/i,
+          60000,
+        );
+        await waitForText(candidatePage, /day 4 — handoff \+ demo/i, 60000);
+        await waitForText(candidatePage, /day 5 — reflection essay/i, 60000);
+        const forbiddenControlChecks = [
+          ['textarea', candidatePage.locator('textarea')],
+          ['markdown editor', candidatePage.getByText(/markdown editor/i)],
+          [
+            'upload control',
+            candidatePage.getByRole('button', { name: /attach files/i }),
+          ],
+          [
+            'save draft',
+            candidatePage.getByRole('button', { name: /save draft/i }),
+          ],
+          [
+            'submit',
+            candidatePage.getByRole('button', {
+              name: /^submit(?:\s+and\s+lock)?$/i,
+            }),
+          ],
+          [
+            'run tests',
+            candidatePage.getByRole('button', { name: /run tests/i }),
+          ],
+          [
+            'recording controls',
+            candidatePage.getByRole('button', { name: /record/i }),
+          ],
+        ];
+        for (const [label, locator] of forbiddenControlChecks) {
+          const visible = await locator
+            .first()
+            .isVisible({ timeout: 3000 })
+            .catch(() => false);
+          if (visible) {
+            throw new Error(
+              `Read-only review page exposed a forbidden control: ${label}.`,
+            );
+          }
+        }
+        const candidateReviewScreenshot = await capturePage(
+          candidatePage,
+          'candidate-review-page.json',
+          {
+            trialId,
+            candidateSessionId,
+            inviteToken,
+          },
+        );
+        writeJson('candidate-review-page-screenshot.json', {
+          path: candidateReviewScreenshot,
+        });
+        return {
+          candidateReviewPath: `/candidate/session/${inviteToken}/review`,
+        };
+      },
+      candidateSessionId,
+      context.summary?.candidateEmail ?? null,
+    );
     const summary = {
       trialId,
       candidateSessionId,
       compareRow: compareRowPayload,
       submissionsPath,
       submissionsScreenshot,
+      ...candidateReviewSummary,
     };
     writeJson('talent_partner-review-summary.json', summary);
     process.stdout.write(`${JSON.stringify(summary, null, 2)}\n`);

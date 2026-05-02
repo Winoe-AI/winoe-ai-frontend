@@ -19,6 +19,10 @@ function normalizePersistedTaskState(
       : null;
   return {
     isComplete: record.isComplete === true,
+    completedAt:
+      typeof record.completedAt === 'string' && record.completedAt.trim()
+        ? record.completedAt
+        : null,
     completedTaskIds,
     currentTask,
   };

@@ -36,7 +36,11 @@ export function deriveWindowState(params: {
   const nextOpenMs = toTimestamp(nextOpenAt);
 
   let phase: WindowStatePhase = 'unknown';
-  if (windowStartMs !== null && nowMs < windowStartMs)
+  const backendState = params.currentDayWindow?.state ?? null;
+  if (backendState === 'active') phase = 'open';
+  else if (backendState === 'upcoming') phase = 'closed_before_start';
+  else if (backendState === 'closed') phase = 'closed_after_end';
+  else if (windowStartMs !== null && nowMs < windowStartMs)
     phase = 'closed_before_start';
   else if (windowEndMs !== null && nowMs >= windowEndMs)
     phase = 'closed_after_end';

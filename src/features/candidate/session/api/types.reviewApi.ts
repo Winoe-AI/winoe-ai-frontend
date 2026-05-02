@@ -52,6 +52,19 @@ export type CandidateReviewTranscript = {
   segments?: CandidateReviewTranscriptSegment[] | null;
 } | null;
 
+export type CandidateReviewCommitHistoryEntry = {
+  sha?: string | null;
+  commitSha?: string | null;
+  message?: string | null;
+  summary?: string | null;
+  authorName?: string | null;
+  authorEmail?: string | null;
+  committedAt?: string | null;
+  url?: string | null;
+  commitUrl?: string | null;
+  workflowUrl?: string | null;
+} | null;
+
 type CandidateReviewArtifactBase = {
   dayIndex: number;
   taskId: number;
@@ -77,6 +90,7 @@ export type CandidateReviewWorkspaceArtifact = CandidateReviewArtifactBase & {
   diffUrl?: string | null;
   diffSummary?: Record<string, unknown> | string | null;
   testResults?: CandidateReviewTestResults;
+  commitHistory?: CandidateReviewCommitHistoryEntry[] | null;
 };
 
 export type CandidateReviewPresentationArtifact =

@@ -9,6 +9,10 @@ function storageKey(candidateSessionId: number, taskId: number): string {
   return `${BRAND_SLUG}:candidate:recordedSubmission:${String(candidateSessionId)}:${String(taskId)}`;
 }
 
+function latestStorageKey(candidateSessionId: number): string {
+  return `${BRAND_SLUG}:candidate:recordedSubmissionLatest:${String(candidateSessionId)}`;
+}
+
 function normalizeReference(
   value: unknown,
 ): RecordedSubmissionReference | null {
@@ -52,5 +56,24 @@ export function saveRecordedSubmissionReference(
       storageKey(candidateSessionId, taskId),
       JSON.stringify(normalized),
     );
+    window.localStorage.setItem(
+      latestStorageKey(candidateSessionId),
+      JSON.stringify(normalized),
+    );
   } catch {}
+}
+
+export function loadLatestRecordedSubmissionReference(
+  candidateSessionId: number,
+): RecordedSubmissionReference | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    const raw = window.localStorage.getItem(
+      latestStorageKey(candidateSessionId),
+    );
+    if (!raw) return null;
+    return normalizeReference(JSON.parse(raw));
+  } catch {
+    return null;
+  }
 }

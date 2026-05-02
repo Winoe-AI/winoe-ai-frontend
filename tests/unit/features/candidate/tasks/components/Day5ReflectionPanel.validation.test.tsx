@@ -1,5 +1,9 @@
 import { fireEvent, screen, waitFor, within } from '@testing-library/react';
 import {
+  TECH_TRIAL_DAY_SUMMARY,
+  TRIAL_COMPLETION_COPY,
+} from '@/features/candidate/session/views/completeView.copy';
+import {
   baseTask,
   fillDay5Markdown,
   renderPanel,
@@ -80,15 +84,11 @@ describe('Day5ReflectionPanel validation and read-only states', () => {
       },
     });
 
-    expect(
-      screen.getByText(/congratulations - your 5-day trial is complete/i),
-    ).toBeInTheDocument();
+    expect(screen.getByText(TRIAL_COMPLETION_COPY)).toBeInTheDocument();
     expect(screen.queryByRole('textbox')).toBeNull();
     expect(
       screen.queryByRole('button', { name: /submit reflection essay/i }),
     ).toBeNull();
-    expect(
-      screen.getByText(/day 1: planning & design doc/i),
-    ).toBeInTheDocument();
+    expect(screen.getByText(TECH_TRIAL_DAY_SUMMARY[0])).toBeInTheDocument();
   });
 });

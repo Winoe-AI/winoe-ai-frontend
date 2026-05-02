@@ -1,4 +1,8 @@
-export type TrialSummary = { title: string; role: string };
+export type TrialSummary = {
+  title: string;
+  role: string;
+  company?: string | null;
+};
 
 export type CandidateDayWindow = {
   dayIndex: number;
@@ -14,6 +18,7 @@ export type CandidateSessionBootstrapResponse = {
   candidateSessionId: number;
   status: 'not_started' | 'in_progress' | 'completed' | 'expired';
   trial: TrialSummary;
+  completedAt?: string | null;
   aiNoticeText: string;
   aiNoticeVersion: string;
   evalEnabledByDay: Record<string, boolean>;

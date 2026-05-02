@@ -7,6 +7,8 @@ export function buildCandidateSessionViewProps(): CandidateSessionViewProps {
     authMessage: null,
     title: 'Infra Trial',
     role: 'Backend Engineer',
+    company: 'Winoe',
+    completedAt: null,
     errorMessage: null,
     errorStatus: null,
     inviteErrorState: null,

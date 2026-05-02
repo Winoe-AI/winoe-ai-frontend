@@ -55,5 +55,8 @@ export function useCandidateDerivedInfo(
     inviteErrorCopy,
     title: state.bootstrap?.trial?.title ?? '',
     role: state.bootstrap?.trial?.role ?? '',
+    company: state.bootstrap?.trial?.company ?? null,
+    completedAt:
+      state.taskState.completedAt ?? state.bootstrap?.completedAt ?? null,
   };
 }

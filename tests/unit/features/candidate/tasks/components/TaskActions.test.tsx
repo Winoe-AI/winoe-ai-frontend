@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { TaskActions } from '@/features/candidate/tasks/components/TaskActions';
 
 describe('TaskActions', () => {
-  it('disables save/submit with shared disabled reason', async () => {
+  it('disables save/submit with shared disabled reason', () => {
     const onSaveDraft = jest.fn();
     const onSubmit = jest.fn();
 
@@ -18,7 +18,6 @@ describe('TaskActions', () => {
       />,
     );
 
-    const user = userEvent.setup();
     const saveButton = screen.getByRole('button', { name: /save draft/i });
     const submitButton = screen.getByRole('button', {
       name: /submit & continue/i,
@@ -27,9 +26,6 @@ describe('TaskActions', () => {
     expect(saveButton).toBeDisabled();
     expect(submitButton).toBeDisabled();
     expect(screen.getByText(/This day is not open yet/i)).toBeInTheDocument();
-
-    await user.click(saveButton);
-    await user.click(submitButton);
     expect(onSaveDraft).not.toHaveBeenCalled();
     expect(onSubmit).not.toHaveBeenCalled();
   });

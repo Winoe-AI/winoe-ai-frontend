@@ -81,6 +81,7 @@ export function buildSessionContext(
         loading: false,
         error: null,
         isComplete: false,
+        completedAt: null,
         completedTaskIds: [11, 22, 33],
         currentTask: makeDay4HandoffTask(),
       },

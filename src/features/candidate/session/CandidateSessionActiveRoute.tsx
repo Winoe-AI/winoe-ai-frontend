@@ -15,7 +15,13 @@ export function CandidateSessionActiveRoute({
 }: CandidateSessionActiveRouteProps) {
   if (props.isComplete) {
     return (
-      <CompleteView onReview={props.onReview} onDashboard={props.onDashboard} />
+      <CompleteView
+        title={props.title}
+        company={props.company}
+        completedAt={props.completedAt}
+        onReview={props.onReview}
+        onDashboard={props.onDashboard}
+      />
     );
   }
   if (!props.started) {

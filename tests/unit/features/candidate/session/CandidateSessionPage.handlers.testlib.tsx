@@ -122,6 +122,7 @@ export const baseState = () => ({
       loading: false,
       error: null,
       isComplete: false,
+      completedAt: null,
       completedTaskIds: [],
       currentTask: {
         id: 1,
@@ -155,6 +156,7 @@ export const primeHandlerApiMocks = () => {
   });
   getCurrentTaskMock.mockResolvedValue({
     isComplete: false,
+    completedAt: null,
     completedTaskIds: [],
     currentTask: {
       id: 1,
