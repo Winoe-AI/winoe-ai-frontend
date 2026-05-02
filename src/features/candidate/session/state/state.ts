@@ -7,6 +7,7 @@ const initialTaskState: TaskState = {
   loading: false,
   error: null,
   isComplete: false,
+  completedAt: null,
   completedTaskIds: [],
   currentTask: null,
 };
@@ -49,6 +50,7 @@ export function reducer(
           loading: false,
           error: null,
           isComplete: action.payload.isComplete,
+          completedAt: action.payload.completedAt ?? null,
           completedTaskIds: action.payload.completedTaskIds,
           currentTask: action.payload.currentTask,
         },

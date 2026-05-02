@@ -33,10 +33,47 @@ mkdir -p "$ARTIFACTS_ROOT" "$EVIDENCE_DIR" "$STORAGE_DIR"
 source "$SCRIPT_DIR/contract_live_env.sh"
 load_contract_live_local_env "$FRONTEND_ENV_FILE" "$BACKEND_ENV_FILE"
 
+USE_LOCAL_DEV_AUTH=0
+if [[ -z "${QA_E2E_TALENT_PARTNER_EMAIL:-}" || -z "${QA_E2E_TALENT_PARTNER_PASSWORD:-}" || -z "${QA_E2E_CANDIDATE_EMAIL:-}" || -z "${QA_E2E_CANDIDATE_PASSWORD:-}" ]]; then
+  USE_LOCAL_DEV_AUTH=1
+fi
+
+if [[ "$USE_LOCAL_DEV_AUTH" -eq 1 ]]; then
+  # In local-dev auth fallback mode, keep each contract-live run on a fresh
+  # candidate identity so stale submissions from prior runs cannot be reused.
+  export QA_E2E_CANDIDATE_EMAIL="candidate-${TIMESTAMP}@example.com"
+  export CONTRACT_LIVE_CANDIDATE_EMAIL="$QA_E2E_CANDIDATE_EMAIL"
+fi
+
+# Local contract-live runs should not spend the schedule flow waiting on the
+# real email provider. The confirmation emails are still exercised, but via the
+# fast console provider so the browser proxy does not hit its 20s timeout.
+export WINOE_EMAIL_PROVIDER="console"
+
+if [[ -z "${CONTRACT_LIVE_FAKE_TIME:-}" ]]; then
+  export CONTRACT_LIVE_FAKE_TIME="$(
+    python3 - <<'PY'
+from datetime import datetime, timedelta
+
+print((datetime.utcnow() + timedelta(days=3)).strftime('%Y-%m-%d 09:00:00'))
+PY
+  )"
+fi
+
+if [[ -z "${CONTRACT_LIVE_SCHEDULE_DATE:-}" ]]; then
+  export CONTRACT_LIVE_SCHEDULE_DATE="$(
+    python3 - <<'PY'
+from datetime import datetime, timedelta
+
+print((datetime.utcnow() + timedelta(days=3)).strftime('%Y-%m-%d'))
+PY
+  )"
+fi
+
 export CONTRACT_LIVE_TIMESTAMP="$TIMESTAMP"
 export CONTRACT_LIVE_ARTIFACTS_DIR="$EVIDENCE_DIR"
 export QA_E2E_STORAGE_DIR="$STORAGE_DIR"
-export CONTRACT_LIVE_BASE_URL="${CONTRACT_LIVE_BASE_URL:-http://localhost:3000}"
+export CONTRACT_LIVE_BASE_URL="${CONTRACT_LIVE_BASE_URL:-http://127.0.0.1:3000}"
 export CONTRACT_LIVE_SCENARIO_GENERATION_RUNTIME_MODE="${CONTRACT_LIVE_SCENARIO_GENERATION_RUNTIME_MODE:-demo}"
 export WINOE_EMAIL_PROVIDER="${WINOE_EMAIL_PROVIDER:-console}"
 STACK_BOOTSTRAP_PID=""
@@ -305,14 +342,18 @@ echo "Driver sequence: ${DRIVER_SEQUENCE_RAW:-<none>}" | tee -a "$RUNNER_LOG"
 echo | tee -a "$RUNNER_LOG"
 
 start_clean_local_stack
-wait_for_http_ready "http://localhost:3000" "Frontend"
-wait_for_http_ready "http://localhost:8000/health" "Backend"
-auth_login_preflight \
-  "talent_partner" \
-  "http://localhost:3000/auth/login?mode=talent_partner&returnTo=%2Fdashboard"
-auth_login_preflight \
-  "candidate" \
-  "http://localhost:3000/auth/login?mode=candidate&returnTo=%2Fcandidate%2Fdashboard"
+wait_for_http_ready "http://127.0.0.1:3000" "Frontend"
+wait_for_http_ready "http://127.0.0.1:8000/health" "Backend"
+if [[ "$USE_LOCAL_DEV_AUTH" -eq 0 ]]; then
+  auth_login_preflight \
+    "talent_partner" \
+    "http://127.0.0.1:3000/auth/login?mode=talent_partner&returnTo=%2Fdashboard"
+  auth_login_preflight \
+    "candidate" \
+    "http://127.0.0.1:3000/auth/login?mode=candidate&returnTo=%2Fcandidate%2Fdashboard"
+else
+  echo "Skipping auth login preflight in local dev auth fallback mode." | tee -a "$RUNNER_LOG"
+fi
 
 if ! run_with_log \
   "playwright_access_and_bootstrap" \

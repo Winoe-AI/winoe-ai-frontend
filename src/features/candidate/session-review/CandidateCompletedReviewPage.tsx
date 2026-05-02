@@ -7,21 +7,57 @@ import { useQuery } from '@tanstack/react-query';
 import {
   getCandidateCompletedReview,
   type CandidateCompletedReviewResponse,
+  type CandidateReviewCommitHistoryEntry,
   type CandidateReviewDayArtifact,
+  type CandidateReviewMarkdownArtifact,
   type CandidateReviewPresentationArtifact,
   type CandidateReviewTranscriptSegment,
   type CandidateReviewWorkspaceArtifact,
 } from '@/features/candidate/session/api';
 import { buildLoginHref } from '@/features/auth/authPaths';
-import { formatDateTime } from '@/shared/formatters';
-import { MarkdownPreview } from '@/shared/ui/Markdown';
+import { formatDateTime, formatShortDate } from '@/shared/formatters';
 import Button from '@/shared/ui/Button';
+import { MarkdownPreview } from '@/shared/ui/Markdown';
 import { queryKeys } from '@/shared/query';
 import { toUserMessage } from '@/platform/errors/errors';
 
 type Props = {
   token: string;
 };
+
+type ReviewDayConfig = {
+  dayIndex: number;
+  label: string;
+  emptyMessage: string;
+};
+
+const REVIEW_DAYS: ReviewDayConfig[] = [
+  {
+    dayIndex: 1,
+    label: 'Day 1 — Design Doc',
+    emptyMessage: 'No design doc content was captured for this day.',
+  },
+  {
+    dayIndex: 2,
+    label: 'Day 2 — Implementation Kickoff',
+    emptyMessage: 'No submission was captured for this day.',
+  },
+  {
+    dayIndex: 3,
+    label: 'Day 3 — Implementation Wrap-Up',
+    emptyMessage: 'No submission was captured for this day.',
+  },
+  {
+    dayIndex: 4,
+    label: 'Day 4 — Handoff + Demo',
+    emptyMessage: 'No handoff + demo submission was captured for this day.',
+  },
+  {
+    dayIndex: 5,
+    label: 'Day 5 — Reflection Essay',
+    emptyMessage: 'No reflection essay content was captured for this day.',
+  },
+];
 
 function ReviewShell({
   title,
@@ -35,7 +71,10 @@ function ReviewShell({
   return (
     <div className="mx-auto flex max-w-5xl flex-col gap-6 p-6">
       <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-        <h1 className="text-2xl font-semibold text-slate-900">{title}</h1>
+        <div className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+          Read-only review
+        </div>
+        <h1 className="mt-2 text-2xl font-semibold text-slate-900">{title}</h1>
         {description ? (
           <p className="mt-2 text-sm text-slate-600">{description}</p>
         ) : null}
@@ -55,12 +94,14 @@ function ReviewMetadata({
   return (
     <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
       <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-        <div>
+        <div className="space-y-2">
           <div className="text-sm font-medium text-slate-500">Trial</div>
-          <div className="mt-1 text-xl font-semibold text-slate-900">
+          <div className="text-2xl font-semibold text-slate-950">
             {review.trial.title}
           </div>
-          <div className="mt-1 text-sm text-slate-600">{review.trial.role}</div>
+          <div className="text-sm text-slate-600">
+            {review.trial.company ?? 'Company unavailable'}
+          </div>
         </div>
         <div className="flex flex-wrap gap-2">
           <Button variant="secondary" onClick={onDashboard}>
@@ -69,23 +110,17 @@ function ReviewMetadata({
         </div>
       </div>
 
-      <dl className="mt-6 grid gap-4 text-sm text-slate-700 md:grid-cols-3">
-        <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
-          <dt className="font-medium text-slate-500">Completed</dt>
-          <dd className="mt-1 text-slate-900">
-            {formatDateTime(review.completedAt) ?? review.completedAt}
-          </dd>
-        </div>
-        <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
-          <dt className="font-medium text-slate-500">Status</dt>
-          <dd className="mt-1 text-slate-900">{review.status}</dd>
-        </div>
-        <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
-          <dt className="font-medium text-slate-500">Candidate timezone</dt>
-          <dd className="mt-1 text-slate-900">
-            {review.candidateTimezone || 'Unavailable'}
-          </dd>
-        </div>
+      <dl className="mt-6 grid gap-4 text-sm text-slate-700 md:grid-cols-4">
+        <MetaTile
+          label="Completion date"
+          value={formatShortDate(review.completedAt) ?? review.completedAt}
+        />
+        <MetaTile label="Candidate timezone" value={review.candidateTimezone} />
+        <MetaTile label="Status" value={review.status} />
+        <MetaTile
+          label="Review mode"
+          value="Read-only. Submission artifacts only."
+        />
       </dl>
 
       {review.dayWindows?.length ? (
@@ -119,50 +154,87 @@ function ReviewMetadata({
   );
 }
 
-function ReviewArtifactCard({
+function ReviewDayCard({
+  day,
   artifact,
 }: {
-  artifact: CandidateReviewDayArtifact;
+  day: ReviewDayConfig;
+  artifact: CandidateReviewDayArtifact | null;
 }) {
   return (
     <section className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
       <div className="flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
         <div>
-          <div className="text-sm font-medium text-slate-500">
+          <div className="text-sm font-medium text-slate-500">{day.label}</div>
+          {artifact ? (
+            <>
+              <h2 className="mt-1 text-lg font-semibold text-slate-900">
+                {artifact.title || day.label}
+              </h2>
+              <div className="mt-1 text-sm text-slate-600">
+                Submitted{' '}
+                {toDisplayValue(
+                  formatDateTime(artifact.submittedAt) ?? artifact.submittedAt,
+                )}
+              </div>
+            </>
+          ) : null}
+        </div>
+        {artifact ? (
+          <div className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-medium uppercase tracking-wide text-slate-600">
             Day {artifact.dayIndex}
           </div>
-          <h2 className="mt-1 text-lg font-semibold text-slate-900">
-            {artifact.title}
-          </h2>
-          <div className="mt-1 text-sm text-slate-600">
-            Submitted{' '}
-            {formatDateTime(artifact.submittedAt) ?? artifact.submittedAt}
+        ) : (
+          <div className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-medium uppercase tracking-wide text-slate-600">
+            Empty
           </div>
-        </div>
-        <div className="rounded-full border border-slate-200 bg-slate-50 px-3 py-1 text-xs font-medium uppercase tracking-wide text-slate-600">
-          {artifact.kind}
-        </div>
+        )}
       </div>
 
       <div className="mt-5">
-        {artifact.kind === 'markdown' ? (
-          <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
-            <MarkdownPreview
-              content={artifact.markdown ?? ''}
-              emptyPlaceholder="No markdown content was captured for this day."
-            />
-          </div>
+        {!artifact ? (
+          <EmptyDayState message={day.emptyMessage} />
+        ) : artifact.kind === 'markdown' ? (
+          <MarkdownDayArtifact
+            artifact={artifact}
+            emptyMessage={day.emptyMessage}
+          />
         ) : artifact.kind === 'workspace' ? (
-          <WorkspaceArtifact artifact={artifact} />
+          <WorkspaceDayArtifact artifact={artifact} />
         ) : (
-          <PresentationArtifact artifact={artifact} />
+          <PresentationDayArtifact artifact={artifact} />
         )}
       </div>
     </section>
   );
 }
 
-function WorkspaceArtifact({
+function EmptyDayState({ message }: { message: string }) {
+  return (
+    <div className="rounded-lg border border-dashed border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
+      {message}
+    </div>
+  );
+}
+
+function MarkdownDayArtifact({
+  artifact,
+  emptyMessage,
+}: {
+  artifact: CandidateReviewMarkdownArtifact;
+  emptyMessage: string;
+}) {
+  return (
+    <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
+      <MarkdownPreview
+        content={artifact.markdown ?? ''}
+        emptyPlaceholder={emptyMessage}
+      />
+    </div>
+  );
+}
+
+function WorkspaceDayArtifact({
   artifact,
 }: {
   artifact: CandidateReviewWorkspaceArtifact;
@@ -178,8 +250,11 @@ function WorkspaceArtifact({
     <div className="space-y-4">
       <dl className="grid gap-3 text-sm text-slate-700 md:grid-cols-2">
         <SummaryTile label="Repository" value={artifact.repoFullName} />
-        <SummaryTile label="Commit" value={artifact.commitSha} />
-        <SummaryTile label="Cutoff commit" value={artifact.cutoffCommitSha} />
+        <SummaryTile label="Commit SHA" value={artifact.commitSha} />
+        <SummaryTile
+          label="Cutoff commit SHA"
+          value={artifact.cutoffCommitSha}
+        />
         <SummaryTile
           label="Cutoff time"
           value={formatDateTime(artifact.cutoffAt) ?? artifact.cutoffAt ?? null}
@@ -192,31 +267,9 @@ function WorkspaceArtifact({
         <ArtifactLink href={artifact.diffUrl} label="Open diff summary" />
       </div>
 
-      {artifact.testResults ? (
-        <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
-          <div className="text-sm font-medium text-slate-900">Test results</div>
-          <dl className="mt-3 grid gap-3 text-sm text-slate-700 md:grid-cols-3">
-            <SummaryTile
-              label="Passed"
-              value={toDisplayValue(artifact.testResults.passed)}
-            />
-            <SummaryTile
-              label="Failed"
-              value={toDisplayValue(artifact.testResults.failed)}
-            />
-            <SummaryTile
-              label="Total"
-              value={toDisplayValue(artifact.testResults.total)}
-            />
-          </dl>
-          {artifact.testResults.stdout ? (
-            <OutputBlock title="Stdout" content={artifact.testResults.stdout} />
-          ) : null}
-          {artifact.testResults.stderr ? (
-            <OutputBlock title="Stderr" content={artifact.testResults.stderr} />
-          ) : null}
-        </div>
-      ) : null}
+      <CommitHistorySection commitHistory={artifact.commitHistory ?? null} />
+
+      <TestResultsSection testResults={artifact.testResults ?? null} />
 
       {diffSummaryText ? (
         <OutputBlock title="Diff summary" content={diffSummaryText} />
@@ -225,7 +278,109 @@ function WorkspaceArtifact({
   );
 }
 
-function PresentationArtifact({
+function CommitHistorySection({
+  commitHistory,
+}: {
+  commitHistory: CandidateReviewCommitHistoryEntry[] | null;
+}) {
+  if (!commitHistory?.length) {
+    return (
+      <UnavailableArtifactSection
+        title="Commit history"
+        message="Commit history is unavailable for this day."
+      />
+    );
+  }
+
+  return (
+    <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
+      <div className="text-sm font-medium text-slate-900">Commit history</div>
+      <div className="mt-3 space-y-2">
+        {commitHistory.map((entry, index) => (
+          <div
+            key={`commit-${index}-${entry?.sha ?? 'unknown'}`}
+            className="rounded-md border border-slate-200 bg-white p-3 text-sm text-slate-700"
+          >
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="font-medium text-slate-950">
+                {entry?.sha ?? 'Commit unavailable'}
+              </span>
+              {entry?.url ? (
+                <ArtifactLink href={entry.url} label="Open commit" />
+              ) : null}
+            </div>
+            {entry?.message ? (
+              <div className="mt-1 whitespace-pre-wrap">{entry.message}</div>
+            ) : null}
+            <div className="mt-1 text-xs text-slate-500">
+              {entry?.authorName
+                ? `Author: ${entry.authorName}`
+                : 'Author unavailable'}
+              {entry?.committedAt
+                ? ` • ${formatDateTime(entry.committedAt) ?? entry.committedAt}`
+                : ''}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function TestResultsSection({
+  testResults,
+}: {
+  testResults: CandidateReviewWorkspaceArtifact['testResults'];
+}) {
+  if (!testResults) {
+    return (
+      <UnavailableArtifactSection
+        title="Test results"
+        message="Test results are unavailable for this day."
+      />
+    );
+  }
+
+  return (
+    <div className="rounded-lg border border-slate-200 bg-slate-50 p-4">
+      <div className="text-sm font-medium text-slate-900">Test results</div>
+      <dl className="mt-3 grid gap-3 text-sm text-slate-700 md:grid-cols-3">
+        <SummaryTile label="Passed" value={testResults.passed} />
+        <SummaryTile label="Failed" value={testResults.failed} />
+        <SummaryTile label="Total" value={testResults.total} />
+      </dl>
+      <div className="mt-3 grid gap-3 md:grid-cols-2">
+        <SummaryTile label="Status" value={testResults.status} />
+        <SummaryTile label="Conclusion" value={testResults.conclusion} />
+        <SummaryTile label="Run status" value={testResults.runStatus} />
+        <SummaryTile label="Workflow run" value={testResults.workflowRunId} />
+      </div>
+      {testResults.stdout ? (
+        <OutputBlock title="Stdout" content={testResults.stdout} />
+      ) : null}
+      {testResults.stderr ? (
+        <OutputBlock title="Stderr" content={testResults.stderr} />
+      ) : null}
+    </div>
+  );
+}
+
+function UnavailableArtifactSection({
+  title,
+  message,
+}: {
+  title: string;
+  message: string;
+}) {
+  return (
+    <div className="rounded-lg border border-dashed border-slate-200 bg-slate-50 p-4">
+      <div className="text-sm font-medium text-slate-900">{title}</div>
+      <p className="mt-2 text-sm text-slate-600">{message}</p>
+    </div>
+  );
+}
+
+function PresentationDayArtifact({
   artifact,
 }: {
   artifact: CandidateReviewPresentationArtifact;
@@ -262,7 +417,7 @@ function PresentationArtifact({
         </div>
       ) : (
         <div className="rounded-lg border border-dashed border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
-          Recording playback is not available for this submission.
+          Recording playback is unavailable for this submission.
         </div>
       )}
 
@@ -288,7 +443,7 @@ function PresentationArtifact({
           </p>
         ) : (
           <p className="mt-3 text-sm text-slate-600">
-            Transcript content is not available yet.
+            Transcript unavailable or still processing.
           </p>
         )}
       </div>
@@ -307,6 +462,25 @@ function SummaryTile({
     <div className="rounded-lg border border-slate-200 bg-white p-3">
       <dt className="font-medium text-slate-500">{label}</dt>
       <dd className="mt-1 break-words text-slate-900">
+        {toDisplayValue(value)}
+      </dd>
+    </div>
+  );
+}
+
+function MetaTile({
+  label,
+  value,
+}: {
+  label: string;
+  value: string | number | null | undefined;
+}) {
+  return (
+    <div className="rounded-lg border border-slate-200 bg-slate-50 p-3">
+      <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+        {label}
+      </dt>
+      <dd className="mt-1 text-sm font-medium text-slate-900">
         {toDisplayValue(value)}
       </dd>
     </div>
@@ -355,6 +529,39 @@ function formatSegmentRange(startMs: number, endMs: number) {
   return `${formatSeconds(startMs)} - ${formatSeconds(endMs)}`;
 }
 
+function ReviewUnavailableState({
+  title,
+  description,
+  primaryAction,
+  secondaryAction,
+}: {
+  title: string;
+  description: string;
+  primaryAction: {
+    label: string;
+    onClick: () => void;
+  };
+  secondaryAction?: {
+    label: string;
+    onClick: () => void;
+  };
+}) {
+  return (
+    <ReviewShell title={title} description={description}>
+      <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+        <div className="flex flex-wrap gap-2">
+          <Button onClick={primaryAction.onClick}>{primaryAction.label}</Button>
+          {secondaryAction ? (
+            <Button variant="secondary" onClick={secondaryAction.onClick}>
+              {secondaryAction.label}
+            </Button>
+          ) : null}
+        </div>
+      </div>
+    </ReviewShell>
+  );
+}
+
 export default function CandidateCompletedReviewPage({ token }: Props) {
   const router = useRouter();
   const loginHref = useMemo(
@@ -380,55 +587,79 @@ export default function CandidateCompletedReviewPage({ token }: Props) {
     }
   }, [errorStatus, loginHref, router]);
 
+  const activeSessionHref = `/candidate/session/${encodeURIComponent(token)}`;
+
   if (reviewQuery.isLoading) {
     return (
       <ReviewShell
-        title="Loading completed review"
-        description="Fetching your completed trial artifacts."
+        title="Loading completed Trial review"
+        description="Fetching your completed Trial submissions."
+      />
+    );
+  }
+
+  if (errorStatus === 409) {
+    return (
+      <ReviewUnavailableState
+        title="Trial not complete yet"
+        description="This Trial is not complete yet. Finish the active session before opening read-only review."
+        primaryAction={{
+          label: 'Back to Candidate Dashboard',
+          onClick: () => router.push('/candidate/dashboard'),
+        }}
+        secondaryAction={{
+          label: 'Return to active session',
+          onClick: () => router.push(activeSessionHref),
+        }}
       />
     );
   }
 
   if (reviewQuery.error || !reviewQuery.data) {
+    const fallbackStatus = errorStatus ?? 500;
     return (
-      <ReviewShell
-        title="Completed review unavailable"
-        description={toUserMessage(
-          reviewQuery.error,
-          'Unable to load your completed trial review.',
-        )}
-      >
-        <div className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-          <div className="flex flex-wrap gap-2">
-            <Button onClick={() => router.replace(loginHref)}>
-              Sign in again
-            </Button>
-            <Button
-              variant="secondary"
-              onClick={() => router.push('/candidate/dashboard')}
-            >
-              Back to Candidate Dashboard
-            </Button>
-          </div>
-        </div>
-      </ReviewShell>
+      <ReviewUnavailableState
+        title="Completed Trial review unavailable"
+        description={
+          fallbackStatus >= 500
+            ? 'The completed Trial review is temporarily unavailable. Please return to the dashboard and try again later.'
+            : toUserMessage(
+                reviewQuery.error,
+                'Unable to load your completed Trial review.',
+              )
+        }
+        primaryAction={{
+          label: 'Back to Candidate Dashboard',
+          onClick: () => router.push('/candidate/dashboard'),
+        }}
+        secondaryAction={{
+          label: 'Reload review',
+          onClick: () => router.refresh(),
+        }}
+      />
     );
+  }
+
+  const artifactsByDay = new Map<number, CandidateReviewDayArtifact>();
+  for (const artifact of reviewQuery.data.artifacts) {
+    artifactsByDay.set(artifact.dayIndex, artifact);
   }
 
   return (
     <ReviewShell
-      title="Completed trial review"
-      description="Review the submitted artifacts and cutoff evidence for each day of your completed trial."
+      title="Completed Trial review"
+      description="Read-only view of the submissions captured during your 5-day Trial."
     >
       <ReviewMetadata
         review={reviewQuery.data}
         onDashboard={() => router.push('/candidate/dashboard')}
       />
       <div className="grid gap-6">
-        {reviewQuery.data.artifacts.map((artifact) => (
-          <ReviewArtifactCard
-            key={`${artifact.dayIndex}-${artifact.taskId}-${artifact.kind}`}
-            artifact={artifact}
+        {REVIEW_DAYS.map((day) => (
+          <ReviewDayCard
+            key={day.dayIndex}
+            day={day}
+            artifact={artifactsByDay.get(day.dayIndex) ?? null}
           />
         ))}
       </div>

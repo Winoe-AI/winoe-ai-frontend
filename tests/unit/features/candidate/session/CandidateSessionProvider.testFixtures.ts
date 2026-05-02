@@ -15,6 +15,7 @@ export const buildPersistedSession = (overrides: PersistedOverrides = {}) => ({
   started: overrides.started ?? true,
   taskState: {
     isComplete: false,
+    completedAt: null,
     completedTaskIds: [1],
     currentTask: {
       id: 55,

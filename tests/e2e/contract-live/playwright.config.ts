@@ -42,7 +42,7 @@ export default defineConfig({
     ],
   ],
   use: {
-    baseURL: process.env.CONTRACT_LIVE_BASE_URL ?? 'http://localhost:3000',
+    baseURL: process.env.CONTRACT_LIVE_BASE_URL ?? 'http://127.0.0.1:3000',
     trace: 'retain-on-failure',
     video: 'retain-on-failure',
     screenshot: 'only-on-failure',

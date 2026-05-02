@@ -7,7 +7,10 @@ type Params = {
   currentTask: Task | null;
   clearTaskError: () => void;
   setTaskError: (msg: string) => void;
-  refreshTask: (opts?: { skipCache?: boolean }) => Promise<void>;
+  refreshTask: (opts?: { skipCache?: boolean }) => Promise<{
+    completedAt?: string | null;
+  } | void>;
+  onCompletionRecorded?: (completedAt: string | null) => void;
   onTaskWindowClosed?: (err: unknown) => void;
   onSubmissionRecorded?: (payload: {
     submissionId: number;
@@ -21,6 +24,7 @@ export function useTaskSubmission({
   clearTaskError,
   setTaskError,
   refreshTask,
+  onCompletionRecorded,
   onTaskWindowClosed = () => {},
   onSubmissionRecorded = () => {},
 }: Params) {
@@ -42,6 +46,7 @@ export function useTaskSubmission({
     setTaskError,
     refreshTask,
     setSubmitting,
+    onCompletionRecorded,
     onTaskWindowClosed,
     onSubmissionRecorded,
     setRefreshTimer: (cb) => {

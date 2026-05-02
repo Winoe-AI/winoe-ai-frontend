@@ -58,6 +58,7 @@ describe('CandidateSessionProvider persistence', () => {
     expect(persisted.started).toBe(true);
     expect(persisted.taskState).toEqual({
       isComplete: false,
+      completedAt: null,
       completedTaskIds: [1],
       currentTask: null,
     });

@@ -16,9 +16,8 @@ test.describe('Contract-Live: TalentPartner Access', () => {
       page.getByRole('button', { name: /new trial/i }),
     ).toBeVisible();
 
-    await page.goto('/dashboard/trials/new', {
-      waitUntil: 'domcontentloaded',
-    });
+    await page.goto('/dashboard/trials/new', { waitUntil: 'commit' });
+    await page.waitForLoadState('domcontentloaded');
     await expect(page).toHaveURL('/dashboard/trials/new');
     await expect(
       page.getByRole('heading', { name: /new trial/i }),

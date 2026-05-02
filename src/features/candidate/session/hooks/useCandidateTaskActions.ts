@@ -2,6 +2,8 @@ import { useMemo } from 'react';
 import { useTaskLoader } from './useTaskLoader';
 import { useTaskSubmission } from './useTaskSubmission';
 import type { SessionCtx } from './useCandidateSessionActions.types';
+import { STORAGE_KEY } from '../state/state';
+import type { CandidateBootstrap } from '../state/types';
 
 type Params = {
   session: SessionCtx;
@@ -22,6 +24,7 @@ export function useCandidateTaskActions({
   onSubmissionRecorded,
 }: Params) {
   const { fetchCurrentTask } = useTaskLoader({
+    session,
     candidateSessionId: session.state.candidateSessionId,
     clearTaskError: session.clearTaskError,
     setTaskLoading: session.setTaskLoading,
@@ -37,6 +40,41 @@ export function useCandidateTaskActions({
     clearTaskError: session.clearTaskError,
     setTaskError: session.setTaskError,
     refreshTask: (opts) => fetchCurrentTask(undefined, opts),
+    onCompletionRecorded: (completedAt) => {
+      const bootstrap = session.state.bootstrap;
+      if (!bootstrap) return;
+      session.setTaskLoaded({
+        isComplete: true,
+        completedAt: completedAt ?? null,
+        completedTaskIds: session.state.taskState.completedTaskIds,
+        currentTask: null,
+      });
+      const nextBootstrap: CandidateBootstrap = {
+        ...bootstrap,
+        status: 'completed',
+        completedAt: completedAt ?? null,
+      };
+      session.setBootstrap(nextBootstrap);
+      try {
+        const raw = window.sessionStorage.getItem(STORAGE_KEY);
+        if (!raw) return;
+        const parsed = JSON.parse(raw) as Record<string, unknown>;
+        window.sessionStorage.setItem(
+          STORAGE_KEY,
+          JSON.stringify({
+            ...parsed,
+            bootstrap: nextBootstrap,
+            taskState: {
+              ...(parsed.taskState && typeof parsed.taskState === 'object'
+                ? (parsed.taskState as Record<string, unknown>)
+                : {}),
+              isComplete: true,
+              completedAt: completedAt ?? null,
+            },
+          }),
+        );
+      } catch {}
+    },
     onTaskWindowClosed,
     onSubmissionRecorded,
   });

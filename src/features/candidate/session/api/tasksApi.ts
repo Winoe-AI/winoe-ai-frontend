@@ -1,5 +1,5 @@
 import { requestWithMeta } from '@/platform/api-client/client/request';
-import { candidateClientOptions } from './baseApi';
+import { candidateClientOptions, toDateString } from './baseApi';
 import type {
   CandidateCurrentTaskResponse,
   CandidateTaskSubmitResponse,
@@ -22,6 +22,7 @@ function normalizeSubmitResponse(
     commitSha: asNullableString(rec.commitSha ?? rec.commit_sha),
     checkpointSha: asNullableString(rec.checkpointSha ?? rec.checkpoint_sha),
     finalSha: asNullableString(rec.finalSha ?? rec.final_sha),
+    completedAt: asNullableString(rec.completedAt ?? rec.completed_at),
   };
 }
 
@@ -48,13 +49,19 @@ export async function getCandidateCurrentTask(
       },
       candidateClientOptions,
     );
+    const rec = (data ?? {}) as Record<string, unknown>;
     const currentTask = normalizeTask(data?.currentTask);
-    return {
+    const completedAt =
+      toDateString(rec.completedAt) ?? toDateString(rec.completed_at);
+    const normalized = {
       ...data,
+      completedAt,
       currentTask,
       completedTaskIds:
         data?.completedTaskIds ?? data?.progress?.completedTaskIds ?? [],
     };
+    delete (normalized as Record<string, unknown>).completed_at;
+    return normalized;
   } catch (err) {
     mapCurrentTaskError(err);
   }

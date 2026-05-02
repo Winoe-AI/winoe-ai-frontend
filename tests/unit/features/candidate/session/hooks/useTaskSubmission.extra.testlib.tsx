@@ -52,6 +52,7 @@ export const buildHookProps = (): HookParams => ({
   clearTaskError: jest.fn(),
   setTaskError: jest.fn(),
   refreshTask: jest.fn().mockResolvedValue(undefined),
+  onCompletionRecorded: jest.fn(),
   onTaskWindowClosed: jest.fn(),
   onSubmissionRecorded: jest.fn(),
 });

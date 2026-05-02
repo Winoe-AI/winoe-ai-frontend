@@ -17,8 +17,11 @@ type Deps = {
   currentTask: Task | null;
   clearTaskError: () => void;
   setTaskError: (msg: string) => void;
-  refreshTask: (opts?: { skipCache?: boolean }) => Promise<void>;
+  refreshTask: (opts?: { skipCache?: boolean }) => Promise<{
+    completedAt?: string | null;
+  } | void>;
   setSubmitting: (v: boolean) => void;
+  onCompletionRecorded?: (completedAt: string | null) => void;
   onTaskWindowClosed?: (err: unknown) => void;
   onSubmissionRecorded?: (payload: {
     submissionId: number;
@@ -34,6 +37,7 @@ export function useTaskSubmitHandler({
   setTaskError,
   refreshTask,
   setSubmitting,
+  onCompletionRecorded,
   onTaskWindowClosed,
   onSubmissionRecorded,
   setRefreshTimer,
@@ -55,9 +59,34 @@ export function useTaskSubmitHandler({
       if (recordedSubmission) {
         onSubmissionRecorded?.(recordedSubmission);
       }
-      setRefreshTimer(() => {
-        void refreshTask({ skipCache: true });
-      });
+      if (resp?.isComplete) {
+        const responseCompletedAt =
+          typeof resp.completedAt === 'string' && resp.completedAt.trim()
+            ? resp.completedAt
+            : null;
+        if (responseCompletedAt) {
+          onCompletionRecorded?.(responseCompletedAt);
+        }
+        const refreshedTask = await refreshTask({ skipCache: true });
+        const completionAt =
+          responseCompletedAt ??
+          (refreshedTask &&
+          typeof refreshedTask === 'object' &&
+          typeof refreshedTask.completedAt === 'string' &&
+          refreshedTask.completedAt.trim()
+            ? refreshedTask.completedAt
+            : null);
+        if (completionAt && completionAt !== responseCompletedAt) {
+          onCompletionRecorded?.(completionAt);
+        }
+        setRefreshTimer(() => {
+          void refreshTask({ skipCache: true });
+        });
+      } else {
+        setRefreshTimer(() => {
+          void refreshTask({ skipCache: true });
+        });
+      }
       notify({
         id: `submit-${currentTask.id}`,
         tone: 'success',

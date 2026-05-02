@@ -20,6 +20,7 @@ export type CandidateTask = {
 
 export type CandidateCurrentTaskResponse = {
   isComplete: boolean;
+  completedAt?: string | null;
   completedTaskIds?: number[];
   progress?: { completedTaskIds?: number[] };
   currentTask: CandidateTask | null;
@@ -37,6 +38,7 @@ export type CandidateTaskSubmitResponse = {
   taskId: number;
   candidateSessionId: number;
   submittedAt: string;
+  completedAt?: string | null;
   progress: { completed: number; total: number };
   isComplete: boolean;
   commitSha?: string | null;

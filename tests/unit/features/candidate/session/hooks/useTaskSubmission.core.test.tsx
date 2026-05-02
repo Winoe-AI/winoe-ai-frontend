@@ -71,6 +71,68 @@ describe('useTaskSubmission core behavior', () => {
     expect(props.refreshTask).toHaveBeenCalledWith({ skipCache: true });
   });
 
+  it('prefers completedAt from refreshed task state when submit response omits it', async () => {
+    const props = buildHookProps();
+    props.currentTask = {
+      id: 15,
+      dayIndex: 5,
+      type: 'documentation',
+      title: 'Reflection',
+      description: 'Structured reflection',
+    };
+    submitCandidateTaskMock.mockResolvedValue({
+      submissionId: 55,
+      submittedAt: '2026-05-01T21:46:43Z',
+      isComplete: true,
+      progress: { completed: 5, total: 5 },
+    });
+    props.refreshTask = jest.fn().mockResolvedValue({
+      completedAt: '2026-05-05T13:00:00Z',
+    });
+    const { ref } = renderTaskSubmissionHarness(props);
+
+    await act(async () => {
+      await ref.current?.handleSubmit({ contentText: '## reflection' });
+    });
+
+    expect(props.refreshTask).toHaveBeenCalledWith({ skipCache: true });
+    expect(props.onCompletionRecorded).toHaveBeenCalledTimes(1);
+    expect(props.onCompletionRecorded).toHaveBeenCalledWith(
+      '2026-05-05T13:00:00Z',
+    );
+  });
+
+  it('uses response completedAt when submit response provides it', async () => {
+    const props = buildHookProps();
+    props.currentTask = {
+      id: 15,
+      dayIndex: 5,
+      type: 'documentation',
+      title: 'Reflection',
+      description: 'Structured reflection',
+    };
+    submitCandidateTaskMock.mockResolvedValue({
+      submissionId: 55,
+      submittedAt: '2026-05-01T21:46:43Z',
+      completedAt: '2026-05-05T13:00:00Z',
+      isComplete: true,
+      progress: { completed: 5, total: 5 },
+    });
+    props.refreshTask = jest.fn().mockResolvedValue({
+      completedAt: '2026-05-01T21:46:43Z',
+    });
+    const { ref } = renderTaskSubmissionHarness(props);
+
+    await act(async () => {
+      await ref.current?.handleSubmit({ contentText: '## reflection' });
+    });
+
+    expect(props.onCompletionRecorded).toHaveBeenCalledTimes(1);
+    expect(props.onCompletionRecorded).toHaveBeenCalledWith(
+      '2026-05-05T13:00:00Z',
+    );
+  });
+
   it('records submission metadata and forwards day 5 reflection payloads', async () => {
     const props = buildHookProps();
     props.currentTask = {

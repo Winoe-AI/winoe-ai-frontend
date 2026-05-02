@@ -10,6 +10,7 @@ export function persistCandidateSessionState(state: CandidateSessionState) {
       started: state.started,
       taskState: {
         isComplete: state.taskState.isComplete,
+        completedAt: state.taskState.completedAt,
         completedTaskIds: state.taskState.completedTaskIds,
         currentTask: state.taskState.currentTask,
       },

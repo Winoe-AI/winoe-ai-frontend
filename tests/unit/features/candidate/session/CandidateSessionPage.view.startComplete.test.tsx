@@ -5,6 +5,7 @@ import {
   screen,
   waitFor,
 } from '@testing-library/react';
+import { BRAND_SLUG } from '@/platform/config/brand';
 import {
   CandidateSessionPage,
   baseState,
@@ -18,12 +19,57 @@ import {
 describe('CandidateSessionPage view - completion and start state', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    window.localStorage.clear();
     primeViewApiMocks();
     routerMock.push.mockReset();
     routerMock.replace.mockReset();
   });
 
   it('shows completion message when tasks are complete', async () => {
+    const state = baseState();
+    window.localStorage.setItem(
+      `${BRAND_SLUG}:candidate:recordedSubmissionLatest:99`,
+      JSON.stringify({
+        submissionId: 5,
+        submittedAt: '2026-05-01T21:46:43Z',
+      }),
+    );
+    useCandidateSessionMock.mockReturnValue(
+      buildState({
+        state: {
+          ...state.state,
+          bootstrap: {
+            ...state.state.bootstrap,
+            trial: {
+              ...state.state.bootstrap.trial,
+              title: 'Infra Trial',
+              company: 'Winoe',
+            },
+            completedAt: '2026-05-01T21:46:43Z',
+          },
+          taskState: {
+            ...state.state.taskState,
+            isComplete: true,
+            completedAt: '2026-05-05T13:00:00Z',
+          },
+        },
+      }),
+    );
+    render(<CandidateSessionPage token="inv" />);
+    await waitFor(() =>
+      expect(
+        screen.getByText(/congratulations, your 5-day trial is complete/i),
+      ).toBeInTheDocument(),
+    );
+    expect(screen.getByText(/trial complete/i)).toBeInTheDocument();
+    expect(screen.getByText('Infra Trial')).toBeInTheDocument();
+    expect(screen.getByText('Winoe')).toBeInTheDocument();
+    expect(screen.getByText(/completion date/i)).toBeInTheDocument();
+    expect(screen.getByText('May 5, 2026')).toBeInTheDocument();
+    expect(screen.getByText(/day 1: design doc/i)).toBeInTheDocument();
+  });
+
+  it('navigates to read-only review from the completion screen', async () => {
     const state = baseState();
     useCandidateSessionMock.mockReturnValue(
       buildState({
@@ -36,12 +82,15 @@ describe('CandidateSessionPage view - completion and start state', () => {
     render(<CandidateSessionPage token="inv" />);
     await waitFor(() =>
       expect(
-        screen.getByText(/congratulations - your 5-day trial is complete/i),
+        screen.getByRole('button', { name: /Review submissions/i }),
       ).toBeInTheDocument(),
     );
-    expect(
-      screen.getByText(/day 1: planning & design doc/i),
-    ).toBeInTheDocument();
+    fireEvent.click(
+      screen.getByRole('button', { name: /Review submissions/i }),
+    );
+    expect(routerMock.push).toHaveBeenCalledWith(
+      '/candidate/session/inv/review',
+    );
   });
 
   it('renders start view and triggers start fetch when not started', async () => {

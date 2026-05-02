@@ -83,6 +83,7 @@ describe('useCurrentTask', () => {
     const ref = React.createRef<HookReturn>();
     getCandidateCurrentTaskMock.mockResolvedValue({
       isComplete: true,
+      completedAt: '2025-01-15T10:00:00Z',
       progress: { completedTaskIds: [3, 4] },
       currentTask: {
         id: 7,
@@ -102,6 +103,7 @@ describe('useCurrentTask', () => {
     expect(props.setTaskLoading).toHaveBeenCalled();
     expect(props.setTaskLoaded).toHaveBeenCalledWith({
       isComplete: true,
+      completedAt: '2025-01-15T10:00:00Z',
       completedTaskIds: [3, 4],
       currentTask: {
         id: 7,

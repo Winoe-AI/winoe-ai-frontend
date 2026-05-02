@@ -63,6 +63,7 @@ export function buildSession(overrides?: {
         loading: false,
         error: null,
         isComplete: false,
+        completedAt: null,
         completedTaskIds: [],
         currentTask: null,
       },

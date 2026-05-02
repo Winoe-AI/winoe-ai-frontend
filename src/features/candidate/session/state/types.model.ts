@@ -4,12 +4,17 @@ import type {
   CandidateRecordedSubmission,
 } from '@/features/candidate/session/api';
 
-export type TrialSummary = { title: string; role: string };
+export type TrialSummary = {
+  title: string;
+  role: string;
+  company?: string | null;
+};
 
 export type CandidateBootstrap = {
   candidateSessionId: number;
   status: 'not_started' | 'in_progress' | 'completed' | 'expired';
   trial: TrialSummary;
+  completedAt?: string | null;
   aiNoticeText: string;
   aiNoticeVersion: string;
   evalEnabledByDay: Record<string, boolean>;
@@ -44,6 +49,7 @@ export type TaskState = {
   loading: boolean;
   error: string | null;
   isComplete: boolean;
+  completedAt?: string | null;
   completedTaskIds: number[];
   currentTask: CandidateTask | null;
 };

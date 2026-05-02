@@ -69,6 +69,7 @@ describe('CandidateSessionProvider', () => {
     expect(stored.started).toBe(true);
     expect(stored.taskState).toEqual({
       isComplete: false,
+      completedAt: null,
       completedTaskIds: [],
       currentTask: null,
     });

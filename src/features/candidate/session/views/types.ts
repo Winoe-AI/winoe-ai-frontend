@@ -34,6 +34,8 @@ export type CandidateSessionViewProps = {
   authMessage: string | null;
   title: string;
   role: string;
+  company: string | null;
+  completedAt: string | null;
   errorMessage: string | null;
   errorStatus: number | null;
   inviteErrorState: InviteErrorState | null;

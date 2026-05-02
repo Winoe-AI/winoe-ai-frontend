@@ -54,6 +54,7 @@ export function buildSessionContext(task: CandidateTask) {
         loading: false,
         error: null,
         isComplete: false,
+        completedAt: null,
         completedTaskIds: [1],
         currentTask: task,
       },

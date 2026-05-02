@@ -121,4 +121,22 @@ describe('windowState', () => {
     expect(closedState.phase).toBe('closed_after_end');
     expect(closedState.actionGate.isReadOnly).toBe(true);
   });
+
+  it('trusts backend currentDayWindow state over local clock', () => {
+    const state = deriveWindowState({
+      dayWindows,
+      currentDayIndex: 2,
+      currentDayWindow: {
+        dayIndex: 2,
+        windowStartAt: '2099-01-03T14:00:00Z',
+        windowEndAt: '2099-01-03T22:00:00Z',
+        state: 'active',
+      },
+      override: null,
+      nowMs: Date.parse('2099-01-03T13:30:00Z'),
+    });
+
+    expect(state.phase).toBe('open');
+    expect(state.actionGate.isReadOnly).toBe(false);
+  });
 });

@@ -1,4 +1,5 @@
 import { screen, waitFor } from '@testing-library/react';
+import { TRIAL_COMPLETION_COPY } from '@/features/candidate/session/views/completeView.copy';
 import {
   baseTask,
   getCandidateTaskDraftMock,
@@ -41,14 +42,10 @@ describe('CandidateTaskView finalized day5 reflection rendering', () => {
       },
     });
     await waitFor(() =>
-      expect(
-        screen.getByText(/congratulations - your 5-day trial is complete/i),
-      ).toBeInTheDocument(),
+      expect(screen.getByText(TRIAL_COMPLETION_COPY)).toBeInTheDocument(),
     );
     expect(screen.queryByRole('textbox')).toBeNull();
-    expect(
-      screen.getByText(/your 5-day trial is complete/i),
-    ).toBeInTheDocument();
+    expect(screen.getByText(TRIAL_COMPLETION_COPY)).toBeInTheDocument();
     expect(getCandidateTaskDraftMock).not.toHaveBeenCalled();
   });
 
@@ -82,9 +79,7 @@ describe('CandidateTaskView finalized day5 reflection rendering', () => {
       },
     });
     await waitFor(() =>
-      expect(
-        screen.getByText(/your 5-day trial is complete/i),
-      ).toBeInTheDocument(),
+      expect(screen.getByText(TRIAL_COMPLETION_COPY)).toBeInTheDocument(),
     );
     expect(screen.queryByRole('textbox')).toBeNull();
     expect(getCandidateTaskDraftMock).not.toHaveBeenCalled();

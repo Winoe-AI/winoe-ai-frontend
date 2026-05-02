@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { forwardJson } from '@/platform/server/bff';
+import { LONG_PROXY_TIMEOUT_MS } from '@/platform/server/backendProxy/constants';
 import { withTalentPartnerAuth } from '@/app/api/bffRouteHelpers';
 
 export const dynamic = 'force-dynamic';
@@ -39,6 +40,8 @@ export async function POST(req: NextRequest) {
         body,
         accessToken: auth.accessToken,
         requestId: auth.requestId,
+        timeoutMs: LONG_PROXY_TIMEOUT_MS,
+        maxTotalTimeMs: LONG_PROXY_TIMEOUT_MS,
       });
     },
   );

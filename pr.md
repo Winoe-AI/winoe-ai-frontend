@@ -1,69 +1,122 @@
 ## Summary
 
-- Reflected the v4 from-scratch pivot in the trial creation flow by removing the template catalog UI and tech stack selector.
-- Replaced those retired selectors with an optional free-text `Preferred Language/Framework` input.
-- Updated trial detail and preview views to stop rendering retired template/stack metadata and to show `Project Brief` instead of `Codespace Structure`.
-- Discarded retired template catalog fields in the frontend so legacy metadata is no longer surfaced in active UI.
+- Restore the completed candidate Trial experience after Day 5.
+- Add the post-Trial congratulations screen metadata: Trial name, company, and authoritative completion date.
+- Restore the completed read-only submission review page with all five day sections.
+- Harden review rendering so missing artifacts show explicit unavailable/empty states instead of crashing.
+- Fix completion-date sourcing so the completion card uses authoritative `completedAt`, not stale local submission timestamps.
+- Stabilize contract-live QA harness/runtime enough to verify #187 end to end.
 
 ## Issue
 
-Closes #197
+Closes #187
 
-## What changed
+## What Changed
 
-### Trial creation
+### Candidate completion screen
 
-- Removed the template repository selector from the trial creation form.
-- Removed the tech stack selector tied to the template catalog.
-- Added an optional `Preferred Language/Framework` text input for free-form stack guidance.
-- Kept the helper copy exactly aligned with the v4 brief guidance: `Optional. Helps Winoe generate a relevant project brief. Candidates may use any stack.`
+- Shows Trial name, company, and completion date after Day 5 completion.
+- Uses authoritative completion timestamp from completed task/session state.
+- Removes stale submission timestamp fallback from the completion-date display.
+- Keeps “Review submissions” and “Back to Candidate Dashboard” actions.
 
-### Trial detail / preview
+### Read-only completed review
 
-- Removed template name, template key, repository, and tech stack metadata from the detail and preview UI.
-- Renamed the section from `Codespace Structure` to `Project Brief`.
-- Ensured retired catalog terminology is no longer rendered in the active detail/preview experience.
+- Renders a read-only completed Trial review route.
+- Shows Trial metadata and completion date.
+- Renders the five-day Trial sequence:
+  - Day 1 — Design Doc
+  - Day 2 — Implementation Kickoff
+  - Day 3 — Implementation Wrap-Up
+  - Day 4 — Handoff + Demo
+  - Day 5 — Reflection Essay
+- Renders markdown content for Day 1 and Day 5.
+- Renders workspace metadata, commit history, and test results for Day 2/3 when available.
+- Shows explicit unavailable states when commit history or test results are missing.
+- Renders Day 4 recording/transcript when available, with graceful unavailable states.
+- Prevents editable controls from appearing in completed review.
 
-### Regression coverage
+### Data/state handling
 
-- Confirmed no active source imports of `templateCatalog` remain.
-- Verified the source grep for `templateCatalog`, `template_repository`, and `tech_stack` returns zero active UI hits.
-- Kept the change scoped to the frontend so it tolerates the backend contract transition while the API pivot continues.
+- Normalizes completed review and current task completion data.
+- Carries `completedAt` through candidate session state.
+- Prefers authoritative task/session completion timestamp over stale bootstrap/local storage data.
+- Handles missing/snake_case backend fields safely.
 
-## Validation
+### QA harness
 
-- [x] `npm run lint`
-- [x] `npm test -- --runInBand`
-- [x] Strict source grep for template catalog / template repository / tech stack fields returned zero active source hits
-- [x] Manual local QA with backend + frontend running
-- [x] Trial creation page verified in browser
-- [x] Trial detail / preview page verified in browser
+- Stabilized contract-live local runtime host handling around `127.0.0.1`.
+- Ensured worker/frontend/backend startup is deterministic for contract-live.
+- Captures Day 5 completion and review page artifacts.
 
-## Manual QA
+## Verification
 
-Environment:
+### Automated checks
 
-- Backend: `http://localhost:8000`
-- Frontend: `http://localhost:3000`
-- Browser: Chromium via Playwright
-- Account: Talent Partner
+- `./precommit.sh` — PASS
+- Frontend test suite — PASS
+  - `508 passed, 508 total`
+  - `1589 passed, 1589 total`
+- Typecheck — PASS
+- Build — PASS
+- Prettier check — PASS
+- Harness syntax check — PASS
+- Terminology audit — PASS, no retired candidate UI copy found
 
-Verified:
+### Contract-live QA
 
-- Trial creation does not show Template Repository selector
-- Trial creation does not show Tech Stack selector
-- Trial creation shows `Preferred Language/Framework` as free text
-- Helper text exactly matches: `Optional. Helps Winoe generate a relevant project brief. Candidates may use any stack.`
-- Trial detail / preview shows `Project Brief`
-- Trial detail / preview does not show template name/key/repository or tech stack metadata
-- No retired terminology visible on the checked pages
+Command:
 
-Screenshots:
+```bash
+CONTRACT_LIVE_DRIVER_SEQUENCE='talent_partner-fresh,candidate-schedule,candidate-day:1,candidate-day:2,candidate-day:3,candidate-day:4,candidate-day:5,talent_partner-review' bash qa_verifications/Contract-Live-QA/run_contract_live.sh
+```
 
-- `qa_verifications/issue197-trial-create.png`
-- `qa_verifications/issue197-trial-detail.png`
+Result: PASS
 
-## Notes / risks
+Evidence bundle:
 
-- Backend #302 may still return retired fields during contract transition; frontend now discards them before rendering.
-- Remaining broad grep hits are limited to tests, fixtures, historical docs, or generated session artifacts, not active UI source.
+```text
+qa_verifications/Contract-Live-QA/contract_live_qa_latest/artifacts/20260502T143652/
+```
+
+Key artifacts:
+
+- `api/candidate-day5-after.json`
+- `candidate-day5-after.png`
+- `api/candidate-day5-current-task-after.json`
+- `api/candidate-review-page.json`
+- `candidate-review-page.png`
+
+Completion-date verification:
+
+- Day 5 completion card: `May 5, 2026`
+- Read-only review page: `May 5, 2026`
+- Authoritative `completedAt`: `2026-05-05T13:00:00Z`
+
+## QA Checklist
+
+- [x] After Day 5 completion: congratulations screen
+- [x] Shows Trial name, company, completion date
+- [x] Review submissions navigates to read-only review
+- [x] Each day viewable but not editable
+- [x] Day 1 design doc markdown rendered
+- [x] Day 2/3 repo metadata, commit history, test results or unavailable states
+- [x] Day 4 video playback/transcript if available or graceful fallback
+- [x] Day 5 reflection essay markdown rendered
+- [x] No editable controls on review page
+
+## Known Caveat
+
+Contract-live now uses API/bootstrap shortcuts for some intermediate setup to keep the local end-to-end run deterministic. This PR should not be used as proof that the full candidate scheduling click path is covered in browser. For #187, the relevant browser surfaces - Day 5 completion, review navigation, and read-only completed review - were verified against real backend data.
+
+## Risk
+
+Low-to-medium.
+
+Main risk is around candidate session completion state and backend payload variance. This is mitigated by:
+
+- defensive frontend normalization,
+- explicit empty/unavailable states,
+- unit coverage for stale completion-date handling,
+- full precommit passing,
+- successful contract-live verification of the completed Trial path.
