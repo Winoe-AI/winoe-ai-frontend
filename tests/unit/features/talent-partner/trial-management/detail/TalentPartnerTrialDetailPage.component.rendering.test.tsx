@@ -12,7 +12,9 @@ describe('TalentPartnerTrialDetailPage component rendering', () => {
 
   it('renders the trial plan shell and metadata', async () => {
     await renderDetailPage();
-    expect(screen.getByText(/5-day trial plan/i)).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: 'Project Brief' }),
+    ).toBeInTheDocument();
     await waitFor(() =>
       expect(screen.getByText('Test Trial')).toBeInTheDocument(),
     );

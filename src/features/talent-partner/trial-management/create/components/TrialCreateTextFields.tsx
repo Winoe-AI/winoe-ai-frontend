@@ -28,10 +28,10 @@ const textFields: Array<{
   },
   {
     key: 'preferredLanguageFramework',
-    label: 'Preferred language/framework',
+    label: 'Preferred Language/Framework',
     placeholder: 'Optional example: Node.js, Python, Rust',
     helperText:
-      'This is optional and helps Winoe generate a relevant project brief. The candidate may ultimately use any language or framework they choose.',
+      'Optional. Helps Winoe generate a relevant project brief. Candidates may use any stack.',
   },
 ];
 

@@ -55,7 +55,9 @@ describe('TrialCreateForm gap coverage', () => {
     });
     const titleInput = screen.getByLabelText('Role title');
     const roleInput = screen.getByLabelText('Role description');
-    const stackInput = screen.getByLabelText('Preferred language/framework');
+    const stackInput = screen.getByRole('textbox', {
+      name: 'Preferred Language/Framework',
+    });
     expect(titleInput).toHaveAttribute('aria-invalid', 'true');
     expect(titleInput).toHaveAttribute('aria-describedby', 'title-error');
     expect(screen.getByText('Role title is required.')).toHaveAttribute(
@@ -64,13 +66,25 @@ describe('TrialCreateForm gap coverage', () => {
     );
     expect(
       screen.getByText(
-        'This is optional and helps Winoe generate a relevant project brief. The candidate may ultimately use any language or framework they choose.',
+        'Optional. Helps Winoe generate a relevant project brief. Candidates may use any stack.',
       ),
     ).toBeInTheDocument();
+    expect((stackInput as HTMLInputElement).type).toBe('text');
     expect(stackInput).toHaveAttribute(
       'aria-describedby',
       'preferredLanguageFramework-help',
     );
+    expect(
+      screen.queryByRole('combobox', {
+        name: 'Preferred Language/Framework',
+      }),
+    ).toBeNull();
+    expect(
+      screen.queryByRole('combobox', { name: /template repository/i }),
+    ).toBeNull();
+    expect(screen.queryByRole('combobox', { name: /tech stack/i })).toBeNull();
+    expect(screen.queryByRole('option', { name: /node/i })).toBeNull();
+    expect(screen.queryByRole('option', { name: /python/i })).toBeNull();
     await user.clear(stackInput);
     await user.type(stackInput, 'Node.js');
     const preferredCalls = onChange.mock.calls.filter(
@@ -123,8 +137,10 @@ describe('TrialCreateForm gap coverage', () => {
   it('does not render retired template or tech stack selectors', () => {
     renderForm();
 
-    expect(screen.queryByLabelText(/template repository/i)).toBeNull();
-    expect(screen.queryByLabelText(/tech stack/i)).toBeNull();
+    expect(
+      screen.queryByRole('combobox', { name: /template repository/i }),
+    ).toBeNull();
+    expect(screen.queryByRole('combobox', { name: /tech stack/i })).toBeNull();
   });
 
   it('submits/cancels when interactive and disables controls while submitting', async () => {

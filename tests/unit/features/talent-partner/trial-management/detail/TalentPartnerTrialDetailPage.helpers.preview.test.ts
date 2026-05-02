@@ -83,6 +83,35 @@ describe('TalentPartnerTrialDetailPage helper preview normalization', () => {
     expect(__testables.isPreviewEmpty(detail)).toBe(false);
   });
 
+  it('drops retired template and stack fields from preview normalization', () => {
+    const detail = __testables.normalizeTrialDetailPreview({
+      id: 8,
+      title: 'From scratch trial',
+      templateKey: 'node-express-ts',
+      template_key: 'node-express-ts',
+      techStack: ['Node', 'TypeScript'],
+      tech_stack: ['Node', 'TypeScript'],
+      stack_name: 'Node + TypeScript',
+      preferredLanguageFramework: 'Rust + Axum',
+      status: 'ready_for_review',
+      role: 'Backend Engineer',
+      scenario: 'Build a trial from scratch.',
+      tasks: [],
+    });
+
+    expect(detail.plan).toMatchObject({
+      title: 'From scratch trial',
+      role: 'Backend Engineer',
+      preferredLanguageFramework: 'Rust + Axum',
+      scenario: 'Build a trial from scratch.',
+    });
+    expect(detail.plan).not.toHaveProperty('templateKey');
+    expect(detail.plan).not.toHaveProperty('template_key');
+    expect(detail.plan).not.toHaveProperty('techStack');
+    expect(detail.plan).not.toHaveProperty('tech_stack');
+    expect(detail.plan).not.toHaveProperty('stack_name');
+  });
+
   it('prefers generation failure metadata over stale generating status', () => {
     const detail = __testables.normalizeTrialDetailPreview({
       id: 49,
