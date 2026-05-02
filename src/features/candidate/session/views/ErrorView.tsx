@@ -1,46 +1,53 @@
 import Button from '@/shared/ui/Button';
+import { buildInviteErrorViewModel } from './inviteErrorViewModel';
 import { StateMessage } from '../components/StateMessage';
+import type { InviteErrorState } from '../api/inviteErrorsApi';
 
 type Props = {
-  authStatus: 'idle' | 'loading' | 'ready' | 'unauthenticated' | 'error';
-  errorStatus: number | null;
-  errorTitle: string;
-  errorCopy: string;
-  inviteLinkError: boolean;
+  inviteErrorState: InviteErrorState | null;
+  inviteContactName: string | null;
+  inviteContactEmail: string | null;
   loginHref: string;
+  onDashboard: () => void;
   onRetry: () => void;
-  onGoHome: () => void;
 };
 
 export function ErrorView({
-  authStatus,
-  errorStatus,
-  errorTitle,
-  errorCopy,
-  inviteLinkError,
   loginHref,
+  inviteErrorState,
+  inviteContactName,
+  inviteContactEmail,
+  onDashboard,
   onRetry,
-  onGoHome,
 }: Props) {
-  const shouldGoToSignIn =
-    inviteLinkError && errorStatus === 409 && authStatus === 'unauthenticated';
-  const action = inviteLinkError ? (
-    <div className="flex gap-3">
-      {shouldGoToSignIn ? (
-        <a href={loginHref}>
-          <Button>Go to sign in</Button>
+  const model = buildInviteErrorViewModel({
+    inviteErrorState,
+    inviteContactName,
+    inviteContactEmail,
+    loginHref,
+  });
+  const action =
+    model.ctaAction === 'retry' ? (
+      <div className="flex gap-3">
+        <Button onClick={onRetry}>{model.ctaLabel}</Button>
+      </div>
+    ) : model.ctaAction === 'dashboard' ? (
+      <div className="flex gap-3">
+        <Button onClick={onDashboard}>{model.ctaLabel}</Button>
+      </div>
+    ) : (
+      <div className="flex gap-3">
+        <a href={model.ctaHref ?? loginHref}>
+          <Button>{model.ctaLabel}</Button>
         </a>
-      ) : (
-        <Button onClick={onGoHome}>Go to Home</Button>
-      )}
-    </div>
-  ) : (
-    <div className="flex gap-3">
-      <Button onClick={onRetry}>Retry</Button>
-    </div>
-  );
+      </div>
+    );
 
   return (
-    <StateMessage title={errorTitle} description={errorCopy} action={action} />
+    <StateMessage
+      title={model.title}
+      description={model.description}
+      action={action}
+    />
   );
 }

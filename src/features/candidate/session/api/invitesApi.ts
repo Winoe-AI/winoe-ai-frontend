@@ -2,6 +2,7 @@ import {
   INVITE_ALREADY_CLAIMED_MESSAGE,
   INVITE_EXPIRED_MESSAGE,
   INVITE_INVALID_MESSAGE,
+  INVITE_TERMINATED_MESSAGE,
 } from '@/platform/copy/invite';
 import { apiClient } from '@/platform/api-client/client';
 import {
@@ -11,6 +12,11 @@ import {
 } from '@/platform/api-client/errors/errors';
 import { candidateClientOptions, mapCandidateApiError } from './baseApi';
 import { normalizeCandidateInvite } from './inviteNormalizeApi';
+import {
+  classifyInviteErrorState,
+  extractInviteErrorContact,
+  inviteErrorHttpError,
+} from './inviteErrorsApi';
 import type {
   CandidateInvite,
   CandidateSessionBootstrapResponse,
@@ -44,16 +50,19 @@ function recoverInviteBootstrap(
   return null;
 }
 
-function inviteHttpError(
-  status: number,
-  message: string,
-  details?: unknown,
-): HttpError {
-  const error = new HttpError(status, message);
-  if (typeof details !== 'undefined') {
-    (error as HttpError & { details?: unknown }).details = details;
+function inviteErrorMessageForState(inviteState: string | null) {
+  switch (inviteState) {
+    case 'terminated':
+      return INVITE_TERMINATED_MESSAGE;
+    case 'expired':
+      return INVITE_EXPIRED_MESSAGE;
+    case 'already_claimed':
+      return INVITE_ALREADY_CLAIMED_MESSAGE;
+    case 'invalid':
+      return INVITE_INVALID_MESSAGE;
+    default:
+      return 'Please sign in again.';
   }
-  return error;
 }
 
 export async function listCandidateInvites(options?: {
@@ -98,19 +107,57 @@ export async function resolveCandidateInviteToken(
   } catch (err) {
     if (err && typeof err === 'object') {
       const status = (err as { status?: unknown }).status;
-      const details = (err as { details?: unknown }).details;
+      const details =
+        (err as { details?: unknown; detail?: unknown }).details ??
+        (err as { details?: unknown; detail?: unknown }).detail;
       const backendMsg = extractBackendMessage(details, true) ?? '';
       const lowerMsg = backendMsg.toLowerCase();
+      const inviteState = classifyInviteErrorState(err);
+      const inviteContact = extractInviteErrorContact(err);
 
       if (status === 409) {
         const recovered = recoverInviteBootstrap(details);
         if (recovered) return recovered;
       }
-      if (status === 400 || status === 404)
-        throw inviteHttpError(status, INVITE_INVALID_MESSAGE, details);
-      if (status === 409)
-        throw inviteHttpError(409, INVITE_ALREADY_CLAIMED_MESSAGE, details);
-      if (status === 401) throw new HttpError(401, 'Please sign in again.');
+      if (inviteState === 'terminated' || inviteState === 'expired') {
+        throw inviteErrorHttpError(
+          typeof status === 'number'
+            ? status
+            : inviteState === 'terminated'
+              ? 410
+              : 410,
+          inviteState === 'terminated'
+            ? INVITE_TERMINATED_MESSAGE
+            : INVITE_EXPIRED_MESSAGE,
+          details,
+          inviteState,
+        );
+      }
+      if (inviteState === 'invalid')
+        throw inviteErrorHttpError(
+          typeof status === 'number' ? status : 400,
+          INVITE_INVALID_MESSAGE,
+          details,
+          inviteState,
+        );
+      if (inviteState === 'already_claimed')
+        throw inviteErrorHttpError(
+          typeof status === 'number' ? status : 409,
+          INVITE_ALREADY_CLAIMED_MESSAGE,
+          details,
+          inviteState,
+        );
+      if (status === 401) {
+        if (inviteState !== 'unavailable') {
+          throw inviteErrorHttpError(
+            401,
+            inviteErrorMessageForState(inviteState),
+            details,
+            inviteState,
+          );
+        }
+        throw new HttpError(401, 'Please sign in again.');
+      }
       if (status === 403) {
         if (lowerMsg.includes('email claim') || lowerMsg.includes('email')) {
           throw new HttpError(
@@ -121,16 +168,29 @@ export async function resolveCandidateInviteToken(
         throw new HttpError(403, 'You do not have access to this invite.');
       }
       if (status === 410)
-        throw inviteHttpError(410, INVITE_EXPIRED_MESSAGE, details);
+        throw inviteErrorHttpError(
+          410,
+          INVITE_EXPIRED_MESSAGE,
+          details,
+          'expired',
+        );
 
       const fallbackMsg =
         extractBackendMessage(details, false) ?? backendMsg ?? '';
       const safeStatus =
         typeof status === 'number' ? status : fallbackStatus(err, 500);
-      throw new HttpError(
+      const error = new HttpError(
         safeStatus,
         fallbackMsg.trim() || 'Something went wrong loading your trial.',
-      );
+      ) as HttpError & {
+        inviteErrorState?: string;
+        inviteContactName?: string | null;
+        inviteContactEmail?: string | null;
+      };
+      error.inviteErrorState = inviteState;
+      error.inviteContactEmail = inviteContact.email;
+      error.inviteContactName = inviteContact.name;
+      throw error;
     }
     mapCandidateApiError(err, 'Something went wrong loading your trial.');
   }

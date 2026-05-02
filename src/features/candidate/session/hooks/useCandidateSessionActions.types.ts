@@ -1,4 +1,5 @@
 import type { Dispatch, SetStateAction } from 'react';
+import type { InviteErrorState } from '@/features/candidate/session/api/inviteErrorsApi';
 import type { useCandidateSession } from '../CandidateSessionProvider';
 import type { ViewState } from '../views/types';
 
@@ -17,6 +18,9 @@ export type SessionActionsParams = {
   setView: Dispatch<SetStateAction<ViewState>>;
   setErrorMessage: (m: string | null) => void;
   setErrorStatus: (n: number | null) => void;
+  setInviteErrorState: (state: InviteErrorState | null) => void;
+  setInviteContactName: (name: string | null) => void;
+  setInviteContactEmail: (email: string | null) => void;
   setAuthMessage: (m: string | null) => void;
   markStart: (label: string) => void;
   markEnd: (label: string, extra?: Record<string, unknown>) => void;

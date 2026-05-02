@@ -97,14 +97,17 @@ describe('CandidateSessionPage', () => {
     expect(currentTaskMock).toHaveBeenCalledWith(123);
   });
 
-  it('redirects to login and hides auth card when invite bootstrap returns 401', async () => {
+  it('renders invalid invite guidance when invite bootstrap returns 401', async () => {
     resolveMock.mockRejectedValueOnce({ status: 401 });
     renderWithProvider(<CandidateSessionPage token="VALID_TOKEN" />);
     await waitFor(() =>
-      expect(routerMock.replace).toHaveBeenCalledWith(
-        expect.stringContaining('/auth/login?'),
-      ),
+      expect(
+        screen.getByText(/This invite link is invalid/i),
+      ).toBeInTheDocument(),
     );
-    expect(screen.queryByText(/sign in to continue/i)).not.toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: /Email support/i }),
+    ).toHaveAttribute('href', 'mailto:support@winoe.ai');
+    expect(routerMock.replace).not.toHaveBeenCalled();
   });
 });

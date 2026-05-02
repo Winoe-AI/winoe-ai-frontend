@@ -29,7 +29,9 @@ describe('CandidateSessionPage view - auth and init guards', () => {
     resolveInviteMock.mockRejectedValue({ status: 401 });
     const state = baseState();
     useCandidateSessionMock.mockReturnValue(
-      buildState({ state: { ...state.state, authStatus: 'ready' } }),
+      buildState({
+        state: { ...state.state, authStatus: 'unauthenticated' },
+      }),
     );
     render(<CandidateSessionPage token="inv" />);
     await waitFor(() => expect(buildLoginHrefMock).toHaveBeenCalled());

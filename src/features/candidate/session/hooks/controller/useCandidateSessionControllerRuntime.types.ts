@@ -20,6 +20,9 @@ export type UseCandidateSessionControllerRuntimeArgs = {
   setView: LocalState['setView'];
   setErrorMessage: LocalState['setErrorMessage'];
   setErrorStatus: LocalState['setErrorStatus'];
+  setInviteErrorState: LocalState['setInviteErrorState'];
+  setInviteContactName: LocalState['setInviteContactName'];
+  setInviteContactEmail: LocalState['setInviteContactEmail'];
   setAuthMessage: LocalState['setAuthMessage'];
   handleTaskWindowClosed: LocalState['handleTaskWindowClosed'];
   resetLocalState: LocalState['resetLocalState'];

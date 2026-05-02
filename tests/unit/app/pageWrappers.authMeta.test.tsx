@@ -13,7 +13,27 @@ describe('route wrapper metadata', () => {
       viewport,
       default: RootLayout,
     } = await import('@/app/layout');
-    expect(metadata?.title).toBeDefined();
+    expect(metadata?.title).toEqual({
+      default: 'Winoe AI | Real-work Trials for hiring',
+      template: '%s | Winoe AI',
+    });
+    expect(metadata?.description).toBe(
+      'Winoe AI helps Talent Partners reveal the real hire through real-work Trials, Winoe Reports, Winoe Scores, and artifact-backed Evidence Trails.',
+    );
+    expect(metadata?.manifest).toBe('/manifest.json');
+    expect(metadata?.openGraph).toMatchObject({
+      title: 'Winoe AI | Real-work Trials for hiring',
+      description:
+        'Winoe AI helps Talent Partners reveal the real hire through real-work Trials, Winoe Reports, Winoe Scores, and artifact-backed Evidence Trails.',
+      siteName: 'Winoe AI',
+      type: 'website',
+    });
+    expect(metadata?.twitter).toMatchObject({
+      card: 'summary_large_image',
+      title: 'Winoe AI | Real-work Trials for hiring',
+      description:
+        'Winoe AI helps Talent Partners reveal the real hire through real-work Trials, Winoe Reports, Winoe Scores, and artifact-backed Evidence Trails.',
+    });
     expect(viewport?.width).toBe('device-width');
 
     const element = RootLayout({ children: <div data-testid="child">ok</div> });
@@ -42,5 +62,29 @@ describe('route wrapper metadata', () => {
     const { metadata: authErrorMeta } =
       await import('@/app/(auth)/auth/error/page');
     expect(authErrorMeta.title).toContain('Sign-in error');
+  });
+
+  it('exposes marketing route metadata for the root page', async () => {
+    const { metadata: marketingMeta } = await import('@/app/(marketing)/page');
+    expect(marketingMeta?.title).toEqual({
+      absolute: 'Winoe AI | Real-work Trials for hiring',
+    });
+    expect(marketingMeta?.description).toBe(
+      'Winoe AI helps Talent Partners reveal the real hire through real-work Trials, Winoe Reports, Winoe Scores, and artifact-backed Evidence Trails.',
+    );
+    expect(marketingMeta?.manifest).toBe('/manifest.json');
+    expect(marketingMeta?.openGraph).toMatchObject({
+      title: 'Winoe AI | Real-work Trials for hiring',
+      description:
+        'Winoe AI helps Talent Partners reveal the real hire through real-work Trials, Winoe Reports, Winoe Scores, and artifact-backed Evidence Trails.',
+      siteName: 'Winoe AI',
+      type: 'website',
+    });
+    expect(marketingMeta?.twitter).toMatchObject({
+      card: 'summary_large_image',
+      title: 'Winoe AI | Real-work Trials for hiring',
+      description:
+        'Winoe AI helps Talent Partners reveal the real hire through real-work Trials, Winoe Reports, Winoe Scores, and artifact-backed Evidence Trails.',
+    });
   });
 });

@@ -6,5 +6,6 @@ export * from './tasksApi';
 export * from './taskDraftsApi';
 export * from './workspaceApi';
 export * from './testsApi';
+export * from './inviteErrorsApi';
 export { normalizeCandidateInvite } from './inviteNormalizeApi';
 export { HttpError } from '@/platform/api-client/errors/errors';

@@ -13,6 +13,7 @@ import type {
   CodingWorkspace,
   CodingWorkspaceSnapshot,
 } from '@/features/candidate/tasks/utils/codingWorkspaceUtils';
+import type { InviteErrorState } from '../api/inviteErrorsApi';
 
 export type ViewState =
   | 'loading'
@@ -35,6 +36,9 @@ export type CandidateSessionViewProps = {
   role: string;
   errorMessage: string | null;
   errorStatus: number | null;
+  inviteErrorState: InviteErrorState | null;
+  inviteContactName: string | null;
+  inviteContactEmail: string | null;
   inviteErrorCopy: string;
   isComplete: boolean;
   started: boolean;

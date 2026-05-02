@@ -15,7 +15,7 @@ import { redirectSignedInHome, gateByRole } from './auth';
 
 export const config = {
   matcher: [
-    '/((?!_next/static|_next/image|favicon.ico|sitemap.xml|robots.txt).*)',
+    '/((?!_next/static|_next/image|favicon.ico|manifest.json|site.webmanifest|sitemap.xml|robots.txt).*)',
   ],
 };
 
@@ -31,6 +31,8 @@ export async function proxy(request: NextRequest) {
     pathname.startsWith('/_next/') ||
     pathname.startsWith('/.well-known/') ||
     pathname === '/favicon.ico' ||
+    pathname === '/manifest.json' ||
+    pathname === '/site.webmanifest' ||
     pathname === '/sitemap.xml' ||
     pathname === '/robots.txt' ||
     /\.(?:css|js|map|png|jpg|jpeg|gif|svg|ico|webp|avif|woff2?|ttf|eot)$/.test(

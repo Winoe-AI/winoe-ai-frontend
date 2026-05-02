@@ -1,0 +1,10 @@
+{
+  "name": "Winoe AI",
+  "short_name": "Winoe AI",
+  "description": "Real-work Trials and artifact-backed hiring evidence for Talent Partners.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#111827",
+  "icons": []
+}

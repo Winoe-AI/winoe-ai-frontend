@@ -69,16 +69,54 @@ describe('candidate api invite helpers', () => {
     await expect(resolveCandidateInviteToken('tok')).rejects.toMatchObject({
       status: 400,
       message: expect.stringContaining('invalid'),
+      inviteErrorState: 'invalid',
     });
     mockGet.mockRejectedValueOnce({ status: 404 });
     await expect(resolveCandidateInviteToken('tok')).rejects.toMatchObject({
       status: 404,
       message: expect.stringContaining('invalid'),
+      inviteErrorState: 'invalid',
+    });
+    mockGet.mockRejectedValueOnce({
+      status: 422,
+      details: { code: 'INVITE_INVALID' },
+    });
+    await expect(resolveCandidateInviteToken('tok')).rejects.toMatchObject({
+      status: 422,
+      message: expect.stringContaining('invalid'),
+      inviteErrorState: 'invalid',
+    });
+    mockGet.mockRejectedValueOnce({
+      status: 422,
+      code: 'VALIDATION_ERROR',
+      detail: [
+        {
+          type: 'string_too_short',
+          loc: ['path', 'token'],
+          msg: 'String should have at least 1 character',
+          input: 'not-a-real-token',
+        },
+      ],
+    });
+    await expect(resolveCandidateInviteToken('tok')).rejects.toMatchObject({
+      status: 422,
+      message: expect.stringContaining('invalid'),
+      inviteErrorState: 'invalid',
     });
     mockGet.mockRejectedValueOnce({ status: 410 });
     await expect(resolveCandidateInviteToken('tok')).rejects.toMatchObject({
       status: 410,
       message: expect.stringContaining('expired'),
+      inviteErrorState: 'expired',
+    });
+    mockGet.mockRejectedValueOnce({
+      status: 422,
+      details: { code: 'INVITE_EXPIRED' },
+    });
+    await expect(resolveCandidateInviteToken('tok')).rejects.toMatchObject({
+      status: 422,
+      message: expect.stringContaining('expired'),
+      inviteErrorState: 'expired',
     });
     mockGet.mockRejectedValueOnce({
       status: 409,
@@ -92,6 +130,24 @@ describe('candidate api invite helpers', () => {
       candidateSessionId: 77,
       status: 'in_progress',
       trial: { title: 'Existing trial', role: 'Role' },
+    });
+    mockGet.mockRejectedValueOnce({
+      status: 409,
+      details: { code: 'INVITE_ALREADY_CLAIMED' },
+    });
+    await expect(resolveCandidateInviteToken('tok')).rejects.toMatchObject({
+      status: 409,
+      message: expect.stringContaining('claimed'),
+      inviteErrorState: 'already_claimed',
+    });
+    mockGet.mockRejectedValueOnce({
+      status: 401,
+      details: { code: 'INVITE_INVALID' },
+    });
+    await expect(resolveCandidateInviteToken('tok')).rejects.toMatchObject({
+      status: 401,
+      message: expect.stringContaining('invalid'),
+      inviteErrorState: 'invalid',
     });
     mockGet.mockRejectedValueOnce({ status: 401 });
     await expect(resolveCandidateInviteToken('tok')).rejects.toMatchObject({
@@ -121,6 +177,15 @@ describe('candidate api invite helpers', () => {
     await expect(resolveCandidateInviteToken('tok')).rejects.toMatchObject({
       status: 403,
       message: 'You do not have access to this invite.',
+    });
+    mockGet.mockRejectedValueOnce({
+      status: 410,
+      details: { trialStatus: 'terminated' },
+    });
+    await expect(resolveCandidateInviteToken('tok')).rejects.toMatchObject({
+      status: 410,
+      message: expect.stringContaining('no longer available'),
+      inviteErrorState: 'terminated',
     });
   });
 

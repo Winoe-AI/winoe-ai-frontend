@@ -1,10 +1,4 @@
-import {
-  act,
-  fireEvent,
-  render,
-  screen,
-  waitFor,
-} from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import { HttpError } from '@/features/candidate/session/api';
 import {
   CandidateSessionPage,
@@ -45,23 +39,44 @@ describe('CandidateSessionPage error states - auth and invite paths', () => {
     await act(async () => render(<CandidateSessionPage token="inv" />));
     await waitFor(() =>
       expect(screen.getByTestId('state-message')).toHaveTextContent(
-        'Invite expired',
+        'This invite has expired',
       ),
     );
-    expect(screen.queryByRole('button', { name: /Go to sign in/i })).toBeNull();
+    expect(
+      screen.getByRole('button', { name: /Go to candidate portal/i }),
+    ).toBeInTheDocument();
   });
 
-  it('shows invalid invite state with go home action when authenticated', async () => {
+  it('shows invalid invite state with support CTA when authenticated', async () => {
     resolveInviteMock.mockRejectedValue(new HttpError(404));
     useCandidateSessionMock.mockReturnValue(buildState());
     await act(async () => render(<CandidateSessionPage token="inv" />));
     await waitFor(() =>
       expect(screen.getByTestId('state-message')).toHaveTextContent(
-        'Invalid invite',
+        'This invite link is invalid',
       ),
     );
-    fireEvent.click(screen.getByRole('button', { name: /Go to Home/i }));
-    expect(routerMock.push).toHaveBeenCalledWith('/');
+    const supportLink = screen.getByRole('link', { name: /Email support/i });
+    expect(supportLink).toHaveAttribute('href', 'mailto:support@winoe.ai');
+    expect(
+      screen.queryByRole('button', { name: /Go to candidate portal/i }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('does not redirect to dashboard for invite-specific 401 invalid token responses', async () => {
+    resolveInviteMock.mockRejectedValue({
+      status: 401,
+      details: { code: 'INVITE_INVALID' },
+    });
+    useCandidateSessionMock.mockReturnValue(buildState());
+    await act(async () => render(<CandidateSessionPage token="inv" />));
+    await waitFor(() =>
+      expect(screen.getByTestId('state-message')).toHaveTextContent(
+        'This invite link is invalid',
+      ),
+    );
+    expect(routerMock.replace).not.toHaveBeenCalled();
+    expect(routerMock.push).not.toHaveBeenCalled();
   });
 
   it('routes 403 invite errors to access denied guidance', async () => {
@@ -80,7 +95,14 @@ describe('CandidateSessionPage error states - auth and invite paths', () => {
 
   it('redirects to login when resolve fails with 401', async () => {
     resolveInviteMock.mockRejectedValue({ status: 401 });
-    useCandidateSessionMock.mockReturnValue(buildState());
+    useCandidateSessionMock.mockReturnValue(
+      buildState({
+        state: {
+          ...baseState().state,
+          authStatus: 'unauthenticated',
+        },
+      }),
+    );
     await act(async () => render(<CandidateSessionPage token="inv" />));
     await waitFor(() =>
       expect(routerMock.replace).toHaveBeenCalledWith(
