@@ -26,11 +26,7 @@ export function normalizeTrialPlan(raw: unknown): TrialPlan | null {
 
   return {
     title: toStringOrNull(rec.title ?? rec.trial_title ?? rec.name),
-    templateKey: toStringOrNull(rec.templateKey ?? rec.template_key),
     role: toStringOrCsv(rec.role ?? rec.role_name ?? rec.roleName),
-    techStack: toStringOrCsv(
-      rec.techStack ?? rec.tech_stack ?? rec.stack ?? rec.stack_name,
-    ),
     preferredLanguageFramework: toStringOrNull(
       rec.preferredLanguageFramework ??
         rec.preferred_language_framework ??

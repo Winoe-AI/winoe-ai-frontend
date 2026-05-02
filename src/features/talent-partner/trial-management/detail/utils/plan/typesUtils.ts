@@ -13,9 +13,7 @@ export type TrialPlanDay = {
 
 export type TrialPlan = {
   title: string | null;
-  templateKey: string | null;
   role: string | null;
-  techStack: string | null;
   preferredLanguageFramework: string | null;
   focus: string | null;
   scenario: string | null;

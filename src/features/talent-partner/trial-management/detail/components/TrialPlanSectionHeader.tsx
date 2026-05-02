@@ -20,9 +20,7 @@ export function TrialPlanSectionHeader({
   return (
     <div className="flex flex-wrap items-start justify-between gap-4">
       <div>
-        <h2 className="text-lg font-semibold text-gray-900">
-          5-day trial plan
-        </h2>
+        <h2 className="text-lg font-semibold text-gray-900">Project Brief</h2>
         <p className="text-sm text-gray-600">
           Review the project brief, tasks, and rubric before inviting
           candidates.

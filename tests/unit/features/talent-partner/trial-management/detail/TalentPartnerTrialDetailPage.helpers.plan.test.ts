@@ -77,9 +77,13 @@ describe('TalentPartnerTrialDetailPage helper plan normalization', () => {
 
     const plan = __testables.normalizeTrialPlan({
       title: 'Infra',
+      templateKey: 'node-express-ts',
       template_key: 'node-express-ts',
       role: ['Backend', 'Infra'],
-      tech_stack: ['Node', 'TS'],
+      techStack: ['Node', 'TypeScript'],
+      tech_stack: ['Node', 'TypeScript'],
+      stack_name: 'Node + TypeScript',
+      preferredLanguageFramework: 'Rust + Axum',
       focus_area: 'APIs',
       scenario: { summary: 'Build APIs' },
       days: [
@@ -89,12 +93,16 @@ describe('TalentPartnerTrialDetailPage helper plan normalization', () => {
     });
     expect(plan).toMatchObject({
       title: 'Infra',
-      templateKey: 'node-express-ts',
       role: 'Backend, Infra',
-      techStack: 'Node, TS',
+      preferredLanguageFramework: 'Rust + Axum',
       focus: 'APIs',
       scenario: 'Build APIs',
     });
+    expect(plan).not.toHaveProperty('templateKey');
+    expect(plan).not.toHaveProperty('template_key');
+    expect(plan).not.toHaveProperty('techStack');
+    expect(plan).not.toHaveProperty('tech_stack');
+    expect(plan).not.toHaveProperty('stack_name');
     expect(plan.days.map((d) => d.dayIndex)).toEqual([1, 2]);
   });
 });

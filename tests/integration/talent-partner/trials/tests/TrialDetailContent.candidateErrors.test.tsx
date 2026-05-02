@@ -80,6 +80,8 @@ describe('TalentPartnerTrialDetailPage - candidate error handling', () => {
     expect(
       await screen.findByText('You are not authorized to view candidates.'),
     ).toBeInTheDocument();
-    expect(await screen.findByText(/5-day trial plan/i)).toBeInTheDocument();
+    expect(
+      await screen.findByRole('heading', { name: 'Project Brief' }),
+    ).toBeInTheDocument();
   });
 });
