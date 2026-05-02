@@ -42,12 +42,14 @@ Closes #197
 ## Manual QA
 
 Environment:
+
 - Backend: `http://localhost:8000`
 - Frontend: `http://localhost:3000`
 - Browser: Chromium via Playwright
 - Account: Talent Partner
 
 Verified:
+
 - Trial creation does not show Template Repository selector
 - Trial creation does not show Tech Stack selector
 - Trial creation shows `Preferred Language/Framework` as free text
@@ -57,6 +59,7 @@ Verified:
 - No retired terminology visible on the checked pages
 
 Screenshots:
+
 - `qa_verifications/issue197-trial-create.png`
 - `qa_verifications/issue197-trial-detail.png`
 
