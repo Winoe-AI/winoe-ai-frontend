@@ -53,6 +53,28 @@ describe('proxy - public and api routes', () => {
     expect(getSessionNormalizedMock).not.toHaveBeenCalled();
   });
 
+  it('treats manifest and icon assets as public static files', async () => {
+    getSessionNormalizedMock.mockResolvedValue(null);
+
+    const manifestRes = await proxy(
+      new NextRequest(new URL('http://localhost/manifest.json')),
+    );
+    expect(manifestRes?.status).toBe(200);
+    expect(manifestRes?.headers.get('location')).toBeNull();
+
+    const siteWebmanifestRes = await proxy(
+      new NextRequest(new URL('http://localhost/site.webmanifest')),
+    );
+    expect(siteWebmanifestRes?.status).toBe(200);
+    expect(siteWebmanifestRes?.headers.get('location')).toBeNull();
+
+    const faviconRes = await proxy(
+      new NextRequest(new URL('http://localhost/favicon.ico')),
+    );
+    expect(faviconRes?.status).toBe(200);
+    expect(faviconRes?.headers.get('location')).toBeNull();
+  });
+
   it('treats /apiary as non-api and applies auth gating', async () => {
     getSessionNormalizedMock.mockResolvedValue(null);
     const res = await proxy(

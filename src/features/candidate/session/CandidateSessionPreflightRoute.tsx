@@ -13,14 +13,7 @@ type CandidateSessionPreflightRouteProps = {
 export function CandidateSessionPreflightRoute({
   props,
 }: CandidateSessionPreflightRouteProps) {
-  const {
-    view,
-    authStatus,
-    authMessage,
-    errorMessage,
-    errorStatus,
-    inviteErrorCopy,
-  } = props;
+  const { view, authMessage, errorMessage } = props;
 
   if (view === 'loading') {
     return <LoadingView message="Checking your invite and signing you in." />;
@@ -60,13 +53,7 @@ export function CandidateSessionPreflightRoute({
   }
 
   if (view === 'error') {
-    return CandidateSessionErrorRoute({
-      props,
-      authStatus,
-      errorMessage,
-      errorStatus,
-      inviteErrorCopy,
-    });
+    return CandidateSessionErrorRoute({ props });
   }
 
   return null;

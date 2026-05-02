@@ -1,6 +1,6 @@
+import { ErrorView } from './views/ErrorView';
 import { StateMessage } from './components/StateMessage';
 import Button from '@/shared/ui/Button';
-import { INVITE_EXPIRED_MESSAGE } from '@/platform/copy/invite';
 import type {
   CandidateSessionViewProps as Props,
   ViewState,
@@ -36,9 +36,13 @@ export function CandidateSessionAccessRoute({
 
   if (view === 'expired') {
     return (
-      <StateMessage
-        title="Invite expired"
-        description={errorMessage ?? INVITE_EXPIRED_MESSAGE}
+      <ErrorView
+        inviteErrorState={props.inviteErrorState ?? 'expired'}
+        inviteContactName={props.inviteContactName}
+        inviteContactEmail={props.inviteContactEmail}
+        loginHref={props.loginHref}
+        onDashboard={props.onDashboard}
+        onRetry={props.onRetryInit}
       />
     );
   }

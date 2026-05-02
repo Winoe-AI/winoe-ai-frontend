@@ -34,8 +34,12 @@ const hasSchedulePayload = (resp: CandidateSessionBootstrapResponse): boolean =>
 export function createInviteInit(params: InviteInitParams) {
   const runInit = async (initToken: string, allowRetry = false) => {
     if (!initToken) {
-      params.setErrorMessage(INVITE_UNAVAILABLE_MESSAGE);
+      params.setErrorMessage(INVITE_INVALID_MESSAGE);
       params.setErrorStatus(400);
+      params.setInviteErrorState('invalid');
+      params.setInviteContactName(null);
+      params.setInviteContactEmail(null);
+      params.setAuthMessage(null);
       params.setView('error');
       return;
     }
@@ -43,6 +47,9 @@ export function createInviteInit(params: InviteInitParams) {
     params.setView('loading');
     params.setErrorMessage(null);
     params.setErrorStatus(null);
+    params.setInviteErrorState(null);
+    params.setInviteContactName(null);
+    params.setInviteContactEmail(null);
     params.setAuthMessage(null);
     params.markStart('candidate:init');
     try {
@@ -65,9 +72,13 @@ export function createInviteInit(params: InviteInitParams) {
         currentDayWindow: resp.currentDayWindow ?? null,
       });
       params.clearTaskError();
+      params.setInviteErrorState(null);
+      params.setInviteContactName(null);
+      params.setInviteContactEmail(null);
       if (resp.status === 'expired') {
         params.setErrorStatus(410);
         params.setErrorMessage(INVITE_EXPIRED_MESSAGE);
+        params.setInviteErrorState('expired');
         params.setView('expired');
         params.markEnd('candidate:init', { status: 'expired' });
         return;

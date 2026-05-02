@@ -1,7 +1,8 @@
 {
-  "name": "frontend",
+  "name": "winoe-ai-frontend",
   "version": "0.1.0",
   "private": true,
+  "description": "Winoe AI frontend for real-work Trials, Talent Partner workflows, candidate sessions, and artifact-backed hiring evidence.",
   "scripts": {
     "dev": "next dev",
     "build": "next build --webpack",

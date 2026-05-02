@@ -5,6 +5,7 @@ import type { ViewState } from '../../views/types';
 import type { useCandidateSessionSchedule } from './useCandidateSessionSchedule';
 import type { useCodingWorkspaceSync } from './useCodingWorkspaceSync';
 import type { SessionCtx } from './useCandidateSessionSchedule.types';
+import type { InviteErrorState } from '../../api/inviteErrorsApi';
 
 export type BuildCandidateSessionControllerResultArgs = {
   finalView: ViewState;
@@ -17,6 +18,9 @@ export type BuildCandidateSessionControllerResultArgs = {
   authMessage: string | null;
   errorMessage: string | null;
   errorStatus: number | null;
+  inviteErrorState: InviteErrorState | null;
+  inviteContactName: string | null;
+  inviteContactEmail: string | null;
   loginHref: string;
   derived: ReturnType<typeof useCandidateDerivedInfo>;
   actions: ReturnType<typeof useCandidateSessionActions>;

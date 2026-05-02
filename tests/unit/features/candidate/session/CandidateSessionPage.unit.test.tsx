@@ -17,15 +17,25 @@ describe('CandidateSessionPage unit flow', () => {
     mockUseCandidateSession.mockReturnValue(buildSession());
     render(<CandidateSessionPage token="" />);
 
-    expect(await screen.findByText(/Invalid invite/i)).toBeInTheDocument();
     expect(
-      screen.getByRole('button', { name: /Go to Home/i }),
+      await screen.findByText(/This invite link is invalid/i),
     ).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: /Email support/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: /Email support/i }),
+    ).toHaveAttribute('href', 'mailto:support@winoe.ai');
+    expect(
+      screen.queryByText(/Go to candidate portal/i),
+    ).not.toBeInTheDocument();
     expect(screen.queryByText(/Retry/i)).not.toBeInTheDocument();
   });
 
   it('redirects to login on 401 bootstrap errors', async () => {
-    mockUseCandidateSession.mockReturnValue(buildSession());
+    mockUseCandidateSession.mockReturnValue(
+      buildSession({ authStatus: 'unauthenticated' }),
+    );
     mockResolveInvite.mockRejectedValueOnce({ status: 401 });
 
     render(<CandidateSessionPage token="invite-token" />);
@@ -51,7 +61,9 @@ describe('CandidateSessionPage unit flow', () => {
       mockResolveInvite.mockRejectedValueOnce({ status });
 
       render(<CandidateSessionPage token="invite-token" />);
-      expect(await screen.findByText(/Invalid invite/i)).toBeInTheDocument();
+      expect(
+        await screen.findByText(/This invite link is invalid/i),
+      ).toBeInTheDocument();
       expect(screen.queryByText(/Retry/i)).not.toBeInTheDocument();
     },
   );
@@ -67,6 +79,8 @@ describe('CandidateSessionPage unit flow', () => {
     expect(
       screen.getByRole('button', { name: /Continue to sign in/i }),
     ).toBeInTheDocument();
+    expect(routerMock.replace).not.toHaveBeenCalled();
+    expect(routerMock.push).not.toHaveBeenCalled();
   });
 
   it('shows expired invite state for 410', async () => {
@@ -74,7 +88,9 @@ describe('CandidateSessionPage unit flow', () => {
     mockResolveInvite.mockRejectedValueOnce({ status: 410 });
 
     render(<CandidateSessionPage token="invite-token" />);
-    expect(await screen.findByText(/Invite expired/i)).toBeInTheDocument();
+    expect(
+      await screen.findByText(/This invite has expired/i),
+    ).toBeInTheDocument();
   });
 
   it('shows error view for non-auth bootstrap failures', async () => {

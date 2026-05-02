@@ -1,4 +1,5 @@
 import { useMemo, type Dispatch, type SetStateAction } from 'react';
+import type { InviteErrorState } from '@/features/candidate/session/api/inviteErrorsApi';
 import { useInviteResolver } from './useInviteResolver';
 import type { SessionCtx } from './useCandidateSessionActions.types';
 import type { ViewState } from '../views/types';
@@ -11,6 +12,9 @@ type Params = {
   setAuthMessage: (m: string | null) => void;
   setErrorMessage: (m: string | null) => void;
   setErrorStatus: (s: number | null) => void;
+  setInviteErrorState: (state: InviteErrorState | null) => void;
+  setInviteContactName: (name: string | null) => void;
+  setInviteContactEmail: (email: string | null) => void;
   fetchCurrentTask: (overrides?: { sessionId?: number }) => Promise<void>;
   markStart: (label: string) => void;
   markEnd: (label: string, extra?: Record<string, unknown>) => void;
@@ -19,6 +23,7 @@ type Params = {
 export function useCandidateInviteActions(params: Params) {
   const { runInit, loginHref, inviteErrorCopy } = useInviteResolver({
     token: params.token,
+    authStatus: params.session.state.authStatus,
     setCandidateSessionId: params.session.setCandidateSessionId,
     setBootstrap: params.session.setBootstrap,
     clearTaskError: params.session.clearTaskError,
@@ -27,6 +32,9 @@ export function useCandidateInviteActions(params: Params) {
     setAuthMessage: params.setAuthMessage,
     setErrorMessage: params.setErrorMessage,
     setErrorStatus: params.setErrorStatus,
+    setInviteErrorState: params.setInviteErrorState,
+    setInviteContactName: params.setInviteContactName,
+    setInviteContactEmail: params.setInviteContactEmail,
     fetchTask: params.fetchCurrentTask,
     markStart: params.markStart,
     markEnd: params.markEnd,
