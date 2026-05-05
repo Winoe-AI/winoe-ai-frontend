@@ -44,6 +44,7 @@ Completed Task 1: Foundation Design System + v4 UI / Copy Cleanup.
 # QA Notes
 
 QA verified:
+
 - Talent Partner dashboard
 - Trial creation
 - Trial detail
