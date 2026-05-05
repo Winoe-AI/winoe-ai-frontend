@@ -56,26 +56,26 @@ export function Day1DeadlineCard({
   const closed = isClosed || remainingMs <= 0;
 
   return (
-    <div className="rounded-md border border-blue-100 bg-blue-50 p-4">
+    <div className="rounded-md border border-wheat-100 bg-wheat-50 p-4 text-wheat-900">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-wide text-blue-800">
+          <p className="text-xs font-semibold uppercase tracking-wide text-wheat-700">
             Day 1 deadline
           </p>
-          <p className="mt-1 text-sm text-blue-950">
+          <p className="mt-1 text-sm">
             5 PM deadline: {deadlineFormatter.format(new Date(cutoffMs))}
           </p>
         </div>
         <div className="text-left sm:text-right">
-          <p className="text-xs font-medium text-blue-800">
+          <p className="text-xs font-medium text-wheat-700">
             {closed ? 'Closed' : 'Time remaining'}
           </p>
-          <p className="mt-1 text-xl font-semibold tabular-nums text-blue-950">
+          <p className="mt-1 text-xl font-semibold tabular-nums">
             {closed ? 'Day 1 closed' : formatRemaining(remainingMs)}
           </p>
         </div>
       </div>
-      <p className="mt-3 text-sm text-blue-900">
+      <p className="mt-3 text-sm text-wheat-700">
         When the deadline arrives, Winoe AI saves the latest Day 1 design
         document draft and locks editing for the Evidence Trail.
       </p>

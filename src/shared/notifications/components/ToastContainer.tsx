@@ -11,7 +11,7 @@ const toneClasses = (tone: ToastState['tone']) => {
     case 'warning':
       return 'border-amber-200 bg-amber-50 text-amber-900';
     default:
-      return 'border-blue-200 bg-blue-50 text-blue-900';
+      return 'border-wheat-300 bg-wheat-50 text-wheat-900';
   }
 };
 

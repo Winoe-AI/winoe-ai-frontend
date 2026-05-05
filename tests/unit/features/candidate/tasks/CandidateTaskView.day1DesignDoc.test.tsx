@@ -41,7 +41,9 @@ describe('CandidateTaskView Day 1 design document workspace', () => {
       screen.getByText(/Plan the build from scratch/i),
     ).toBeInTheDocument();
     expect(
-      screen.getAllByText(/What tech stack will you use and why\?/i).length,
+      screen.getAllByText(
+        /What implementation approach will you use and why\?/i,
+      ).length,
     ).toBeGreaterThan(0);
     expect(
       screen.getAllByText(/How will you structure the project\?/i).length,
@@ -287,7 +289,7 @@ describe('CandidateTaskView Day 1 design document workspace', () => {
       screen.getByRole('heading', { name: /^Day 1 Design Document$/ }),
     ).toBeInTheDocument();
     expect(screen.getByRole<HTMLTextAreaElement>('textbox').value).toContain(
-      'What tech stack will you use and why?',
+      'What implementation approach will you use and why?',
     );
   });
 
@@ -339,7 +341,7 @@ describe('CandidateTaskView Day 1 design document workspace', () => {
     });
 
     expect(screen.getByRole<HTMLTextAreaElement>('textbox').value).toContain(
-      'What tech stack will you use and why?',
+      'What implementation approach will you use and why?',
     );
     expect(putCandidateTaskDraftMock).not.toHaveBeenCalled();
   });

@@ -63,7 +63,7 @@ export function CandidateRow({
       <CandidateDateCell value={candidate.completedAt} />
       <td className="px-4 py-3 text-right align-top">
         <Link
-          className="text-blue-600 hover:underline"
+          className="text-wheat-700 hover:underline"
           href={submissionsHref}
           prefetch={LINK_PREFETCH}
           onMouseEnter={prefetchCandidateData}

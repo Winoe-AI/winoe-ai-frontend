@@ -81,7 +81,7 @@ export function EvidenceList({
                   href={url}
                   target="_blank"
                   rel="noreferrer noopener"
-                  className="text-sm font-medium text-blue-700 hover:underline"
+                  className="text-sm font-medium text-wheat-700 hover:underline"
                 >
                   Open evidence link
                 </a>

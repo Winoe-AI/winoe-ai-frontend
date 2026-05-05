@@ -71,7 +71,7 @@ export function PlanDayCard({ slot }: Props) {
           </div>
         </div>
         {day.type ? (
-          <span className="rounded-full bg-blue-50 px-2 py-1 text-xs font-semibold text-blue-700">
+          <span className="rounded-full bg-wheat-100 px-2 py-1 text-xs font-semibold text-wheat-900">
             {day.type}
           </span>
         ) : null}

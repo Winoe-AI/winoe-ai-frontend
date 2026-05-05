@@ -40,7 +40,7 @@ export function PlanDayWorkspace({ day, dayIndex }: Props) {
               {repoLinkLabel}
             </div>
             <a
-              className="text-blue-600 hover:underline"
+              className="text-wheat-700 hover:underline"
               href={day.repoUrl}
               target="_blank"
               rel="noreferrer"
@@ -60,7 +60,7 @@ export function PlanDayWorkspace({ day, dayIndex }: Props) {
         )}
         {day.codespaceUrl ? (
           <a
-            className="text-blue-600 hover:underline"
+            className="text-wheat-700 hover:underline"
             href={day.codespaceUrl}
             target="_blank"
             rel="noreferrer"

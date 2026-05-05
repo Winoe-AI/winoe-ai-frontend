@@ -4,9 +4,9 @@ export const DAY1_DESIGN_DOC_STARTER = `# Day 1 Design Document
 
 Summarize the problem, user needs, key requirements, and constraints in your own words.
 
-## Tech Stack Choice
+## Implementation Approach
 
-What tech stack will you use and why? Include the framework, libraries, tools, and dependency choices you plan to use.
+What implementation approach will you use and why? Include the framework, libraries, tools, and dependency choices you plan to use.
 
 ## Project Structure
 

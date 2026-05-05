@@ -22,7 +22,7 @@ export function AllSubmissionsCard({
           All submissions
         </div>
         <button
-          className="text-sm text-blue-600 underline"
+          className="text-sm text-wheat-700 underline"
           onClick={actions.toggleShowAll}
         >
           {state.showAll ? 'Hide list' : 'Show all'}

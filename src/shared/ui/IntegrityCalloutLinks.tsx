@@ -12,7 +12,7 @@ export function IntegrityCalloutLinks({ repoUrl, codespaceUrl }: Props) {
         <p className="break-all">
           <span className="font-semibold">Codespace:</span>{' '}
           <a
-            className="text-blue-700 underline hover:text-blue-800"
+            className="text-wheat-700 underline hover:text-wheat-700"
             href={codespaceUrl}
             target="_blank"
             rel="noopener noreferrer"
@@ -25,7 +25,7 @@ export function IntegrityCalloutLinks({ repoUrl, codespaceUrl }: Props) {
         <p className="break-all">
           <span className="font-semibold">Repository:</span>{' '}
           <a
-            className="text-blue-700 underline hover:text-blue-800"
+            className="text-wheat-700 underline hover:text-wheat-700"
             href={repoUrl}
             target="_blank"
             rel="noopener noreferrer"

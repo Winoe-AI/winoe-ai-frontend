@@ -17,6 +17,15 @@ type Props = {
   onSaved: () => Promise<void> | void;
 };
 
+const AGENT_KEY_LABELS: Record<string, string> = {
+  demoPresentationReviewer: 'Handoff + Demo Reviewer',
+  codeImplementationReviewer: 'Implementation Reviewer',
+  designDocReviewer: 'Design Doc Reviewer',
+  reflectionEssayReviewer: 'Reflection Reviewer',
+  winoeReport: 'Winoe Report Aggregator',
+  prestart: 'Pre-start Configuration',
+};
+
 export function TrialAiOverridesPanel({ trialId, aiConfig, onSaved }: Props) {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -108,7 +117,9 @@ export function TrialAiOverridesPanel({ trialId, aiConfig, onSaved }: Props) {
                 key={agent.key}
                 className="rounded border border-gray-200 bg-white p-2"
               >
-                <div className="font-medium text-gray-900">{agent.key}</div>
+                <div className="font-medium text-gray-900">
+                  {AGENT_KEY_LABELS[agent.key] || agent.key}
+                </div>
                 <div className="mt-1">
                   {agent.provider ?? 'unknown'} / {agent.model ?? 'unknown'}
                 </div>
@@ -116,7 +127,11 @@ export function TrialAiOverridesPanel({ trialId, aiConfig, onSaved }: Props) {
                   Runtime: {agent.runtimeMode ?? 'unknown'}
                 </div>
                 <div className="mt-1">
-                  Prompt: {agent.promptVersion ?? 'unknown'}
+                  Prompt:{' '}
+                  {(agent.promptVersion ?? 'unknown').replace(
+                    'demoPresentationReviewer',
+                    'handoffDemoReviewer',
+                  )}
                 </div>
               </div>
             ))}

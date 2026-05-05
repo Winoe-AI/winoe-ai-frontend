@@ -50,7 +50,7 @@ export default async function NotAuthorizedPage({
         </Link>
         <Link
           href={returnTo && mode === 'talent_partner' ? returnTo : '/dashboard'}
-          className="inline-flex items-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-blue-700"
+          className="inline-flex items-center rounded-md border border-transparent bg-wheat-500 px-4 py-2 text-sm font-medium text-on-accent shadow-sm hover:bg-wheat-700"
         >
           Go to Talent Partner Dashboard
         </Link>

@@ -92,7 +92,10 @@ export function TrialDetailHeaderActions({
       >
         {trialStatus === 'terminated' ? 'Trial terminated' : 'Terminate trial'}
       </Button>
-      <Link className="text-sm text-blue-600 hover:underline" href="/dashboard">
+      <Link
+        className="text-sm text-wheat-700 hover:text-wheat-900 hover:underline"
+        href="/dashboard"
+      >
         ← Back to dashboard
       </Link>
     </div>

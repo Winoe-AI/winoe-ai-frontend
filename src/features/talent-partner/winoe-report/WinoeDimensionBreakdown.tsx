@@ -65,7 +65,7 @@ export function WinoeDimensionBreakdown({ dimensions }: Props) {
               className={[
                 'text-left rounded-2xl border p-4 transition',
                 selected
-                  ? 'border-blue-400 bg-blue-50 shadow-sm'
+                  ? 'border-wheat-500 bg-wheat-500 shadow-sm'
                   : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50',
               ].join(' ')}
             >

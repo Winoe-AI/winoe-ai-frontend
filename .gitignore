@@ -62,3 +62,46 @@ ai_flow_boot_script.sh
 
 # Code Quality generated artifacts
 /code-quality
+
+# --- ADDED FOR TASK 1 ---
+# Dependencies
+node_modules/
+.pnpm-store/
+.yarn/
+.npm/
+
+# Next.js / frontend build output
+.next/
+out/
+dist/
+build/
+
+# Storybook / UI static output
+storybook-static/
+ladle-static/
+chromatic-archives/
+
+# Test / coverage output
+coverage/
+playwright-report/
+test-results/
+.nyc_output/
+
+# Tool caches
+.turbo/
+.cache/
+.eslintcache
+*.tsbuildinfo
+
+# Local env / deployment state
+.env
+.env.*
+!.env.example
+.vercel/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+ladle-static/

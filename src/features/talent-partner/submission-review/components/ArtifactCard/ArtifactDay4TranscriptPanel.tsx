@@ -99,7 +99,7 @@ export function ArtifactDay4TranscriptPanel({
             <button
               type="button"
               onClick={() => onSeek(entry.segment.startMs)}
-              className="font-mono text-xs text-blue-700 underline"
+              className="font-mono text-xs text-wheat-700 underline"
               aria-label={`Seek to ${formatTranscriptTimestamp(entry.segment.startMs)}`}
             >
               {formatTranscriptTimestamp(entry.segment.startMs)}

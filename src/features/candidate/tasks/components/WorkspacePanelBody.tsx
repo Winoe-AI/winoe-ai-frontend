@@ -34,23 +34,23 @@ export function WorkspacePanelBody({
   const repoLabel = workspace?.repoFullName ?? workspace?.repoName;
   const codespaceUrl = workspace?.codespaceUrl ?? null;
   const codespaceCard = codespaceUrl ? (
-    <div className="rounded-md border border-blue-200 bg-blue-50 p-3">
-      <div className="text-[10px] font-semibold uppercase tracking-wide text-blue-800">
+    <div className="rounded-md border border-wheat-100 bg-wheat-50 p-3 text-wheat-900">
+      <div className="text-[10px] font-semibold uppercase tracking-wide text-wheat-700">
         Primary work environment
       </div>
       <a
         aria-label="Open Codespace"
-        className="mt-1 block text-sm font-semibold text-blue-900 hover:underline"
+        className="mt-1 block text-sm font-semibold hover:underline"
         href={codespaceUrl}
         target="_blank"
         rel="noopener noreferrer"
       >
         Open Codespace
       </a>
-      <span className="mt-1 block break-all text-xs font-normal text-blue-800">
+      <span className="mt-1 block break-all text-xs font-normal text-wheat-700">
         {codespaceUrl}
       </span>
-      <p className="mt-2 text-xs text-blue-900">
+      <p className="mt-2 text-xs text-wheat-700">
         Use this Codespace for all Day 2 and Day 3 implementation work.
       </p>
     </div>

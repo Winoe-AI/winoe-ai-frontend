@@ -14,7 +14,7 @@ export function TaskTextToolbar({ mode, onChange }: Props) {
           Preview to verify formatting.
         </span>
         <a
-          className="text-blue-600 hover:text-blue-700 hover:underline"
+          className="text-wheat-700 hover:text-wheat-700 hover:underline"
           href="https://www.markdownguide.org/cheat-sheet/"
           target="_blank"
           rel="noopener noreferrer"
@@ -29,7 +29,7 @@ export function TaskTextToolbar({ mode, onChange }: Props) {
           className={cn(
             'px-3 py-1 transition-colors',
             mode === 'write'
-              ? 'bg-blue-50 text-blue-700'
+              ? 'bg-wheat-50 text-wheat-900'
               : 'text-gray-700 hover:bg-gray-50',
           )}
           onClick={() => onChange('write')}
@@ -42,7 +42,7 @@ export function TaskTextToolbar({ mode, onChange }: Props) {
           className={cn(
             'border-l border-gray-200 px-3 py-1 transition-colors',
             mode === 'preview'
-              ? 'bg-blue-50 text-blue-700'
+              ? 'bg-wheat-50 text-wheat-900'
               : 'text-gray-700 hover:bg-gray-50',
           )}
           onClick={() => onChange('preview')}

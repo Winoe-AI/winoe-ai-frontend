@@ -5,7 +5,7 @@ const baseButton =
 
 export const primaryCtaClass = cn(
   baseButton,
-  'border-indigo-600 bg-indigo-600 text-white hover:bg-indigo-700 focus-visible:outline-indigo-600',
+  'border-wheat-500 bg-wheat-500 text-on-accent hover:bg-wheat-700 focus-visible:outline-wheat-500',
 );
 
 export const secondaryCtaClass = cn(

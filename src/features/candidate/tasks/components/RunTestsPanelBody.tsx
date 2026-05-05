@@ -36,7 +36,7 @@ export function RunTestsPanelBody({
         <StatusPill label={statusLabel} tone={statusTone} />
         {workflowUrl ? (
           <a
-            className="text-xs text-blue-600 hover:underline"
+            className="text-xs text-wheat-700 hover:underline"
             href={workflowUrl}
             target="_blank"
             rel="noopener noreferrer"

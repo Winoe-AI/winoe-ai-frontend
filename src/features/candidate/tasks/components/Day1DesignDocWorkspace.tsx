@@ -39,7 +39,7 @@ export function Day1DesignDocWorkspace({
       >
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div className="max-w-3xl">
-            <p className="text-xs font-semibold uppercase tracking-wide text-blue-700">
+            <p className="text-xs font-semibold uppercase tracking-wide text-wheat-700">
               Project Brief
             </p>
             <h2
@@ -59,7 +59,7 @@ export function Day1DesignDocWorkspace({
           <div className="rounded-md border border-gray-200 bg-gray-50 px-4 py-3 text-sm text-gray-700">
             <p className="font-medium text-gray-950">Include clear answers</p>
             <ul className="mt-2 list-disc space-y-1 pl-5">
-              <li>What tech stack will you use and why?</li>
+              <li>What implementation approach will you use and why?</li>
               <li>How will you structure the project?</li>
               <li>What is your testing strategy?</li>
             </ul>
@@ -129,7 +129,7 @@ export function Day1DesignDocWorkspace({
                 Markdown editor
               </span>
               <textarea
-                className="min-h-[520px] w-full resize-y rounded-md border border-gray-300 bg-white p-4 text-sm leading-6 text-gray-950 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/30 disabled:bg-gray-100 disabled:text-gray-600"
+                className="min-h-[520px] w-full resize-y rounded-md border border-gray-300 bg-white p-4 text-sm leading-6 text-gray-950 shadow-sm focus:border-wheat-500 focus:outline-none focus:ring-2 focus:ring-wheat-500/30 disabled:bg-gray-100 disabled:text-gray-600"
                 value={value}
                 onChange={(event) => onChange(event.target.value)}
                 disabled={disabled}

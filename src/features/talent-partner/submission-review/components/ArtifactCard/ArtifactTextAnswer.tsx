@@ -35,7 +35,7 @@ function Text({
         <div className="text-sm font-semibold text-gray-900">Text answer</div>
         <button
           type="button"
-          className="text-sm text-blue-600 underline"
+          className="text-sm text-wheat-700 underline"
           onClick={onToggle}
           aria-expanded={expanded}
         >

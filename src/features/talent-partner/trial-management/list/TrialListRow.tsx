@@ -24,7 +24,7 @@ export function TrialListRow({ trial, onInvite, onPrefetch }: Props) {
             prefetch={LINK_PREFETCH_RETURNING}
             onMouseEnter={() => onPrefetch(trial.id)}
             onFocus={() => onPrefetch(trial.id)}
-            className="font-medium text-blue-600 hover:underline"
+            className="font-medium text-wheat-700 hover:underline"
           >
             {trial.title}
           </Link>

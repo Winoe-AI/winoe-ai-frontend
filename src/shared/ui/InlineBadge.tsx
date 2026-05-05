@@ -4,7 +4,7 @@ type InlineBadgeProps = {
 };
 
 const toneClasses: Record<NonNullable<InlineBadgeProps['tone']>, string> = {
-  info: 'bg-blue-50 text-blue-800',
+  info: 'bg-wheat-50 text-wheat-900',
   success: 'bg-green-50 text-green-800',
   warning: 'bg-yellow-50 text-yellow-800',
   muted: 'bg-gray-100 text-gray-800',

@@ -43,7 +43,7 @@ export function HandoffWindowStatus({ task, controller }: Props) {
       className={`rounded-md border px-3 py-2 text-sm ${
         isNearCutoff
           ? 'border-amber-200 bg-amber-50 text-amber-900'
-          : 'border-blue-200 bg-blue-50 text-blue-900'
+          : 'border-wheat-100 bg-wheat-50 text-wheat-900'
       }`}
       aria-live="polite"
     >

@@ -1,8 +1,16 @@
 import type { Metadata, Viewport } from 'next';
 import { ReactNode } from 'react';
+import { GeistSans } from 'geist/font/sans';
+import { GeistMono } from 'geist/font/mono';
+import { Source_Serif_4 } from 'next/font/google';
 import './globals.css';
 import { NotificationsProvider } from '@/shared/notifications';
 import { QueryProvider } from '@/shared/query';
+
+const sourceSerif = Source_Serif_4({
+  subsets: ['latin'],
+  variable: '--font-serif',
+});
 
 const SITE_NAME = 'Winoe AI';
 const SITE_TITLE = 'Winoe AI | Real-work Trials for hiring';
@@ -39,13 +47,16 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  themeColor: '#111827',
+  themeColor: 'var(--wheat-500)',
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en">
-      <body>
+    <html
+      lang="en"
+      className={`${GeistSans.variable} ${GeistMono.variable} ${sourceSerif.variable}`}
+    >
+      <body className="font-sans antialiased bg-primary text-primary">
         <QueryProvider>
           <NotificationsProvider>{children}</NotificationsProvider>
         </QueryProvider>

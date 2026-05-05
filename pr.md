@@ -1,122 +1,61 @@
-## Summary
+# Summary
 
-- Restore the completed candidate Trial experience after Day 5.
-- Add the post-Trial congratulations screen metadata: Trial name, company, and authoritative completion date.
-- Restore the completed read-only submission review page with all five day sections.
-- Harden review rendering so missing artifacts show explicit unavailable/empty states instead of crashing.
-- Fix completion-date sourcing so the completion card uses authoritative `completedAt`, not stale local submission timestamps.
-- Stabilize contract-live QA harness/runtime enough to verify #187 end to end.
+Completed Task 1: Foundation Design System + v4 UI / Copy Cleanup.
 
-## Issue
+# What Changed
 
-Closes #187
+### Foundation Design System
 
-## What Changed
+- Added/standardized Winoe AI design tokens using the warm wheat + neutral foundation.
+- Removed default Tailwind blue/indigo/purple palette usage from active frontend source.
+- Removed raw frontend hex colors from active UI source.
+- Ensured primary wheat CTAs use safe contrast via `text-on-accent`.
+- Converted low-contrast wheat informational cards from solid wheat surfaces to light wheat callouts:
+  - `border-wheat-100`
+  - `bg-wheat-50`
+  - `text-wheat-900`
+- Added ESLint guardrails to prevent unsafe `bg-wheat-500` + `text-wheat-*` pairings.
+- Verified remaining `bg-wheat-500` usages are safe CTA, progress, selected-state, or design-system swatch usages.
 
-### Candidate completion screen
+### v4 UI / Copy Cleanup
 
-- Shows Trial name, company, and completion date after Day 5 completion.
-- Uses authoritative completion timestamp from completed task/session state.
-- Removes stale submission timestamp fallback from the completion-date display.
-- Keeps “Review submissions” and “Back to Candidate Dashboard” actions.
+- Removed active UI references to retired template/tech-stack selector concepts.
+- Ensured Trial detail/preview uses Project Brief framing, not codespace structure/template framing.
+- Replaced Presentation user-facing copy with Handoff + Demo.
+- Removed offline/local-work language from active UI.
+- Fixed Day 1 Design Document starter copy:
+  - `## Tech Stack Choice` became `## Implementation Approach`
+  - prompt copy now asks for implementation approach instead of tech stack.
+- Updated visible AI override agent labels so raw internal keys like `demoPresentationReviewer` do not leak into Talent Partner UI.
+  - Display label is now safe, e.g. `Handoff + Demo Reviewer`.
+- Added a unit test proving raw internal agent keys are not rendered.
 
-### Read-only completed review
+# Validation
 
-- Renders a read-only completed Trial review route.
-- Shows Trial metadata and completion date.
-- Renders the five-day Trial sequence:
-  - Day 1 — Design Doc
-  - Day 2 — Implementation Kickoff
-  - Day 3 — Implementation Wrap-Up
-  - Day 4 — Handoff + Demo
-  - Day 5 — Reflection Essay
-- Renders markdown content for Day 1 and Day 5.
-- Renders workspace metadata, commit history, and test results for Day 2/3 when available.
-- Shows explicit unavailable states when commit history or test results are missing.
-- Renders Day 4 recording/transcript when available, with graceful unavailable states.
-- Prevents editable controls from appearing in completed review.
+- `npm run lint` passed
+- `npm run typecheck` passed
+- `npm test` passed
+- `npm run build` passed
+- `npm run build-ladle` passed
+- `./precommit.sh` passed
+- Full local browser QA passed using real Chrome via CDP/Puppeteer.
+- Backend and frontend servers were run locally.
 
-### Data/state handling
+# QA Notes
 
-- Normalizes completed review and current task completion data.
-- Carries `completedAt` through candidate session state.
-- Prefers authoritative task/session completion timestamp over stale bootstrap/local storage data.
-- Handles missing/snake_case backend fields safely.
+QA verified:
+- Talent Partner dashboard
+- Trial creation
+- Trial detail
+- Candidate submission review
+- Winoe Report route
+- Candidate dashboard
+- Candidate session
+- Day 1 Project Brief / Design Document
+- Day 4 Handoff + Demo
+- What We Evaluate page
+- Text dump scans found no forbidden visible terms after the final fixes.
 
-### QA harness
+# Risks / Follow-ups
 
-- Stabilized contract-live local runtime host handling around `127.0.0.1`.
-- Ensured worker/frontend/backend startup is deterministic for contract-live.
-- Captures Day 5 completion and review page artifacts.
-
-## Verification
-
-### Automated checks
-
-- `./precommit.sh` — PASS
-- Frontend test suite — PASS
-  - `508 passed, 508 total`
-  - `1589 passed, 1589 total`
-- Typecheck — PASS
-- Build — PASS
-- Prettier check — PASS
-- Harness syntax check — PASS
-- Terminology audit — PASS, no retired candidate UI copy found
-
-### Contract-live QA
-
-Command:
-
-```bash
-CONTRACT_LIVE_DRIVER_SEQUENCE='talent_partner-fresh,candidate-schedule,candidate-day:1,candidate-day:2,candidate-day:3,candidate-day:4,candidate-day:5,talent_partner-review' bash qa_verifications/Contract-Live-QA/run_contract_live.sh
-```
-
-Result: PASS
-
-Evidence bundle:
-
-```text
-qa_verifications/Contract-Live-QA/contract_live_qa_latest/artifacts/20260502T143652/
-```
-
-Key artifacts:
-
-- `api/candidate-day5-after.json`
-- `candidate-day5-after.png`
-- `api/candidate-day5-current-task-after.json`
-- `api/candidate-review-page.json`
-- `candidate-review-page.png`
-
-Completion-date verification:
-
-- Day 5 completion card: `May 5, 2026`
-- Read-only review page: `May 5, 2026`
-- Authoritative `completedAt`: `2026-05-05T13:00:00Z`
-
-## QA Checklist
-
-- [x] After Day 5 completion: congratulations screen
-- [x] Shows Trial name, company, completion date
-- [x] Review submissions navigates to read-only review
-- [x] Each day viewable but not editable
-- [x] Day 1 design doc markdown rendered
-- [x] Day 2/3 repo metadata, commit history, test results or unavailable states
-- [x] Day 4 video playback/transcript if available or graceful fallback
-- [x] Day 5 reflection essay markdown rendered
-- [x] No editable controls on review page
-
-## Known Caveat
-
-Contract-live now uses API/bootstrap shortcuts for some intermediate setup to keep the local end-to-end run deterministic. This PR should not be used as proof that the full candidate scheduling click path is covered in browser. For #187, the relevant browser surfaces - Day 5 completion, review navigation, and read-only completed review - were verified against real backend data.
-
-## Risk
-
-Low-to-medium.
-
-Main risk is around candidate session completion state and backend payload variance. This is mitigated by:
-
-- defensive frontend normalization,
-- explicit empty/unavailable states,
-- unit coverage for stale completion-date handling,
-- full precommit passing,
-- successful contract-live verification of the completed Trial path.
+- None.

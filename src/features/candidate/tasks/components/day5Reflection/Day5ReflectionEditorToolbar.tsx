@@ -22,7 +22,7 @@ export function Day5ReflectionEditorToolbar({ mode, onModeChange }: Props) {
           aria-pressed={mode === 'write'}
           className={
             mode === 'write'
-              ? 'bg-blue-50 px-3 py-1 text-blue-700 transition-colors'
+              ? 'bg-wheat-50 px-3 py-1 text-wheat-900 transition-colors'
               : 'px-3 py-1 text-gray-700 transition-colors hover:bg-gray-50'
           }
           onClick={() => onModeChange('write')}
@@ -34,7 +34,7 @@ export function Day5ReflectionEditorToolbar({ mode, onModeChange }: Props) {
           aria-pressed={mode === 'preview'}
           className={
             mode === 'preview'
-              ? 'border-l border-gray-200 bg-blue-50 px-3 py-1 text-blue-700 transition-colors'
+              ? 'border-l border-gray-200 bg-wheat-50 px-3 py-1 text-wheat-900 transition-colors'
               : 'border-l border-gray-200 px-3 py-1 text-gray-700 transition-colors hover:bg-gray-50'
           }
           onClick={() => onModeChange('preview')}

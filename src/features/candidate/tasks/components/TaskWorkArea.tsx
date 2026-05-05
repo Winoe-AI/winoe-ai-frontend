@@ -55,7 +55,7 @@ export function TaskWorkArea({
               'This day is closed and read-only. Review your prompt and recorded submission details in the banner above.'}
           </div>
         ) : (
-          <div className="rounded-md border border-blue-100 bg-blue-50 p-3 text-sm text-blue-900">
+          <div className="rounded-md border border-wheat-100 bg-wheat-50 p-3 text-sm text-wheat-900">
             {dayIndex === 3
               ? 'Use the same Codespace and repository from Day 2 for all wrap-up work. When the implementation is ready for handoff, submit to record the final commit SHA.'
               : 'Use your Codespace for all implementation work. When you’re ready, submit to move to the next day.'}

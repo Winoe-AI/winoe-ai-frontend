@@ -15,9 +15,9 @@ export function StartView({ title, role, onStart, onDashboard }: Props) {
     <div className="mx-auto max-w-4xl space-y-5 p-6">
       <StartIntro title={title} role={role} />
 
-      <div className="rounded-md border border-blue-100 bg-blue-50 p-4">
-        <h2 className="text-sm font-semibold text-blue-900">What to expect</h2>
-        <ul className="mt-2 space-y-1 text-sm text-blue-900">
+      <div className="rounded-md border border-wheat-100 bg-wheat-50 p-4 text-wheat-900">
+        <h2 className="text-sm font-semibold">What to expect</h2>
+        <ul className="mt-2 space-y-1 text-sm text-wheat-700">
           <li>
             <b>Day 1:</b> architecture plan (written).
           </li>

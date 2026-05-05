@@ -40,7 +40,7 @@ export function RunTestsOutput({ label, content }: Props) {
         <div className="flex items-center gap-2">
           {canCopy ? (
             <button
-              className="text-blue-600 hover:underline"
+              className="text-wheat-700 hover:underline"
               type="button"
               onClick={handleCopy}
             >
@@ -49,7 +49,7 @@ export function RunTestsOutput({ label, content }: Props) {
           ) : null}
           {needsTruncate ? (
             <button
-              className="text-blue-600 hover:underline"
+              className="text-wheat-700 hover:underline"
               type="button"
               onClick={() => setExpanded((v) => !v)}
             >

@@ -52,7 +52,7 @@ export function CandidateCompareTableRow({ trialId, row }: Props) {
       <td className="px-4 py-3 align-top">
         <div className="flex flex-col items-start gap-2">
           <Link
-            className="text-blue-600 hover:underline"
+            className="text-wheat-700 hover:underline"
             href={winoeReportHref}
             prefetch={LINK_PREFETCH}
           >
