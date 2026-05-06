@@ -35,7 +35,7 @@ export function ScenarioEditorFields({
           storyline (markdown)
         </span>
         <textarea
-          className="min-h-28 rounded border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-blue-500 focus:outline-none"
+          className="min-h-28 rounded border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:border-wheat-500 focus:outline-none"
           value={storylineInput}
           onChange={(event) => onStorylineChange(event.target.value)}
           disabled={disabled}
@@ -58,7 +58,7 @@ export function ScenarioEditorFields({
           task prompts (json)
         </span>
         <textarea
-          className="min-h-40 rounded border border-gray-300 px-3 py-2 font-mono text-xs text-gray-900 focus:border-blue-500 focus:outline-none"
+          className="min-h-40 rounded border border-gray-300 px-3 py-2 font-mono text-xs text-gray-900 focus:border-wheat-500 focus:outline-none"
           value={taskPromptsInput}
           onChange={(event) => onTaskPromptsChange(event.target.value)}
           disabled={disabled}
@@ -81,7 +81,7 @@ export function ScenarioEditorFields({
           rubric (json)
         </span>
         <textarea
-          className="min-h-40 rounded border border-gray-300 px-3 py-2 font-mono text-xs text-gray-900 focus:border-blue-500 focus:outline-none"
+          className="min-h-40 rounded border border-gray-300 px-3 py-2 font-mono text-xs text-gray-900 focus:border-wheat-500 focus:outline-none"
           value={rubricInput}
           onChange={(event) => onRubricChange(event.target.value)}
           disabled={disabled}

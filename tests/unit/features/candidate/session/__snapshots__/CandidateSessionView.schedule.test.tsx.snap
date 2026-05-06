@@ -18,10 +18,10 @@ exports[`CandidateSessionView scheduling states renders locked state with countd
       </p>
     </div>
     <div
-      class="rounded-md border border-blue-200 bg-blue-50 p-4"
+      class="rounded-md border border-wheat-100 bg-wheat-50 p-4 text-wheat-900"
     >
       <p
-        class="text-sm text-blue-900"
+        class="text-sm"
       >
         Starts in 
         <span
@@ -31,7 +31,7 @@ exports[`CandidateSessionView scheduling states renders locked state with countd
         </span>
       </p>
       <p
-        class="mt-1 text-xs text-blue-800"
+        class="mt-1 text-xs text-wheat-700"
       >
         Your Trial opens on Thu, Jan 1, 2099 at 9:00 AM America/New_York. Come back then.
       </p>
@@ -150,7 +150,7 @@ exports[`CandidateSessionView scheduling states renders locked state with countd
       </p>
     </div>
     <button
-      class="inline-flex items-center justify-center rounded-md border font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 bg-white text-gray-800 border-gray-300 hover:bg-gray-50 focus:ring-blue-500 px-4 py-2 text-sm"
+      class="inline-flex items-center justify-center rounded-md border font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 bg-elevated text-primary border-strong hover:bg-secondary focus:ring-wheat-500 px-4 py-2 text-sm"
     >
       Refresh
     </button>
@@ -203,7 +203,7 @@ exports[`CandidateSessionView scheduling states renders scheduling confirm state
         </li>
       </ul>
       <a
-        class="mt-2 inline-block text-sm text-blue-700 underline"
+        class="mt-2 inline-block text-sm text-wheat-700 underline"
         href="/candidate/what-we-evaluate"
       >
         What we evaluate
@@ -213,7 +213,7 @@ exports[`CandidateSessionView scheduling states renders scheduling confirm state
       class="space-y-4 rounded-md border border-gray-200 p-4"
     >
       <div
-        class="rounded-md border border-blue-200 bg-blue-50 p-3 text-sm text-blue-900"
+        class="rounded-md border border-wheat-100 bg-wheat-50 p-3 text-sm text-wheat-900"
       >
         <p>
           Your Trial opens on 
@@ -358,12 +358,12 @@ exports[`CandidateSessionView scheduling states renders scheduling confirm state
         class="flex gap-3 pt-1"
       >
         <button
-          class="inline-flex items-center justify-center rounded-md border font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 bg-white text-gray-800 border-gray-300 hover:bg-gray-50 focus:ring-blue-500 px-4 py-2 text-sm"
+          class="inline-flex items-center justify-center rounded-md border font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 bg-elevated text-primary border-strong hover:bg-secondary focus:ring-wheat-500 px-4 py-2 text-sm"
         >
           Back
         </button>
         <button
-          class="inline-flex items-center justify-center rounded-md border font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 bg-blue-600 text-white border-transparent hover:bg-blue-700 focus:ring-blue-500 px-4 py-2 text-sm"
+          class="inline-flex items-center justify-center rounded-md border font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 bg-wheat-500 text-on-accent border-transparent hover:bg-wheat-700 focus:ring-wheat-500 px-4 py-2 text-sm"
         >
           Confirm schedule
         </button>
@@ -418,7 +418,7 @@ exports[`CandidateSessionView scheduling states renders scheduling form state 1`
         </li>
       </ul>
       <a
-        class="mt-2 inline-block text-sm text-blue-700 underline"
+        class="mt-2 inline-block text-sm text-wheat-700 underline"
         href="/candidate/what-we-evaluate"
       >
         What we evaluate
@@ -437,7 +437,7 @@ exports[`CandidateSessionView scheduling states renders scheduling form state 1`
         <input
           aria-invalid="false"
           aria-label="Start date"
-          class="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          class="block w-full rounded-md border border-strong bg-primary px-3 py-2 text-sm shadow-sm focus:border-wheat-500 focus:outline-none focus:ring-1 focus:ring-wheat-500 text-primary"
           id="schedule-start-date"
           type="date"
           value="2099-01-01"
@@ -453,7 +453,7 @@ exports[`CandidateSessionView scheduling states renders scheduling form state 1`
         <input
           aria-invalid="false"
           aria-label="Timezone"
-          class="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          class="block w-full rounded-md border border-strong bg-primary px-3 py-2 text-sm shadow-sm focus:border-wheat-500 focus:outline-none focus:ring-1 focus:ring-wheat-500 text-primary"
           id="schedule-timezone"
           list="candidate-timezone-list"
           placeholder="America/New_York"
@@ -486,7 +486,7 @@ exports[`CandidateSessionView scheduling states renders scheduling form state 1`
         <input
           aria-invalid="false"
           aria-label="GitHub username"
-          class="block w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          class="block w-full rounded-md border border-strong bg-primary px-3 py-2 text-sm shadow-sm focus:border-wheat-500 focus:outline-none focus:ring-1 focus:ring-wheat-500 text-primary"
           id="schedule-github-username"
           placeholder="octocat"
           type="text"
@@ -499,7 +499,7 @@ exports[`CandidateSessionView scheduling states renders scheduling form state 1`
         Use the GitHub username connected to your Trial workspace.
       </p>
       <div
-        class="rounded-md border border-blue-200 bg-blue-50 p-3 text-sm text-blue-900"
+        class="rounded-md border border-wheat-100 bg-wheat-50 p-3 text-sm text-wheat-900"
       >
         Your Trial opens on 
         <span
@@ -600,12 +600,12 @@ exports[`CandidateSessionView scheduling states renders scheduling form state 1`
         class="flex gap-3 pt-2"
       >
         <button
-          class="inline-flex items-center justify-center rounded-md border font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 bg-white text-gray-800 border-gray-300 hover:bg-gray-50 focus:ring-blue-500 px-4 py-2 text-sm"
+          class="inline-flex items-center justify-center rounded-md border font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 bg-elevated text-primary border-strong hover:bg-secondary focus:ring-wheat-500 px-4 py-2 text-sm"
         >
           Back to dashboard
         </button>
         <button
-          class="inline-flex items-center justify-center rounded-md border font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 bg-blue-600 text-white border-transparent hover:bg-blue-700 focus:ring-blue-500 px-4 py-2 text-sm"
+          class="inline-flex items-center justify-center rounded-md border font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 bg-wheat-500 text-on-accent border-transparent hover:bg-wheat-700 focus:ring-wheat-500 px-4 py-2 text-sm"
         >
           Continue
         </button>

@@ -58,7 +58,7 @@ const Placeholder = ({ label }: { label: string }) => (
 );
 
 const LoadingPlaceholder = ({ label }: { label: string }) => (
-  <div className="rounded border border-dashed border-blue-200 bg-blue-50 p-3 text-sm text-blue-900">
+  <div className="rounded border border-dashed border-wheat-300 bg-wheat-50 p-3 text-sm text-wheat-900">
     Loading {label} artifact...
   </div>
 );

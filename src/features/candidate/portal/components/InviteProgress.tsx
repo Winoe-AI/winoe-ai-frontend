@@ -11,7 +11,7 @@ export function InviteProgress({ invite }: Props) {
     <div className="mt-3">
       <div className="h-2 rounded-full bg-gray-100">
         <div
-          className="h-2 rounded-full bg-blue-600"
+          className="h-2 rounded-full bg-wheat-500"
           style={{ width: `${(summary.completed / summary.total) * 100}%` }}
         />
       </div>

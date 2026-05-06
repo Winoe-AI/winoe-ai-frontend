@@ -26,7 +26,7 @@ export function IntegrityCalloutCutoffDetails({
           <span className="font-semibold">Cutoff commit:</span>{' '}
           {cutoffCommitUrl ? (
             <a
-              className="text-blue-700 underline hover:text-blue-800"
+              className="text-wheat-700 underline hover:text-wheat-700"
               href={cutoffCommitUrl}
               target="_blank"
               rel="noopener noreferrer"

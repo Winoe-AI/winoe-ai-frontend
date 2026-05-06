@@ -55,12 +55,12 @@ export function TrialPlanContent({
         </div>
       ) : null}
       {preferredLanguageFrameworkLabel ? (
-        <div className="rounded border border-blue-200 bg-blue-50 p-3 text-sm text-blue-900">
-          <div className="text-xs font-medium uppercase tracking-wide text-blue-700">
+        <div className="rounded border border-wheat-100 bg-wheat-50 p-3 text-sm text-wheat-900">
+          <div className="text-xs font-medium uppercase tracking-wide text-wheat-700">
             Preferred language/framework
           </div>
           <div className="mt-1">{preferredLanguageFrameworkLabel}</div>
-          <p className="mt-1 text-xs text-blue-800">
+          <p className="mt-1 text-xs text-wheat-700">
             Informational context only. Candidates may use any stack they need
             to solve the project brief.
           </p>

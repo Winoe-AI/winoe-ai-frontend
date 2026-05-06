@@ -11,11 +11,11 @@ type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 
 const variants: Record<NonNullable<ButtonProps['variant']>, string> = {
   primary:
-    'bg-blue-600 text-white border-transparent hover:bg-blue-700 focus:ring-blue-500',
+    'bg-wheat-500 text-on-accent border-transparent hover:bg-wheat-700 focus:ring-wheat-500',
   secondary:
-    'bg-white text-gray-800 border-gray-300 hover:bg-gray-50 focus:ring-blue-500',
+    'bg-elevated text-primary border-strong hover:bg-secondary focus:ring-wheat-500',
   ghost:
-    'bg-transparent text-gray-700 border-transparent hover:bg-gray-50 focus:ring-blue-500',
+    'bg-transparent text-secondary border-transparent hover:bg-secondary focus:ring-wheat-500',
 };
 
 const sizes: Record<NonNullable<ButtonProps['size']>, string> = {

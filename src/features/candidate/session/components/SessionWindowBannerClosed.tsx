@@ -50,7 +50,7 @@ export function SessionWindowClosedBanner({
       ) : null}
       {submissionHref ? (
         <p className="mt-1 text-xs">
-          <a className="text-blue-700 underline" href={submissionHref}>
+          <a className="text-wheat-700 underline" href={submissionHref}>
             View recorded submission
           </a>
         </p>

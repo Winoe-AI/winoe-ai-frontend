@@ -39,7 +39,7 @@ export function DayScoreCard({ dayScore }: DayScoreCardProps) {
           className={
             isAiEvaluationDisabled || isNotEvaluated
               ? 'rounded-full border border-slate-300 bg-slate-100 px-3 py-1 text-sm font-semibold text-slate-700'
-              : 'rounded-full border border-blue-200 bg-blue-50 px-3 py-1 text-sm font-semibold text-blue-800'
+              : 'rounded-full border border-wheat-300 bg-wheat-50 px-3 py-1 text-sm font-semibold text-wheat-900'
           }
         >
           {isAiEvaluationDisabled

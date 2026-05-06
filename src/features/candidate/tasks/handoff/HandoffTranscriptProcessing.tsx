@@ -7,7 +7,7 @@ export function HandoffTranscriptProcessing({ controller }: Props) {
 
   return (
     <div
-      className="rounded-md border border-blue-200 bg-blue-50 p-3 text-sm text-blue-900"
+      className="rounded-md border border-wheat-100 bg-wheat-50 p-3 text-sm text-wheat-900"
       role="status"
       aria-live="polite"
     >

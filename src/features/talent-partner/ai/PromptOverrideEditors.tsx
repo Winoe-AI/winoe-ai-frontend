@@ -21,7 +21,7 @@ type Props = {
 };
 
 const textareaClassName =
-  'mt-1 min-h-32 w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500';
+  'mt-1 min-h-32 w-full rounded-md border border-gray-300 px-3 py-2 text-sm shadow-sm focus:border-wheat-500 focus:outline-none focus:ring-1 focus:ring-wheat-500';
 
 export function PromptOverrideEditors({
   values,

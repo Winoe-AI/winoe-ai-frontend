@@ -2,10 +2,10 @@
 import Button from '@/shared/ui/Button';
 
 export const TrialPlanGeneratingBanner = () => (
-  <div className="rounded border border-blue-200 bg-blue-50 p-3 text-sm text-blue-800">
+  <div className="rounded border border-wheat-100 bg-wheat-50 p-3 text-sm text-wheat-900">
     <div className="flex items-center gap-2">
       <span
-        className="inline-block h-3 w-3 animate-spin rounded-full border-2 border-blue-700 border-t-transparent"
+        className="inline-block h-3 w-3 animate-spin rounded-full border-2 border-wheat-700 border-t-transparent"
         aria-hidden="true"
       />
       Project brief generation is in progress. This view refreshes

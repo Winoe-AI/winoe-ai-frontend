@@ -22,7 +22,7 @@ export function ArtifactTestResults({
         {(testResults.stdout || testResults.stderr) && (
           <button
             type="button"
-            className="text-[11px] text-blue-600 underline"
+            className="text-[11px] text-wheat-700 underline"
             onClick={onToggleOutput}
           >
             {showOutput ? 'Hide' : 'View'}

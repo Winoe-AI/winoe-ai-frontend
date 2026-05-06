@@ -31,7 +31,7 @@ export function SchedulingConfirmStep({
 
   return (
     <div className="space-y-4 rounded-md border border-gray-200 p-4">
-      <div className="rounded-md border border-blue-200 bg-blue-50 p-3 text-sm text-blue-900">
+      <div className="rounded-md border border-wheat-100 bg-wheat-50 p-3 text-sm text-wheat-900">
         <p>
           Your Trial opens on{' '}
           <span className="font-semibold">

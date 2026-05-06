@@ -67,7 +67,7 @@ export function WinoeReportPageToolbar({
           data-winoe-report-no-print="true"
         >
           <Link
-            className="text-sm text-blue-600 hover:underline"
+            className="text-sm text-wheat-700 hover:underline"
             href={submissionsHref}
           >
             &larr; Back to submissions

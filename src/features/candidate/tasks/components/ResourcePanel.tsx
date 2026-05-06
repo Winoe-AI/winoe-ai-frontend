@@ -22,7 +22,7 @@ export function ResourcePanel({
       <div className="mt-3 text-sm text-gray-700">
         {linkUrl ? (
           <a
-            className="text-blue-600 hover:underline"
+            className="text-wheat-700 hover:underline"
             href={linkUrl}
             target="_blank"
             rel="noreferrer"

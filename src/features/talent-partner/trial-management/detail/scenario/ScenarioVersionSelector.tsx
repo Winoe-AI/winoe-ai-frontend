@@ -22,7 +22,7 @@ function statusClass(status: ScenarioUiStatus): string {
     return 'bg-amber-100 text-amber-800 border-amber-200';
   }
   if (status === 'generating') {
-    return 'bg-blue-100 text-blue-800 border-blue-200';
+    return 'bg-wheat-50 text-wheat-900 border-wheat-300';
   }
   return 'bg-slate-100 text-slate-800 border-slate-200';
 }
@@ -60,7 +60,7 @@ export function ScenarioVersionSelector({
               className={[
                 'inline-flex items-center gap-2 rounded border px-2.5 py-1.5 text-xs font-medium',
                 selected
-                  ? 'border-blue-300 bg-blue-50 text-blue-800'
+                  ? 'border-wheat-300 bg-wheat-50 text-wheat-900'
                   : 'border-gray-200 bg-white text-gray-700 hover:bg-gray-50',
               ].join(' ')}
               onClick={() => onSelectVersion(version.id)}
@@ -82,7 +82,7 @@ export function ScenarioVersionSelector({
                 </span>
               ) : null}
               {version.isPending ? (
-                <span className="rounded border border-blue-200 bg-blue-50 px-1.5 py-0.5 text-[10px] uppercase tracking-wide text-blue-700">
+                <span className="rounded border border-wheat-300 bg-wheat-50 px-1.5 py-0.5 text-[10px] uppercase tracking-wide text-wheat-900">
                   pending
                 </span>
               ) : null}

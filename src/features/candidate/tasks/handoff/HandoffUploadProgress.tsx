@@ -8,7 +8,7 @@ export function HandoffUploadProgress({ controller }: Props) {
   if (controller.validating) {
     return (
       <div
-        className="rounded-md border border-blue-200 bg-blue-50 p-3 text-sm text-blue-900"
+        className="rounded-md border border-wheat-100 bg-wheat-50 p-3 text-sm text-wheat-900"
         role="status"
         aria-live="polite"
       >
@@ -23,20 +23,20 @@ export function HandoffUploadProgress({ controller }: Props) {
 
   return (
     <div
-      className="rounded-md border border-blue-200 bg-blue-50 p-3 text-sm text-blue-900"
+      className="rounded-md border border-wheat-100 bg-wheat-50 p-3 text-sm text-wheat-900"
       role="status"
       aria-live="polite"
     >
       <div className="font-medium">Uploading video...</div>
       <div
-        className="mt-2 h-2 w-full overflow-hidden rounded bg-blue-100"
+        className="mt-2 h-2 w-full overflow-hidden rounded bg-wheat-500"
         role="progressbar"
         aria-valuemin={0}
         aria-valuemax={100}
         aria-valuenow={controller.state.uploadProgressPct}
       >
         <div
-          className="h-full bg-blue-600 transition-all"
+          className="h-full bg-wheat-500 transition-all"
           style={{ width: `${String(controller.state.uploadProgressPct)}%` }}
         />
       </div>

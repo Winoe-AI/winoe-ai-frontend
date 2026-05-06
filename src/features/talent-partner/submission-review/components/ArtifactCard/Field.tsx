@@ -15,7 +15,7 @@ export function Field({ label, value, link, linkLabel }: Props) {
       <div className="font-semibold text-gray-800">{label}</div>
       {link ? (
         <a
-          className="text-blue-600 hover:underline"
+          className="text-wheat-700 hover:underline"
           href={link}
           target="_blank"
           rel="noreferrer"

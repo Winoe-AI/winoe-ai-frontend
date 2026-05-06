@@ -66,7 +66,7 @@ export function AiNoticeCard({
         </ul>
       )}
       <a
-        className="mt-2 inline-block text-sm text-blue-700 underline"
+        className="mt-2 inline-block text-sm text-wheat-700 underline"
         href={href}
       >
         What we evaluate

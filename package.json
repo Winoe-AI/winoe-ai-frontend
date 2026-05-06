@@ -18,11 +18,14 @@
     "test:e2e": "npx playwright install --with-deps && npx playwright test -c tests/e2e/playwright.config.ts",
     "format": "prettier . --write",
     "prettier:write": "prettier . --write",
-    "loadtest:dashboard": "node scripts/loadtest-dashboard.mjs"
+    "loadtest:dashboard": "node scripts/loadtest-dashboard.mjs",
+    "ladle": "ladle serve",
+    "build-ladle": "ladle build --outDir ladle-static"
   },
   "dependencies": {
     "@auth0/nextjs-auth0": "^4.13.2",
     "@tanstack/react-query": "^5.95.2",
+    "geist": "^1.7.0",
     "next": "16.2.1",
     "react": "19.2.1",
     "react-dom": "19.2.1",
@@ -32,8 +35,10 @@
     "undici": "^7.18.2"
   },
   "devDependencies": {
+    "@ladle/react": "^5.1.1",
     "@next/bundle-analyzer": "^16.1.6",
     "@playwright/test": "^1.57.0",
+    "@swc/helpers": "^0.5.21",
     "@tailwindcss/postcss": "^4",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.0",

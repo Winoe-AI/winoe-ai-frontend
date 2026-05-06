@@ -65,7 +65,7 @@ export function ScenarioControlsSection({
           previous={previousVersion}
         />
         {generatingLabel ? (
-          <div className="rounded border border-blue-200 bg-blue-50 p-3 text-sm text-blue-800">
+          <div className="rounded border border-wheat-100 bg-wheat-50 p-3 text-sm text-wheat-900">
             {generatingLabel}
           </div>
         ) : null}

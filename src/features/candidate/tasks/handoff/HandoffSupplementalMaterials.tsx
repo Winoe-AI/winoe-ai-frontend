@@ -102,7 +102,7 @@ export function HandoffSupplementalMaterials({
               >
                 {material.downloadUrl ? (
                   <a
-                    className="font-medium text-blue-700 underline"
+                    className="font-medium text-wheat-700 underline"
                     href={material.downloadUrl}
                     target="_blank"
                     rel="noreferrer"

@@ -14,7 +14,7 @@ type WinoeReportStatusPanelProps = {
 function spinner() {
   return (
     <span
-      className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-blue-600 border-t-transparent"
+      className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-wheat-700 border-t-transparent"
       aria-hidden="true"
     />
   );
@@ -31,12 +31,12 @@ export function WinoeReportStatusPanel({
 }: WinoeReportStatusPanelProps) {
   if (status === 'generating') {
     return (
-      <div className="rounded border border-blue-200 bg-blue-50 p-4 text-blue-900">
+      <div className="rounded border border-wheat-100 bg-wheat-50 p-4 text-wheat-900">
         <div className="flex items-center gap-2 text-sm font-semibold">
           {spinner()}
           <span>Generating Winoe Report</span>
         </div>
-        <p className="mt-2 text-sm text-blue-800">{message}</p>
+        <p className="mt-2 text-sm text-wheat-700">{message}</p>
       </div>
     );
   }

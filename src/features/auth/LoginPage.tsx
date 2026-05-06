@@ -62,7 +62,7 @@ export default function LoginPage({
       {signupHref ? (
         <a
           href={signupHref}
-          className="mt-3 block text-center text-sm text-blue-600 hover:underline"
+          className="mt-3 block text-center text-sm text-wheat-700 hover:underline"
         >
           {isCandidate
             ? 'New candidate? Create your account'

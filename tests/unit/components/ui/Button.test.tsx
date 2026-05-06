@@ -10,7 +10,7 @@ describe('Button', () => {
     );
 
     const btn = screen.getByRole('button', { name: /click/i });
-    expect(btn).toHaveClass('bg-white');
+    expect(btn).toHaveClass('bg-elevated');
     expect(btn).toHaveClass('px-3');
     expect(btn).toHaveTextContent('Click');
     expect(btn.querySelector('span')).toHaveTextContent('i');

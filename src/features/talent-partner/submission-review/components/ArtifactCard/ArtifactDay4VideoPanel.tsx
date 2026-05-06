@@ -27,7 +27,7 @@ export function ArtifactDay4VideoPanel({
           onError={() => onVideoError(downloadUrl)}
         />
         <a
-          className="mt-2 inline-block text-sm text-blue-600 underline"
+          className="mt-2 inline-block text-sm text-wheat-700 underline"
           href={downloadUrl}
           download
         >

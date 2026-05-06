@@ -11,7 +11,7 @@ export function TrialError({ message, onRetry }: Props) {
       {onRetry ? (
         <div className="mt-2">
           <button
-            className="text-sm font-medium text-blue-700 underline"
+            className="text-sm font-medium text-wheat-700 underline"
             type="button"
             onClick={onRetry}
           >
