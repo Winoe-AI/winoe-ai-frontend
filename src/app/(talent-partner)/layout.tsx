@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import { redirect } from 'next/navigation';
 import { getCachedTalentPartnerSessionProfile } from '@/features/auth/talentPartnerOnboarding.server';
-import AppShell from '@/shared/layout/AppShell';
+import TalentPartnerAppShell from '@/shared/layout/TalentPartnerAppShell';
 
 export default async function TalentPartnerLayout({
   children,
@@ -13,5 +13,18 @@ export default async function TalentPartnerLayout({
   if (canTalentPartner && profile && profile.onboardingComplete === false) {
     redirect('/talent-partner-onboarding?returnTo=%2Fdashboard');
   }
-  return <AppShell navScope="talent_partner">{children}</AppShell>;
+
+  const organizationName = profile?.companyName || 'Workspace';
+  const userEmail = profile?.email || 'Account';
+  const userDisplayName = profile?.name || undefined;
+
+  return (
+    <TalentPartnerAppShell
+      organizationName={organizationName}
+      userEmail={userEmail}
+      userDisplayName={userDisplayName}
+    >
+      {children}
+    </TalentPartnerAppShell>
+  );
 }

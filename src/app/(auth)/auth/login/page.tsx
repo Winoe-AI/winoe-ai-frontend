@@ -24,7 +24,7 @@ export async function generateMetadata({
     mode === 'candidate' ? 'candidate portal' : 'talent partner dashboard';
   return {
     title: `${actorLabel} login | ${BRAND_NAME}`,
-    description: `Sign in to access your ${BRAND_NAME} ${destination}.`,
+    description: `Access your ${BRAND_NAME} ${destination}.`,
   };
 }
 

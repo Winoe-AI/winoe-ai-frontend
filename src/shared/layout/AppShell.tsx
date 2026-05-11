@@ -17,13 +17,13 @@ export default async function AppShell({ children, navScope }: AppShellProps) {
   const permissions = extractPermissions(session?.user, null);
 
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-900">
+    <div className="min-h-screen bg-primary text-primary">
       <NavigationPerfLogger />
       <WebVitalsLogger />
       <a
         href="#main-content"
         data-winoe-report-no-print="true"
-        className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:rounded focus:bg-white focus:px-3 focus:py-2 focus:shadow"
+        className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:rounded focus:bg-elevated focus:px-3 focus:py-2 focus:shadow"
       >
         Skip to main content
       </a>

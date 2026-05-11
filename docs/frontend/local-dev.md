@@ -77,3 +77,24 @@ Additional Playwright suites:
 npx playwright test -c tests/e2e/integration-lane/playwright.config.ts
 npx playwright test -c tests/e2e/flow-qa/playwright.config.ts
 ```
+
+## 6) Local QA Session Bootstrap (Task 3)
+
+Use this local-only route to create an Auth0-compatible dev session cookie and
+land directly on Task 3 surfaces without external Universal Login:
+
+```bash
+# Talent Partner dashboard QA entry
+open "http://localhost:3000/api/dev/qa-login?role=talent_partner&returnTo=%2Fdashboard%2Ftrials"
+
+# Candidate QA entry (for role-boundary checks)
+open "http://localhost:3000/api/dev/qa-login?role=candidate&returnTo=%2Fcandidate%2Fdashboard"
+```
+
+Notes:
+
+- Route is disabled outside local development and returns `404` in production.
+- Requires `WINOE_AUTH0_SECRET` in `.env.local`.
+- Optional query params:
+  - `email` (override the QA email used in the cookie session)
+  - `returnTo` (safe relative route only; auth/internal paths are sanitized)

@@ -6,10 +6,11 @@ type StatusPillProps = {
 };
 
 const toneClasses: Record<StatusPillTone, string> = {
-  info: 'bg-wheat-50 text-wheat-900',
-  success: 'bg-green-50 text-green-800',
-  warning: 'bg-yellow-50 text-yellow-800',
-  muted: 'bg-gray-100 text-gray-800',
+  info: 'bg-info/10 text-info',
+  success: 'bg-success/10 text-success',
+  warning: 'bg-warning/10 text-warning',
+  danger: 'bg-danger/10 text-danger',
+  muted: 'bg-secondary text-secondary',
 };
 
 export function StatusPill({ label, tone = 'muted' }: StatusPillProps) {

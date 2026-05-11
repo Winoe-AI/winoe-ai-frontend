@@ -22,6 +22,14 @@ describe('proxy - auth login', () => {
     expect(res?.headers.get('location')).toBeNull();
   });
 
+  it('allows public /login route when logged out', async () => {
+    getSessionNormalizedMock.mockResolvedValue(null);
+    const req = new NextRequest(new URL('http://localhost/login'));
+    const res = await proxy(req);
+    expect(res?.status).toBe(200);
+    expect(res?.headers.get('location')).toBeNull();
+  });
+
   it('redirects logged-in talent_partner hitting auth login to dashboard', async () => {
     const authResp = NextResponse.next();
     authResp.cookies.set('edge', 'cookie');
@@ -52,5 +60,15 @@ describe('proxy - auth login', () => {
     expect(res?.headers.get('location')).toBe(
       'http://localhost/candidate/dashboard',
     );
+  });
+
+  it('redirects logged-in talent_partner hitting /login to dashboard', async () => {
+    getSessionNormalizedMock.mockResolvedValue({
+      user: { permissions: ['talent_partner:access'] },
+      accessToken: 't',
+    });
+    const res = await proxy(new NextRequest(new URL('http://localhost/login')));
+    expect(res?.status).toBe(307);
+    expect(res?.headers.get('location')).toBe('http://localhost/dashboard');
   });
 });

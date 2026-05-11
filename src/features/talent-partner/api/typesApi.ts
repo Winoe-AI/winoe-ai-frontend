@@ -5,6 +5,7 @@ export type TrialListItem = {
   createdAt: string;
   candidateCount: number;
   status?: TrialLifecycleStatus | string | null;
+  scoreRange?: string | null;
 };
 
 export type TrialLifecycleStatus =
@@ -13,7 +14,8 @@ export type TrialLifecycleStatus =
   | 'ready_for_review'
   | 'approved'
   | 'active_inviting'
-  | 'terminated';
+  | 'terminated'
+  | 'completed';
 
 export type InviteCandidateResponse = {
   candidateSessionId: string;

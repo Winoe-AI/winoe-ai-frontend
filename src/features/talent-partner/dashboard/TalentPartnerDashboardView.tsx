@@ -1,5 +1,6 @@
 'use client';
 
+import { Suspense } from 'react';
 import dynamic from 'next/dynamic';
 import type { TalentPartnerProfile } from './types';
 import type { TrialListItem } from '@/features/talent-partner/types';
@@ -15,7 +16,7 @@ const InviteCandidateModal = dynamic(
     ssr: false,
     loading: () => (
       <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/30">
-        <div className="rounded bg-white px-4 py-3 text-sm text-gray-700 shadow">
+        <div className="rounded bg-elevated px-4 py-3 text-sm text-primary shadow">
           Loading invite form…
         </div>
       </div>
@@ -47,16 +48,18 @@ export default function TalentPartnerDashboardView({
 
   return (
     <>
-      <DashboardContent
-        profile={profile}
-        error={error}
-        profileLoading={profileLoading}
-        trials={trials}
-        trialsError={trialsError}
-        trialsLoading={trialsLoading}
-        onRefresh={onRefresh}
-        onOpenInvite={(trial) => openInvite(trial.id, trial.title)}
-      />
+      <Suspense fallback={null}>
+        <DashboardContent
+          profile={profile}
+          error={error}
+          profileLoading={profileLoading}
+          trials={trials}
+          trialsError={trialsError}
+          trialsLoading={trialsLoading}
+          onRefresh={onRefresh}
+          onOpenInvite={(trial) => openInvite(trial.id, trial.title)}
+        />
+      </Suspense>
       {modal.open ? (
         <InviteCandidateModal
           open={modal.open}

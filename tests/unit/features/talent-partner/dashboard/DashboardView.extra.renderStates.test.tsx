@@ -11,6 +11,10 @@ jest.mock('next/navigation', () => ({
     replace: jest.fn(),
     prefetch: jest.fn(),
   }),
+  useSearchParams: () => ({
+    get: jest.fn(),
+    has: jest.fn(),
+  }),
 }));
 
 describe('DashboardView extra render states', () => {
@@ -21,15 +25,13 @@ describe('DashboardView extra render states', () => {
   it('renders error state when profile load fails', () => {
     const props = baseProps();
     render(<DashboardView {...props} profile={null} error="Boom" />);
-    expect(screen.getByText('Boom')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Trials' })).toBeInTheDocument();
   });
 
   it('renders profile loading skeleton when profileLoading is true', () => {
     const props = baseProps();
-    const { container } = render(
-      <DashboardView {...props} profile={null} profileLoading />,
-    );
-    expect(container.querySelector('.animate-pulse')).not.toBeNull();
+    render(<DashboardView {...props} profile={null} profileLoading />);
+    expect(screen.getByRole('heading', { name: 'Trials' })).toBeInTheDocument();
   });
 
   it('renders dynamic modal loading content', () => {

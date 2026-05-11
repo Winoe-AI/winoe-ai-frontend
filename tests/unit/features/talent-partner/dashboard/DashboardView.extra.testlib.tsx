@@ -28,6 +28,18 @@ jest.mock('@/features/talent-partner/utils/formattersUtils', () => ({
   copyInviteLink: (...args: unknown[]) => copyInviteLinkMock(...args),
 }));
 
+jest.mock('next/navigation', () => ({
+  useRouter: () => ({
+    push: jest.fn(),
+    replace: jest.fn(),
+    prefetch: jest.fn(),
+  }),
+  useSearchParams: () => ({
+    get: jest.fn(),
+    has: jest.fn(),
+  }),
+}));
+
 jest.mock('next/dynamic', () => {
   return (
     _importer: () => Promise<unknown>,
@@ -50,36 +62,6 @@ jest.mock('next/dynamic', () => {
     return Mock;
   };
 });
-
-jest.mock('@/features/talent-partner/dashboard/components/ProfileCard', () => ({
-  ProfileCard: ({ name }: { name: string }) => (
-    <div data-testid="profile-card">{name}</div>
-  ),
-}));
-jest.mock(
-  '@/features/talent-partner/dashboard/components/TrialSection',
-  () => ({
-    TrialSection: (props: {
-      trials: Array<{
-        id: string;
-        title: string;
-        status: string;
-        candidateCount: number;
-      }>;
-      loading: boolean;
-      error: string | null;
-      onInvite?: (trial: { id: string; title: string }) => void;
-      onRetry?: () => void;
-    }) => (
-      <div data-testid="trial-section">
-        <button onClick={() => props.onInvite?.({ id: '1', title: 'Trial 1' })}>
-          invite
-        </button>
-        <button onClick={() => props.onRetry?.()}>retry</button>
-      </div>
-    ),
-  }),
-);
 
 type Trial = {
   id: string;

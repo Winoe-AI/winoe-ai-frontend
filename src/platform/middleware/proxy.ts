@@ -53,7 +53,8 @@ export async function proxy(request: NextRequest) {
       : NextResponse.next();
 
   if (isApiPath) return responder(NextResponse.next());
-  const isRootOrLogin = pathname === '/' || pathname === '/auth/login';
+  const isRootOrLogin =
+    pathname === '/' || pathname === '/auth/login' || pathname === '/login';
   if (shouldSkipAuth(pathname) && !isRootOrLogin) {
     return responder(passThrough());
   }

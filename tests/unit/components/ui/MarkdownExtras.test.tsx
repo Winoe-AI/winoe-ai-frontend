@@ -70,11 +70,11 @@ describe('StatusPill', () => {
   it('uses default muted tone when tone not provided', () => {
     render(<StatusPill label="Muted" />);
     const pill = screen.getByText('Muted');
-    expect(pill.className).toContain('bg-gray-100');
+    expect(pill.className).toContain('bg-secondary');
   });
 
   it('renders other tones', () => {
     render(<StatusPill label="Warn" tone="warning" />);
-    expect(screen.getByText('Warn').className).toContain('bg-yellow-50');
+    expect(screen.getByText('Warn').className).toContain('bg-warning/10');
   });
 });

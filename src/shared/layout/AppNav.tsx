@@ -30,19 +30,19 @@ export function AppNav({ isAuthed, permissions = [], navScope }: AppNavProps) {
       data-app-nav="true"
     >
       {showTalentPartner ? (
-        <Link href="/dashboard" className="text-gray-700 hover:text-gray-900">
+        <Link href="/dashboard" className="text-secondary hover:text-primary">
           Talent Partner Dashboard
         </Link>
       ) : null}
       {showCandidate ? (
         <Link
           href="/candidate/dashboard"
-          className="text-gray-700 hover:text-gray-900"
+          className="text-secondary hover:text-primary"
         >
           Candidate Portal
         </Link>
       ) : null}
-      <LogoutLink className="inline-flex select-none items-center rounded-md px-2.5 py-1 text-gray-700 hover:text-gray-900 cursor-pointer touch-manipulation">
+      <LogoutLink className="inline-flex select-none items-center rounded-md px-2.5 py-1 text-secondary hover:text-primary cursor-pointer touch-manipulation">
         Logout
       </LogoutLink>
     </nav>
