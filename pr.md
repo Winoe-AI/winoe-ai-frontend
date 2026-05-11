@@ -1,62 +1,58 @@
-# Summary
+# Task 3: TP Dashboard + App Shell + Command Palette
 
-Completed Task 1: Foundation Design System + v4 UI / Copy Cleanup.
+## Summary
 
-# What Changed
+Task 3 is fully implemented and verified end-to-end locally. This includes Talent Partner dashboard and app shell implementation, command palette wiring with keyboard behavior, deterministic local QA auth/bootstrap path, seeded Task 3 QA data, backend dashboard auth handoff fix, completed Trial status + score range support, and local seed idempotency/FK-safe purge behavior validated through the full local QA gate.
 
-### Foundation Design System
+## Scope (Frontend)
 
-- Added/standardized Winoe AI design tokens using the warm wheat + neutral foundation.
-- Removed default Tailwind blue/indigo/purple palette usage from active frontend source.
-- Removed raw frontend hex colors from active UI source.
-- Ensured primary wheat CTAs use safe contrast via `text-on-accent`.
-- Converted low-contrast wheat informational cards from solid wheat surfaces to light wheat callouts:
-  - `border-wheat-100`
-  - `bg-wheat-50`
-  - `text-wheat-900`
-- Added ESLint guardrails to prevent unsafe `bg-wheat-500` + `text-wheat-*` pairings.
-- Verified remaining `bg-wheat-500` usages are safe CTA, progress, selected-state, or design-system swatch usages.
+- Implemented `/login` public route behavior for local demo login states.
+- Added `/api/dev/qa-login` local-only QA session bootstrap for Talent Partner and candidate flows.
+- Added support for `/dashboard/trials` and `/talent-partner/trials` routing.
+- Delivered TP dashboard real data rendering and removed fake dashboard metadata fallback behavior.
+- Improved Trial table semantics and sticky header behavior.
+- Finalized app shell collapse and account-menu behavior.
+- Completed command palette with real Trial wiring, search, Recent entries, keyboard navigation, `Esc` close behavior, and `Tab` focus trap behavior.
+- Added `npm run qa:task3` browser QA script coverage.
+- Verified dark mode, responsive behavior, and Lighthouse checks for the Task 3 flow.
 
-### v4 UI / Copy Cleanup
+## QA Evidence (Iteration 8)
 
-- Removed active UI references to retired template/tech-stack selector concepts.
-- Ensured Trial detail/preview uses Project Brief framing, not codespace structure/template framing.
-- Replaced Presentation user-facing copy with Handoff + Demo.
-- Removed offline/local-work language from active UI.
-- Fixed Day 1 Design Document starter copy:
-  - `## Tech Stack Choice` became `## Implementation Approach`
-  - prompt copy now asks for implementation approach instead of tech stack.
-- Updated visible AI override agent labels so raw internal keys like `demoPresentationReviewer` do not leak into Talent Partner UI.
-  - Display label is now safe, e.g. `Handoff + Demo Reviewer`.
-- Added a unit test proving raw internal agent keys are not rendered.
+- Verdict: **QA PASS**
+- Artifact root: `qa_verifications/task-3-tp-dashboard-app-shell-command-palette/20260507-005607`
+- `/api/dashboard`: `200` and includes:
+  - `Senior Backend Engineer`
+  - `QA Awaiting Candidate Trial`
+  - `QA Completed Cohort Trial`
+- Browser QA: `browser-results.json` reports `failed=0`, `ok=true`
+- Lighthouse:
+  - `/login`: `98`
+  - authenticated `/dashboard/trials`: `96`
+- Candidate boundary: **PASS**
+- Dark mode: **PASS**
+- Responsive: **PASS**
 
-# Validation
+## Validation Commands
 
-- `npm run lint` passed
-- `npm run typecheck` passed
-- `npm test` passed
-- `npm run build` passed
-- `npm run build-ladle` passed
-- `./precommit.sh` passed
-- Full local browser QA passed using real Chrome via CDP/Puppeteer.
-- Backend and frontend servers were run locally.
+- `TASK3_QA_TALENT_PARTNER_EMAIL=talent_partner1@local.test npm run qa:task3` — PASS
+- `npm run lint` — PASS
+- `npm run typecheck` — PASS
+- `npm test` — PASS
+- `npm run build` — PASS
+- `./precommit.sh` — PASS
+- Lighthouse login/authenticated dashboard — PASS
 
-# QA Notes
+## Compliance Scan
 
-QA verified:
+- No forbidden retired terminology hits in `src`.
+- No `bg-blue|text-indigo|bg-purple` hits.
+- Hex literals are limited to `src/app/globals.css` design-token/global CSS usage.
+- Tailwind raw color utility hits are pre-existing legacy usage outside changed Task 3 files and were not introduced by this work.
 
-- Talent Partner dashboard
-- Trial creation
-- Trial detail
-- Candidate submission review
-- Winoe Report route
-- Candidate dashboard
-- Candidate session
-- Day 1 Project Brief / Design Document
-- Day 4 Handoff + Demo
-- What We Evaluate page
-- Text dump scans found no forbidden visible terms after the final fixes.
+## Risk / Rollout Notes
 
-# Risks / Follow-ups
+- Local QA auth/bootstrap path is intentionally local-only and production-guarded.
+- Auth0 production flow is not weakened.
+- Remaining raw utility-class cleanup is broader legacy cleanup and not a Task 3 blocker.
 
-- None.
+Task 3 is implemented and verified end-to-end for the local QA gate. Ready for PR review.

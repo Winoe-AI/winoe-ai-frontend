@@ -9,6 +9,7 @@ import {
 
 export const PUBLIC_PATHS = new Set([
   '/',
+  '/login',
   '/auth/login',
   '/auth/logout',
   '/not-authorized',

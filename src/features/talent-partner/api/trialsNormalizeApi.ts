@@ -33,6 +33,12 @@ export const normalizeTrial = (raw: unknown): TrialListItem => {
         : typeof raw.lifecycle_status === 'string'
           ? raw.lifecycle_status
           : null;
+  const scoreRangeRaw =
+    typeof raw.scoreRange === 'string'
+      ? raw.scoreRange
+      : typeof raw.score_range === 'string'
+        ? raw.score_range
+        : null;
   return {
     id,
     title,
@@ -40,6 +46,7 @@ export const normalizeTrial = (raw: unknown): TrialListItem => {
     createdAt,
     candidateCount,
     status,
+    scoreRange: scoreRangeRaw ?? undefined,
   };
 };
 

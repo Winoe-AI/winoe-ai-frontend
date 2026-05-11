@@ -17,6 +17,10 @@ jest.mock('next/navigation', () => ({
     replace: jest.fn(),
     prefetch: jest.fn(),
   }),
+  useSearchParams: () => ({
+    get: jest.fn(),
+    has: jest.fn(),
+  }),
 }));
 jest.mock(
   '@/features/talent-partner/dashboard/hooks/useInviteCandidateFlow',
@@ -38,34 +42,6 @@ jest.mock('next/dynamic', () => () => {
     return <div data-testid="invite-modal" />;
   };
 });
-jest.mock('@/features/talent-partner/dashboard/components/ProfileCard', () => ({
-  ProfileCard: ({ name }: { name: string }) => (
-    <div data-testid="profile-card">{name}</div>
-  ),
-}));
-jest.mock(
-  '@/features/talent-partner/dashboard/components/TrialSection',
-  () => ({
-    TrialSection: ({
-      trials,
-      loading,
-      error,
-      onInvite,
-    }: {
-      trials: Array<{ id: string; title: string; status: string }>;
-      loading: boolean;
-      error: string | null;
-      onInvite?: (trial: { id: string; title: string }) => void;
-    }) => (
-      <div data-testid="trial-section">
-        <button onClick={() => onInvite?.({ id: '1', title: 'Trial 1' })}>
-          invite
-        </button>
-        {JSON.stringify({ trials, loading, error })}
-      </div>
-    ),
-  }),
-);
 
 type Trial = {
   id: string;

@@ -88,6 +88,24 @@ export default {
         16: 'var(--space-16)',
         20: 'var(--space-20)',
       },
+      keyframes: {
+        'new-row': {
+          '0%': {
+            transform: 'translateY(-100%)',
+            opacity: '0',
+            backgroundColor: 'var(--wheat-100)',
+          },
+          '10%': {
+            transform: 'translateY(0)',
+            opacity: '1',
+            backgroundColor: 'var(--wheat-100)',
+          },
+          '100%': { backgroundColor: 'transparent' },
+        },
+      },
+      animation: {
+        'new-row': 'new-row 1.2s ease-out forwards',
+      },
     },
   },
 } satisfies Config;

@@ -14,11 +14,11 @@ export function ProfileCard({
   return (
     <div className="rounded border border-gray-200 p-4">
       <p className="font-medium">{name}</p>
-      <p className="text-sm text-gray-600">{email}</p>
+      <p className="text-sm text-secondary">{email}</p>
       {companyName ? (
-        <p className="mt-1 text-sm text-gray-600">{companyName}</p>
+        <p className="mt-1 text-sm text-secondary">{companyName}</p>
       ) : null}
-      <p className="mt-1 text-xs uppercase tracking-wide text-gray-500">
+      <p className="mt-1 text-xs uppercase tracking-wide text-tertiary">
         Role: {role}
       </p>
     </div>

@@ -48,4 +48,26 @@ describe('normalizeTrial', () => {
       candidateCount: 0,
     });
   });
+
+  it('maps score range from camelCase or snake_case', () => {
+    expect(
+      normalizeTrial({
+        id: 1,
+        title: 'T',
+        role: 'R',
+        createdAt: '2026-01-01T00:00:00Z',
+        numCandidates: 2,
+        scoreRange: '0.72–0.91',
+      }),
+    ).toMatchObject({ scoreRange: '0.72–0.91' });
+    expect(
+      normalizeTrial({
+        id: 2,
+        title: 'T',
+        role: 'R',
+        createdAt: '2026-01-01T00:00:00Z',
+        score_range: '0.80',
+      }),
+    ).toMatchObject({ scoreRange: '0.80' });
+  });
 });

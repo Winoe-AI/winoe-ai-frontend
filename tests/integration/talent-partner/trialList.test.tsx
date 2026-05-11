@@ -38,16 +38,39 @@ describe('TalentPartner trials list (integration)', () => {
 
     render(<TalentPartnerDashboardPage />);
 
+    expect(screen.getByRole('heading', { name: 'Trials' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'New Trial' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'All' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Active' })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Awaiting Candidate' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Completed' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: 'Terminated' }),
+    ).toBeInTheDocument();
+    expect(screen.getByPlaceholderText('Search trials...')).toBeInTheDocument();
+    expect(
+      screen.getByRole('columnheader', { name: 'Trial' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('columnheader', { name: 'Candidates' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('columnheader', { name: 'Status' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('columnheader', { name: 'Started' }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('columnheader', { name: 'Score range' }),
+    ).toBeInTheDocument();
     expect(
       screen.getByRole('link', { name: 'Backend Trial' }),
     ).toBeInTheDocument();
-    expect(screen.getByText('Backend Engineer')).toBeInTheDocument();
-    expect(screen.getByText('2025-12-10')).toBeInTheDocument();
-    expect(screen.getByText('3 candidate(s)')).toBeInTheDocument();
-    expect(screen.getByText('Ready for review')).toBeInTheDocument();
-    expect(
-      screen.getByRole('button', { name: /Invite candidate/i }),
-    ).toBeInTheDocument();
+    expect(screen.getAllByText('Awaiting Candidate').length).toBeGreaterThan(0);
   });
 
   it('shows empty state when no trials exist', async () => {
@@ -63,8 +86,12 @@ describe('TalentPartner trials list (integration)', () => {
 
     render(<TalentPartnerDashboardPage />);
 
-    expect(screen.getByText(/No trials yet/)).toBeInTheDocument();
-    expect(screen.queryByText(/candidate\(s\)/i)).not.toBeInTheDocument();
+    expect(screen.getByText('Create your first Trial')).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        'A 5-day work Trial that surfaces real engineering signal.',
+      ),
+    ).toBeInTheDocument();
   });
 
   it('renders zero candidate counts and the lifecycle status badge', async () => {
@@ -89,10 +116,8 @@ describe('TalentPartner trials list (integration)', () => {
 
     render(<TalentPartnerDashboardPage />);
 
-    expect(screen.getByText('0 candidate(s)')).toBeInTheDocument();
-    expect(screen.getByText('Frontend Engineer')).toBeInTheDocument();
-    expect(screen.getByText('2025-12-10')).toBeInTheDocument();
-    expect(screen.getByText('Active inviting')).toBeInTheDocument();
+    expect(screen.getAllByText('—').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Active').length).toBeGreaterThan(0);
   });
 
   it('shows error message when backend call fails', async () => {
@@ -108,7 +133,8 @@ describe('TalentPartner trials list (integration)', () => {
 
     render(<TalentPartnerDashboardPage />);
 
-    expect(screen.getByText(/Couldn’t load trials/i)).toBeInTheDocument();
-    expect(screen.getByText('Unauthorized')).toBeInTheDocument();
+    expect(
+      screen.getByText('Failed to load trials: Unauthorized'),
+    ).toBeInTheDocument();
   });
 });

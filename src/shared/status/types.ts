@@ -1,1 +1,6 @@
-export type StatusPillTone = 'info' | 'success' | 'warning' | 'muted';
+export type StatusPillTone =
+  | 'info'
+  | 'success'
+  | 'warning'
+  | 'danger'
+  | 'muted';

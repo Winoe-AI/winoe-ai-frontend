@@ -19,6 +19,7 @@
     "format": "prettier . --write",
     "prettier:write": "prettier . --write",
     "loadtest:dashboard": "node scripts/loadtest-dashboard.mjs",
+    "qa:task3": "node scripts/task3-browser-qa.mjs",
     "ladle": "ladle serve",
     "build-ladle": "ladle build --outDir ladle-static"
   },

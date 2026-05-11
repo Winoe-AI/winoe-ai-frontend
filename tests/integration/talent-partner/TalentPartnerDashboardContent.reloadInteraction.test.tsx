@@ -24,13 +24,17 @@ describe('TalentPartnerDashboardPage error/empty/reload interaction', () => {
 
     renderDashboard();
 
-    expect(screen.getByText(/Couldn’t load trials/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        /Failed to load trials: Unable to load trials right now\./i,
+      ),
+    ).toBeInTheDocument();
     expect(
       screen.getByText(/Unable to load trials right now\./i),
     ).toBeInTheDocument();
 
     const user = userEvent.setup();
-    await user.click(screen.getByRole('button', { name: /Retry/i }));
+    await user.click(screen.getByRole('button', { name: /Try again/i }));
 
     expect(refresh).toHaveBeenCalledTimes(1);
   });
@@ -45,9 +49,9 @@ describe('TalentPartnerDashboardPage error/empty/reload interaction', () => {
 
     renderDashboard();
 
-    expect(screen.getByText(/No trials yet/i)).toBeInTheDocument();
+    expect(screen.getByText('Create your first Trial')).toBeInTheDocument();
     expect(
-      screen.queryByRole('button', { name: /Retry/i }),
+      screen.queryByRole('button', { name: /Try again/i }),
     ).not.toBeInTheDocument();
   });
 });

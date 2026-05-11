@@ -18,15 +18,38 @@ import {
   totalRetries,
 } from './dashboardHelpersApi';
 
-type AuthContext = { accessToken: string; requestId: string };
+type DashboardAuthContext = {
+  accessToken: string;
+  requestId: string;
+  session?: { user?: { email?: string | null } } | null;
+};
+
+function buildUpstreamAuthHeaders(
+  auth: DashboardAuthContext,
+): Record<string, string> {
+  const headers: Record<string, string> = {
+    Authorization: `Bearer ${auth.accessToken}`,
+  };
+  const fromSession = auth.session?.user?.email?.trim();
+  const fromToken =
+    auth.accessToken.includes(':') &&
+    auth.accessToken.startsWith('talent_partner:')
+      ? auth.accessToken.slice(auth.accessToken.indexOf(':') + 1).trim()
+      : '';
+  const devEmail = fromSession || fromToken;
+  if (devEmail) {
+    headers['x-dev-user-email'] = devEmail.toLowerCase();
+  }
+  return headers;
+}
 
 export async function handleDashboard(
   req: Request,
-  auth: AuthContext,
+  auth: DashboardAuthContext,
 ): Promise<NextResponse> {
   const routeStart = Date.now();
   const backendBase = getBackendBaseUrl();
-  const authHeaders = { Authorization: `Bearer ${auth.accessToken}` };
+  const authHeaders = buildUpstreamAuthHeaders(auth);
 
   const [profileOutcome, trialsOutcome] = await Promise.allSettled([
     fetchProfile({
