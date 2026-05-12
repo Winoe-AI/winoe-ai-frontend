@@ -4,6 +4,10 @@ import type { RowState } from '@/features/talent-partner/trial-management/detail
 
 jest.useFakeTimers();
 
+afterAll(() => {
+  jest.useRealTimers();
+});
+
 describe('useInviteCooldown', () => {
   it('ticks cooldown and clears when finished', () => {
     const updates: Array<{

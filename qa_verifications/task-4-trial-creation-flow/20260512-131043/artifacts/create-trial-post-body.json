@@ -1,0 +1,12 @@
+{
+  "role_title": "Senior Backend Engineer",
+  "seniority": "senior",
+  "focus_notes": "This engineer will build internal workflow APIs for operations teams. They need to design clear service boundaries, model data carefully, handle errors cleanly, and communicate tradeoffs. We want to see pragmatic architecture, testing discipline, and thoughtful documentation.",
+  "preferred_language_framework": "Python + FastAPI",
+  "evaluation_focus_areas": [
+    "System design",
+    "API design",
+    "Testing discipline",
+    "Error handling"
+  ]
+}

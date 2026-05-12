@@ -1,0 +1,92 @@
+{
+  "status": "ready",
+  "checkedAt": "2026-05-12T17:18:58.449171Z",
+  "checks": {
+    "database": {
+      "status": "ready",
+      "code": "schema_ok",
+      "detail": "Required database tables and foreign keys are present.",
+      "data": null
+    },
+    "worker": {
+      "status": "ready",
+      "code": "heartbeat_fresh",
+      "detail": "Worker heartbeat is fresh.",
+      "data": {
+        "serviceName": "winoe-worker",
+        "instanceId": "Robels-MacBook-Air-2.local:96809",
+        "ageSeconds": 8
+      }
+    },
+    "ai": {
+      "status": "ready",
+      "code": "ai_providers_ready",
+      "detail": "AI provider readiness validated.",
+      "data": {
+        "checks": {
+          "scenarioGeneration": {
+            "status": "skipped",
+            "code": "demo_mode",
+            "detail": "scenarioGeneration is running in demo/test mode.",
+            "data": { "runtimeMode": "demo", "provider": "anthropic" }
+          },
+          "transcription": {
+            "status": "ready",
+            "code": "provider_ready",
+            "detail": "transcription is ready with the OpenAI provider.",
+            "data": { "runtimeMode": "real", "provider": "openai" }
+          },
+          "winoeReportDay1": {
+            "status": "ready",
+            "code": "provider_ready",
+            "detail": "winoeReportDay1 is ready with the Anthropic provider.",
+            "data": { "runtimeMode": "real", "provider": "anthropic" }
+          },
+          "winoeReportCodeImplementationReviewer": {
+            "status": "ready",
+            "code": "provider_ready",
+            "detail": "winoeReportCodeImplementationReviewer is ready with the OpenAI provider.",
+            "data": { "runtimeMode": "real", "provider": "openai" }
+          },
+          "winoeReportDay4": {
+            "status": "ready",
+            "code": "provider_ready",
+            "detail": "winoeReportDay4 is ready with the Anthropic provider.",
+            "data": { "runtimeMode": "real", "provider": "anthropic" }
+          },
+          "winoeReportDay5": {
+            "status": "ready",
+            "code": "provider_ready",
+            "detail": "winoeReportDay5 is ready with the Anthropic provider.",
+            "data": { "runtimeMode": "real", "provider": "anthropic" }
+          },
+          "winoeReportAggregator": {
+            "status": "ready",
+            "code": "provider_ready",
+            "detail": "winoeReportAggregator is ready with the OpenAI provider.",
+            "data": { "runtimeMode": "real", "provider": "openai" }
+          }
+        }
+      }
+    },
+    "github": {
+      "status": "ready",
+      "code": "provider_ready",
+      "detail": "GitHub configuration is ready.",
+      "data": { "apiBase": "https://api.github.com", "orgConfigured": true }
+    },
+    "email": {
+      "status": "ready",
+      "code": "provider_ready",
+      "detail": "Resend email provider is configured.",
+      "data": { "provider": "resend", "senderConfigured": true }
+    },
+    "media": {
+      "status": "ready",
+      "code": "provider_ready",
+      "detail": "Fake media storage provider is ready for local/demo use.",
+      "data": { "provider": "fake" }
+    }
+  },
+  "demoMode": false
+}

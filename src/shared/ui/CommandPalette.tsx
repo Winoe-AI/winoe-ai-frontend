@@ -79,7 +79,7 @@ export function CommandPalette({ trials = [] }: CommandPaletteProps) {
         section: 'Quick Actions',
         shortcut: 'C',
         onSelect: () => {
-          router.push('/dashboard/trials/new');
+          router.push('/talent-partner/trials/new');
         },
         icon: <TrialsIcon />,
       },

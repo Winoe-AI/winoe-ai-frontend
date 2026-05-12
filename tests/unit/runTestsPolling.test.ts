@@ -3,6 +3,10 @@ import { useBackoffPolling } from '@/shared/polling/useBackoffPolling';
 
 jest.useFakeTimers();
 
+afterAll(() => {
+  jest.useRealTimers();
+});
+
 describe('useBackoffPolling', () => {
   it('invokes onMaxAttempts and stops', async () => {
     const run = jest.fn().mockResolvedValue(true);

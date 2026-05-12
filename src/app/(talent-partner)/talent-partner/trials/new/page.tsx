@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import TrialCreatePage from '@/features/talent-partner/trial-management/create/TrialCreatePage';
+import NewTrialWizard from '@/features/talent-partner/trial-management/create/NewTrialWizard';
 import { BRAND_NAME } from '@/platform/config/brand';
 
 export const metadata: Metadata = {
@@ -9,5 +9,5 @@ export const metadata: Metadata = {
 };
 
 export default function Page() {
-  return <TrialCreatePage />;
+  return <NewTrialWizard />;
 }

@@ -1,58 +1,39 @@
-# Task 3: TP Dashboard + App Shell + Command Palette
+# Task 4: Talent Partner Trial Creation (v4)
 
 ## Summary
 
-Task 3 is fully implemented and verified end-to-end locally. This includes Talent Partner dashboard and app shell implementation, command palette wiring with keyboard behavior, deterministic local QA auth/bootstrap path, seeded Task 3 QA data, backend dashboard auth handoff fix, completed Trial status + score range support, and local seed idempotency/FK-safe purge behavior validated through the full local QA gate.
+- Built the v4 Talent Partner Trial Creation wizard at `/talent-partner/trials/new`.
+- Added a polished Generation Loading state with six visible Winoe drafting steps, rotating context lines, SSE progress handling, reconnect/failure states, and 12-second minimum perceived timing.
+- Added `/dashboard/trials/new` compatibility route rendering the same wizard.
+- Updated dashboard, list, header, and command palette entry points to the canonical route.
+- Added frontend tests for the v4 wizard, `createTrialV4`, EventSource behavior, redirect timing, failure handling, and retired-field exclusion.
 
-## Scope (Frontend)
+## Validation
 
-- Implemented `/login` public route behavior for local demo login states.
-- Added `/api/dev/qa-login` local-only QA session bootstrap for Talent Partner and candidate flows.
-- Added support for `/dashboard/trials` and `/talent-partner/trials` routing.
-- Delivered TP dashboard real data rendering and removed fake dashboard metadata fallback behavior.
-- Improved Trial table semantics and sticky header behavior.
-- Finalized app shell collapse and account-menu behavior.
-- Completed command palette with real Trial wiring, search, Recent entries, keyboard navigation, `Esc` close behavior, and `Tab` focus trap behavior.
-- Added `npm run qa:task3` browser QA script coverage.
-- Verified dark mode, responsive behavior, and Lighthouse checks for the Task 3 flow.
+- `npm run lint` — pass
+- `npm run typecheck` — pass
+- `npm test` — pass
+- `./precommit.sh` — pass
+- Retired frontend field grep — no matches
+- Retired user-facing vocabulary grep — no matches
 
-## QA Evidence (Iteration 8)
+## Real Local QA Evidence
 
-- Verdict: **QA PASS**
-- Artifact root: `qa_verifications/task-3-tp-dashboard-app-shell-command-palette/20260507-005607`
-- `/api/dashboard`: `200` and includes:
-  - `Senior Backend Engineer`
-  - `QA Awaiting Candidate Trial`
-  - `QA Completed Cohort Trial`
-- Browser QA: `browser-results.json` reports `failed=0`, `ok=true`
-- Lighthouse:
-  - `/login`: `98`
-  - authenticated `/dashboard/trials`: `96`
-- Candidate boundary: **PASS**
-- Dark mode: **PASS**
-- Responsive: **PASS**
+- Backend server: running on localhost:8000
+- Frontend server: running on localhost:3000
+- Talent Partner login: pass (`/api/dev/qa-login`, local-only)
+- `/talent-partner/trials/new`: pass
+- `/dashboard/trials/new`: pass
+- Step 1 validation: pass
+- Step 2 validation: pass
+- v4 create request shape: pass (see `artifacts/create-trial-post-body.json`)
+- Generation Loading: pass
+- SSE progress stream: pass (EventSource to `/api/v1/trials/{trial_id}/generation-progress`)
+- Completion redirect to `/talent-partner/trials/{id}/preview`: pass (with `WINOE_SCENARIO_GENERATION_RUNTIME_MODE=demo` for reproducible worker completion; `real` mode hit LLM failures in this environment — see `qa-report.md`)
+- Failure state tested: pass (Playwright abort on generation-progress stream)
+- Artifact folder: `qa_verifications/task-4-trial-creation-flow/20260512-131043/`
 
-## Validation Commands
+## Notes
 
-- `TASK3_QA_TALENT_PARTNER_EMAIL=talent_partner1@local.test npm run qa:task3` — PASS
-- `npm run lint` — PASS
-- `npm run typecheck` — PASS
-- `npm test` — PASS
-- `npm run build` — PASS
-- `./precommit.sh` — PASS
-- Lighthouse login/authenticated dashboard — PASS
-
-## Compliance Scan
-
-- No forbidden retired terminology hits in `src`.
-- No `bg-blue|text-indigo|bg-purple` hits.
-- Hex literals are limited to `src/app/globals.css` design-token/global CSS usage.
-- Tailwind raw color utility hits are pre-existing legacy usage outside changed Task 3 files and were not introduced by this work.
-
-## Risk / Rollout Notes
-
-- Local QA auth/bootstrap path is intentionally local-only and production-guarded.
-- Auth0 production flow is not weakened.
-- Remaining raw utility-class cleanup is broader legacy cleanup and not a Task 3 blocker.
-
-Task 3 is implemented and verified end-to-end for the local QA gate. Ready for PR review.
+- `/talent-partner/trials/{id}/preview` is intentionally a placeholder. Full preview and approval work belongs to Task 5.
+- Preferred language/framework is optional and informational. The candidate may use any stack.

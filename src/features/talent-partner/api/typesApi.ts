@@ -89,6 +89,24 @@ export type CreateTrialResponse = {
   id: string;
 };
 
+export type CreateTrialV4Input = {
+  roleTitle: string;
+  seniority: TrialRoleLevel;
+  preferredLanguageFramework?: string;
+  focusNotes: string;
+  evaluationFocusAreas?: string[];
+};
+
+export type CreateTrialV4Result = {
+  ok: boolean;
+  status?: number;
+  message?: string;
+  details?: unknown;
+  trialId: string;
+  jobId: string;
+  generationStatus?: string;
+};
+
 export type CompanyAiConfig = {
   companyId: number;
   companyName: string;

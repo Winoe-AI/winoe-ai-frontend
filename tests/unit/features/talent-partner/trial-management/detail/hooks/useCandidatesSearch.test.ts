@@ -3,6 +3,10 @@ import { useCandidatesSearch } from '@/features/talent-partner/trial-management/
 
 jest.useFakeTimers();
 
+afterAll(() => {
+  jest.useRealTimers();
+});
+
 const mockCandidates = [
   {
     id: '1',

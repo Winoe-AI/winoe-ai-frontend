@@ -102,9 +102,15 @@ export default {
           },
           '100%': { backgroundColor: 'transparent' },
         },
+        'winoe-check': {
+          '0%': { transform: 'scale(1)' },
+          '40%': { transform: 'scale(1.2)' },
+          '100%': { transform: 'scale(1)' },
+        },
       },
       animation: {
         'new-row': 'new-row 1.2s ease-out forwards',
+        'winoe-check': 'winoe-check 250ms ease-out',
       },
     },
   },
