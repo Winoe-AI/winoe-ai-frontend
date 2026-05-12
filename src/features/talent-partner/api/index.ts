@@ -1,6 +1,7 @@
 export * from './typesApi';
 export * from './trialsApi';
 export * from './trialsCreateApi';
+export * from './trialsCreateV4Api';
 export * from './trialsUpdateApi';
 export * from './companyAiConfigApi';
 export * from './candidatesApi';

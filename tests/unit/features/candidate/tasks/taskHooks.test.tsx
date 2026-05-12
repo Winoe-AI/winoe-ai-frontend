@@ -3,6 +3,10 @@ import { useTaskDrafts } from '@/features/candidate/tasks/hooks/useTaskHooks';
 
 jest.useFakeTimers();
 
+afterAll(() => {
+  jest.useRealTimers();
+});
+
 const saveTextDraft = jest.fn();
 const loadTextDraft = jest.fn(() => 'cached');
 const clearTextDraft = jest.fn();

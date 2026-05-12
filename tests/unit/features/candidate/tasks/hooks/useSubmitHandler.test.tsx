@@ -3,6 +3,10 @@ import { useSubmitHandler } from '@/features/candidate/tasks/hooks/useSubmitHand
 
 jest.useFakeTimers();
 
+afterAll(() => {
+  jest.useRealTimers();
+});
+
 const buildResponse = () => ({
   submissionId: 1,
   taskId: 10,

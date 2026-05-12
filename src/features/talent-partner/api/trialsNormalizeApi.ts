@@ -1,5 +1,9 @@
 import { getId, getNumber, getString, isRecord } from './trialUtilsApi';
-import type { CreateTrialResponse, TrialListItem } from './typesApi';
+import type {
+  CreateTrialResponse,
+  CreateTrialV4Result,
+  TrialListItem,
+} from './typesApi';
 import { extractBackendMessage } from '@/platform/api-client/errors/errors';
 
 export const normalizeTrial = (raw: unknown): TrialListItem => {
@@ -47,6 +51,44 @@ export const normalizeTrial = (raw: unknown): TrialListItem => {
     candidateCount,
     status,
     scoreRange: scoreRangeRaw ?? undefined,
+  };
+};
+
+export const normalizeCreateTrialV4Response = (
+  raw: unknown,
+  status: number,
+): CreateTrialV4Result => {
+  if (!isRecord(raw)) {
+    return {
+      ok: false,
+      status,
+      trialId: '',
+      jobId: '',
+      message: undefined,
+    };
+  }
+  const trialId = getId(raw.trial_id ?? raw.trialId);
+  const jobId = getString(raw.job_id ?? raw.jobId, '');
+  const message =
+    typeof raw.message === 'string'
+      ? raw.message
+      : typeof raw.detail === 'string'
+        ? raw.detail
+        : (extractBackendMessage(raw, true) ?? undefined);
+  const details =
+    raw.details ??
+    (typeof raw.detail === 'string' ? undefined : raw.detail) ??
+    undefined;
+  const generationStatus =
+    typeof raw.status === 'string' ? raw.status : undefined;
+  return {
+    ok: status >= 200 && status < 300 && Boolean(trialId) && Boolean(jobId),
+    status,
+    trialId,
+    jobId,
+    message,
+    details,
+    generationStatus,
   };
 };
 

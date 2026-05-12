@@ -36,12 +36,13 @@ const customJestConfig = {
     },
   },
   coverageReporters: ['text', 'lcov', 'json', 'json-summary'],
-  coveragePathIgnorePatterns: ['<rootDir>/.qa/'],
+  coveragePathIgnorePatterns: ['<rootDir>/.qa/', '<rootDir>/qa_verifications/'],
   testPathIgnorePatterns: [
     '<rootDir>/.qa/',
     '<rootDir>/.next/',
     '<rootDir>/node_modules/',
     '<rootDir>/tests/e2e/',
+    '<rootDir>/qa_verifications/',
   ],
   watchPathIgnorePatterns: ['<rootDir>/.qa/'],
 };

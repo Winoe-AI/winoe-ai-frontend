@@ -166,7 +166,7 @@ export function DashboardContent({
     <div className="flex flex-col gap-6">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-semibold text-primary">Trials</h1>
-        <Link href="/dashboard/trials/new">
+        <Link href="/talent-partner/trials/new">
           <Button
             icon={
               <svg
@@ -273,7 +273,7 @@ export function DashboardContent({
           <p className="mb-6 max-w-md text-secondary">
             A 5-day work Trial that surfaces real engineering signal.
           </p>
-          <Link href="/dashboard/trials/new">
+          <Link href="/talent-partner/trials/new">
             <Button
               icon={
                 <svg

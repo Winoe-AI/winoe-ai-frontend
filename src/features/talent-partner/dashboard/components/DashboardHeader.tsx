@@ -19,7 +19,7 @@ export function DashboardHeader({ onNewTrial }: DashboardHeaderProps) {
               AI Settings
             </Button>
           </Link>
-          <Link href="/dashboard/trials/new" prefetch={LINK_PREFETCH}>
+          <Link href="/talent-partner/trials/new" prefetch={LINK_PREFETCH}>
             <Button type="button" onClick={onNewTrial}>
               New Trial
             </Button>

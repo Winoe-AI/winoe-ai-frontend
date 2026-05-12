@@ -3,6 +3,10 @@ import { useBackoffPolling, usePolling } from '@/shared/polling';
 
 jest.useFakeTimers();
 
+afterAll(() => {
+  jest.useRealTimers();
+});
+
 describe('usePolling', () => {
   let errorSpy: jest.SpyInstance;
 

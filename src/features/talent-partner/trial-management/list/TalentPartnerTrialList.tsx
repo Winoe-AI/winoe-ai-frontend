@@ -24,7 +24,7 @@ export function TalentPartnerTrialList({
         title="No trials yet"
         description="Kick off a trial to invite candidates and track their progress."
         action={
-          <Link href="/dashboard/trials/new" prefetch={LINK_PREFETCH}>
+          <Link href="/talent-partner/trials/new" prefetch={LINK_PREFETCH}>
             <Button>New Trial</Button>
           </Link>
         }
