@@ -1,0 +1,19 @@
+{
+  "ok": true,
+  "status": 200,
+  "statusText": "OK",
+  "url": "http://127.0.0.1:8000/api/trials/5/scenario/4/approve",
+  "text": "{\"trialId\":5,\"status\":\"ready_for_review\",\"activeScenarioVersionId\":4,\"pendingScenarioVersionId\":null,\"scenario\":{\"id\":4,\"versionIndex\":1,\"status\":\"locked\",\"lockedAt\":\"2026-05-13T02:08:10.139702Z\"}}",
+  "json": {
+    "trialId": 5,
+    "status": "ready_for_review",
+    "activeScenarioVersionId": 4,
+    "pendingScenarioVersionId": null,
+    "scenario": {
+      "id": 4,
+      "versionIndex": 1,
+      "status": "locked",
+      "lockedAt": "2026-05-13T02:08:10.139702Z"
+    }
+  }
+}

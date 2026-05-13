@@ -13,7 +13,7 @@ export class TalentPartnerDashboardQaPage extends BasePage {
   async expectDashboardLoaded() {
     await this.expectHeading(/dashboard/i);
     await this.expectVisibleText(/trials/i);
-    await this.expectVisibleText(/talent-partner qa/i);
+    await this.expectVisibleText(/new trial/i);
   }
 
   async openInviteModal() {

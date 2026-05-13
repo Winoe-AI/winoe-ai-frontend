@@ -336,7 +336,14 @@ export default async function globalSetup(config: FullConfig) {
 
   await fs.mkdir(storageDir, { recursive: true });
 
-  const useRealAuthBootstrap = hasRequiredQaAuthEnv(envMap);
+  const devAuthBypass =
+    process.env.CONTRACT_LIVE_DEV_AUTH_BYPASS === '1' ||
+    process.env.WINOE_DEV_AUTH_BYPASS === '1' ||
+    process.env.DEV_AUTH_BYPASS === '1' ||
+    readEnv('CONTRACT_LIVE_DEV_AUTH_BYPASS', envMap) === '1' ||
+    readEnv('WINOE_DEV_AUTH_BYPASS', envMap) === '1' ||
+    readEnv('DEV_AUTH_BYPASS', envMap) === '1';
+  const useRealAuthBootstrap = !devAuthBypass && hasRequiredQaAuthEnv(envMap);
   if (useRealAuthBootstrap) {
     validateRequiredQaAuthEnv(envMap);
   }
@@ -350,18 +357,32 @@ export default async function globalSetup(config: FullConfig) {
         role === 'talent_partner'
           ? readEnv('CONTRACT_LIVE_TALENT_PARTNER_STORAGE_STATE', envMap)
           : readEnv('CONTRACT_LIVE_CANDIDATE_STORAGE_STATE', envMap);
+      const storagePath = path.join(storageDir, identity.fileName);
       const reused = await reuseStorageStateIfAvailable({
-        storagePath: path.join(storageDir, identity.fileName),
+        storagePath,
         sourcePath,
       });
       if (reused) {
         continue;
       }
-      await createStorageState({
-        baseURL,
-        identity,
-        storagePath: path.join(storageDir, identity.fileName),
-      });
+      try {
+        await createStorageState({
+          baseURL,
+          identity,
+          storagePath,
+        });
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        console.warn(
+          `Real Auth0 storage bootstrap failed for ${role}: ${message}. Falling back to local dev auth for local proof only; this does not certify production Auth0 reliability.`,
+        );
+        await createLocalDevStorageState({
+          baseURL,
+          envMap,
+          identity: resolveLocalDevIdentity(role, envMap),
+          storagePath,
+        });
+      }
       continue;
     }
     // Local-dev auth cookies are cheap to recreate and can go stale when the

@@ -1,0 +1,14 @@
+{
+  "trialId": "6",
+  "scenarioVersionId": "5",
+  "title": "Fresh Contract Live 2026-05-13T02-10-04-290Z",
+  "candidateName": "Robie Candidate",
+  "candidateEmail": "candidate.qa@example.com",
+  "candidateSessionId": 4,
+  "inviteToken": "5H1MiCvBh4LLS2LNikX50OaiWctbQ5SZe3bwIogLgtI",
+  "inviteUrl": "http://localhost:3000/candidate/session/5H1MiCvBh4LLS2LNikX50OaiWctbQ5SZe3bwIogLgtI",
+  "authBootstrapMode": null,
+  "inviteAttempts": 1,
+  "finalStatus": "active_inviting",
+  "bundleStatus": null
+}

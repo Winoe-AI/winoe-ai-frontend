@@ -4,6 +4,7 @@ This lane is for real-stack validation only.
 
 - It targets the real local app on `http://localhost:3000` by default so the browser host matches the app's Auth0 callback configuration.
 - It creates fresh talent_partner and candidate browser sessions through the real Auth0 login flow during Playwright global setup.
+- When real Auth0 bootstrap is unavailable or explicitly bypassed, the lane may fall back to local dev auth for local proof only. That proves the local product flow, worker execution, Winoe Report generation, Evidence Trail persistence, and UI readiness, but it does not certify production Auth0 reliability.
 - It must not add mocked API routes.
 - It writes timestamped evidence bundles under `winoe-frontend/qa_verifications/Contract-Live-QA/contract_live_qa_latest/artifacts/<timestamp>/`.
 
@@ -19,6 +20,8 @@ The lane reads those from the current shell first, then falls back to `winoe-fro
 If any of the four `QA_E2E_*` values are missing, the lane now fails fast with:
 
 `Contract-live browser QA requires real Auth0 QA credentials. Missing: ...`
+
+If the lane falls back to local dev auth, the logs and generated report will say so explicitly so the local proof is not mistaken for production Auth0 certification.
 
 Archived storage states are not reusable across local stack or session changes. Regenerate them for each fresh run instead of copying prior `storage/*.json` files into a new environment.
 

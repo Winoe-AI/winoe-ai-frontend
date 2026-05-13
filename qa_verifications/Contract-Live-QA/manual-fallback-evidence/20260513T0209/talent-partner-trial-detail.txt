@@ -1,0 +1,280 @@
+URL: http://127.0.0.1:3000/dashboard/trials/6
+
+Skip to main content
+Winoe
+Talent Partner Dashboard
+Logout
+Fresh Contract Live 2026-05-13T02-10-04-290Z
+
+Trial ID: 6
+
+Regenerate scenario
+Invite candidate
+Terminate trial
+← Back to dashboard
+Locked
+Scenario v1
+ID: 5
+Locked 5/12/2026
+SCENARIO VERSIONS
+v1
+LOCKED
+ACTIVE
+This version is locked because invites exist.
+Scenario editor
+
+Edit storyline, task prompts, and rubric before approval.
+
+Save edits
+This version is locked because invites exist.
+STORYLINE (MARKDOWN)
+TASK PROMPTS (JSON)
+RUBRIC (JSON)
+Trial AI overrides
+
+These prompts and rubrics apply only to this trial and replace any company default for the same agent.
+
+Notice version: mvp1
+AI scoring days: Day 1, Day 2, Day 3, Day 4, Day 5
+Prompt pack: winoe-ai-pack-v4
+Active frozen snapshot
+Scenario version: 5
+Snapshot digest: 32472f1db15510af9318aa4b6e89a8122f30eacc36843b6b849431d80151865a
+Bundle status: n/a
+Drift from current edits: No
+Pending snapshot
+Scenario version: None
+Snapshot digest: None
+Bundle status: n/a
+Current changes take effect only after scenario regeneration and approval.
+Frozen agent runtime
+Implementation Reviewer
+openai / gpt-5.2-codex
+Runtime: demo
+Prompt: winoe-ai-pack-v4:codeImplementationReviewer
+Handoff + Demo Reviewer
+anthropic / claude-sonnet-4-6
+Runtime: demo
+Prompt: winoe-ai-pack-v4:handoffDemoReviewer
+Design Doc Reviewer
+anthropic / claude-opus-4-7
+Runtime: demo
+Prompt: winoe-ai-pack-v4:designDocReviewer
+Pre-start Configuration
+anthropic / claude-opus-4-7
+Runtime: demo
+Prompt: winoe-ai-pack-v4:prestart
+Reflection Reviewer
+anthropic / claude-sonnet-4-6
+Runtime: demo
+Prompt: winoe-ai-pack-v4:reflectionEssayReviewer
+Winoe Report Aggregator
+openai / gpt-5.2
+Runtime: demo
+Prompt: winoe-ai-pack-v4:winoeReport
+Project brief setup
+
+Project framing, task definition, and structured rubric output.
+
+Instructions override
+0/40000
+Rubric override
+0/40000
+Workspace reviewer
+
+Workspace setup review and deterministic scenario guidance.
+
+Instructions override
+0/40000
+Rubric override
+0/40000
+Written work reviewer
+
+Review of written and product-thinking deliverables.
+
+Instructions override
+0/40000
+Rubric override
+0/40000
+Coding workspace reviewer
+
+Shared coding and debugging evaluator across the workspace days.
+
+Instructions override
+0/40000
+Rubric override
+0/40000
+Handoff reviewer
+
+Handoff video and transcript review grounded in transcript evidence.
+
+Instructions override
+0/40000
+Rubric override
+0/40000
+Reflection reviewer
+
+Reflection and communication review for the final day.
+
+Instructions override
+0/40000
+Rubric override
+0/40000
+Winoe Report aggregator
+
+Cross-day aggregation, calibration, and final recommendation.
+
+Instructions override
+0/40000
+Rubric override
+0/40000
+Save trial overrides
+Project Brief
+
+Review the project brief, tasks, and rubric before inviting candidates.
+
+Locked
+Version v1
+Scenario ID 5
+Version locked
+PROJECT CONTEXT
+Domain: B2B developer tooling · Product: workflow automation platform · Preferred language/framework: Python, FastAPI, pytest
+EVALUATION FOCUS AREAS
+Fresh end-to-end proof after live bundle/runtime repairs
+TARGET LEVEL
+mid
+SCENARIO ROLE
+Backend Engineer
+PROJECT BRIEF NARRATIVE
+Backend Engineer Scenario v1
+
+You are joining a product team with an empty repository and a blank slate.
+The team needs a from-scratch build for an incident-prone integration that needs stronger reliability boundaries.
+The trial is intended to surface product judgment, build quality, and communication under a two-day implementation window with tight operational observability from day one.
+Treat the scenario as production hiring work, not an interview toy.
+The product area is framed around a realistic company need, and the candidate is free to choose a reasonable implementation approach.
+
+SYSTEM REQUIREMENTS AND TECHNICAL CONSTRAINTS
+
+Fresh end-to-end proof after live bundle/runtime repairs
+
+RUBRIC SUMMARY
+{
+  "summary": "Evaluate Backend Engineer performance across design, implementation, Handoff + Demo, and reflection in a from-scratch build.",
+  "dayWeights": {
+    "1": 20,
+    "2": 25,
+    "3": 20,
+    "4": 20,
+    "5": 15
+  },
+  "dimensions": [
+    {
+      "name": "Architecture & Design",
+      "weight": 20,
+      "description": "Shows a workable architecture, boundaries, and data flow for the Trial."
+    },
+    {
+      "name": "Problem Understanding",
+      "weight": 10,
+      "description": "Reframes the business need accurately and keeps the brief grounded in real stakes."
+    },
+    {
+      "name": "Functional Requirements",
+      "weight": 15,
+      "description": "Captures the core product behaviors that must actually work."
+    },
+    {
+      "name": "Non-Functional Requirements",
+      "weight": 10,
+      "description": "States reliability, security, and performance expectations without over-specifying the stack."
+    },
+    {
+      "name": "Scope Realism",
+      "weight": 10,
+      "description": "Keeps the work achievable in the 2-day implementation window."
+    },
+    {
+      "name": "Code Quality",
+      "weight": 15,
+      "description": "Sets expectations for readable, maintainable, and well-structured code."
+    },
+    {
+      "name": "Testing",
+      "weight": 5,
+      "description": "Requires meaningful verification of the important paths and failure cases."
+    },
+    {
+      "name": "Communication",
+      "weight": 5,
+      "description": "Requires clear handoff language that a Talent Partner can follow."
+    }
+  ]
+}
+
+PLANNING AND DESIGN DOC
+AI Evaluation: Enabled
+design
+TASK DESCRIPTION
+
+Draft an implementation plan that defines service boundaries, key data flows, API contracts, and risk controls. Include concrete tradeoffs and how you will validate correctness with tests and reviewable artifacts.
+
+IMPLEMENTATION KICKOFF
+AI Evaluation: Enabled
+code
+TASK DESCRIPTION
+
+Implement the primary backend slice in code with tests. Prioritize correctness under realistic edge cases and keep the solution aligned with the brief.
+
+IMPLEMENTATION KICKOFF WORKSPACE
+Provisioning happens per-candidate after invite.
+IMPLEMENTATION WRAP-UP
+AI Evaluation: Enabled
+code
+TASK DESCRIPTION
+
+Continue the implementation wrap-up in the same repository used on Day 2. Focus on final validation across the core user flow while finishing implementation details, tightening tests, improving docs, and polishing the codebase for handoff.
+
+IMPLEMENTATION WRAP-UP WORKSPACE
+Provisioning happens per-candidate after invite.
+HANDOFF + DEMO
+AI Evaluation: Enabled
+handoff
+TASK DESCRIPTION
+
+Prepare a concise handoff demo that walks through the implemented solution, key decisions, tradeoffs, outcomes, and remaining risks for reviewers.
+
+REFLECTION ESSAY
+AI Evaluation: Enabled
+reflection
+TASK DESCRIPTION
+
+Write a markdown reflection essay covering your experience, challenges, decisions, tradeoffs, communication, and what you would do next.
+
+Benchmarks
+
+Compare completed candidates from this Trial using the same Winoe evaluation lens.
+
+Winoe surfaces evidence from each Trial. The Talent Partner makes the hiring decision.
+
+No completed candidates yet
+Benchmarks will appear once candidates complete this Trial and Winoe Reports are available.
+SEARCH CANDIDATES
+Showing 1 of 1 (total 1)
+Prev
+Page 1 / 1
+Next
+Candidate	Status	Report	Invite email	Verification	Day progress	Started	Completed	
+
+Robie Candidate
+candidate.qa@example.com
+4
+	In progress	—	
+Email sent
+Sent at 5/12/2026, 10:10:10 PM
+Copy invite link
+Resend invite
+	
+Not verified
+—
+	—	5/12/2026, 10:12:00 PM	—	View submissions →

@@ -1,0 +1,10 @@
+{
+  "ok": false,
+  "status": 401,
+  "statusText": "Unauthorized",
+  "url": "http://127.0.0.1:8000/api/candidate/session/5H1MiCvBh4LLS2LNikX50OaiWctbQ5SZe3bwIogLgtI",
+  "text": "{\"detail\":\"Not authenticated\"}",
+  "json": {
+    "detail": "Not authenticated"
+  }
+}

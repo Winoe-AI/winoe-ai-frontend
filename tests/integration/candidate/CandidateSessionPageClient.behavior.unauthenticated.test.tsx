@@ -1,3 +1,4 @@
+import { buildLoginHref } from '@/features/auth/authPaths';
 import { screen, waitFor } from '@testing-library/react';
 import {
   fetchMock,
@@ -17,7 +18,7 @@ describe('CandidateSessionPage auth flow unauthenticated bootstrap', () => {
     restoreFetch();
   });
 
-  it('renders invalid invite guidance when initial bootstrap returns 401', async () => {
+  it('redirects to login when initial bootstrap returns 401', async () => {
     fetchMock.mockImplementation(async (url: RequestInfo | URL) => {
       if (String(url).endsWith('/candidate/session/valid-token'))
         return jsonResponse({ message: 'Not authenticated' }, 401);
@@ -25,13 +26,12 @@ describe('CandidateSessionPage auth flow unauthenticated bootstrap', () => {
     });
     renderSessionPage('valid-token');
     await waitFor(() =>
-      expect(
-        screen.getByText(/This invite link is invalid/i),
-      ).toBeInTheDocument(),
+      expect(routerMock.replace).toHaveBeenCalledWith(
+        buildLoginHref('/candidate/session/valid-token', 'candidate'),
+      ),
     );
     expect(
-      screen.getByRole('link', { name: /Email support/i }),
-    ).toHaveAttribute('href', 'mailto:support@winoe.ai');
-    expect(routerMock.replace).not.toHaveBeenCalled();
+      screen.queryByText(/This invite link is invalid/i),
+    ).not.toBeInTheDocument();
   });
 });

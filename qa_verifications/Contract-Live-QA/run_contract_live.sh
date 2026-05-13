@@ -34,9 +34,18 @@ source "$SCRIPT_DIR/contract_live_env.sh"
 load_contract_live_local_env "$FRONTEND_ENV_FILE" "$BACKEND_ENV_FILE"
 
 USE_LOCAL_DEV_AUTH=0
+if [[ "${CONTRACT_LIVE_DEV_AUTH_BYPASS:-0}" == "1" || "${WINOE_DEV_AUTH_BYPASS:-0}" == "1" || "${DEV_AUTH_BYPASS:-0}" == "1" ]]; then
+  USE_LOCAL_DEV_AUTH=1
+fi
 if [[ -z "${QA_E2E_TALENT_PARTNER_EMAIL:-}" || -z "${QA_E2E_TALENT_PARTNER_PASSWORD:-}" || -z "${QA_E2E_CANDIDATE_EMAIL:-}" || -z "${QA_E2E_CANDIDATE_PASSWORD:-}" ]]; then
   USE_LOCAL_DEV_AUTH=1
 fi
+if [[ "$USE_LOCAL_DEV_AUTH" -eq 1 ]]; then
+  AUTH_BOOTSTRAP_MODE="local-dev-fallback"
+else
+  AUTH_BOOTSTRAP_MODE="real-auth0"
+fi
+export CONTRACT_LIVE_AUTH_BOOTSTRAP_MODE="$AUTH_BOOTSTRAP_MODE"
 
 if [[ "$USE_LOCAL_DEV_AUTH" -eq 1 ]]; then
   # In local-dev auth fallback mode, keep each contract-live run on a fresh
@@ -73,7 +82,7 @@ fi
 export CONTRACT_LIVE_TIMESTAMP="$TIMESTAMP"
 export CONTRACT_LIVE_ARTIFACTS_DIR="$EVIDENCE_DIR"
 export QA_E2E_STORAGE_DIR="$STORAGE_DIR"
-export CONTRACT_LIVE_BASE_URL="${CONTRACT_LIVE_BASE_URL:-http://127.0.0.1:3000}"
+export CONTRACT_LIVE_BASE_URL="${CONTRACT_LIVE_BASE_URL:-http://localhost:3000}"
 export CONTRACT_LIVE_SCENARIO_GENERATION_RUNTIME_MODE="${CONTRACT_LIVE_SCENARIO_GENERATION_RUNTIME_MODE:-demo}"
 export WINOE_EMAIL_PROVIDER="${WINOE_EMAIL_PROVIDER:-console}"
 STACK_BOOTSTRAP_PID=""
@@ -255,6 +264,8 @@ write_report() {
     echo "- Runner: \`${RUNNER_REL_PATH}\`"
     echo "- Base URL: \`${CONTRACT_LIVE_BASE_URL}\`"
     echo "- Email provider: \`${WINOE_EMAIL_PROVIDER}\`"
+    echo "- Auth bootstrap mode: \`${AUTH_BOOTSTRAP_MODE}\`"
+    echo "- Auth boundary: Local contract-live QA proves the local product flow, worker execution, Winoe Report generation, Evidence Trail persistence, and UI readiness. It does not certify production Auth0 reliability."
     echo "- Evidence bundle: \`contract_live_qa_latest/artifacts/${TIMESTAMP}/\`"
     echo "- Driver sequence: \`${DRIVER_SEQUENCE_RAW:-<none>}\`"
     echo "- Skip driver: \`${SKIP_DRIVER}\`"
@@ -334,25 +345,25 @@ echo "Storage states: $STORAGE_DIR" | tee -a "$RUNNER_LOG"
 echo "Base URL: $CONTRACT_LIVE_BASE_URL" | tee -a "$RUNNER_LOG"
 echo "WINOE_EMAIL_PROVIDER: $WINOE_EMAIL_PROVIDER" | tee -a "$RUNNER_LOG"
 if [[ -n "${QA_E2E_TALENT_PARTNER_EMAIL:-}" && -n "${QA_E2E_TALENT_PARTNER_PASSWORD:-}" && -n "${QA_E2E_CANDIDATE_EMAIL:-}" && -n "${QA_E2E_CANDIDATE_PASSWORD:-}" ]]; then
-  echo "Auth bootstrap: real Auth0 browser login" | tee -a "$RUNNER_LOG"
+  echo "Auth bootstrap: real Auth0 browser login (local proof only; not production Auth0 certification)" | tee -a "$RUNNER_LOG"
 else
-  echo "Auth bootstrap: local dev storage-state fallback" | tee -a "$RUNNER_LOG"
+  echo "Auth bootstrap: local dev storage-state fallback (local proof only; not production Auth0 certification)" | tee -a "$RUNNER_LOG"
 fi
 echo "Driver sequence: ${DRIVER_SEQUENCE_RAW:-<none>}" | tee -a "$RUNNER_LOG"
 echo | tee -a "$RUNNER_LOG"
 
 start_clean_local_stack
-wait_for_http_ready "http://127.0.0.1:3000" "Frontend"
+wait_for_http_ready "$CONTRACT_LIVE_BASE_URL" "Frontend"
 wait_for_http_ready "http://127.0.0.1:8000/health" "Backend"
 if [[ "$USE_LOCAL_DEV_AUTH" -eq 0 ]]; then
   auth_login_preflight \
     "talent_partner" \
-    "http://127.0.0.1:3000/auth/login?mode=talent_partner&returnTo=%2Fdashboard"
+    "$CONTRACT_LIVE_BASE_URL/auth/login?mode=talent_partner&returnTo=%2Fdashboard"
   auth_login_preflight \
     "candidate" \
-    "http://127.0.0.1:3000/auth/login?mode=candidate&returnTo=%2Fcandidate%2Fdashboard"
+    "$CONTRACT_LIVE_BASE_URL/auth/login?mode=candidate&returnTo=%2Fcandidate%2Fdashboard"
 else
-  echo "Skipping auth login preflight in local dev auth fallback mode." | tee -a "$RUNNER_LOG"
+  echo "Skipping auth login preflight in local dev auth fallback mode; local proof still covers the product flow, report generation, and Evidence Trail persistence." | tee -a "$RUNNER_LOG"
 fi
 
 if ! run_with_log \

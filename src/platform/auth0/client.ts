@@ -18,10 +18,12 @@ import {
   toStringArray,
   wrapCallbackErrorRedirect,
 } from './helpers';
+import { resolveBaseUrl } from './helpers/baseUrl';
 
 export function createAuth0Client() {
+  const appBaseUrl = resolveBaseUrl()?.origin ?? process.env.WINOE_APP_BASE_URL;
   return new Auth0Client({
-    appBaseUrl: process.env.WINOE_APP_BASE_URL,
+    appBaseUrl,
     domain: process.env.WINOE_AUTH0_DOMAIN,
     clientId: process.env.WINOE_AUTH0_CLIENT_ID,
     clientSecret: process.env.WINOE_AUTH0_CLIENT_SECRET,

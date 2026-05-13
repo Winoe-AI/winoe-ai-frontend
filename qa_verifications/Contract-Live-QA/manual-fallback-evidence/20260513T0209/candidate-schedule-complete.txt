@@ -1,0 +1,41 @@
+URL: http://127.0.0.1:3000/candidate/session/5H1MiCvBh4LLS2LNikX50OaiWctbQ5SZe3bwIogLgtI
+
+Skip to main content
+Winoe
+Candidate Portal
+Logout
+Pick your start date
+
+Choose when your 5-day Trial begins. Trial content unlocks only when Day 1 opens for Fresh Contract Live 2026-05-13T02-10-04-290Z (Backend Engineer).
+
+AI-assisted evaluation notice
+Notice mvp1
+
+We use AI to help evaluate submitted work artifacts, coding outputs, and communication signals across the trial. Human reviewers oversee AI-generated findings and final hiring decisions are made by people.
+
+What we evaluate
+
+Your Trial opens on Tue, May 19, 2026 at 9:00 AM America/New_York.
+
+Trial content unlocks only when Day 1 opens. Confirm this schedule before the Talent Partner is notified.
+
+GitHub username: candidateqa
+
+5-day schedule preview
+Day 1 — Planning & Design Doc
+Tue, May 19, 2026
+9:00 AM - 5:00 PM
+Day 2 — Implementation Kickoff
+Wed, May 20, 2026
+9:00 AM - 5:00 PM
+Day 3 — Implementation Wrap-Up
+Thu, May 21, 2026
+9:00 AM - 5:00 PM
+Day 4 — Handoff + Demo
+Fri, May 22, 2026
+9:00 AM - 5:00 PM
+Day 5 — Reflection Essay
+Sat, May 23, 2026
+9:00 AM - 5:00 PM
+Back
+Confirm schedule

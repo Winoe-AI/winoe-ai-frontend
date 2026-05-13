@@ -1,0 +1,25 @@
+{
+  "ok": false,
+  "status": 422,
+  "statusText": "Unprocessable Entity",
+  "url": "http://127.0.0.1:3000/api/trials/5/invite",
+  "text": "{\"detail\":[{\"type\":\"value_error\",\"loc\":[\"body\",\"inviteEmail\"],\"msg\":\"value is not a valid email address: The part after the @-sign is a special-use or reserved name that cannot be used with email.\",\"input\":\"candidate1@local.test\",\"ctx\":{\"reason\":\"The part after the @-sign is a special-use or reserved name that cannot be used with email.\"}}],\"errorCode\":\"VALIDATION_ERROR\",\"retryable\":false}",
+  "json": {
+    "detail": [
+      {
+        "type": "value_error",
+        "loc": [
+          "body",
+          "inviteEmail"
+        ],
+        "msg": "value is not a valid email address: The part after the @-sign is a special-use or reserved name that cannot be used with email.",
+        "input": "candidate1@local.test",
+        "ctx": {
+          "reason": "The part after the @-sign is a special-use or reserved name that cannot be used with email."
+        }
+      }
+    ],
+    "errorCode": "VALIDATION_ERROR",
+    "retryable": false
+  }
+}

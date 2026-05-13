@@ -2,5 +2,8 @@
 node_modules
 coverage
 out
+.pytest_cache
 .qa
 .qa/**
+qa_verifications/Contract-Live-QA/manual-*
+qa_verifications/Contract-Live-QA/contract_live_qa_latest
