@@ -5,7 +5,7 @@ import { chromium } from 'playwright';
 
 const command = process.argv[2]?.trim() || '';
 const baseURL =
-  process.env.CONTRACT_LIVE_BASE_URL?.trim() || 'http://127.0.0.1:3000';
+  process.env.CONTRACT_LIVE_BASE_URL?.trim() || 'http://localhost:3000';
 const frontendOrigin =
   process.env.CONTRACT_LIVE_FRONTEND_ORIGIN?.trim() || 'http://localhost:3000';
 const backendBaseURL =
@@ -762,7 +762,7 @@ async function controlCandidateSessionDayWindow(
   }
 
   const response = await fetch(
-    `${backendBaseURL}/api/admin/candidate_sessions/${candidateSessionId}/day_windows/control`,
+    `${backendBaseURL}/api/admin/candidate_trials/${candidateSessionId}/day_windows/control`,
     {
       method: 'POST',
       headers: {
@@ -1097,6 +1097,8 @@ async function runTalentPartnerFreshFlow() {
       candidateSessionId: invite.json?.candidateSessionId ?? null,
       inviteToken: invite.json?.token ?? null,
       inviteUrl: invite.json?.inviteUrl ?? null,
+      authBootstrapMode:
+        trimToNull(process.env.CONTRACT_LIVE_AUTH_BOOTSTRAP_MODE) || null,
       inviteAttempts,
       finalStatus:
         postInviteDetail.json?.status ?? activeDetail.json?.status ?? null,
@@ -1814,6 +1816,58 @@ async function runTalentPartnerReviewFlow() {
   const candidateSessionId = requireCandidateSessionId(context);
   const inviteToken = requireInviteToken(context);
 
+  const winoeReportSummary = await withPage(
+    'talent_partner',
+    async (page) => {
+      const reportPath = `/dashboard/trials/${trialId}/candidates/${candidateSessionId}/winoe-report`;
+      await page.goto(reportPath, {
+        waitUntil: 'domcontentloaded',
+        timeout: 60000,
+      });
+      await page.waitForLoadState('networkidle');
+
+      const generateButton = page.getByRole('button', {
+        name: /generate winoe report/i,
+      });
+      const generateVisible = await generateButton
+        .isVisible({ timeout: 3000 })
+        .catch(() => false);
+      if (generateVisible) {
+        await generateButton.click();
+      }
+
+      await waitForText(page, /winoe score/i, 60000);
+      const reportText = await page.locator('body').innerText();
+      if (
+        !/Winoe Score/i.test(reportText) ||
+        !/Evidence Trail/i.test(reportText)
+      ) {
+        throw new Error(
+          'Winoe report page did not expose the ready report and evidence trail copy.',
+        );
+      }
+
+      const screenshot = await capturePage(
+        page,
+        'talent_partner-winoe-report-page.json',
+        {
+          trialId,
+          candidateSessionId,
+        },
+      );
+      writeJson('talent_partner-winoe-report-page-screenshot.json', {
+        path: screenshot,
+      });
+
+      return {
+        reportPath,
+        reportVisible: true,
+      };
+    },
+    candidateSessionId,
+    context.summary?.candidateEmail ?? null,
+  );
+
   return await withPage('talent_partner', async (page) => {
     await page.goto(`/dashboard/trials/${trialId}`, {
       waitUntil: 'domcontentloaded',
@@ -1964,6 +2018,7 @@ async function runTalentPartnerReviewFlow() {
     const summary = {
       trialId,
       candidateSessionId,
+      ...winoeReportSummary,
       compareRow: compareRowPayload,
       submissionsPath,
       submissionsScreenshot,

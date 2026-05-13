@@ -1,0 +1,300 @@
+{
+  "attempt": 1,
+  "label": "trial active_inviting",
+  "response": {
+    "ok": true,
+    "status": 200,
+    "statusText": "OK",
+    "url": "http://127.0.0.1:3000/api/trials/5",
+    "text": "{\"id\":5,\"title\":\"Fresh Contract Live 2026-05-13T02-08-00-722Z\",\"role\":\"Backend Engineer\",\"seniority\":\"mid\",\"focus\":\"Fresh end-to-end proof after live bundle/runtime repairs\",\"companyContext\":{\"domain\":\"B2B developer tooling\",\"productArea\":\"workflow automation platform\",\"preferredLanguageFramework\":\"Python, FastAPI, pytest\"},\"ai\":{\"noticeVersion\":\"mvp1\",\"noticeText\":\"We use AI to help evaluate submitted work artifacts, coding outputs, and communication signals across the trial. Human reviewers oversee AI-generated findings and final hiring decisions are made by people.\",\"evalEnabledByDay\":{\"1\":true,\"2\":true,\"3\":true,\"4\":true,\"5\":true},\"promptPackVersion\":\"winoe-ai-pack-v4\",\"changesPendingRegeneration\":false,\"activeScenarioSnapshot\":{\"scenarioVersionId\":4,\"snapshotDigest\":\"32472f1db15510af9318aa4b6e89a8122f30eacc36843b6b849431d80151865a\",\"promptPackVersion\":\"winoe-ai-pack-v4\",\"agents\":[{\"key\":\"codeImplementationReviewer\",\"provider\":\"openai\",\"model\":\"gpt-5.2-codex\",\"runtimeMode\":\"demo\",\"promptVersion\":\"winoe-ai-pack-v4:codeImplementationReviewer\",\"rubricVersion\":\"winoe-ai-pack-v4:codeImplementationReviewer:rubric\"},{\"key\":\"demoPresentationReviewer\",\"provider\":\"anthropic\",\"model\":\"claude-sonnet-4-6\",\"runtimeMode\":\"demo\",\"promptVersion\":\"winoe-ai-pack-v4:demoPresentationReviewer\",\"rubricVersion\":\"winoe-ai-pack-v4:demoPresentationReviewer:rubric\"},{\"key\":\"designDocReviewer\",\"provider\":\"anthropic\",\"model\":\"claude-opus-4-7\",\"runtimeMode\":\"demo\",\"promptVersion\":\"winoe-ai-pack-v4:designDocReviewer\",\"rubricVersion\":\"winoe-ai-pack-v4:designDocReviewer:rubric\"},{\"key\":\"prestart\",\"provider\":\"anthropic\",\"model\":\"claude-opus-4-7\",\"runtimeMode\":\"demo\",\"promptVersion\":\"winoe-ai-pack-v4:prestart\",\"rubricVersion\":\"winoe-ai-pack-v4:prestart:rubric\"},{\"key\":\"reflectionEssayReviewer\",\"provider\":\"anthropic\",\"model\":\"claude-sonnet-4-6\",\"runtimeMode\":\"demo\",\"promptVersion\":\"winoe-ai-pack-v4:reflectionEssayReviewer\",\"rubricVersion\":\"winoe-ai-pack-v4:reflectionEssayReviewer:rubric\"},{\"key\":\"winoeReport\",\"provider\":\"openai\",\"model\":\"gpt-5.2\",\"runtimeMode\":\"demo\",\"promptVersion\":\"winoe-ai-pack-v4:winoeReport\",\"rubricVersion\":\"winoe-ai-pack-v4:winoeReport:rubric\"}]}},\"activeScenarioVersionId\":4,\"pendingScenarioVersionId\":null,\"scenario\":{\"id\":4,\"versionIndex\":1,\"status\":\"locked\",\"lockedAt\":\"2026-05-13T02:08:10.139702Z\",\"storylineMd\":\"# Backend Engineer Scenario v1\\n\\nYou are joining a product team with an empty repository and a blank slate.\\nThe team needs a from-scratch build for an incident-prone integration that needs stronger reliability boundaries.\\nThe trial is intended to surface product judgment, build quality, and communication under a two-day implementation window with tight operational observability from day one.\\nTreat the scenario as production hiring work, not an interview toy.\\nThe product area is framed around a realistic company need, and the candidate is free to choose a reasonable implementation approach.\",\"taskPromptsJson\":[{\"dayIndex\":1,\"type\":\"design\",\"title\":\"Architecture Plan\",\"description\":\"Draft an implementation plan that defines service boundaries, key data flows, API contracts, and risk controls. Include concrete tradeoffs and how you will validate correctness with tests and reviewable artifacts.\"},{\"dayIndex\":2,\"type\":\"code\",\"title\":\"Feature Implementation\",\"description\":\"Implement the primary backend slice in code with tests. Prioritize correctness under realistic edge cases and keep the solution aligned with the brief.\"},{\"dayIndex\":3,\"type\":\"code\",\"title\":\"Implementation Wrap-Up\",\"description\":\"Continue the implementation wrap-up in the same repository used on Day 2. Focus on final validation across the core user flow while finishing implementation details, tightening tests, improving docs, and polishing the codebase for handoff.\"},{\"dayIndex\":4,\"type\":\"handoff\",\"title\":\"Handoff + Demo\",\"description\":\"Prepare a concise handoff demo that walks through the implemented solution, key decisions, tradeoffs, outcomes, and remaining risks for reviewers.\"},{\"dayIndex\":5,\"type\":\"reflection\",\"title\":\"Reflection Essay\",\"description\":\"Write a markdown reflection essay covering your experience, challenges, decisions, tradeoffs, communication, and what you would do next.\"}],\"projectBriefMd\":\"# Fresh End-To-End Proof After Live Bundle/Runtime Repairs\\n\\n## Context\\n\\nthe team is trying to improve Fresh end-to-end proof after live bundle/runtime repairs.\\nThe work should feel like a real backend engineer trial: the candidate starts from an empty repository and is expected to build the system from scratch.\\nDomain: B2B developer tooling; Product area: workflow automation platform\\n\\n## Problem\\n\\nThe candidate must design and build a Fresh end-to-end proof after live bundle/runtime repairs that solves a concrete business problem with enough detail to grade the work consistently.\\n\\n## Users\\n\\n- Primary users: the operational team that depends on the new workflow or service.\\n- Secondary users: the Talent Partner reviewing the Evidence Trail and demo.\\n- Preferred language/framework context: Python, FastAPI, pytest. Treat this as a constraint to respect, not a command to follow blindly.\\n\\n## Functional Requirements\\n\\n- Build a production-shaped system, feature, service, or tool from scratch.\\n- Support the core user journey and the main success path end to end.\\n- Include the minimum data model, APIs, and persistence needed for the workflow.\\n- Make the implementation testable and understandable without prescribing the exact file layout.\\n\\n## Non-Functional Requirements\\n\\n- Keep the scope achievable in two focused implementation days.\\n- Choose an architecture that is reliable, secure enough for the trial, and easy to explain.\\n- Avoid unnecessary framework lock-in beyond the preferred language/framework context.\\n- Surface errors clearly and make the system observable enough for review.\\n\\n## Out of Scope\\n\\n- Do not build unrelated features, admin tooling, or extra user journeys.\\n- Do not prescribe exact file structures or endpoint names.\\n- Do not assume implementation files beyond the empty-workspace infrastructure.\\n\\n## What \\\"Done\\\" Looks Like\\n\\n- The requested workflow is implemented and behaves consistently in the candidate repository.\\n- Tests cover the meaningful success path and the important failure cases.\\n- The repository is easy to review, hand off, and demo within the Trial.\\n\\n## Suggested Daily Cadence\\n- Day 1 (Design Doc): define the architecture, risks, tradeoffs, and validation plan.\\n- Day 2 (Implementation Kickoff): scaffold the system and land the first end-to-end slice.\\n- Day 3 (Implementation Wrap-Up): finish the core path, tighten tests, and harden edges.\\n- Day 4 (Handoff + Demo): walk through what was built, what was verified, and what remains open.\\n- Day 5 (Reflection): explain the decisions, mistakes, and lessons from the Trial.\",\"rubricJson\":{\"summary\":\"Evaluate Backend Engineer performance across design, implementation, Handoff + Demo, and reflection in a from-scratch build.\",\"dayWeights\":{\"1\":20,\"2\":25,\"3\":20,\"4\":20,\"5\":15},\"dimensions\":[{\"name\":\"Architecture & Design\",\"weight\":20,\"description\":\"Shows a workable architecture, boundaries, and data flow for the Trial.\"},{\"name\":\"Problem Understanding\",\"weight\":10,\"description\":\"Reframes the business need accurately and keeps the brief grounded in real stakes.\"},{\"name\":\"Functional Requirements\",\"weight\":15,\"description\":\"Captures the core product behaviors that must actually work.\"},{\"name\":\"Non-Functional Requirements\",\"weight\":10,\"description\":\"States reliability, security, and performance expectations without over-specifying the stack.\"},{\"name\":\"Scope Realism\",\"weight\":10,\"description\":\"Keeps the work achievable in the 2-day implementation window.\"},{\"name\":\"Code Quality\",\"weight\":15,\"description\":\"Sets expectations for readable, maintainable, and well-structured code.\"},{\"name\":\"Testing\",\"weight\":5,\"description\":\"Requires meaningful verification of the important paths and failure cases.\"},{\"name\":\"Communication\",\"weight\":5,\"description\":\"Requires clear handoff language that a Talent Partner can follow.\"}]},\"notes\":\"Fresh end-to-end proof after live bundle/runtime repairs\",\"modelName\":\"deterministic_trial_fallback\",\"modelVersion\":\"v1\",\"promptVersion\":\"winoe-ai-pack-v4:prestart\",\"rubricVersion\":\"winoe-ai-pack-v4:prestart:rubric\",\"aiPolicySnapshotDigest\":\"32472f1db15510af9318aa4b6e89a8122f30eacc36843b6b849431d80151865a\",\"aiPromptPackVersion\":\"winoe-ai-pack-v4\",\"agentRuntimeSummary\":[{\"key\":\"codeImplementationReviewer\",\"provider\":\"openai\",\"model\":\"gpt-5.2-codex\",\"runtimeMode\":\"demo\",\"promptVersion\":\"winoe-ai-pack-v4:codeImplementationReviewer\",\"rubricVersion\":\"winoe-ai-pack-v4:codeImplementationReviewer:rubric\"},{\"key\":\"demoPresentationReviewer\",\"provider\":\"anthropic\",\"model\":\"claude-sonnet-4-6\",\"runtimeMode\":\"demo\",\"promptVersion\":\"winoe-ai-pack-v4:demoPresentationReviewer\",\"rubricVersion\":\"winoe-ai-pack-v4:demoPresentationReviewer:rubric\"},{\"key\":\"designDocReviewer\",\"provider\":\"anthropic\",\"model\":\"claude-opus-4-7\",\"runtimeMode\":\"demo\",\"promptVersion\":\"winoe-ai-pack-v4:designDocReviewer\",\"rubricVersion\":\"winoe-ai-pack-v4:designDocReviewer:rubric\"},{\"key\":\"prestart\",\"provider\":\"anthropic\",\"model\":\"claude-opus-4-7\",\"runtimeMode\":\"demo\",\"promptVersion\":\"winoe-ai-pack-v4:prestart\",\"rubricVersion\":\"winoe-ai-pack-v4:prestart:rubric\"},{\"key\":\"reflectionEssayReviewer\",\"provider\":\"anthropic\",\"model\":\"claude-sonnet-4-6\",\"runtimeMode\":\"demo\",\"promptVersion\":\"winoe-ai-pack-v4:reflectionEssayReviewer\",\"rubricVersion\":\"winoe-ai-pack-v4:reflectionEssayReviewer:rubric\"},{\"key\":\"winoeReport\",\"provider\":\"openai\",\"model\":\"gpt-5.2\",\"runtimeMode\":\"demo\",\"promptVersion\":\"winoe-ai-pack-v4:winoeReport\",\"rubricVersion\":\"winoe-ai-pack-v4:winoeReport:rubric\"}]},\"status\":\"active_inviting\",\"generationStatus\":\"ready_for_review\",\"generationFailure\":null,\"backgroundFailures\":{\"hasFailedJobs\":false,\"failedJobsCount\":0,\"latestFailure\":null},\"scenarioLocked\":true,\"canApproveScenario\":false,\"canActivateTrial\":false,\"canRetryGeneration\":false,\"generatingAt\":\"2026-05-13T02:08:00.844209Z\",\"readyForReviewAt\":\"2026-05-13T02:08:02.763250Z\",\"activatedAt\":\"2026-05-13T02:08:15.688952Z\",\"terminatedAt\":null,\"tasks\":[{\"dayIndex\":1,\"title\":\"Architecture Plan\",\"type\":\"design\",\"description\":\"Draft an implementation plan that defines service boundaries, key data flows, API contracts, and risk controls. Include concrete tradeoffs and how you will validate correctness with tests and reviewable artifacts.\",\"rubric\":null,\"maxScore\":20},{\"dayIndex\":2,\"title\":\"Feature Implementation\",\"type\":\"code\",\"description\":\"Implement the primary backend slice in code with tests. Prioritize correctness under realistic edge cases and keep the solution aligned with the brief.\",\"rubric\":null,\"maxScore\":25},{\"dayIndex\":3,\"title\":\"Implementation Wrap-Up\",\"type\":\"code\",\"description\":\"Continue the implementation wrap-up in the same repository used on Day 2. Focus on final validation across the core user flow while finishing implementation details, tightening tests, improving docs, and polishing the codebase for handoff.\",\"rubric\":null,\"maxScore\":20},{\"dayIndex\":4,\"title\":\"Handoff + Demo\",\"type\":\"handoff\",\"description\":\"Prepare a concise handoff demo that walks through the implemented solution, key decisions, tradeoffs, outcomes, and remaining risks for reviewers.\",\"rubric\":null,\"maxScore\":20},{\"dayIndex\":5,\"title\":\"Reflection Essay\",\"type\":\"reflection\",\"description\":\"Write a markdown reflection essay covering your experience, challenges, decisions, tradeoffs, communication, and what you would do next.\",\"rubric\":null,\"maxScore\":15}]}",
+    "json": {
+      "id": 5,
+      "title": "Fresh Contract Live 2026-05-13T02-08-00-722Z",
+      "role": "Backend Engineer",
+      "seniority": "mid",
+      "focus": "Fresh end-to-end proof after live bundle/runtime repairs",
+      "companyContext": {
+        "domain": "B2B developer tooling",
+        "productArea": "workflow automation platform",
+        "preferredLanguageFramework": "Python, FastAPI, pytest"
+      },
+      "ai": {
+        "noticeVersion": "mvp1",
+        "noticeText": "We use AI to help evaluate submitted work artifacts, coding outputs, and communication signals across the trial. Human reviewers oversee AI-generated findings and final hiring decisions are made by people.",
+        "evalEnabledByDay": {
+          "1": true,
+          "2": true,
+          "3": true,
+          "4": true,
+          "5": true
+        },
+        "promptPackVersion": "winoe-ai-pack-v4",
+        "changesPendingRegeneration": false,
+        "activeScenarioSnapshot": {
+          "scenarioVersionId": 4,
+          "snapshotDigest": "32472f1db15510af9318aa4b6e89a8122f30eacc36843b6b849431d80151865a",
+          "promptPackVersion": "winoe-ai-pack-v4",
+          "agents": [
+            {
+              "key": "codeImplementationReviewer",
+              "provider": "openai",
+              "model": "gpt-5.2-codex",
+              "runtimeMode": "demo",
+              "promptVersion": "winoe-ai-pack-v4:codeImplementationReviewer",
+              "rubricVersion": "winoe-ai-pack-v4:codeImplementationReviewer:rubric"
+            },
+            {
+              "key": "demoPresentationReviewer",
+              "provider": "anthropic",
+              "model": "claude-sonnet-4-6",
+              "runtimeMode": "demo",
+              "promptVersion": "winoe-ai-pack-v4:demoPresentationReviewer",
+              "rubricVersion": "winoe-ai-pack-v4:demoPresentationReviewer:rubric"
+            },
+            {
+              "key": "designDocReviewer",
+              "provider": "anthropic",
+              "model": "claude-opus-4-7",
+              "runtimeMode": "demo",
+              "promptVersion": "winoe-ai-pack-v4:designDocReviewer",
+              "rubricVersion": "winoe-ai-pack-v4:designDocReviewer:rubric"
+            },
+            {
+              "key": "prestart",
+              "provider": "anthropic",
+              "model": "claude-opus-4-7",
+              "runtimeMode": "demo",
+              "promptVersion": "winoe-ai-pack-v4:prestart",
+              "rubricVersion": "winoe-ai-pack-v4:prestart:rubric"
+            },
+            {
+              "key": "reflectionEssayReviewer",
+              "provider": "anthropic",
+              "model": "claude-sonnet-4-6",
+              "runtimeMode": "demo",
+              "promptVersion": "winoe-ai-pack-v4:reflectionEssayReviewer",
+              "rubricVersion": "winoe-ai-pack-v4:reflectionEssayReviewer:rubric"
+            },
+            {
+              "key": "winoeReport",
+              "provider": "openai",
+              "model": "gpt-5.2",
+              "runtimeMode": "demo",
+              "promptVersion": "winoe-ai-pack-v4:winoeReport",
+              "rubricVersion": "winoe-ai-pack-v4:winoeReport:rubric"
+            }
+          ]
+        }
+      },
+      "activeScenarioVersionId": 4,
+      "pendingScenarioVersionId": null,
+      "scenario": {
+        "id": 4,
+        "versionIndex": 1,
+        "status": "locked",
+        "lockedAt": "2026-05-13T02:08:10.139702Z",
+        "storylineMd": "# Backend Engineer Scenario v1\n\nYou are joining a product team with an empty repository and a blank slate.\nThe team needs a from-scratch build for an incident-prone integration that needs stronger reliability boundaries.\nThe trial is intended to surface product judgment, build quality, and communication under a two-day implementation window with tight operational observability from day one.\nTreat the scenario as production hiring work, not an interview toy.\nThe product area is framed around a realistic company need, and the candidate is free to choose a reasonable implementation approach.",
+        "taskPromptsJson": [
+          {
+            "dayIndex": 1,
+            "type": "design",
+            "title": "Architecture Plan",
+            "description": "Draft an implementation plan that defines service boundaries, key data flows, API contracts, and risk controls. Include concrete tradeoffs and how you will validate correctness with tests and reviewable artifacts."
+          },
+          {
+            "dayIndex": 2,
+            "type": "code",
+            "title": "Feature Implementation",
+            "description": "Implement the primary backend slice in code with tests. Prioritize correctness under realistic edge cases and keep the solution aligned with the brief."
+          },
+          {
+            "dayIndex": 3,
+            "type": "code",
+            "title": "Implementation Wrap-Up",
+            "description": "Continue the implementation wrap-up in the same repository used on Day 2. Focus on final validation across the core user flow while finishing implementation details, tightening tests, improving docs, and polishing the codebase for handoff."
+          },
+          {
+            "dayIndex": 4,
+            "type": "handoff",
+            "title": "Handoff + Demo",
+            "description": "Prepare a concise handoff demo that walks through the implemented solution, key decisions, tradeoffs, outcomes, and remaining risks for reviewers."
+          },
+          {
+            "dayIndex": 5,
+            "type": "reflection",
+            "title": "Reflection Essay",
+            "description": "Write a markdown reflection essay covering your experience, challenges, decisions, tradeoffs, communication, and what you would do next."
+          }
+        ],
+        "projectBriefMd": "# Fresh End-To-End Proof After Live Bundle/Runtime Repairs\n\n## Context\n\nthe team is trying to improve Fresh end-to-end proof after live bundle/runtime repairs.\nThe work should feel like a real backend engineer trial: the candidate starts from an empty repository and is expected to build the system from scratch.\nDomain: B2B developer tooling; Product area: workflow automation platform\n\n## Problem\n\nThe candidate must design and build a Fresh end-to-end proof after live bundle/runtime repairs that solves a concrete business problem with enough detail to grade the work consistently.\n\n## Users\n\n- Primary users: the operational team that depends on the new workflow or service.\n- Secondary users: the Talent Partner reviewing the Evidence Trail and demo.\n- Preferred language/framework context: Python, FastAPI, pytest. Treat this as a constraint to respect, not a command to follow blindly.\n\n## Functional Requirements\n\n- Build a production-shaped system, feature, service, or tool from scratch.\n- Support the core user journey and the main success path end to end.\n- Include the minimum data model, APIs, and persistence needed for the workflow.\n- Make the implementation testable and understandable without prescribing the exact file layout.\n\n## Non-Functional Requirements\n\n- Keep the scope achievable in two focused implementation days.\n- Choose an architecture that is reliable, secure enough for the trial, and easy to explain.\n- Avoid unnecessary framework lock-in beyond the preferred language/framework context.\n- Surface errors clearly and make the system observable enough for review.\n\n## Out of Scope\n\n- Do not build unrelated features, admin tooling, or extra user journeys.\n- Do not prescribe exact file structures or endpoint names.\n- Do not assume implementation files beyond the empty-workspace infrastructure.\n\n## What \"Done\" Looks Like\n\n- The requested workflow is implemented and behaves consistently in the candidate repository.\n- Tests cover the meaningful success path and the important failure cases.\n- The repository is easy to review, hand off, and demo within the Trial.\n\n## Suggested Daily Cadence\n- Day 1 (Design Doc): define the architecture, risks, tradeoffs, and validation plan.\n- Day 2 (Implementation Kickoff): scaffold the system and land the first end-to-end slice.\n- Day 3 (Implementation Wrap-Up): finish the core path, tighten tests, and harden edges.\n- Day 4 (Handoff + Demo): walk through what was built, what was verified, and what remains open.\n- Day 5 (Reflection): explain the decisions, mistakes, and lessons from the Trial.",
+        "rubricJson": {
+          "summary": "Evaluate Backend Engineer performance across design, implementation, Handoff + Demo, and reflection in a from-scratch build.",
+          "dayWeights": {
+            "1": 20,
+            "2": 25,
+            "3": 20,
+            "4": 20,
+            "5": 15
+          },
+          "dimensions": [
+            {
+              "name": "Architecture & Design",
+              "weight": 20,
+              "description": "Shows a workable architecture, boundaries, and data flow for the Trial."
+            },
+            {
+              "name": "Problem Understanding",
+              "weight": 10,
+              "description": "Reframes the business need accurately and keeps the brief grounded in real stakes."
+            },
+            {
+              "name": "Functional Requirements",
+              "weight": 15,
+              "description": "Captures the core product behaviors that must actually work."
+            },
+            {
+              "name": "Non-Functional Requirements",
+              "weight": 10,
+              "description": "States reliability, security, and performance expectations without over-specifying the stack."
+            },
+            {
+              "name": "Scope Realism",
+              "weight": 10,
+              "description": "Keeps the work achievable in the 2-day implementation window."
+            },
+            {
+              "name": "Code Quality",
+              "weight": 15,
+              "description": "Sets expectations for readable, maintainable, and well-structured code."
+            },
+            {
+              "name": "Testing",
+              "weight": 5,
+              "description": "Requires meaningful verification of the important paths and failure cases."
+            },
+            {
+              "name": "Communication",
+              "weight": 5,
+              "description": "Requires clear handoff language that a Talent Partner can follow."
+            }
+          ]
+        },
+        "notes": "Fresh end-to-end proof after live bundle/runtime repairs",
+        "modelName": "deterministic_trial_fallback",
+        "modelVersion": "v1",
+        "promptVersion": "winoe-ai-pack-v4:prestart",
+        "rubricVersion": "winoe-ai-pack-v4:prestart:rubric",
+        "aiPolicySnapshotDigest": "32472f1db15510af9318aa4b6e89a8122f30eacc36843b6b849431d80151865a",
+        "aiPromptPackVersion": "winoe-ai-pack-v4",
+        "agentRuntimeSummary": [
+          {
+            "key": "codeImplementationReviewer",
+            "provider": "openai",
+            "model": "gpt-5.2-codex",
+            "runtimeMode": "demo",
+            "promptVersion": "winoe-ai-pack-v4:codeImplementationReviewer",
+            "rubricVersion": "winoe-ai-pack-v4:codeImplementationReviewer:rubric"
+          },
+          {
+            "key": "demoPresentationReviewer",
+            "provider": "anthropic",
+            "model": "claude-sonnet-4-6",
+            "runtimeMode": "demo",
+            "promptVersion": "winoe-ai-pack-v4:demoPresentationReviewer",
+            "rubricVersion": "winoe-ai-pack-v4:demoPresentationReviewer:rubric"
+          },
+          {
+            "key": "designDocReviewer",
+            "provider": "anthropic",
+            "model": "claude-opus-4-7",
+            "runtimeMode": "demo",
+            "promptVersion": "winoe-ai-pack-v4:designDocReviewer",
+            "rubricVersion": "winoe-ai-pack-v4:designDocReviewer:rubric"
+          },
+          {
+            "key": "prestart",
+            "provider": "anthropic",
+            "model": "claude-opus-4-7",
+            "runtimeMode": "demo",
+            "promptVersion": "winoe-ai-pack-v4:prestart",
+            "rubricVersion": "winoe-ai-pack-v4:prestart:rubric"
+          },
+          {
+            "key": "reflectionEssayReviewer",
+            "provider": "anthropic",
+            "model": "claude-sonnet-4-6",
+            "runtimeMode": "demo",
+            "promptVersion": "winoe-ai-pack-v4:reflectionEssayReviewer",
+            "rubricVersion": "winoe-ai-pack-v4:reflectionEssayReviewer:rubric"
+          },
+          {
+            "key": "winoeReport",
+            "provider": "openai",
+            "model": "gpt-5.2",
+            "runtimeMode": "demo",
+            "promptVersion": "winoe-ai-pack-v4:winoeReport",
+            "rubricVersion": "winoe-ai-pack-v4:winoeReport:rubric"
+          }
+        ]
+      },
+      "status": "active_inviting",
+      "generationStatus": "ready_for_review",
+      "generationFailure": null,
+      "backgroundFailures": {
+        "hasFailedJobs": false,
+        "failedJobsCount": 0,
+        "latestFailure": null
+      },
+      "scenarioLocked": true,
+      "canApproveScenario": false,
+      "canActivateTrial": false,
+      "canRetryGeneration": false,
+      "generatingAt": "2026-05-13T02:08:00.844209Z",
+      "readyForReviewAt": "2026-05-13T02:08:02.763250Z",
+      "activatedAt": "2026-05-13T02:08:15.688952Z",
+      "terminatedAt": null,
+      "tasks": [
+        {
+          "dayIndex": 1,
+          "title": "Architecture Plan",
+          "type": "design",
+          "description": "Draft an implementation plan that defines service boundaries, key data flows, API contracts, and risk controls. Include concrete tradeoffs and how you will validate correctness with tests and reviewable artifacts.",
+          "rubric": null,
+          "maxScore": 20
+        },
+        {
+          "dayIndex": 2,
+          "title": "Feature Implementation",
+          "type": "code",
+          "description": "Implement the primary backend slice in code with tests. Prioritize correctness under realistic edge cases and keep the solution aligned with the brief.",
+          "rubric": null,
+          "maxScore": 25
+        },
+        {
+          "dayIndex": 3,
+          "title": "Implementation Wrap-Up",
+          "type": "code",
+          "description": "Continue the implementation wrap-up in the same repository used on Day 2. Focus on final validation across the core user flow while finishing implementation details, tightening tests, improving docs, and polishing the codebase for handoff.",
+          "rubric": null,
+          "maxScore": 20
+        },
+        {
+          "dayIndex": 4,
+          "title": "Handoff + Demo",
+          "type": "handoff",
+          "description": "Prepare a concise handoff demo that walks through the implemented solution, key decisions, tradeoffs, outcomes, and remaining risks for reviewers.",
+          "rubric": null,
+          "maxScore": 20
+        },
+        {
+          "dayIndex": 5,
+          "title": "Reflection Essay",
+          "type": "reflection",
+          "description": "Write a markdown reflection essay covering your experience, challenges, decisions, tradeoffs, communication, and what you would do next.",
+          "rubric": null,
+          "maxScore": 15
+        }
+      ]
+    }
+  }
+}

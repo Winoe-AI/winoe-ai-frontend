@@ -1,0 +1,17 @@
+ERROR: TimeoutError: page.waitForURL: Timeout 120000ms exceeded.
+=========================== logs ===========================
+waiting for navigation until "load"
+  navigated to "http://localhost:3000/auth/error?mode=talent_partner&returnTo=&error=callback_failed&errorCode=invalid_state&errorId=3e93fa91-ac2a-4104-971f-17680f7e46fe"
+============================================================
+URL: http://localhost:3000/auth/error?mode=talent_partner&returnTo=&error=callback_failed&errorCode=invalid_state&errorId=3e93fa91-ac2a-4104-971f-17680f7e46fe
+
+Skip to main content
+Winoe
+Sign-in failed
+
+Your sign-in session expired or was interrupted. Please try again.
+
+Retry sign-in
+Clear auth state
+Code: invalid_state
+Trace ID: 3e93fa91-ac2a-4104-971f-17680f7e46fe

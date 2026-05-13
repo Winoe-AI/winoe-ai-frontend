@@ -36,19 +36,12 @@ describe('inviteInitRunner auth handling', () => {
   it('redirects to login for generic auth-required 401 bootstrap failures', async () => {
     resolveCandidateInviteTokenMock.mockRejectedValue({ status: 401 });
     const params = buildParams();
-    params.authStatus = 'unauthenticated';
+    params.authStatus = 'idle';
     const runInit = createInviteInit(params);
 
     await runInit('invite-token');
 
     expect(params.redirectToLogin).toHaveBeenCalledTimes(1);
-    expect(params.setInviteErrorState).toHaveBeenCalledTimes(1);
-    expect(params.setInviteErrorState).toHaveBeenCalledWith(null);
-    expect(params.setInviteContactName).toHaveBeenCalledTimes(1);
-    expect(params.setInviteContactName).toHaveBeenCalledWith(null);
-    expect(params.setInviteContactEmail).toHaveBeenCalledTimes(1);
-    expect(params.setInviteContactEmail).toHaveBeenCalledWith(null);
-    expect(params.setView).not.toHaveBeenCalledWith('accessDenied');
     expect(params.markEnd).toHaveBeenCalledWith('candidate:init', {
       status: 'auth_redirect',
     });

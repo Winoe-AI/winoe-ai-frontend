@@ -1,0 +1,31 @@
+{
+  "ok": true,
+  "status": 200,
+  "statusText": "OK",
+  "url": "http://127.0.0.1:3000/api/trials/6/candidates",
+  "text": "[{\"candidateSessionId\":4,\"inviteEmail\":\"candidate.qa@example.com\",\"candidateName\":\"Robie Candidate\",\"githubUsername\":null,\"status\":\"not_started\",\"startedAt\":null,\"completedAt\":null,\"hasWinoeReport\":false,\"hasReport\":false,\"reportReady\":false,\"reportId\":null,\"dayProgress\":{\"completed\":0,\"total\":5},\"inviteToken\":\"5H1MiCvBh4LLS2LNikX50OaiWctbQ5SZe3bwIogLgtI\",\"inviteUrl\":\"http://localhost:3000/candidate/session/5H1MiCvBh4LLS2LNikX50OaiWctbQ5SZe3bwIogLgtI\",\"inviteEmailStatus\":\"sent\",\"inviteEmailSentAt\":\"2026-05-13T02:10:10.735576Z\",\"inviteEmailError\":null}]",
+  "json": [
+    {
+      "candidateSessionId": 4,
+      "inviteEmail": "candidate.qa@example.com",
+      "candidateName": "Robie Candidate",
+      "githubUsername": null,
+      "status": "not_started",
+      "startedAt": null,
+      "completedAt": null,
+      "hasWinoeReport": false,
+      "hasReport": false,
+      "reportReady": false,
+      "reportId": null,
+      "dayProgress": {
+        "completed": 0,
+        "total": 5
+      },
+      "inviteToken": "5H1MiCvBh4LLS2LNikX50OaiWctbQ5SZe3bwIogLgtI",
+      "inviteUrl": "http://localhost:3000/candidate/session/5H1MiCvBh4LLS2LNikX50OaiWctbQ5SZe3bwIogLgtI",
+      "inviteEmailStatus": "sent",
+      "inviteEmailSentAt": "2026-05-13T02:10:10.735576Z",
+      "inviteEmailError": null
+    }
+  ]
+}

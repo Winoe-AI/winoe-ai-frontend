@@ -13,6 +13,7 @@
 # testing
 /coverage
 /test-results/
+/.pytest_cache/
 /playwright-report/
 **/.last-run.json
 

@@ -87,20 +87,6 @@ export function handleInviteInitError(params: InviteInitParams, err: unknown) {
   }
 
   if (status === 401) {
-    if (params.authStatus !== 'unauthenticated') {
-      params.setInviteErrorState('invalid');
-      params.setInviteContactName(inviteContact.name);
-      params.setInviteContactEmail(inviteContact.email);
-      params.setErrorStatus(401);
-      params.setErrorMessage(INVITE_INVALID_MESSAGE);
-      params.setAuthMessage(null);
-      params.setView('error');
-      params.markEnd('candidate:init', {
-        status: 'error',
-        inviteErrorState: 'invalid',
-      });
-      return;
-    }
     params.markEnd('candidate:init', { status: 'auth_redirect' });
     params.redirectToLogin();
     return;

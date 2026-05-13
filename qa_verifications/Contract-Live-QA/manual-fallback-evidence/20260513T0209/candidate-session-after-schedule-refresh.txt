@@ -1,0 +1,34 @@
+URL: http://127.0.0.1:3000/candidate/session/5H1MiCvBh4LLS2LNikX50OaiWctbQ5SZe3bwIogLgtI
+
+Skip to main content
+Winoe
+Candidate Portal
+Logout
+Trial locked until start
+
+Fresh Contract Live 2026-05-13T02-10-04-290Z (Backend Engineer) opens when Day 1 starts. Come back at the scheduled opening time.
+
+Starts in 6d 10h 45m 46s
+
+Your Trial opens on Tue, May 19, 2026 at 9:00 AM America/New_York. Come back then.
+
+5-day schedule preview
+Day 1 — Planning & Design Doc
+Tue, May 19, 2026
+9:00 AM - 5:00 PM
+Day 2 — Implementation Kickoff
+Wed, May 20, 2026
+9:00 AM - 5:00 PM
+Day 3 — Implementation Wrap-Up
+Thu, May 21, 2026
+9:00 AM - 5:00 PM
+Day 4 — Handoff + Demo
+Fri, May 22, 2026
+9:00 AM - 5:00 PM
+Day 5 — Reflection Essay
+Sat, May 23, 2026
+9:00 AM - 9:00 PM
+
+Current window state: upcoming
+
+Refresh

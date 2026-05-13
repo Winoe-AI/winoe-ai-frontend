@@ -1,0 +1,27 @@
+URL: http://127.0.0.1:3000/candidate/session/5H1MiCvBh4LLS2LNikX50OaiWctbQ5SZe3bwIogLgtI
+
+Skip to main content
+Winoe
+Candidate Portal
+Logout
+Pick your start date
+
+Choose when your 5-day Trial begins. Trial content unlocks only when Day 1 opens for Fresh Contract Live 2026-05-13T02-10-04-290Z (Backend Engineer).
+
+AI-assisted evaluation notice
+Notice mvp1
+
+We use AI to help evaluate submitted work artifacts, coding outputs, and communication signals across the trial. Human reviewers oversee AI-generated findings and final hiring decisions are made by people.
+
+What we evaluate
+Start date
+Timezone
+
+Detected timezone: America/New_York
+
+GitHub username
+
+Use the GitHub username connected to your Trial workspace.
+
+Back to dashboard
+Continue

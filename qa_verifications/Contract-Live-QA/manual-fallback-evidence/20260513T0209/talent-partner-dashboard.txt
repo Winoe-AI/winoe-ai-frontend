@@ -1,0 +1,32 @@
+URL: http://127.0.0.1:3000/dashboard
+
+Skip to main content
+Winoe
+Talent Partner Dashboard
+Logout
+Dashboard
+AI Settings
+New Trial
+
+Talent Partner QA
+
+talent.partner.qa@example.com
+
+LocalCo
+
+ROLE: TALENT_PARTNER
+
+Trials
+TITLE
+ROLE
+CREATED
+ACTIONS
+Fresh Contract Live 2026-05-13T02-10-04-290Z
+1 candidate(s)
+Active inviting
+
+Backend Engineer
+
+2026-05-13
+
+Invite candidate

@@ -1,8 +1,5 @@
 import { useCallback } from 'react';
-import {
-  isScheduleLocked,
-  localDateAtHourToUtcIso,
-} from '../../utils/scheduleUtils';
+import { localDateAtHourToUtcIso } from '../../utils/scheduleUtils';
 import type {
   CandidateSessionScheduleParams,
   SetNullableString,
@@ -76,7 +73,7 @@ export function useScheduleConfirmAction({
     setScheduleSubmitError(null);
     markStart('candidate:schedule:submit');
     try {
-      const response = await submitCandidateSchedule({
+      await submitCandidateSchedule({
         token,
         session,
         bootstrap,
@@ -85,13 +82,10 @@ export function useScheduleConfirmAction({
         githubUsernameValue: scheduleGithubUsernameValue,
         clearScheduleErrors,
       });
-      if (isScheduleLocked(response)) {
-        setView('locked');
-        markEnd('candidate:schedule:submit', { status: 'locked' });
-        return;
-      }
-      setView('running');
-      markEnd('candidate:schedule:submit', { status: 'success' });
+      setView('locked');
+      markEnd('candidate:schedule:submit', {
+        status: 'locked',
+      });
     } catch (err) {
       await handleScheduleConfirmError({
         err,

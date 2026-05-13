@@ -1,6 +1,7 @@
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { buildLoginHref } from '@/features/auth/authPaths';
 import CandidateSessionPage from '@/features/candidate/session/CandidateSessionPage';
 import { CandidateSessionProvider } from '@/features/candidate/session/CandidateSessionProvider';
 import {
@@ -97,17 +98,16 @@ describe('CandidateSessionPage', () => {
     expect(currentTaskMock).toHaveBeenCalledWith(123);
   });
 
-  it('renders invalid invite guidance when invite bootstrap returns 401', async () => {
+  it('redirects to login when invite bootstrap returns 401', async () => {
     resolveMock.mockRejectedValueOnce({ status: 401 });
     renderWithProvider(<CandidateSessionPage token="VALID_TOKEN" />);
     await waitFor(() =>
-      expect(
-        screen.getByText(/This invite link is invalid/i),
-      ).toBeInTheDocument(),
+      expect(routerMock.replace).toHaveBeenCalledWith(
+        buildLoginHref('/candidate/session/VALID_TOKEN', 'candidate'),
+      ),
     );
     expect(
-      screen.getByRole('link', { name: /Email support/i }),
-    ).toHaveAttribute('href', 'mailto:support@winoe.ai');
-    expect(routerMock.replace).not.toHaveBeenCalled();
+      screen.queryByText(/This invite link is invalid/i),
+    ).not.toBeInTheDocument();
   });
 });
