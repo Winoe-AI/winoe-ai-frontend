@@ -22,7 +22,19 @@ const trialDetailResponse = () =>
     techStack: 'Node.js + Postgres',
     preferredLanguageFramework: 'Node.js + Postgres',
     focus: 'Payments',
-    scenario: 'Design a billing service for a SaaS platform.',
+    activeScenarioVersionId: '200',
+    scenario: {
+      id: '200',
+      versionIndex: 1,
+      status: 'ready',
+      storylineMd: 'Storyline for editor textarea',
+      projectBriefMd:
+        'Design a billing service for a SaaS platform.\n\nSAAS_BRIEF_EXTRA.',
+      rubricJson: {},
+      taskPromptsJson: [],
+    },
+    projectBriefMd:
+      'Design a billing service for a SaaS platform.\n\nSAAS_BRIEF_EXTRA.',
     rubricSummary: 'Judge correctness, clarity, and resilience.',
     tasks: [
       {

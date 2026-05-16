@@ -1,4 +1,5 @@
 import { screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import {
   listTrialCandidatesMock,
   primeDetailMocks,
@@ -10,41 +11,61 @@ describe('TalentPartnerTrialDetailPage component rendering', () => {
     primeDetailMocks();
   });
 
-  it('renders the trial plan shell and metadata', async () => {
+  it('shows Active badge and overflow menu for active inviting Trial', async () => {
     await renderDetailPage();
+    await waitFor(() =>
+      expect(screen.getByTestId('trial-active-badge')).toBeInTheDocument(),
+    );
+    expect(screen.getByText('Active')).toBeInTheDocument();
     expect(
-      screen.getByRole('heading', { name: 'Project Brief' }),
+      screen.getByTestId('trial-detail-overflow-menu'),
     ).toBeInTheDocument();
+  });
+
+  it('renders hero, underline tabs, and Brief tab content', async () => {
+    const user = userEvent.setup();
+    await renderDetailPage();
     await waitFor(() =>
       expect(screen.getByText('Test Trial')).toBeInTheDocument(),
     );
-    expect(screen.getByText(/Developer/)).toBeInTheDocument();
-    expect(screen.getByText(/Project brief narrative/i)).toBeInTheDocument();
+    await waitFor(() =>
+      expect(
+        screen.getByRole('button', { name: 'Candidates' }),
+      ).toBeInTheDocument(),
+    );
+    expect(screen.getByRole('button', { name: 'Brief' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Rubric' })).toBeInTheDocument();
     expect(
-      screen.getByText(/Build a project brief from scratch/i),
+      screen.getByRole('button', { name: 'Activity' }),
     ).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Brief' }));
+    await waitFor(() =>
+      expect(
+        screen.getByRole('heading', { name: 'Project Brief', level: 3 }),
+      ).toBeInTheDocument(),
+    );
+    expect(screen.getByText(/UNIQUE_SUPPORTING_DETAIL/)).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Rubric' }));
     expect(
-      screen.getByText(/Preferred language\/framework/i),
+      screen.getByText(
+        /Winoe will evaluate candidates against these dimensions/i,
+      ),
     ).toBeInTheDocument();
-    expect(screen.getByText(/React \+ TypeScript/)).toBeInTheDocument();
-    expect(screen.getByText(/Rubric summary/i)).toBeInTheDocument();
-    expect(
-      screen.getByText(/Assess clarity, correctness, and resilience/i),
-    ).toBeInTheDocument();
-    expect(screen.getByText(/^Planning and Design Doc$/i)).toBeInTheDocument();
-    expect(screen.getByText(/^Implementation Kickoff$/i)).toBeInTheDocument();
-    expect(screen.getByText(/^Implementation Wrap-Up$/i)).toBeInTheDocument();
-    expect(screen.getByText(/^Handoff \+ Demo$/i)).toBeInTheDocument();
-    expect(screen.getByText(/^Reflection Essay$/i)).toBeInTheDocument();
+
     expect(screen.queryByText(/template/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/tech stack/i)).not.toBeInTheDocument();
   });
 
   it('shows empty candidates state', async () => {
     await renderDetailPage();
-    await waitFor(() =>
-      expect(screen.getByText(/No candidates yet/i)).toBeInTheDocument(),
-    );
+    await waitFor(() => {
+      expect(
+        screen.getByText(/No candidates invited yet/i),
+      ).toBeInTheDocument();
+      expect(screen.getByText(/real-work evidence/)).toBeInTheDocument();
+    });
   });
 
   it('renders candidates table rows when candidates exist', async () => {

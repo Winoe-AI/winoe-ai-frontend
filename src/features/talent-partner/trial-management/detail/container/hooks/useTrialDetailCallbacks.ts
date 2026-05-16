@@ -1,5 +1,6 @@
 import { useState, type Dispatch, type SetStateAction } from 'react';
 import type { ToastInput } from '@/shared/notifications/types';
+import type { InviteCandidateRow } from '@/features/talent-partner/trial-management/invitations/InviteBatchCandidateTypes';
 import { logTrialDetailEvent } from '../../utils/eventsUtils';
 import { activateTrialAction } from '../actions/activateTrialAction';
 import { useSubmitInviteCallback } from './useSubmitInviteCallback';
@@ -20,7 +21,7 @@ type UseTrialDetailCallbacksArgs = {
   isTerminated: boolean;
   inviteDisabledReason: string | null;
   closeInviteModal: () => void;
-  submitInvite: (candidateName: string, inviteEmail: string) => Promise<void>;
+  submitInvite: (rows: InviteCandidateRow[]) => Promise<void>;
   notify: NotifyFn;
   setActionError: Dispatch<SetStateAction<string | null>>;
   setTerminatePending: Dispatch<SetStateAction<boolean>>;
@@ -55,7 +56,7 @@ export function useTrialDetailCallbacks({
   const approveButtonLabel = hasSelectedScenarioVersion
     ? `Approve ${selectedScenarioVersionText}`
     : 'Approve';
-  const activateButtonLabel = 'Activate trial';
+  const activateButtonLabel = 'Approve & Invite Candidates';
   const [activateLoading, setActivateLoading] = useState(false);
 
   const onSubmitInvite = useSubmitInviteCallback({

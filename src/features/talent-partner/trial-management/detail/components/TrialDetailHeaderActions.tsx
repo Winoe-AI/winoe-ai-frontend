@@ -3,8 +3,11 @@
 import Link from 'next/link';
 import Button from '@/shared/ui/Button';
 import { RegenerateScenarioButton } from '../scenario';
+import { TrialDetailOverflowMenu } from './TrialDetailOverflowMenu';
 
 type Props = {
+  commandCenterActive: boolean;
+  onRevealScenarioWorkbench: () => void;
   canApprove: boolean;
   approveButtonLabel: string;
   approveLoading: boolean;
@@ -26,6 +29,8 @@ type Props = {
 };
 
 export function TrialDetailHeaderActions({
+  commandCenterActive,
+  onRevealScenarioWorkbench,
   canApprove,
   approveButtonLabel,
   approveLoading,
@@ -45,6 +50,45 @@ export function TrialDetailHeaderActions({
   terminatePending,
   onOpenTerminateModal,
 }: Props) {
+  if (commandCenterActive) {
+    return (
+      <div className="flex flex-wrap items-center justify-end gap-2">
+        <Button
+          onClick={onInvite}
+          size="sm"
+          disabled={!inviteEnabled}
+          title={
+            inviteEnabled ? undefined : (inviteDisabledReason ?? undefined)
+          }
+          data-testid="invite-candidates-header"
+        >
+          Invite candidates
+        </Button>
+        <TrialDetailOverflowMenu
+          onEditDetails={onRevealScenarioWorkbench}
+          onTerminate={onOpenTerminateModal}
+          terminatePending={terminatePending}
+          trialTerminated={trialStatus === 'terminated'}
+          midMenuSlot={
+            <RegenerateScenarioButton
+              appearance="menu"
+              loading={regenerateLoading}
+              disabled={regenerateDisabled}
+              currentVersionLabel={scenarioVersionLabel}
+              onConfirm={onRegenerate}
+            />
+          }
+        />
+        <Link
+          className="tp-no-print text-sm text-wheat-700 hover:text-wheat-900 hover:underline"
+          href="/dashboard"
+        >
+          ← Back to dashboard
+        </Link>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-wrap items-center justify-end gap-2">
       {canApprove ? (
@@ -78,8 +122,9 @@ export function TrialDetailHeaderActions({
         size="sm"
         disabled={!inviteEnabled}
         title={inviteEnabled ? undefined : (inviteDisabledReason ?? undefined)}
+        data-testid="invite-candidates-header"
       >
-        Invite candidate
+        Invite candidates
       </Button>
       <Button
         type="button"
@@ -93,7 +138,7 @@ export function TrialDetailHeaderActions({
         {trialStatus === 'terminated' ? 'Trial terminated' : 'Terminate trial'}
       </Button>
       <Link
-        className="text-sm text-wheat-700 hover:text-wheat-900 hover:underline"
+        className="tp-no-print text-sm text-wheat-700 hover:text-wheat-900 hover:underline"
         href="/dashboard"
       >
         ← Back to dashboard

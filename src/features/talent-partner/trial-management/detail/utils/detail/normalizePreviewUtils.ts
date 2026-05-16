@@ -5,6 +5,7 @@ import { normalizeTrialPlan } from '../plan';
 import {
   readCompanyContext,
   readNotes,
+  readProjectBrief,
   readRubricJson,
   readRubricSummary,
   readStoryline,
@@ -86,6 +87,7 @@ export function normalizeTrialDetailPreview(raw: unknown): TrialDetailPreview {
     scenarioVersions: versions,
     scenarioVersion,
     storyline: readStoryline(record, scenario, plan),
+    projectBrief: readProjectBrief(record, scenario),
     taskPromptsJson: readTaskPromptsJson(record, scenario),
     rubricJson: readRubricJson(record, scenario),
     notes: readNotes(record, scenario),

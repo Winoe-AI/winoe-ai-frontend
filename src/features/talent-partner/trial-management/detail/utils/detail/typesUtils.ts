@@ -41,6 +41,7 @@ export type TrialDetailPreview = {
   scenarioVersions: TrialScenarioVersion[];
   scenarioVersion: TrialScenarioVersion;
   storyline: string | null;
+  projectBrief: string | null;
   taskPromptsJson: unknown;
   rubricJson: unknown;
   notes: string | null;

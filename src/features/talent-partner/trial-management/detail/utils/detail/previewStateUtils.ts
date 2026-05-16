@@ -21,7 +21,8 @@ export function isPreviewGenerating(
 export function isPreviewEmpty(detail: TrialDetailPreview | null): boolean {
   if (!detail) return true;
   const hasStoryline = Boolean(detail.storyline?.trim());
+  const hasProjectBrief = Boolean(detail.projectBrief?.trim());
   const hasRubricSummary = Boolean(detail.rubricSummary?.trim());
   const hasTasks = Boolean(detail.plan?.days?.length);
-  return !hasStoryline && !hasRubricSummary && !hasTasks;
+  return !hasStoryline && !hasProjectBrief && !hasRubricSummary && !hasTasks;
 }

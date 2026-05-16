@@ -1,7 +1,8 @@
 import type { ScenarioPatchPayload } from '@/features/talent-partner/api/trialLifecycleApi';
 import type { TrialAiConfig } from '@/features/talent-partner/api';
 import type { CandidateSession } from '@/features/talent-partner/types';
-import type { InviteUiState } from '@/features/talent-partner/trial-management/invitations/InviteCandidateTypes';
+import type { InviteBatchUiState } from '@/features/talent-partner/trial-management/invitations/InviteBatchCandidateTypes';
+import type { InviteCandidateRow } from '@/features/talent-partner/trial-management/invitations/InviteBatchCandidateTypes';
 import type { RowState } from '../hooks/useTypes';
 import type { ScenarioEditorDraft } from '../scenario';
 import type { ScenarioVersionItem } from '../scenario/types';
@@ -97,7 +98,7 @@ export type TrialDetailViewProps = {
   cooldownNow: number;
   inviteModalOpen: boolean;
   setInviteModalOpen: (open: boolean) => void;
-  inviteFlowState: InviteUiState;
-  submitInvite: (name: string, email: string) => Promise<void>;
+  inviteFlowState: InviteBatchUiState;
+  submitInvite: (rows: InviteCandidateRow[]) => Promise<void>;
   resetInviteFlow: () => void;
 };

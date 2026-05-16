@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { textResponse } from '../../../../setup/responseHelpers';
 import {
   installTerminateFetchMock,
+  openTerminateTrialFromHeader,
   resetTerminateIntegrationState,
 } from './TrialDetailTerminate.testlib';
 import TalentPartnerTrialDetailPage from '@/features/talent-partner/trial-management/detail/TalentPartnerTrialDetailPage';
@@ -23,13 +24,11 @@ describe('Trial detail terminate access handling', () => {
     render(<TalentPartnerTrialDetailPage />);
     await waitFor(() =>
       expect(
-        screen.getByRole('button', { name: /^terminate trial$/i }),
+        screen.getByTestId('trial-detail-overflow-menu'),
       ).toBeInTheDocument(),
     );
 
-    await user.click(
-      screen.getByRole('button', { name: /^terminate trial$/i }),
-    );
+    await openTerminateTrialFromHeader(user);
     const modal = await screen.findByTestId('terminate-trial-modal');
     await user.click(within(modal).getByLabelText('confirm-terminate-trial'));
     await user.click(

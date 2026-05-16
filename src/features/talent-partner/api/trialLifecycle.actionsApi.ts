@@ -1,4 +1,5 @@
 export { activateTrialInviting } from './trialLifecycle.actions.activateApi';
+export { approveTrialForInviting } from './trialLifecycle.actions.approveApi';
 export {
   approveScenarioVersion,
   patchScenarioVersion,

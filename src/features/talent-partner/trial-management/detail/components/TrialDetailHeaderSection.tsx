@@ -4,12 +4,19 @@ import type { TrialDetailViewProps } from './types';
 type TrialDetailHeaderSectionProps = {
   props: TrialDetailViewProps;
   onInvite: () => void;
+  onRevealScenarioWorkbench: () => void;
 };
 
 export function TrialDetailHeaderSection({
   props,
   onInvite,
+  onRevealScenarioWorkbench,
 }: TrialDetailHeaderSectionProps) {
+  const commandCenterActive =
+    props.trialStatus === 'active_inviting' &&
+    !props.generating &&
+    !props.jobFailureMessage;
+
   return (
     <TrialDetailHeader
       trialId={props.trialId}
@@ -20,6 +27,10 @@ export function TrialDetailHeaderSection({
       scenarioLocked={props.scenarioLocked}
       scenarioLockedAt={props.scenarioLockedAt}
       titleLabel={props.titleLabel}
+      roleLabel={props.roleLabel}
+      preferredLanguageFrameworkLabel={props.preferredLanguageFrameworkLabel}
+      commandCenterActive={commandCenterActive}
+      onRevealScenarioWorkbench={onRevealScenarioWorkbench}
       inviteEnabled={props.inviteEnabled}
       inviteDisabledReason={props.inviteDisabledReason}
       canApprove={props.canApprove}

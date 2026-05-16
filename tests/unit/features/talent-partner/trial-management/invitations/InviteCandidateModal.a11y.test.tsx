@@ -39,7 +39,7 @@ describe('InviteCandidateModal a11y gap coverage', () => {
     const dialog = screen.getByRole('dialog');
     expect(dialog).toHaveAttribute('aria-modal', 'true');
     expect(
-      screen.getByRole('heading', { name: /Invite candidate/i }),
+      screen.getByRole('heading', { name: /Invite candidates/i }),
     ).toBeInTheDocument();
 
     const nameInput = screen.getByLabelText(/Candidate name/i);

@@ -87,7 +87,19 @@ export const primeDetailMocks = () => {
     techStack: 'React',
     preferredLanguageFramework: 'React + TypeScript',
     focus: 'Testing',
-    scenario: 'Build a project brief from scratch',
+    activeScenarioVersionId: '100',
+    scenario: {
+      id: '100',
+      versionIndex: 1,
+      status: 'ready',
+      storylineMd: 'Short storyline for editor',
+      projectBriefMd:
+        'Build a project brief from scratch\n\nUNIQUE_SUPPORTING_DETAIL.',
+      rubricJson: {},
+      taskPromptsJson: [],
+    },
+    projectBriefMd:
+      'Build a project brief from scratch\n\nUNIQUE_SUPPORTING_DETAIL.',
     rubricSummary: 'Assess clarity, correctness, and resilience.',
     tasks: [
       { dayIndex: 1, title: 'Day 1', type: 'text', prompt: 'Task 1' },

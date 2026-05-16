@@ -118,7 +118,9 @@ describe('TalentPartnerDashboardPage profile/list states', () => {
     );
 
     await user.keyboard('{Control>}k{/Control}');
-    await user.click(screen.getByRole('option', { name: /Invite candidate/i }));
+    await user.click(
+      screen.getByRole('option', { name: /Invite candidates/i }),
+    );
     expect(routerMock.push).toHaveBeenCalledWith('/dashboard/trials');
   });
 

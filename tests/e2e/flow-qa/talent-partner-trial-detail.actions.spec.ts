@@ -52,10 +52,8 @@ test.describe('TalentPartner Trial Detail Actions', () => {
       page.getByRole('heading', { name: /invite candidate/i }),
     ).toHaveCount(0);
 
-    await page
-      .getByRole('button', { name: /terminate trial/i })
-      .first()
-      .click();
+    await page.getByRole('button', { name: /trial actions menu/i }).click();
+    await page.getByRole('button', { name: /^terminate trial$/i }).click();
     await expect(page.getByTestId('terminate-trial-modal')).toBeVisible();
     await expect(
       page.getByRole('button', { name: /terminate trial/i }).last(),

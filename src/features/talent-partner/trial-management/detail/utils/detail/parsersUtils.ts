@@ -60,6 +60,8 @@ export function hasCanonicalScenarioContent(
 ): boolean {
   if (!record) return false;
   return (
+    Object.prototype.hasOwnProperty.call(record, 'projectBriefMd') ||
+    Object.prototype.hasOwnProperty.call(record, 'project_brief_md') ||
     Object.prototype.hasOwnProperty.call(record, 'storylineMd') ||
     Object.prototype.hasOwnProperty.call(record, 'storyline_md') ||
     Object.prototype.hasOwnProperty.call(record, 'storyline') ||

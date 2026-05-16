@@ -8,65 +8,37 @@ import {
   trialDetailResponse,
   trialListResponse,
   textResponse,
+  userEvent,
 } from './TrialDetailContent.testlib';
 
 describe('TalentPartnerTrialDetailPage - plan rendering', () => {
-  it('renders the generated trial plan with tasks and repo status', async () => {
+  it('renders tabbed Trial detail with Brief and Rubric content', async () => {
+    const user = userEvent.setup();
     render(<TalentPartnerTrialDetailPage />);
+
+    expect(await screen.findByText('Jane Doe')).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Brief' }));
     expect(
-      await screen.findByRole('heading', { name: 'Project Brief' }),
-    ).toBeInTheDocument();
-    expect(await screen.findByText('Backend Engineer')).toBeInTheDocument();
-    expect(
-      await screen.findByText(/Project brief narrative/i),
-    ).toBeInTheDocument();
-    expect(
-      await screen.findByText(/Build a billing service/i),
+      await screen.findByRole('heading', { name: 'Project Brief', level: 3 }),
     ).toBeInTheDocument();
     expect(
-      await screen.findByText(/Preferred language\/framework/i),
+      await screen.findByText(/MARKETPLACE_BRIEF_EXTRA/),
     ).toBeInTheDocument();
-    expect(await screen.findByText('Python + FastAPI')).toBeInTheDocument();
-    expect(await screen.findByText(/Rubric summary/i)).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Rubric' }));
     expect(
-      await screen.findByText(/Assess API correctness, clarity/i),
+      await screen.findByText(
+        /Winoe will evaluate candidates against these dimensions/i,
+      ),
     ).toBeInTheDocument();
-    expect(
-      await screen.findByText(/Project brief narrative/i),
-    ).toBeInTheDocument();
-    expect(await screen.findByText('Clarity')).toBeInTheDocument();
-    expect(
-      await screen.findByText(/^Planning and Design Doc$/i),
-    ).toBeInTheDocument();
-    expect(
-      await screen.findByText(/^Implementation Kickoff$/i),
-    ).toBeInTheDocument();
-    expect(
-      await screen.findByText(/^Implementation Wrap-Up$/i),
-    ).toBeInTheDocument();
-    expect(await screen.findByText(/^Handoff \+ Demo$/i)).toBeInTheDocument();
-    expect(await screen.findByText(/^Reflection Essay$/i)).toBeInTheDocument();
-    expect(
-      await screen.findByText(/^Implementation Kickoff workspace$/i),
-    ).toBeInTheDocument();
-    expect(await screen.findByText(/Repo provisioned/i)).toBeInTheDocument();
-    expect(
-      await screen.findByText(/Repo not provisioned yet/i),
-    ).toBeInTheDocument();
-    expect(
-      await screen.findByText(/AI Evaluation: Disabled/i),
-    ).toBeInTheDocument();
-    expect(
-      screen.getAllByText(/AI Evaluation: Enabled/i).length,
-    ).toBeGreaterThan(0);
-    expect(
-      (await screen.findAllByText(/Not generated yet/i)).length,
-    ).toBeGreaterThanOrEqual(2);
+
     expect(screen.queryByText(/Template/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/Tech stack/i)).not.toBeInTheDocument();
   });
 
   it('normalizes plan data from nested task objects', async () => {
+    const user = userEvent.setup();
     installFetchMock(async (input: RequestInfo | URL) => {
       const url = getRequestUrl(input);
       if (url === '/api/trials') return trialListResponse();
@@ -82,7 +54,17 @@ describe('TalentPartnerTrialDetailPage - plan rendering', () => {
           stack_name: 'Node + TypeScript',
           preferred_language_framework: 'Rust + Axum',
           focus_area: ['Performance', 'Reliability'],
-          scenario: { summary: 'Project brief summary from object.' },
+          activeScenarioVersionId: '7',
+          scenario: {
+            id: '7',
+            versionIndex: 1,
+            status: 'ready',
+            storylineMd: 'Legacy storyline',
+            projectBriefMd: 'Project brief summary from object.\n\nBody.',
+            rubricJson: {},
+            taskPromptsJson: [],
+          },
+          projectBriefMd: 'Project brief summary from object.\n\nBody.',
           tasks: {
             day_1: {
               title: 'Discovery',
@@ -108,31 +90,19 @@ describe('TalentPartnerTrialDetailPage - plan rendering', () => {
       return textResponse('Not found', 404);
     });
     render(<TalentPartnerTrialDetailPage />);
+
+    await user.click(screen.getByRole('button', { name: 'Brief' }));
     expect(
       await screen.findByText(/Project brief summary from object/i),
     ).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Rubric' }));
     expect(
-      await screen.findByText(/Preferred language\/framework/i),
+      await screen.findByText(
+        /Winoe will evaluate candidates against these dimensions/i,
+      ),
     ).toBeInTheDocument();
-    expect(await screen.findByText('Rust + Axum')).toBeInTheDocument();
-    expect(
-      await screen.findByText('Performance, Reliability'),
-    ).toBeInTheDocument();
-    expect(
-      await screen.findByText(/^Review the project brief\.$/i),
-    ).toBeInTheDocument();
-    expect(
-      await screen.findByText(/Clear and concise notes/i),
-    ).toBeInTheDocument();
-    expect(
-      await screen.findByText(/^Implementation Kickoff workspace$/i),
-    ).toBeInTheDocument();
-    expect(
-      (await screen.findAllByText(/Repo provisioned/i)).length,
-    ).toBeGreaterThan(0);
-    expect(
-      await screen.findByText(/Repo not provisioned yet/i),
-    ).toBeInTheDocument();
+
     expect(screen.queryByText('node-express-ts')).toBeNull();
     expect(screen.queryByText('Node + TypeScript')).toBeNull();
     expect(screen.queryByText('Node, TypeScript')).toBeNull();
@@ -161,7 +131,8 @@ describe('TalentPartnerTrialDetailPage - plan rendering', () => {
     expect(await screen.findByText('Report ready')).toBeInTheDocument();
   });
 
-  it('uses neutral copy when provisioning status is unknown', async () => {
+  it('shows Activity tab empty state when no audit feed exists', async () => {
+    const user = userEvent.setup();
     installFetchMock(async (input: RequestInfo | URL) => {
       const url = getRequestUrl(input);
       if (url === '/api/trials') return trialListResponse();
@@ -186,15 +157,9 @@ describe('TalentPartnerTrialDetailPage - plan rendering', () => {
       return textResponse('Not found', 404);
     });
     render(<TalentPartnerTrialDetailPage />);
+    await user.click(screen.getByRole('button', { name: 'Activity' }));
     expect(
-      await screen.findByText(
-        /Provisioning happens per-candidate after invite/i,
-      ),
+      await screen.findByText(/No Trial activity recorded yet/i),
     ).toBeInTheDocument();
-    expect(screen.queryByText(/Repo provisioned/i)).not.toBeInTheDocument();
-    expect(
-      screen.queryByText(/Repo not provisioned yet/i),
-    ).not.toBeInTheDocument();
-    expect(await screen.findByText(/Repository link/i)).toBeInTheDocument();
   });
 });

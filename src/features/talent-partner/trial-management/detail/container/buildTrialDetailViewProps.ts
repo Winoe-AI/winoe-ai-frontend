@@ -1,4 +1,5 @@
 import type { TrialAiConfig } from '@/features/talent-partner/api';
+import type { InviteCandidateRow } from '@/features/talent-partner/trial-management/invitations/InviteBatchCandidateTypes';
 import type { TrialDetailViewProps } from '../components/types';
 import type { useTrialLabels } from '../hooks/useTrialLabels';
 import type { useTrialDetailCandidates } from './hooks/useTrialDetailCandidates';
@@ -34,7 +35,7 @@ type BuildTrialDetailViewPropsArgs = {
   activateLoading: boolean;
   onActivate: () => Promise<void>;
   candidatesModel: ReturnType<typeof useTrialDetailCandidates>;
-  onSubmitInvite: (name: string, email: string) => Promise<void>;
+  onSubmitInvite: (rows: InviteCandidateRow[]) => Promise<void>;
 };
 
 export function buildTrialDetailViewProps({

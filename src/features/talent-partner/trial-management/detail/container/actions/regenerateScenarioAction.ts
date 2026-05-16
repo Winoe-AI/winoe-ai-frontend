@@ -95,6 +95,7 @@ export async function regenerateScenarioAction({
           lockedAt: null,
           contentAvailability: 'local_only',
           storylineMd: null,
+          projectBriefMd: null,
           taskPrompts: null,
           rubric: null,
         },

@@ -6,5 +6,6 @@ export * from './trialsUpdateApi';
 export * from './companyAiConfigApi';
 export * from './candidatesApi';
 export * from './invitesApi';
+export * from './invitesBatchApi';
 export * from './resendCandidateInviteApi';
 export * from './trialLifecycleApi';

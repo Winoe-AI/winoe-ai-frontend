@@ -46,7 +46,7 @@ describe('TrialListRow', () => {
     expect(screen.getByText('0 candidate(s)')).toBeInTheDocument();
     expect(screen.getByText('Active inviting')).toBeInTheDocument();
     expect(
-      screen.getByRole('button', { name: /Invite candidate/i }),
+      screen.getByRole('button', { name: /Invite candidates/i }),
     ).toBeInTheDocument();
     expect(screen.queryByText(/Template:/i)).toBeNull();
   });

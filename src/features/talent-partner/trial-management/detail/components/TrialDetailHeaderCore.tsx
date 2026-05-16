@@ -1,4 +1,5 @@
 'use client';
+
 import { InlineBadge } from '@/shared/ui/InlineBadge';
 import PageHeader from '@/shared/ui/PageHeader';
 import { StatusPill } from '@/shared/ui/StatusPill';
@@ -14,6 +15,10 @@ type Props = {
   scenarioLocked: boolean;
   scenarioLockedAt: string | null;
   title: string;
+  roleLabel: string;
+  preferredLanguageFrameworkLabel: string | null;
+  commandCenterActive: boolean;
+  onRevealScenarioWorkbench: () => void;
   inviteEnabled: boolean;
   inviteDisabledReason: string | null;
   canApprove: boolean;
@@ -41,6 +46,10 @@ export function TrialDetailHeaderCore({
   scenarioLocked,
   scenarioLockedAt,
   title,
+  roleLabel,
+  preferredLanguageFrameworkLabel,
+  commandCenterActive,
+  onRevealScenarioWorkbench,
   inviteEnabled,
   inviteDisabledReason,
   canApprove,
@@ -62,12 +71,20 @@ export function TrialDetailHeaderCore({
     selectedScenarioStatusForDisplay ?? trialStatus ?? 'draft',
     'Unknown',
   );
+  const stack =
+    preferredLanguageFrameworkLabel &&
+    preferredLanguageFrameworkLabel.trim().length > 0
+      ? preferredLanguageFrameworkLabel.trim()
+      : 'Any stack';
+  const heroSubtitle = `${roleLabel} · ${stack} · Trial ID: ${trialId}`;
 
   return (
     <div className="flex flex-col gap-3">
       <div className="flex flex-wrap items-start justify-between gap-4">
-        <PageHeader title={title} subtitle={`Trial ID: ${trialId}`} />
+        <PageHeader title={title} subtitle={heroSubtitle} />
         <TrialDetailHeaderActions
+          commandCenterActive={commandCenterActive}
+          onRevealScenarioWorkbench={onRevealScenarioWorkbench}
           canApprove={canApprove}
           approveButtonLabel={approveButtonLabel}
           approveLoading={approveLoading}
@@ -89,6 +106,11 @@ export function TrialDetailHeaderCore({
         />
       </div>
       <div className="flex flex-wrap items-center gap-2">
+        {trialStatus === 'active_inviting' ? (
+          <span data-testid="trial-active-badge">
+            <InlineBadge label="Active" tone="success" />
+          </span>
+        ) : null}
         <StatusPill label={status.label} tone={status.tone} />
         <InlineBadge label={`Scenario ${scenarioVersionLabel}`} tone="info" />
         {scenarioIdLabel ? (

@@ -267,6 +267,60 @@ export default function NewTrialWizard() {
   }, [scheduleRedirect, sseRetryKey, trialId, wizardStep]);
 
   useEffect(() => {
+    if (wizardStep !== 3 || !trialId) return undefined;
+    let cancelled = false;
+    let polls = 0;
+    const maxPolls = 200;
+
+    const pollDetail = async () => {
+      if (cancelled || backendCompleteRef.current || polls >= maxPolls) return;
+      polls += 1;
+      try {
+        const res = await fetch(`/api/trials/${encodeURIComponent(trialId)}`, {
+          credentials: 'same-origin',
+          cache: 'no-store',
+        });
+        if (!res.ok || cancelled || backendCompleteRef.current) return;
+        const data: unknown = await res.json();
+        if (!data || typeof data !== 'object') return;
+        const rec = data as Record<string, unknown>;
+        const gs =
+          typeof rec.generationStatus === 'string'
+            ? rec.generationStatus
+            : typeof rec.generation_status === 'string'
+              ? rec.generation_status
+              : null;
+        if (gs === 'failed') {
+          const gf = rec.generationFailure ?? rec.generation_failure;
+          let msg: string | undefined;
+          if (gf && typeof gf === 'object') {
+            const er = (gf as Record<string, unknown>).error;
+            if (typeof er === 'string' && er.trim()) msg = er.trim();
+          }
+          setSseFailedMessage(
+            msg ??
+              'Scenario generation failed. Edit your context and try again, or return to Trials if you want to stop here.',
+          );
+          backendCompleteRef.current = true;
+          setStreamOverlay('generation_failed');
+          return;
+        }
+        if (gs === 'ready_for_review') {
+          backendCompleteRef.current = true;
+          scheduleRedirect(trialId);
+        }
+      } catch {}
+    };
+
+    void pollDetail();
+    const id = window.setInterval(() => void pollDetail(), 2800);
+    return () => {
+      cancelled = true;
+      window.clearInterval(id);
+    };
+  }, [scheduleRedirect, trialId, wizardStep]);
+
+  useEffect(() => {
     if (wizardStep !== 3 || !loadStartedAt.current) return undefined;
     const tick = () => {
       const start = loadStartedAt.current;
@@ -653,6 +707,13 @@ export default function NewTrialWizard() {
                       }}
                     >
                       Edit context
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      onClick={() => router.push('/dashboard/trials')}
+                    >
+                      Back to Trials
                     </Button>
                     <Button
                       type="button"

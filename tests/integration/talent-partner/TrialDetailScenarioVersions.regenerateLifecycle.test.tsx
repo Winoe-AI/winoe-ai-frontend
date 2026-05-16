@@ -1,3 +1,4 @@
+import { fireEvent } from '@testing-library/react';
 import {
   act,
   buildDetail,
@@ -65,22 +66,22 @@ describe('TrialDetail scenario versions - regenerate lifecycle', () => {
       }),
     });
     renderPage();
-    await user.click(
-      await screen.findByRole('button', { name: /Regenerate scenario/i }),
-    );
+    fireEvent.click(await screen.findByTestId('regenerate-scenario-trigger'));
     const dialog = await screen.findByRole('dialog', {
       name: /Confirm scenario regenerate/i,
     });
     await user.click(
       within(dialog).getByRole('button', { name: /^Regenerate$/i }),
     );
-    expect(await screen.findByText(/Generating v2\.\.\./i)).toBeInTheDocument();
+    expect(
+      await screen.findByText(/Project brief generation is in progress/i),
+    ).toBeInTheDocument();
     await act(async () => {
       jest.advanceTimersByTime(2200);
     });
     await waitFor(() =>
       expect(
-        screen.queryByText(/Generating v2\.\.\./i),
+        screen.queryByText(/Project brief generation is in progress/i),
       ).not.toBeInTheDocument(),
     );
     expect(
@@ -130,16 +131,16 @@ describe('TrialDetail scenario versions - regenerate lifecycle', () => {
       }),
     });
     renderPage();
-    await user.click(
-      await screen.findByRole('button', { name: /Regenerate scenario/i }),
-    );
+    fireEvent.click(await screen.findByTestId('regenerate-scenario-trigger'));
     const dialog = await screen.findByRole('dialog', {
       name: /Confirm scenario regenerate/i,
     });
     await user.click(
       within(dialog).getByRole('button', { name: /^Regenerate$/i }),
     );
-    expect(await screen.findByText(/Generating v2\.\.\./i)).toBeInTheDocument();
+    expect(
+      await screen.findByText(/Project brief generation is in progress/i),
+    ).toBeInTheDocument();
     await act(async () => {
       jest.advanceTimersByTime(2200);
     });
@@ -152,7 +153,7 @@ describe('TrialDetail scenario versions - regenerate lifecycle', () => {
     );
     await waitFor(() =>
       expect(
-        screen.queryByText(/Generating v2\.\.\./i),
+        screen.queryByText(/Project brief generation is in progress/i),
       ).not.toBeInTheDocument(),
     );
     expect(
@@ -165,9 +166,7 @@ describe('TrialDetail scenario versions - regenerate lifecycle', () => {
     expect(
       screen.queryByRole('button', { name: /Approve v\d+/i }),
     ).not.toBeInTheDocument();
-    expect(
-      screen.getByRole('button', { name: /Invite candidate/i }),
-    ).toBeDisabled();
+    expect(screen.getByTestId('invite-candidates-header')).toBeDisabled();
     expect(
       screen.getByText(
         /Invites stay disabled until the trial is active inviting\./i,

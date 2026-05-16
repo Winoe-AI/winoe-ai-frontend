@@ -1,12 +1,13 @@
-import { InviteCandidateModal } from '@/features/talent-partner/trial-management/invitations/InviteCandidateModal';
-import type { InviteUiState } from '@/features/talent-partner/trial-management/invitations/InviteCandidateTypes';
+import { InviteCandidatesBatchModal } from '@/features/talent-partner/trial-management/invitations/InviteCandidatesBatchModal';
+import type { InviteBatchUiState } from '@/features/talent-partner/trial-management/invitations/InviteBatchCandidateTypes';
+import type { InviteCandidateRow } from '@/features/talent-partner/trial-management/invitations/InviteBatchCandidateTypes';
 
 type Props = {
   trialId: string;
   open: boolean;
-  inviteFlowState: InviteUiState;
+  inviteFlowState: InviteBatchUiState;
   onClose: () => void;
-  onSubmit: (name: string, email: string) => Promise<void>;
+  onSubmit: (rows: InviteCandidateRow[]) => Promise<void>;
 };
 
 export function TrialInviteModal({
@@ -16,17 +17,15 @@ export function TrialInviteModal({
   onClose,
   onSubmit,
 }: Props) {
-  const state: InviteUiState = inviteFlowState;
-
   return (
-    <InviteCandidateModal
+    <InviteCandidatesBatchModal
       open={open}
       title={`Trial ${trialId}`}
-      state={state}
+      state={inviteFlowState}
       onClose={onClose}
-      onSubmit={onSubmit}
-      initialName=""
-      initialEmail=""
+      onSubmit={(rows) => {
+        void onSubmit(rows);
+      }}
     />
   );
 }

@@ -9,6 +9,7 @@ export type {
 
 export {
   activateTrialInviting,
+  approveTrialForInviting,
   approveScenarioVersion,
   patchScenarioVersion,
   regenerateTrialScenario,

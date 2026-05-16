@@ -39,7 +39,7 @@ export function InviteCandidateModal({
       <div className="relative w-full max-w-lg rounded-lg bg-white p-6 shadow-lg">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <h3 className="text-lg font-semibold">Invite candidate</h3>
+            <h3 className="text-lg font-semibold">Invite candidates</h3>
             <p className="mt-1 text-sm text-gray-600">{title}</p>
           </div>
           <button

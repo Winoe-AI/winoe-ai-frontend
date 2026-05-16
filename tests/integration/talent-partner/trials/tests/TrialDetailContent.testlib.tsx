@@ -50,7 +50,19 @@ export const trialDetailResponse = () =>
         '5': true,
       },
     },
-    scenario: 'Build a billing service for a growing marketplace.',
+    activeScenarioVersionId: '300',
+    scenario: {
+      id: '300',
+      versionIndex: 1,
+      status: 'ready',
+      storylineMd: 'Separate storyline text',
+      projectBriefMd:
+        'Build a billing service for a growing marketplace.\n\nMARKETPLACE_BRIEF_EXTRA.',
+      rubricJson: {},
+      taskPromptsJson: [],
+    },
+    projectBriefMd:
+      'Build a billing service for a growing marketplace.\n\nMARKETPLACE_BRIEF_EXTRA.',
     rubricSummary: 'Assess API correctness, clarity, and error handling.',
     tasks: [
       {

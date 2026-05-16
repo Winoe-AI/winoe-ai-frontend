@@ -1,3 +1,4 @@
+import type { InviteCandidateRow } from '@/features/talent-partner/trial-management/invitations/InviteBatchCandidateTypes';
 import type { useTrialDetailCandidates } from './hooks/useTrialDetailCandidates';
 
 type BuildCandidatePropsArgs = {
@@ -6,7 +7,7 @@ type BuildCandidatePropsArgs = {
   inviteResendEnabled: boolean;
   inviteResendDisabledReason: string | null;
   candidatesModel: ReturnType<typeof useTrialDetailCandidates>;
-  onSubmitInvite: (name: string, email: string) => Promise<void>;
+  onSubmitInvite: (rows: InviteCandidateRow[]) => Promise<void>;
 };
 
 export function buildTrialDetailCandidateProps({

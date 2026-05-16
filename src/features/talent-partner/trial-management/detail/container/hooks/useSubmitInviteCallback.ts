@@ -1,5 +1,6 @@
 import { useCallback, type Dispatch, type SetStateAction } from 'react';
 import type { ToastInput } from '@/shared/notifications/types';
+import type { InviteCandidateRow } from '@/features/talent-partner/trial-management/invitations/InviteBatchCandidateTypes';
 import { submitInviteAction } from '../actions/submitInviteAction';
 
 type NotifyFn = (payload: ToastInput) => void;
@@ -9,7 +10,7 @@ type UseSubmitInviteCallbackArgs = {
   isTerminated: boolean;
   inviteDisabledReason: string | null;
   closeInviteModal: () => void;
-  submitInvite: (candidateName: string, inviteEmail: string) => Promise<void>;
+  submitInvite: (rows: InviteCandidateRow[]) => Promise<void>;
   notify: NotifyFn;
   setActionError: Dispatch<SetStateAction<string | null>>;
 };
@@ -24,10 +25,9 @@ export function useSubmitInviteCallback({
   setActionError,
 }: UseSubmitInviteCallbackArgs) {
   return useCallback(
-    async (candidateName: string, inviteEmail: string) => {
+    async (rows: InviteCandidateRow[]) => {
       await submitInviteAction({
-        candidateName,
-        inviteEmail,
+        rows,
         isTerminated,
         inviteDisabledReason,
         trialId,

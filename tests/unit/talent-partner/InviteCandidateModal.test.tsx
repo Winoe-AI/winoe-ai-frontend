@@ -131,7 +131,7 @@ describe('InviteCandidateModal', () => {
 
     expect(screen.getByTestId('invite-success')).toBeInTheDocument();
     expect(
-      screen.getByRole('heading', { name: /Invite candidate/i }),
+      screen.getByRole('heading', { name: /Invite candidates/i }),
     ).toBeInTheDocument();
     expect(screen.getByLabelText(/Invite URL/i)).toHaveValue(
       'https://example.com/candidate/session/token-123',

@@ -36,8 +36,8 @@ export function TerminateTrialModal({
           Terminate trial
         </h2>
         <p className="mt-2 text-sm text-gray-700">
-          Terminating this trial is destructive. Invites are disabled
-          immediately, and cleanup jobs run asynchronously in the background.
+          Terminate this Trial? Candidate access will be revoked and workspace
+          cleanup will start in the background.
         </p>
         <ul className="mt-3 list-disc space-y-1 pl-5 text-sm text-gray-700">
           <li>Invite and resend actions are blocked immediately.</li>

@@ -1,6 +1,8 @@
 import '../../../setup/paramsMock';
 import { setMockParams } from '../../../setup/paramsMock';
 import React from 'react';
+import { screen, within } from '@testing-library/react';
+import type { UserEvent } from '@testing-library/user-event';
 import {
   getRequestUrl,
   jsonResponse,
@@ -57,6 +59,12 @@ export function resetTerminateIntegrationState() {
   __resetCandidateCache();
   __resetHttpClientCache();
   setMockParams({ id: '1' });
+}
+
+export async function openTerminateTrialFromHeader(user: UserEvent) {
+  const menu = await screen.findByTestId('trial-detail-overflow-menu');
+  await user.click(within(menu).getByText(/^More$/));
+  await user.click(screen.getByRole('button', { name: /^Terminate Trial$/i }));
 }
 
 export function installTerminateFetchMock(

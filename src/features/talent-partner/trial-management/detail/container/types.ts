@@ -12,6 +12,7 @@ export type ScenarioVersionSnapshot = {
   lockedAt: string | null;
   contentAvailability: ScenarioContentAvailability;
   storylineMd: string | null;
+  projectBriefMd: string | null;
   taskPrompts: Array<Record<string, unknown>> | null;
   rubric: Record<string, unknown> | null;
 };

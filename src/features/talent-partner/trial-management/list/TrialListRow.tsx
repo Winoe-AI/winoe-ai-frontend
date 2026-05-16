@@ -49,7 +49,7 @@ export function TrialListRow({ trial, onInvite, onPrefetch }: Props) {
         </div>
 
         <div className="col-span-2 flex justify-end">
-          <Button onClick={() => onInvite(trial)}>Invite candidate</Button>
+          <Button onClick={() => onInvite(trial)}>Invite candidates</Button>
         </div>
       </div>
     </div>
