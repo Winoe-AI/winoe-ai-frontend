@@ -8,7 +8,6 @@ import {
 describe('TalentPartnerTrialDetailPage component interactions', () => {
   beforeEach(() => {
     primeDetailMocks();
-    jest.useFakeTimers();
   });
 
   afterEach(() => {
@@ -18,13 +17,25 @@ describe('TalentPartnerTrialDetailPage component interactions', () => {
   it('opens invite modal', async () => {
     await renderDetailPage();
     await waitFor(() =>
-      expect(screen.getByText(/No candidates yet/i)).toBeInTheDocument(),
+      expect(
+        screen.getByText(/No candidates invited yet/i),
+      ).toBeInTheDocument(),
     );
-    fireEvent.click(screen.getByRole('button', { name: /Invite candidate/i }));
-    expect(await screen.findByTestId('invite-modal')).toBeInTheDocument();
+    const inviteButtons = screen.getAllByRole('button', {
+      name: /^Invite candidates$/i,
+    });
+    const enabled = inviteButtons.find(
+      (b) => !(b as HTMLButtonElement).disabled,
+    );
+    expect(enabled).toBeTruthy();
+    fireEvent.click(enabled!);
+    expect(
+      await screen.findByRole('heading', { name: 'Invite candidates' }),
+    ).toBeInTheDocument();
   });
 
   it('filters candidates by search input', async () => {
+    jest.useFakeTimers();
     listTrialCandidatesMock.mockResolvedValue([
       {
         candidateSessionId: 1,

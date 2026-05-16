@@ -31,7 +31,7 @@ describe('TrialDetail scenario versions - lock banner and approve', () => {
     expect(
       (
         await screen.findAllByText(
-          /This version is locked because invites exist\./i,
+          /This version is locked for editing because the Trial is approved for inviting\./i,
         )
       ).length,
     ).toBeGreaterThan(0);
@@ -163,7 +163,7 @@ describe('TrialDetail scenario versions - lock banner and approve', () => {
       expect(approveCalls.length).toBe(1);
     });
     const activateButton = await screen.findByRole('button', {
-      name: /Activate trial/i,
+      name: /Approve & Invite Candidates/i,
     });
     expect(activateButton).toBeEnabled();
     await user.click(activateButton);
@@ -174,10 +174,8 @@ describe('TrialDetail scenario versions - lock banner and approve', () => {
       expect(activateCalls.length).toBe(1);
     });
     expect(
-      screen.queryByRole('button', { name: /Activate trial/i }),
+      screen.queryByRole('button', { name: /Approve & Invite Candidates/i }),
     ).toBeNull();
-    expect(
-      screen.getByRole('button', { name: /Invite candidate/i }),
-    ).toBeEnabled();
+    expect(screen.getByTestId('invite-candidates-header')).toBeEnabled();
   });
 });

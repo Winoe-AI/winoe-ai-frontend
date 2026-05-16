@@ -1,5 +1,5 @@
 import { useCallback, useState } from 'react';
-import { useInviteCandidateFlow } from '@/features/talent-partner/dashboard/hooks/useInviteCandidateFlow';
+import { useInviteBatchCandidateFlow } from '@/features/talent-partner/dashboard/hooks/useInviteBatchCandidateFlow';
 import { useInviteSubmit } from './useInviteSubmit';
 import type { CandidateSession } from '@/features/talent-partner/types';
 
@@ -11,7 +11,7 @@ type Params = {
 export function useTrialInviteModal({ trialId, reloadCandidates }: Params) {
   const [open, setOpen] = useState(false);
 
-  const inviteFlow = useInviteCandidateFlow(
+  const inviteFlow = useInviteBatchCandidateFlow(
     open
       ? {
           open: true,
@@ -27,7 +27,6 @@ export function useTrialInviteModal({ trialId, reloadCandidates }: Params) {
   }, [inviteFlow]);
 
   const submitInvite = useInviteSubmit({
-    trialId,
     inviteFlow,
     reload: reloadCandidates,
   });

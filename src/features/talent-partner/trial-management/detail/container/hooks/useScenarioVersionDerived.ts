@@ -39,7 +39,7 @@ export function scenarioEditorDisabledReason(
     return 'This version cannot be edited because canonical scenario content is unavailable.';
   }
   if (selectedScenarioVersion.isLocked) {
-    return 'This version is locked because invites exist.';
+    return 'This scenario version is locked for editing in the current trial state.';
   }
   if (trialStatus !== 'ready_for_review' && trialStatus !== 'active_inviting') {
     return 'Scenario editing is unavailable in the current trial status.';

@@ -36,13 +36,17 @@ export async function forwardJson(options: ForwardOptions) {
     Authorization: `Bearer ${accessToken}`,
     ...headers,
   };
-  const session = devUserEmail
-    ? null
-    : await import('@/platform/auth0').then((mod) =>
-        mod.getSessionNormalized(),
-      );
-  const effectiveDevUserEmail =
-    devUserEmail ?? (session?.user?.email as string | undefined);
+  let sessionEmail: string | undefined;
+  if (!devUserEmail) {
+    try {
+      const mod = await import('@/platform/auth0');
+      const session = await mod.getSessionNormalized();
+      sessionEmail = session?.user?.email as string | undefined;
+    } catch {
+      sessionEmail = undefined;
+    }
+  }
+  const effectiveDevUserEmail = devUserEmail ?? sessionEmail;
   if (effectiveDevUserEmail) {
     outgoingHeaders['x-dev-user-email'] = effectiveDevUserEmail;
   }

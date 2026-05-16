@@ -24,7 +24,10 @@ describe('TalentPartnerTrialDetailPage - page states', () => {
 
     expect(await screen.findByText(/Trial not found/i)).toBeInTheDocument();
     expect(
-      screen.queryByRole('button', { name: /Invite candidate/i }),
+      screen.queryByTestId('invite-candidates-header'),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId('invite-candidates-empty-cta'),
     ).not.toBeInTheDocument();
     expect(
       screen.queryByRole('button', { name: /Approve v\d+/i }),
@@ -52,7 +55,10 @@ describe('TalentPartnerTrialDetailPage - page states', () => {
       await screen.findByText(/You don't have access to this trial/i),
     ).toBeInTheDocument();
     expect(
-      screen.queryByRole('button', { name: /Invite candidate/i }),
+      screen.queryByTestId('invite-candidates-header'),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByTestId('invite-candidates-empty-cta'),
     ).not.toBeInTheDocument();
     expect(
       screen.queryByRole('button', { name: /Approve v\d+/i }),

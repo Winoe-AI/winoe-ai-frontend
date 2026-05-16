@@ -1,3 +1,4 @@
+import { fireEvent } from '@testing-library/react';
 import {
   fetchMock,
   getUrl,
@@ -7,10 +8,11 @@ import {
   screen,
   userEvent,
   waitFor,
+  within,
 } from './TrialDetailPageClient.testlib';
 
 describe('TalentPartnerTrialDetailPage - invite create modal', () => {
-  it('creates an invite and refreshes the list', async () => {
+  it('sends a batch invite and shows copyable links', async () => {
     const user = userEvent.setup();
     const candidateResponses = [
       jsonResponse([]),
@@ -39,35 +41,47 @@ describe('TalentPartnerTrialDetailPage - invite create modal', () => {
       ]),
       '/api/trials/trial-1/candidates': () =>
         candidateResponses.shift() ?? jsonResponse([]),
-      '/api/trials/trial-1/invite': jsonResponse({
-        candidateSessionId: '99',
-        token: 'invite-token',
-        inviteUrl: 'https://example.com/candidate/session/invite-token',
-        outcome: 'created',
+      '/api/trials/trial-1/invite-candidates': jsonResponse({
+        invites: [
+          {
+            candidateSessionId: '99',
+            name: 'New Person',
+            email: 'new@example.com',
+            inviteUrl: 'https://example.com/candidate/session/invite-token',
+            status: 'sent',
+          },
+        ],
       }),
     });
 
     renderPage();
-    await screen.findByText(/No candidates yet/i);
-    await user.click(screen.getByRole('button', { name: /Invite candidate/i }));
-    await user.type(screen.getByLabelText(/Candidate name/i), 'New Person');
+    await screen.findByText(/No candidates invited yet/i);
+    await waitFor(() =>
+      expect(screen.getByTestId('invite-candidates-header')).not.toBeDisabled(),
+    );
+    fireEvent.click(screen.getByTestId('invite-candidates-header'));
+    await screen.findByLabelText(/Full name \(row 1\)/i);
     await user.type(
-      screen.getByLabelText(/Candidate email/i),
+      screen.getByLabelText(/Full name \(row 1\)/i),
+      'New Person',
+    );
+    await user.type(
+      screen.getByLabelText(/Email \(row 1\)/i),
       'new@example.com',
     );
     await user.click(screen.getByRole('button', { name: /Send invite/i }));
-    expect(await screen.findByTestId('invite-success')).toBeInTheDocument();
-    expect(await screen.findByLabelText(/Invite URL/i)).toHaveValue(
-      'https://example.com/candidate/session/invite-token',
-    );
     expect(
-      await screen.findByRole('button', { name: /Copy invite URL/i }),
+      await screen.findByTestId('invite-batch-success'),
     ).toBeInTheDocument();
-    expect(await screen.findByText('New Person')).toBeInTheDocument();
-    expect(await screen.findByText(/Email sent/i)).toBeInTheDocument();
+    expect(
+      await screen.findByLabelText(/Invite URL for new@example.com/i),
+    ).toHaveValue('https://example.com/candidate/session/invite-token');
+    const success = await screen.findByTestId('invite-batch-success');
+    expect(within(success).getByText('New Person')).toBeInTheDocument();
+    expect(await screen.findByText(/1 invite sent/i)).toBeInTheDocument();
   });
 
-  it('shows a truthful warning when refreshed invite delivery is degraded', async () => {
+  it('reopens the modal to a clean idle form after success', async () => {
     const user = userEvent.setup();
     const candidateResponses = [
       jsonResponse([]),
@@ -77,70 +91,7 @@ describe('TalentPartnerTrialDetailPage - invite create modal', () => {
           inviteEmail: 'new@example.com',
           candidateName: 'New Person',
           status: 'not_started',
-          inviteEmailStatus: 'rate_limited',
-          inviteEmailSentAt: null,
-          startedAt: null,
-          completedAt: null,
-          hasReport: false,
-          inviteUrl: 'https://example.com/candidate/session/invite-token',
-        },
-      ]),
-    ];
-
-    mockFetchHandlers({
-      '/api/trials': jsonResponse([
-        {
-          id: 'trial-1',
-          title: 'Trial trial-1',
-          templateKey: 'python-fastapi',
-        },
-      ]),
-      '/api/trials/trial-1/candidates': () =>
-        candidateResponses.shift() ?? jsonResponse([]),
-      '/api/trials/trial-1/invite': jsonResponse({
-        candidateSessionId: '99',
-        token: 'invite-token',
-        inviteUrl: 'https://example.com/candidate/session/invite-token',
-        outcome: 'created',
-      }),
-    });
-
-    renderPage();
-    await screen.findByText(/No candidates yet/i);
-    await user.click(screen.getByRole('button', { name: /Invite candidate/i }));
-    await user.type(screen.getByLabelText(/Candidate name/i), 'New Person');
-    await user.type(
-      screen.getByLabelText(/Candidate email/i),
-      'new@example.com',
-    );
-    await user.click(screen.getByRole('button', { name: /Send invite/i }));
-
-    expect(await screen.findByTestId('invite-success')).toBeInTheDocument();
-    expect(screen.queryByText(/^Invite sent$/i)).not.toBeInTheDocument();
-    expect(
-      await screen.findByText(
-        /Invite link created, but email delivery was rate limited/i,
-      ),
-    ).toBeInTheDocument();
-    expect(await screen.findByLabelText(/Invite URL/i)).toHaveValue(
-      'https://example.com/candidate/session/invite-token',
-    );
-    expect(
-      await screen.findByRole('button', { name: /Copy invite URL/i }),
-    ).toBeInTheDocument();
-  });
-
-  it('reopens the modal to a clean idle form after a degraded invite state', async () => {
-    const user = userEvent.setup();
-    const candidateResponses = [
-      jsonResponse([]),
-      jsonResponse([
-        {
-          candidateSessionId: 99,
-          inviteEmail: 'new@example.com',
-          candidateName: 'New Person',
-          status: 'not_started',
-          inviteEmailStatus: 'rate_limited',
+          inviteEmailStatus: 'sent',
           inviteEmailSentAt: null,
           startedAt: null,
           completedAt: null,
@@ -159,35 +110,51 @@ describe('TalentPartnerTrialDetailPage - invite create modal', () => {
       ]),
       '/api/trials/trial-1/candidates': () =>
         candidateResponses.shift() ?? jsonResponse([]),
-      '/api/trials/trial-1/invite': jsonResponse({
-        candidateSessionId: '99',
-        token: 'invite-token',
-        inviteUrl: 'https://example.com/candidate/session/invite-token',
-        outcome: 'created',
+      '/api/trials/trial-1/invite-candidates': jsonResponse({
+        invites: [
+          {
+            candidateSessionId: '99',
+            name: 'New Person',
+            email: 'new@example.com',
+            inviteUrl: 'https://example.com/candidate/session/invite-token',
+            status: 'sent',
+          },
+        ],
       }),
     });
 
     renderPage();
-    await screen.findByText(/No candidates yet/i);
-    await user.click(screen.getByRole('button', { name: /Invite candidate/i }));
-    await user.type(screen.getByLabelText(/Candidate name/i), 'New Person');
+    await screen.findByText(/No candidates invited yet/i);
+    await waitFor(() =>
+      expect(screen.getByTestId('invite-candidates-header')).not.toBeDisabled(),
+    );
+    fireEvent.click(screen.getByTestId('invite-candidates-header'));
+    await screen.findByLabelText(/Full name \(row 1\)/i);
     await user.type(
-      screen.getByLabelText(/Candidate email/i),
+      screen.getByLabelText(/Full name \(row 1\)/i),
+      'New Person',
+    );
+    await user.type(
+      screen.getByLabelText(/Email \(row 1\)/i),
       'new@example.com',
     );
     await user.click(screen.getByRole('button', { name: /Send invite/i }));
 
     expect(
-      await screen.findByText(
-        /Invite link created, but email delivery was rate limited/i,
-      ),
+      await screen.findByTestId('invite-batch-success'),
     ).toBeInTheDocument();
     await user.click(screen.getByRole('button', { name: /Done/i }));
 
-    await user.click(screen.getByRole('button', { name: /Invite candidate/i }));
-    expect(screen.getByLabelText(/Candidate name/i)).toHaveValue('');
-    expect(screen.getByLabelText(/Candidate email/i)).toHaveValue('');
-    expect(screen.queryByText(/Invite link created/i)).not.toBeInTheDocument();
+    await waitFor(() =>
+      expect(screen.getByTestId('invite-candidates-header')).not.toBeDisabled(),
+    );
+    fireEvent.click(screen.getByTestId('invite-candidates-header'));
+    await screen.findByLabelText(/Full name \(row 1\)/i);
+    expect(screen.getByLabelText(/Full name \(row 1\)/i)).toHaveValue('');
+    expect(screen.getByLabelText(/Email \(row 1\)/i)).toHaveValue('');
+    expect(
+      screen.queryByTestId('invite-batch-success'),
+    ).not.toBeInTheDocument();
   });
 
   it('does not pre-check candidates when opening the invite modal', async () => {
@@ -202,23 +169,32 @@ describe('TalentPartnerTrialDetailPage - invite create modal', () => {
         },
       ]),
       '/api/trials/trial-1/candidates': jsonResponse([]),
-      '/api/trials/trial-1/invite': jsonResponse({
-        candidateSessionId: '99',
-        token: 'invite-token',
-        inviteUrl: 'https://example.com/candidate/session/invite-token',
-        outcome: 'created',
+      '/api/trials/trial-1/invite-candidates': jsonResponse({
+        invites: [
+          {
+            candidateSessionId: '99',
+            name: 'New Person',
+            email: 'new@example.com',
+            inviteUrl: 'https://example.com/candidate/session/invite-token',
+            status: 'sent',
+          },
+        ],
       }),
     });
 
     renderPage();
-    await screen.findByText(/No candidates yet/i);
+    await screen.findByText(/No candidates invited yet/i);
 
     const candidatesUrl = '/api/trials/trial-1/candidates';
     const candidateCallsBefore = fetchMock.mock.calls.filter(
       (call) => getUrl(call[0]) === candidatesUrl,
     ).length;
 
-    await user.click(screen.getByRole('button', { name: /Invite candidate/i }));
+    await waitFor(() =>
+      expect(screen.getByTestId('invite-candidates-header')).not.toBeDisabled(),
+    );
+    fireEvent.click(screen.getByTestId('invite-candidates-header'));
+    await screen.findByLabelText(/Full name \(row 1\)/i);
     await waitFor(() => {
       const candidateCallsAfterOpen = fetchMock.mock.calls.filter(
         (call) => getUrl(call[0]) === candidatesUrl,
@@ -228,16 +204,19 @@ describe('TalentPartnerTrialDetailPage - invite create modal', () => {
       );
     });
 
-    await user.type(screen.getByLabelText(/Candidate name/i), 'New Person');
     await user.type(
-      screen.getByLabelText(/Candidate email/i),
+      screen.getByLabelText(/Full name \(row 1\)/i),
+      'New Person',
+    );
+    await user.type(
+      screen.getByLabelText(/Email \(row 1\)/i),
       'new@example.com',
     );
     await user.click(screen.getByRole('button', { name: /Send invite/i }));
 
     await waitFor(() => {
       const inviteCalls = fetchMock.mock.calls.filter(
-        (call) => getUrl(call[0]) === '/api/trials/trial-1/invite',
+        (call) => getUrl(call[0]) === '/api/trials/trial-1/invite-candidates',
       ).length;
       expect(inviteCalls).toBe(1);
     });

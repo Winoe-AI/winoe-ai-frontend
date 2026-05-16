@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 type UseTrialDetailStateArgs = {
   trialId: string;
@@ -25,8 +25,13 @@ export function useTrialDetailState({
   >(null);
   const [statusOverride, setStatusOverride] = useState<string | null>(null);
   const [cleanupJobIds, setCleanupJobIds] = useState<string[]>([]);
+  const skipInitialResetRef = useRef(true);
 
   useEffect(() => {
+    if (skipInitialResetRef.current) {
+      skipInitialResetRef.current = false;
+      return;
+    }
     const timerId = window.setTimeout(() => {
       setActionError(null);
       setTerminatePending(false);

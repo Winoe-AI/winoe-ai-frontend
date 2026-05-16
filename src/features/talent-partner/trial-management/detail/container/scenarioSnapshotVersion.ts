@@ -28,6 +28,7 @@ export function mergeScenarioSnapshot(
       incoming.contentAvailability,
     ),
     storylineMd: incoming.storylineMd ?? current.storylineMd,
+    projectBriefMd: incoming.projectBriefMd ?? current.projectBriefMd,
     taskPrompts: incoming.taskPrompts ?? current.taskPrompts,
     rubric: incoming.rubric ?? current.rubric,
   };

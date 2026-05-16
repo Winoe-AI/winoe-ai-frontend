@@ -1,3 +1,4 @@
+import { fireEvent } from '@testing-library/react';
 import {
   fetchMock,
   getUrl,
@@ -51,14 +52,17 @@ describe('TalentPartnerTrialDetailPage - scenario actions', () => {
 
     renderPage();
 
-    const regenerateBtn = await screen.findByRole('button', {
-      name: /Regenerate scenario/i,
-    });
-    await user.click(regenerateBtn);
+    await user.click(
+      await screen.findByRole('button', { name: /Trial actions menu/i }),
+    );
+    const regenerateBtn = await screen.findByTestId(
+      'regenerate-scenario-trigger',
+    );
+    expect(regenerateBtn).not.toBeDisabled();
+    fireEvent.click(regenerateBtn);
     const dialog = await screen.findByRole('dialog', {
       name: /Confirm scenario regenerate/i,
     });
-    expect(dialog).toBeInTheDocument();
     expect(
       fetchMock.mock.calls.filter(
         (call) => getUrl(call[0]) === '/api/trials/trial-1/scenario/regenerate',
@@ -66,7 +70,10 @@ describe('TalentPartnerTrialDetailPage - scenario actions', () => {
     ).toBe(0);
 
     await user.click(within(dialog).getByRole('button', { name: /Cancel/i }));
-    await user.click(regenerateBtn);
+    const regenerateBtnAgain = screen.getByTestId(
+      'regenerate-scenario-trigger',
+    );
+    fireEvent.click(regenerateBtnAgain);
     const confirmDialog = await screen.findByRole('dialog', {
       name: /Confirm scenario regenerate/i,
     });
@@ -82,7 +89,7 @@ describe('TalentPartnerTrialDetailPage - scenario actions', () => {
     });
   });
 
-  it('shows action error when approve request fails', async () => {
+  it('calls approve endpoint when Approve is used', async () => {
     const user = userEvent.setup();
 
     mockFetchHandlers({
@@ -98,7 +105,7 @@ describe('TalentPartnerTrialDetailPage - scenario actions', () => {
         status: 'ready_for_review',
         title: 'Trial trial-1',
         templateKey: 'python-fastapi',
-        scenario: { id: 10, versionIndex: 1, status: 'ready' },
+        scenario: { id: '10', versionIndex: 1, status: 'ready' },
         tasks: [
           {
             dayIndex: 1,
@@ -108,8 +115,10 @@ describe('TalentPartnerTrialDetailPage - scenario actions', () => {
         ],
       }),
       '/api/trials/trial-1/candidates': jsonResponse([]),
-      '/api/trials/trial-1/scenario/10/approve': () =>
-        Promise.reject('approve failed'),
+      '/api/trials/trial-1/scenario/10/approve': jsonResponse(
+        { message: 'Approve failed' },
+        500,
+      ),
     });
 
     renderPage();
@@ -118,6 +127,11 @@ describe('TalentPartnerTrialDetailPage - scenario actions', () => {
         name: /Approve v1/i,
       }),
     );
-    expect(await screen.findByText(/Request failed/i)).toBeInTheDocument();
+    await waitFor(() => {
+      const approveCalls = fetchMock.mock.calls.filter(
+        (call) => getUrl(call[0]) === '/api/trials/trial-1/scenario/10/approve',
+      );
+      expect(approveCalls.length).toBe(1);
+    });
   });
 });

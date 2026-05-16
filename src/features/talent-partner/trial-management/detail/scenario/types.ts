@@ -17,6 +17,7 @@ export type ScenarioVersionItem = {
   isPending: boolean;
   contentAvailability: ScenarioContentAvailability;
   storylineMd: string | null;
+  projectBriefMd: string | null;
   taskPrompts: Array<Record<string, unknown>> | null;
   rubric: Record<string, unknown> | null;
 };

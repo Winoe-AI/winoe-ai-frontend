@@ -109,7 +109,9 @@ export function deriveScenarioVersionViewFields({
     effectiveLockBannerMessage:
       scenarioLockBannerMessage ??
       (selectedScenarioVersion?.isLocked
-        ? 'This version is locked because invites exist.'
+        ? trialStatus === 'active_inviting'
+          ? 'This scenario version is frozen while this Trial is active for inviting.'
+          : 'This scenario version is locked.'
         : null),
   };
 }

@@ -25,10 +25,12 @@ describe('TalentPartnerTrialDetailPage - candidate state rendering', () => {
 
     render(<TalentPartnerTrialDetailPage />);
     await waitFor(() =>
-      expect(screen.getByText(/No candidates yet/i)).toBeInTheDocument(),
+      expect(
+        screen.getByText(/No candidates invited yet/i),
+      ).toBeInTheDocument(),
     );
     expect(
-      screen.getByRole('button', { name: /Invite candidate/i }),
+      screen.getByTestId('invite-candidates-empty-cta'),
     ).toBeInTheDocument();
   });
 

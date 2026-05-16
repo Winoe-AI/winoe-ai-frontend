@@ -36,6 +36,17 @@ function extractActionErrorCode(error: unknown): string | null {
   return nestedErrorCode;
 }
 
+function sanitizeTalentPartnerActionMessage(
+  message: string | null | undefined,
+  fallback: string,
+): string {
+  const raw =
+    typeof message === 'string' && message.trim() ? message.trim() : fallback;
+  if (/\bapi\.github\.com\b/i.test(raw)) return fallback;
+  if (/GitHub API error/i.test(raw)) return fallback;
+  return raw;
+}
+
 export function mapActionError(
   error: unknown,
   fallback: string,
@@ -79,12 +90,26 @@ export function mapActionError(
       };
     }
 
+    if (errorCode === 'SCENARIO_APPROVAL_PENDING') {
+      return {
+        ok: false,
+        statusCode,
+        errorCode,
+        details,
+        message:
+          'A regenerated Project Brief is waiting for your approval. Open this Trial, select the pending scenario version, approve that brief, then return here to approve the Trial for inviting.',
+      };
+    }
+
     return {
       ok: false,
       statusCode,
       errorCode,
       details,
-      message: toUserMessage(error, fallback, { includeDetail: false }),
+      message: sanitizeTalentPartnerActionMessage(
+        toUserMessage(error, fallback, { includeDetail: false }),
+        fallback,
+      ),
     };
   } catch {
     return {

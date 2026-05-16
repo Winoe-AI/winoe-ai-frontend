@@ -42,6 +42,21 @@ describe('TerminateTrialModal', () => {
     expect(onConfirm).toHaveBeenCalledTimes(1);
   });
 
+  it('uses neutral cleanup copy instead of destructive wording', () => {
+    render(
+      <TerminateTrialModal
+        open={true}
+        pending={false}
+        onClose={() => {}}
+        onConfirm={() => {}}
+      />,
+    );
+    expect(
+      screen.getByText(/Candidate access will be revoked/i),
+    ).toBeInTheDocument();
+    expect(screen.queryByText(/destructive/i)).not.toBeInTheDocument();
+  });
+
   it('disables controls while request is pending', () => {
     render(
       <TerminateTrialModal

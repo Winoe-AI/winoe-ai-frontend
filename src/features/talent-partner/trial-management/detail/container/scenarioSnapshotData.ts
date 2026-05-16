@@ -55,6 +55,7 @@ export function toScenarioSnapshotFromDetail({
     lockedAt: detail.scenarioVersion.lockedAt,
     contentAvailability: detail.scenarioVersion.contentAvailability,
     storylineMd: detail.storyline,
+    projectBriefMd: detail.projectBrief,
     taskPrompts:
       normalizeTaskPrompts(detail.taskPromptsJson) ?? fallbackTaskPrompts,
     rubric: normalizeRubricObject(detail.rubricJson),

@@ -28,6 +28,28 @@ export function readCompanyContext(value: unknown): string | null {
   return bits.length ? bits.join(' · ') : null;
 }
 
+export function readProjectBrief(
+  raw: Record<string, unknown>,
+  scenario: Record<string, unknown> | null,
+): string | null {
+  const top = toStringOrNull(
+    raw.projectBrief ??
+      raw.projectBriefMd ??
+      raw.project_brief_md ??
+      raw.projectBriefMarkdown ??
+      raw.project_brief_markdown,
+  );
+  if (top) return top;
+  if (!scenario) return null;
+  return toStringOrNull(
+    scenario.projectBrief ??
+      scenario.projectBriefMd ??
+      scenario.project_brief_md ??
+      scenario.projectBriefMarkdown ??
+      scenario.project_brief_markdown,
+  );
+}
+
 export function readStoryline(
   raw: Record<string, unknown>,
   scenario: Record<string, unknown> | null,

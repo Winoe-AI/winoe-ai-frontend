@@ -13,6 +13,8 @@ type Props = Pick<
   | 'scenarioLocked'
   | 'scenarioLockedAt'
   | 'titleLabel'
+  | 'roleLabel'
+  | 'preferredLanguageFrameworkLabel'
   | 'inviteEnabled'
   | 'inviteDisabledReason'
   | 'canApprove'
@@ -27,7 +29,12 @@ type Props = Pick<
   | 'regenerateDisabled'
   | 'onRegenerate'
   | 'terminatePending'
-> & { onInvite: () => void; onOpenTerminateModal: () => void };
+> & {
+  commandCenterActive: boolean;
+  onRevealScenarioWorkbench: () => void;
+  onInvite: () => void;
+  onOpenTerminateModal: () => void;
+};
 
 export function TrialDetailHeader({
   trialId,
@@ -38,6 +45,10 @@ export function TrialDetailHeader({
   scenarioLocked,
   scenarioLockedAt,
   titleLabel,
+  roleLabel,
+  preferredLanguageFrameworkLabel,
+  commandCenterActive,
+  onRevealScenarioWorkbench,
   inviteEnabled,
   inviteDisabledReason,
   canApprove,
@@ -65,6 +76,10 @@ export function TrialDetailHeader({
       scenarioLocked={scenarioLocked}
       scenarioLockedAt={scenarioLockedAt}
       title={titleLabel}
+      roleLabel={roleLabel}
+      preferredLanguageFrameworkLabel={preferredLanguageFrameworkLabel}
+      commandCenterActive={commandCenterActive}
+      onRevealScenarioWorkbench={onRevealScenarioWorkbench}
       inviteEnabled={inviteEnabled}
       inviteDisabledReason={inviteDisabledReason}
       canApprove={canApprove}

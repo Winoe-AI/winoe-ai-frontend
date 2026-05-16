@@ -11,6 +11,7 @@ import {
 
 describe('TalentPartnerTrialDetailPage - candidate rows and gating', () => {
   it('renders candidate rows with status badges', async () => {
+    const user = userEvent.setup();
     mockFetchHandlers({
       '/api/trials': jsonResponse([
         {
@@ -48,17 +49,11 @@ describe('TalentPartnerTrialDetailPage - candidate rows and gating', () => {
     renderPage();
 
     expect(await screen.findByText(/Trial ID: trial-1/i)).toBeInTheDocument();
-    expect(
-      await screen.findByText(/Project brief narrative/i),
-    ).toBeInTheDocument();
-    expect(
-      await screen.findByText(/Preferred language\/framework/i),
-    ).toBeInTheDocument();
-    expect(
-      await screen.findByText(/Node\.js \+ Postgres/i),
-    ).toBeInTheDocument();
     expect(await screen.findByText('Alex')).toBeInTheDocument();
     expect(await screen.findByText('Blake')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Brief' }));
+    expect(await screen.findByText(/SAAS_BRIEF_EXTRA/)).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Candidates' }));
     expect(await screen.findByText(/In progress/i)).toBeInTheDocument();
     expect(await screen.findByText('Pending')).toBeInTheDocument();
     expect(await screen.findByText('Rate limited')).toBeInTheDocument();
@@ -132,13 +127,11 @@ describe('TalentPartnerTrialDetailPage - candidate rows and gating', () => {
     const approveBtn = await screen.findByRole('button', {
       name: /Approve v1/i,
     });
-    const inviteBtn = await screen.findByRole('button', {
-      name: /Invite candidate/i,
-    });
+    const inviteBtn = await screen.findByTestId('invite-candidates-header');
     expect(approveBtn).toBeEnabled();
     expect(inviteBtn).toBeDisabled();
     expect(
-      screen.queryByRole('button', { name: /Activate trial/i }),
+      screen.queryByRole('button', { name: /Approve & Invite Candidates/i }),
     ).not.toBeInTheDocument();
 
     await user.click(approveBtn);
@@ -156,16 +149,14 @@ describe('TalentPartnerTrialDetailPage - candidate rows and gating', () => {
     });
     await waitFor(() =>
       expect(
-        screen.getByRole('button', { name: /Activate trial/i }),
+        screen.getByRole('button', { name: /Approve & Invite Candidates/i }),
       ).toBeInTheDocument(),
     );
     const activateBtn = await screen.findByRole('button', {
-      name: /Activate trial/i,
+      name: /Approve & Invite Candidates/i,
     });
     expect(activateBtn).toBeEnabled();
-    expect(
-      screen.getByRole('button', { name: /Invite candidate/i }),
-    ).toBeDisabled();
+    expect(screen.getByTestId('invite-candidates-header')).toBeDisabled();
     await user.click(activateBtn);
     await waitFor(() => {
       const activateCalls = fetchMock.mock.calls.filter(
@@ -173,8 +164,6 @@ describe('TalentPartnerTrialDetailPage - candidate rows and gating', () => {
       );
       expect(activateCalls.length).toBe(1);
     });
-    expect(
-      screen.getByRole('button', { name: /Invite candidate/i }),
-    ).toBeEnabled();
+    expect(screen.getByTestId('invite-candidates-header')).toBeEnabled();
   });
 });

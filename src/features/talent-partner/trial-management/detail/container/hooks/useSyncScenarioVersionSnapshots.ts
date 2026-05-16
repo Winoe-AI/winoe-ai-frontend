@@ -35,6 +35,7 @@ export function syncScenarioVersionSnapshots({
       lockedAt: version.lockedAt,
       contentAvailability: version.contentAvailability,
       storylineMd: current?.storylineMd ?? null,
+      projectBriefMd: current?.projectBriefMd ?? null,
       taskPrompts: current?.taskPrompts ?? null,
       rubric: current?.rubric ?? null,
     });
@@ -75,6 +76,7 @@ export function syncScenarioVersionSnapshots({
         ? 'local_only'
         : 'unavailable',
     storylineMd: next[pendingId]?.storylineMd ?? null,
+    projectBriefMd: next[pendingId]?.projectBriefMd ?? null,
     taskPrompts: next[pendingId]?.taskPrompts ?? null,
     rubric: next[pendingId]?.rubric ?? null,
   });

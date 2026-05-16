@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { getRequestUrl, jsonResponse } from '../../../../setup/responseHelpers';
 import {
   installTerminateFetchMock,
+  openTerminateTrialFromHeader,
   resetTerminateIntegrationState,
 } from './TrialDetailTerminate.testlib';
 import TalentPartnerTrialDetailPage from '@/features/talent-partner/trial-management/detail/TalentPartnerTrialDetailPage';
@@ -37,9 +38,7 @@ describe('Trial detail terminate flow', () => {
     expect(
       await screen.findByRole('button', { name: /^send invite$/i }),
     ).toBeInTheDocument();
-    await user.click(
-      screen.getByRole('button', { name: /^terminate trial$/i }),
-    );
+    await openTerminateTrialFromHeader(user);
 
     const modal = await screen.findByTestId('terminate-trial-modal');
     const confirmButton = within(modal).getByRole('button', {

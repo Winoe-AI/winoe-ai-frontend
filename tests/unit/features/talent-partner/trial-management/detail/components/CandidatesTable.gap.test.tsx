@@ -78,10 +78,10 @@ describe('CandidatesTable gap coverage', () => {
     });
     render(<CandidatesTable {...props} />);
     const inviteButton = screen.getByRole('button', {
-      name: /Invite your first candidate/i,
+      name: /Invite candidates/i,
     });
 
-    expect(screen.getByText('No candidates yet')).toBeInTheDocument();
+    expect(screen.getByText('No candidates invited yet.')).toBeInTheDocument();
     expect(inviteButton).toBeDisabled();
     expect(inviteButton).toHaveAttribute(
       'title',

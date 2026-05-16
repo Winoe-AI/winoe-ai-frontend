@@ -8,6 +8,7 @@ type Props = {
   disabled?: boolean;
   currentVersionLabel: string;
   onConfirm: () => void;
+  appearance?: 'toolbar' | 'menu';
 };
 
 export function RegenerateScenarioButton({
@@ -15,6 +16,7 @@ export function RegenerateScenarioButton({
   disabled,
   currentVersionLabel,
   onConfirm,
+  appearance = 'toolbar',
 }: Props) {
   const [open, setOpen] = useState(false);
 
@@ -36,11 +38,17 @@ export function RegenerateScenarioButton({
   return (
     <>
       <Button
+        data-testid="regenerate-scenario-trigger"
         onClick={openModal}
         size="sm"
         variant="secondary"
         loading={loading}
         disabled={disabled}
+        className={
+          appearance === 'menu'
+            ? 'block w-full rounded-none border-0 bg-transparent px-3 py-2 text-left text-sm font-normal text-primary shadow-none hover:bg-muted/30'
+            : undefined
+        }
       >
         Regenerate scenario
       </Button>

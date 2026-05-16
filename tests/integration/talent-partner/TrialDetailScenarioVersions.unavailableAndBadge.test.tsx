@@ -5,6 +5,7 @@ import {
   renderPage,
   screen,
   userEvent,
+  waitFor,
 } from './TrialDetailScenarioVersions.testlib';
 
 describe('TrialDetail scenario versions - unavailable and badges', () => {
@@ -33,7 +34,11 @@ describe('TrialDetail scenario versions - unavailable and badges', () => {
       }),
     ).toBeInTheDocument();
     await user.click(selectV2);
-    expect(await screen.findByText(/Version v2/i)).toBeInTheDocument();
+    await waitFor(() =>
+      expect(
+        screen.getByRole('button', { name: /Select scenario v2/i }),
+      ).toHaveAttribute('aria-pressed', 'true'),
+    );
     expect(
       await screen.findAllByText(/content is unavailable from the backend/i),
     ).not.toHaveLength(0);
@@ -44,9 +49,7 @@ describe('TrialDetail scenario versions - unavailable and badges', () => {
     expect(
       screen.queryByRole('button', { name: /Approve v1/i }),
     ).not.toBeInTheDocument();
-    expect(
-      screen.getByRole('button', { name: /Invite candidate/i }),
-    ).toBeDisabled();
+    expect(screen.getByTestId('invite-candidates-header')).toBeDisabled();
     expect(screen.getByRole('button', { name: /Save edits/i })).toBeDisabled();
   });
 
@@ -65,7 +68,9 @@ describe('TrialDetail scenario versions - unavailable and badges', () => {
       ),
     });
     renderPage();
-    expect(await screen.findByText(/Generating v2\.\.\./i)).toBeInTheDocument();
+    expect(
+      await screen.findByText(/Project brief generation is in progress/i),
+    ).toBeInTheDocument();
     expect(screen.queryByText(/^Ready for review$/i)).not.toBeInTheDocument();
     expect(screen.getAllByText(/^Generating$/i).length).toBeGreaterThanOrEqual(
       2,

@@ -8,6 +8,7 @@ import {
   trialDetailResponse,
   textResponse,
   waitFor,
+  userEvent,
 } from './TrialDetailContent.testlib';
 
 describe('TalentPartnerTrialDetailPage - candidate error handling', () => {
@@ -80,6 +81,8 @@ describe('TalentPartnerTrialDetailPage - candidate error handling', () => {
     expect(
       await screen.findByText('You are not authorized to view candidates.'),
     ).toBeInTheDocument();
+    const user = userEvent.setup();
+    await user.click(screen.getByRole('button', { name: 'Brief' }));
     expect(
       await screen.findByRole('heading', { name: 'Project Brief' }),
     ).toBeInTheDocument();

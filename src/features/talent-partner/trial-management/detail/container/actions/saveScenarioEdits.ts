@@ -56,7 +56,7 @@ export async function saveScenarioEdits({
     if (!result.ok) {
       if (result.statusCode === 409 && result.errorCode === 'SCENARIO_LOCKED') {
         setScenarioLockBannerMessage(
-          'This version is locked because invites exist.',
+          'This version is locked for editing because the Trial is approved for inviting.',
         );
         setScenarioVersionSnapshots((prev) => {
           const current = prev[selectedScenarioVersionId];

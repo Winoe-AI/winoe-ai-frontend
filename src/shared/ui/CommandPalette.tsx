@@ -85,7 +85,7 @@ export function CommandPalette({ trials = [] }: CommandPaletteProps) {
       },
       {
         id: 'qa-2',
-        label: 'Invite candidate',
+        label: 'Invite candidates',
         section: 'Quick Actions',
         shortcut: 'I',
         onSelect: () => {

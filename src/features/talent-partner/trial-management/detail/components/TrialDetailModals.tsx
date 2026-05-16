@@ -1,21 +1,7 @@
 'use client';
-import dynamic from 'next/dynamic';
 import { TerminateTrialModal } from './TerminateTrialModal';
+import { TrialInviteModal } from './TrialInviteModal';
 import type { TrialDetailViewProps } from './types';
-
-const TrialInviteModal = dynamic(
-  () => import('./TrialInviteModal').then((mod) => mod.TrialInviteModal),
-  {
-    ssr: false,
-    loading: () => (
-      <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/30">
-        <div className="rounded bg-white px-4 py-3 text-sm text-gray-700 shadow">
-          Loading invite form…
-        </div>
-      </div>
-    ),
-  },
-);
 
 type TrialDetailModalsProps = {
   props: TrialDetailViewProps;

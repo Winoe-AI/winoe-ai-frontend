@@ -5,7 +5,7 @@ type Props = {
 };
 
 export function ScenarioLockBanner({
-  message = 'This version is locked because invites exist.',
+  message = 'This version is locked for editing because the Trial is approved for inviting.',
 }: Props) {
   return (
     <div className="rounded border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">

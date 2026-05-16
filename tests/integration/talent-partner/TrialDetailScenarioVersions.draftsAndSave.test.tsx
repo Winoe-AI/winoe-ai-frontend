@@ -1,3 +1,4 @@
+import { fireEvent } from '@testing-library/react';
 import {
   buildDetail,
   fetchMock,
@@ -73,7 +74,11 @@ describe('TrialDetail scenario versions - drafts and save', () => {
     await user.click(
       screen.getByRole('button', { name: /Select scenario v2/i }),
     );
-    await screen.findByText(/Version v2/i);
+    await waitFor(() =>
+      expect(
+        screen.getByRole('button', { name: /Select scenario v2/i }),
+      ).toHaveAttribute('aria-pressed', 'true'),
+    );
     await user.click(
       screen.getByRole('button', { name: /Select scenario v1/i }),
     );
@@ -100,6 +105,23 @@ describe('TrialDetail scenario versions - drafts and save', () => {
               ],
             }),
           );
+        if (detailCalls === 2)
+          return jsonResponse(
+            buildDetail({
+              status: 'ready_for_review',
+              activeScenarioVersionId: 10,
+              pendingScenarioVersionId: 12,
+              scenarioVersions: [
+                { id: 10, versionIndex: 1, status: 'ready', lockedAt: null },
+                {
+                  id: 12,
+                  versionIndex: 2,
+                  status: 'generating',
+                  lockedAt: null,
+                },
+              ],
+            }),
+          );
         return jsonResponse(
           buildDetail({
             status: 'ready_for_review',
@@ -107,7 +129,7 @@ describe('TrialDetail scenario versions - drafts and save', () => {
             pendingScenarioVersionId: 12,
             scenarioVersions: [
               { id: 10, versionIndex: 1, status: 'ready', lockedAt: null },
-              { id: 12, versionIndex: 2, status: 'generating', lockedAt: null },
+              { id: 12, versionIndex: 2, status: 'ready', lockedAt: null },
             ],
           }),
         );
@@ -117,9 +139,9 @@ describe('TrialDetail scenario versions - drafts and save', () => {
         jobId: 'job-regen-draft',
         status: 'generating',
       }),
-      '/api/backend/jobs/job-regen-draft': jsonResponse({
+      '/api/jobs/job-regen-draft': jsonResponse({
         jobId: 'job-regen-draft',
-        status: 'running',
+        status: 'succeeded',
       }),
     });
     renderPage();
@@ -129,19 +151,24 @@ describe('TrialDetail scenario versions - drafts and save', () => {
     await user.clear(storylineArea);
     await user.type(storylineArea, 'Draft survives regenerate');
     expect(storylineArea.value).toBe('Draft survives regenerate');
-    await user.click(
-      screen.getByRole('button', { name: /Regenerate scenario/i }),
-    );
+    fireEvent.click(screen.getByTestId('regenerate-scenario-trigger'));
     const dialog = await screen.findByRole('dialog', {
       name: /Confirm scenario regenerate/i,
     });
     await user.click(
       within(dialog).getByRole('button', { name: /^Regenerate$/i }),
     );
-    await screen.findByText(/Generating v2\.\.\./i);
+    await screen.findByText(/Project brief generation is in progress/i);
     expect(
       screen.queryByRole('button', { name: /Approve v\d+/i }),
     ).not.toBeInTheDocument();
+    await waitFor(
+      () =>
+        expect(
+          screen.queryByText(/Project brief generation is in progress/i),
+        ).not.toBeInTheDocument(),
+      { timeout: 12000 },
+    );
     await user.click(
       await screen.findByRole('button', { name: /Select scenario v1/i }),
     );

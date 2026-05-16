@@ -1,23 +1,22 @@
 import type { Dispatch, SetStateAction } from 'react';
 import type { ToastInput } from '@/shared/notifications/types';
+import type { InviteCandidateRow } from '@/features/talent-partner/trial-management/invitations/InviteBatchCandidateTypes';
 
 type NotifyFn = (payload: ToastInput) => void;
 
 type SubmitInviteArgs = {
-  candidateName: string;
-  inviteEmail: string;
+  rows: InviteCandidateRow[];
   isTerminated: boolean;
   inviteDisabledReason: string | null;
   trialId: string;
   setActionError: Dispatch<SetStateAction<string | null>>;
   closeInviteModal: () => void;
   notify: NotifyFn;
-  submitInvite: (candidateName: string, inviteEmail: string) => Promise<void>;
+  submitInvite: (rows: InviteCandidateRow[]) => Promise<void>;
 };
 
 export async function submitInviteAction({
-  candidateName,
-  inviteEmail,
+  rows,
   isTerminated,
   inviteDisabledReason,
   trialId,
@@ -29,7 +28,7 @@ export async function submitInviteAction({
   if (isTerminated) {
     const message =
       inviteDisabledReason ??
-      'This trial has been terminated. Invites are disabled immediately.';
+      'This Trial has been terminated. Invites are disabled immediately.';
     setActionError(message);
     notify({
       id: `invite-disabled-${trialId}`,
@@ -40,5 +39,5 @@ export async function submitInviteAction({
     closeInviteModal();
     return;
   }
-  await submitInvite(candidateName, inviteEmail);
+  await submitInvite(rows);
 }

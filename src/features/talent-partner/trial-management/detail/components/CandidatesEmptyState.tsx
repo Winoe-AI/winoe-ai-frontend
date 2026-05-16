@@ -16,8 +16,8 @@ export function CandidatesEmptyState({
 }: Props) {
   return (
     <EmptyState
-      title="No candidates yet"
-      description="Invite candidates to this trial to track their progress and submissions."
+      title="No candidates invited yet."
+      description="Invite candidates to start collecting real-work evidence for this Trial."
       action={
         <Button
           variant="secondary"
@@ -27,8 +27,9 @@ export function CandidatesEmptyState({
           title={
             inviteEnabled ? undefined : (inviteDisabledReason ?? undefined)
           }
+          data-testid="invite-candidates-empty-cta"
         >
-          Invite your first candidate
+          Invite candidates
         </Button>
       }
     />
