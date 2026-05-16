@@ -18,18 +18,24 @@ export function toNumberOrNull(value: unknown): number | null {
   return null;
 }
 
+function normalizeScaleAwareUnit(value: number): number {
+  if (value <= 0) return 0;
+  if (value <= 1) return value;
+  if (value <= 10) return value / 10;
+  if (value <= 100) return value / 100;
+  return 1;
+}
+
 export function toUnitInterval(value: unknown): number {
   const numeric = toNumberOrNull(value);
   if (numeric === null) return 0;
-  if (numeric > 1 && numeric <= 100) return Math.min(1, numeric / 100);
-  return Math.min(1, Math.max(0, numeric));
+  return normalizeScaleAwareUnit(numeric);
 }
 
 export function toUnitIntervalOrNull(value: unknown): number | null {
   const numeric = toNumberOrNull(value);
   if (numeric === null) return null;
-  if (numeric > 1 && numeric <= 100) return Math.min(1, numeric / 100);
-  return Math.min(1, Math.max(0, numeric));
+  return normalizeScaleAwareUnit(numeric);
 }
 
 export function toStringList(value: unknown): string[] {

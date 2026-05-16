@@ -66,38 +66,58 @@ describe('WinoeReportPage print-proof artifact', () => {
       </div>,
     );
 
-    expect(await screen.findAllByText('78 / 100')).toHaveLength(2);
-    expect(screen.getByText(/Winoe Report/i)).toBeInTheDocument();
-    expect(screen.getAllByText(/Winoe Score/i).length).toBeGreaterThan(0);
-    expect(screen.getByText(/Dimensional sub-scores/i)).toBeInTheDocument();
-    expect(screen.getByText(/Evidence Trail drill-down/i)).toBeInTheDocument();
-    expect(screen.getByText(/Per-day scores/i)).toBeInTheDocument();
+    expect(await screen.findByText(/Candidate report/i)).toBeInTheDocument();
+    expect(screen.getByText(/Candidate's Work/i)).toBeInTheDocument();
+    expect(screen.getByText(/Evidence Appendix/i)).toBeInTheDocument();
+    expect(screen.getByText(/Winoe Score/i)).toBeInTheDocument();
+    expect(screen.getByText(/Dimensional Breakdown/i)).toBeInTheDocument();
+    expect(screen.getByText(/Narrative Assessment/i)).toBeInTheDocument();
+    expect(screen.getByText(/Disagree\? Send feedback →/i)).toBeInTheDocument();
     expect(
-      screen.getByText(/Reviewer sub-agent summaries/i),
-    ).toBeInTheDocument();
-    expect(screen.getAllByText(/Day 1/i).length).toBeGreaterThan(0);
-    expect(screen.getByText(/Design Doc Reviewer/i)).toBeInTheDocument();
-    expect(screen.getAllByText(/Winoe synthesis/i).length).toBeGreaterThan(0);
+      screen.getAllByText(/Project scaffolding quality/i).length,
+    ).toBeGreaterThan(0);
     expect(
-      screen.getByText(/Winoe provides evidence, context, and calibration\./i),
-    ).toBeInTheDocument();
+      screen.getAllByText(/Communication \/ Handoff \+ Demo/i).length,
+    ).toBeGreaterThan(0);
     expect(
       container.querySelector('[data-winoe-report-no-print="true"]'),
     ).not.toBeNull();
-    expect(screen.getByText(/URL:/)).toHaveTextContent(
-      'https://github.com/org/repo/commit/abc123',
+    expect(screen.queryByText(/^Footer Actions$/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/^Winoe Report$/i)).not.toBeInTheDocument();
+
+    [
+      '.winoe-report',
+      '.identity-bar',
+      '.score-headline',
+      '.score-ring',
+      '.dimensional-breakdown',
+      '.dimension-row',
+      '.evidence-drawer',
+      '.narrative-assessment',
+      '.prose-narrative',
+      '.per-day-artifacts',
+      '.collapsible-content',
+      '.evidence-appendix',
+      '.footer-actions',
+    ].forEach((selector) => {
+      expect(container.querySelector(selector)).not.toBeNull();
+    });
+
+    const codeBlock = container.querySelector('.evidence-appendix pre');
+    expect(codeBlock).not.toBeNull();
+    expect(container).toHaveTextContent(/Day 1 — Design Doc/i);
+    expect(codeBlock).toHaveTextContent('/* timeline-1 */');
+    expect(codeBlock).toHaveTextContent(
+      'Workspace structure appears before feature work starts.',
     );
-    expect(screen.getByText(/URL:/)).not.toHaveTextContent('token=');
-    expect(
-      screen.getAllByText(
-        /No linked artifacts were returned for this dimension yet\./i,
-      ).length,
-    ).toBeGreaterThan(0);
 
     const cssPath = path.join(process.cwd(), 'src/app/globals.css');
-    const fullCss = fs
+    const printCssPath = path.join(process.cwd(), 'src/styles/print.css');
+    const fullCss = `${fs
       .readFileSync(cssPath, 'utf8')
-      .replace(/@import\s+['"][^'"]+['"];\s*/g, '');
+      .replace(/@import\s+['"][^'"]+['"];\s*/g, '')}\n${fs
+      .readFileSync(printCssPath, 'utf8')
+      .replace(/@import\s+['"][^'"]+['"];\s*/g, '')}`;
     const artifactPath = path.join(
       process.cwd(),
       'test-results',

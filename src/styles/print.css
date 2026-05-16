@@ -1,0 +1,138 @@
+@media print {
+  @page {
+    size: auto;
+    margin: 0.7in 0.6in 0.8in;
+  }
+
+  @page :left {
+    @bottom-left {
+      content: 'Winoe Report';
+      font-family: var(--font-sans);
+      font-size: 10pt;
+      color: #6b7280;
+    }
+
+    @bottom-right {
+      content: counter(page) ' / ' counter(pages);
+      font-family: var(--font-mono);
+      font-size: 10pt;
+      color: #6b7280;
+    }
+  }
+
+  @page :right {
+    @bottom-left {
+      content: 'Winoe Report';
+      font-family: var(--font-sans);
+      font-size: 10pt;
+      color: #6b7280;
+    }
+
+    @bottom-right {
+      content: counter(page) ' / ' counter(pages);
+      font-family: var(--font-mono);
+      font-size: 10pt;
+      color: #6b7280;
+    }
+  }
+
+  html,
+  body {
+    background: #fff !important;
+  }
+
+  body.winoe-report-print-mode {
+    color: #111827 !important;
+    font-size: 11pt;
+    line-height: 1.5;
+  }
+
+  body.winoe-report-print-mode * {
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  body.winoe-report-print-mode nav[aria-label='Sidebar'],
+  body.winoe-report-print-mode [data-app-header='true'],
+  body.winoe-report-print-mode [data-app-nav='true'],
+  body.winoe-report-print-mode .evidence-drawer,
+  body.winoe-report-print-mode .footer-actions,
+  body.winoe-report-print-mode [data-winoe-report-no-print='true'] {
+    display: none !important;
+  }
+
+  body.winoe-report-print-mode .winoe-report-print-root {
+    max-width: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  body.winoe-report-print-mode .winoe-report {
+    max-width: none !important;
+    padding: 0 !important;
+  }
+
+  body.winoe-report-print-mode .print-report-header {
+    display: block !important;
+  }
+
+  body.winoe-report-print-mode .identity-bar,
+  body.winoe-report-print-mode .score-ring,
+  body.winoe-report-print-mode .score-headline,
+  body.winoe-report-print-mode .dimensional-breakdown,
+  body.winoe-report-print-mode .dimension-row,
+  body.winoe-report-print-mode .narrative-assessment,
+  body.winoe-report-print-mode .prose-narrative,
+  body.winoe-report-print-mode .per-day-artifacts,
+  body.winoe-report-print-mode .evidence-appendix {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  body.winoe-report-print-mode .evidence-appendix {
+    display: block !important;
+    break-before: page;
+    page-break-before: always;
+  }
+
+  body.winoe-report-print-mode .collapsible-content,
+  body.winoe-report-print-mode .print-only,
+  body.winoe-report-print-mode [hidden] {
+    display: block !important;
+  }
+
+  body.winoe-report-print-mode .collapsible-content {
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  body.winoe-report-print-mode .prose-narrative {
+    font-family: var(--font-serif) !important;
+  }
+
+  body.winoe-report-print-mode .prose-narrative p,
+  body.winoe-report-print-mode .prose-narrative li {
+    break-inside: avoid;
+  }
+
+  body.winoe-report-print-mode .hide-on-print {
+    display: none !important;
+  }
+
+  body.winoe-report-print-mode .winoe-report article,
+  body.winoe-report-print-mode .winoe-report section,
+  body.winoe-report-print-mode .winoe-report .radar-chart {
+    break-inside: avoid;
+  }
+
+  body.winoe-report-print-mode .winoe-report,
+  body.winoe-report-print-mode .winoe-report * {
+    background: #fff !important;
+  }
+
+  body.winoe-report-print-mode pre,
+  body.winoe-report-print-mode code {
+    white-space: pre-wrap !important;
+    word-break: break-word;
+  }
+}

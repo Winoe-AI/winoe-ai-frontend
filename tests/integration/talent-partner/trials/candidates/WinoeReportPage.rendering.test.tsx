@@ -1,4 +1,5 @@
-import { screen } from '@testing-library/react';
+import { screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import {
   READY_PAYLOAD,
   jsonResponse,
@@ -32,43 +33,98 @@ describe('WinoeReportPage rendering', () => {
   });
 
   it('renders ready report from 200 payload', async () => {
+    const user = userEvent.setup();
+    const readyPayload = {
+      ...READY_PAYLOAD,
+      report: {
+        ...READY_PAYLOAD.report,
+        dimensionScores: READY_PAYLOAD.report.dimensionScores.map(
+          (dimension, index) =>
+            index === 0
+              ? {
+                  ...dimension,
+                  evidence: [
+                    {
+                      ...dimension.evidence[0],
+                      url: 'https://github.com/org/repo/commit/abc123',
+                    },
+                  ],
+                }
+              : dimension,
+        ),
+      },
+    };
     setFetchForWinoeReport(async (url) =>
       url === '/api/candidate_sessions/2/winoe_report'
-        ? jsonResponse(READY_PAYLOAD)
+        ? jsonResponse(readyPayload)
         : textResponse('Not found', 404),
     );
     renderWinoeReportPage();
-    expect(await screen.findAllByText('78 / 100')).toHaveLength(2);
-    expect(screen.getAllByText('Day 1').length).toBeGreaterThan(0);
     expect(
-      screen.getByText(/Winoe's narrative assessment/i),
-    ).toBeInTheDocument();
+      (await screen.findAllByText(/Project scaffolding quality/i)).length,
+    ).toBeGreaterThan(0);
+    expect(screen.getByText(/Winoe Score/i)).toBeInTheDocument();
+    expect(screen.queryByText(/^Winoe Report$/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Footer Actions/i)).not.toBeInTheDocument();
+    expect(screen.getByText(/Candidate's Work/i)).toBeInTheDocument();
+    expect(screen.getByText(/Narrative Assessment/i)).toBeInTheDocument();
+    expect(screen.getByText(/Disagree\? Send feedback →/i)).toBeInTheDocument();
+    expect(document.querySelector('.prose-narrative')).toHaveStyle({
+      fontFamily: 'var(--font-serif)',
+    });
     expect(
-      screen.getByRole('button', { name: /Project scaffolding quality/i }),
-    ).toBeInTheDocument();
+      screen.getAllByText(/Project scaffolding quality/i).length,
+    ).toBeGreaterThan(0);
     expect(
-      screen.getByRole('button', { name: /Architectural coherence/i }),
-    ).toBeInTheDocument();
+      screen.getAllByText(/Repository structure was established early/i).length,
+    ).toBeGreaterThan(0);
     expect(
-      screen.getByRole('button', { name: /Development process/i }),
-    ).toBeInTheDocument();
+      screen.getAllByRole('button', { name: /View evidence/i }).length,
+    ).toBeGreaterThan(0);
+    expect(screen.getAllByTestId('view-evidence-button')[0]).toBeVisible();
     expect(
-      screen.getByRole('button', { name: /Reflection & self-awareness/i }),
-    ).toBeInTheDocument();
-    expect(screen.getAllByText(/Score pending/i).length).toBeGreaterThan(0);
-    expect(screen.queryByText(/^Hire$/i)).not.toBeInTheDocument();
-    expect(screen.queryByText(/^Reject$/i)).not.toBeInTheDocument();
-    expect(
-      screen.getByRole('button', { name: /Print \/ Save PDF/i }),
-    ).toBeInTheDocument();
-    expect(
-      screen.getAllByRole('link', { name: /Open evidence link/i }),
+      screen.getAllByRole('button', { name: /Download PDF/i }),
     ).toHaveLength(2);
     expect(
-      screen.getAllByText(
-        /No linked artifacts were returned for this dimension yet\./i,
-      ).length,
+      screen.getByRole('button', { name: /Share with team/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole('link', { name: /Compare to other candidates/i }),
+    ).toHaveAttribute('href', '/dashboard/trials/1#benchmarks');
+    await user.click(
+      screen.getAllByRole('button', { name: /View evidence/i })[0],
+    );
+    const drawer = screen.getByRole('dialog', {
+      name: /Evidence Trail · Project scaffolding quality/i,
+    });
+    expect(drawer).toBeInTheDocument();
+    expect(within(drawer).getByText(/Dimension score/i)).toBeInTheDocument();
+    expect(
+      within(drawer).getByText(/Project scaffolding quality/i),
+    ).toBeInTheDocument();
+    expect(
+      within(drawer).getByRole('heading', {
+        name: /Day 2\/3 — Code/i,
+        level: 4,
+      }),
+    ).toBeInTheDocument();
+    expect(within(drawer).getAllByText('abc123').length).toBeGreaterThan(0);
+    expect(
+      within(drawer).getByText(/Repository structure was established early/i),
+    ).toBeInTheDocument();
+    expect(
+      within(drawer).getAllByRole('link', { name: /Open evidence link/i })
+        .length,
     ).toBeGreaterThan(0);
+    await user.click(screen.getByRole('button', { name: /Share with team/i }));
+    expect(
+      await screen.findByRole('dialog', { name: /Share this report/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/Secure team sharing is not enabled yet/i),
+    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Copy link/i })).toBeDisabled();
+    expect(screen.queryByLabelText(/Link expiry/i)).not.toBeInTheDocument();
   });
 
   it('renders AI-disabled day cards as human-review-required placeholders', async () => {
@@ -103,14 +159,18 @@ describe('WinoeReportPage rendering', () => {
         : textResponse('Not found', 404),
     );
     renderWinoeReportPage();
-    expect(await screen.findByText('Day 2')).toBeInTheDocument();
-    expect(screen.getByText('Day 3')).toBeInTheDocument();
-    expect(screen.getByText(/Disabled days: 2, 3/i)).toBeInTheDocument();
-    expect(screen.getAllByText('AI evaluation disabled')).toHaveLength(2);
     expect(
-      screen.getAllByText(/AI evaluation disabled for this day./i),
-    ).toHaveLength(2);
-    expect(screen.getAllByText(/Human review required./i)).toHaveLength(2);
+      await screen.findByText('Day 2 — Code (Implementation Kickoff)'),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText('Day 3 — Code (Implementation Wrap-Up)'),
+    ).toBeInTheDocument();
+    expect(
+      screen.getAllByText(/AI evaluation disabled for this day\./i).length,
+    ).toBeGreaterThanOrEqual(2);
+    expect(
+      screen.getAllByText(/Human review required\./i).length,
+    ).toBeGreaterThanOrEqual(2);
   });
 
   it('renders warning banner when payload includes warnings', async () => {

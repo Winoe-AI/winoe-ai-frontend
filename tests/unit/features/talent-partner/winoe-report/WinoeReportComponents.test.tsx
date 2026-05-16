@@ -1,9 +1,12 @@
 import React from 'react';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { DayScoreCard } from '@/features/talent-partner/winoe-report/DayScoreCard';
 import { WinoeDimensionBreakdown } from '@/features/talent-partner/winoe-report/WinoeDimensionBreakdown';
 import { WinoeScoreHeader } from '@/features/talent-partner/winoe-report/WinoeScoreHeader';
+import { ScoreRing } from '@/features/talent-partner/winoe-report/components/ScoreRing';
+import { FooterActions } from '@/features/talent-partner/winoe-report/components/FooterActions';
+import { RadarChart } from '@/features/talent-partner/winoe-report/components/RadarChart';
 
 describe('Winoe Report components', () => {
   it('renders score header narrative and calibration', () => {
@@ -33,6 +36,15 @@ describe('Winoe Report components', () => {
       screen.getByText(/Evidence suggests strong alignment with this Trial\./i),
     ).toBeInTheDocument();
     expect(screen.queryByText(/Winoe persona/i)).not.toBeInTheDocument();
+  });
+
+  it('renders the hero score ring without out-of-100 suffix text', async () => {
+    render(<ScoreRing score={0.6731} />);
+    await waitFor(() =>
+      expect(screen.getByText(/^(?:66\.9|67)$/)).toBeInTheDocument(),
+    );
+    expect(screen.queryByText(/\/ 100/)).not.toBeInTheDocument();
+    expect(screen.getByText(/Winoe Score/i)).toBeInTheDocument();
   });
 
   it.each([
@@ -162,5 +174,54 @@ describe('Winoe Report components', () => {
         /No linked artifacts were returned for this dimension yet\./i,
       ).length,
     ).toBeGreaterThan(0);
+  });
+
+  it('renders a disabled benchmarks fallback when compare href is missing', () => {
+    render(
+      <FooterActions
+        onDownloadPdf={jest.fn()}
+        onShare={jest.fn()}
+        compareHref={null}
+      />,
+    );
+
+    expect(
+      screen.getByRole('button', {
+        name: /Benchmarks unavailable for this Trial/i,
+      }),
+    ).toBeDisabled();
+    expect(
+      screen.queryByRole('link', {
+        name: /Compare to other candidates/i,
+      }),
+    ).not.toBeInTheDocument();
+  });
+
+  it('uses Benchmarks language for the radar fallback', () => {
+    render(
+      <RadarChart
+        dimensions={[
+          {
+            id: 'project_scaffolding_quality',
+            name: 'Project scaffolding quality',
+            score: 7.8,
+            justification: 'Repository structure was established early.',
+            citations: [],
+          },
+        ]}
+      />,
+    );
+
+    expect(
+      screen.getByRole('img', {
+        name: /Winoe Report dimensional radar chart/i,
+      }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/Benchmarks unavailable for this report/i),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByText(/Cohort median unavailable/i),
+    ).not.toBeInTheDocument();
   });
 });

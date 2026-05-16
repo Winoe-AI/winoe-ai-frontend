@@ -34,9 +34,9 @@ describe('WinoeReportPage polling and generate flow', () => {
     await act(async () => {
       jest.advanceTimersByTime(10200);
     });
-    await waitFor(() =>
-      expect(screen.getAllByText('78 / 100')).toHaveLength(2),
-    );
+    expect(
+      await screen.findByRole('link', { name: /Compare to other candidates/i }),
+    ).toBeInTheDocument();
   });
 
   it('triggers POST generate then renders ready view', async () => {
@@ -75,9 +75,9 @@ describe('WinoeReportPage polling and generate flow', () => {
     await act(async () => {
       jest.advanceTimersByTime(10200);
     });
-    await waitFor(() =>
-      expect(screen.getAllByText('78 / 100')).toHaveLength(2),
-    );
+    expect(
+      await screen.findByRole('link', { name: /Compare to other candidates/i }),
+    ).toBeInTheDocument();
   });
 
   it('handles POST 409 generate by polling existing run until ready', async () => {
@@ -111,9 +111,9 @@ describe('WinoeReportPage polling and generate flow', () => {
     await act(async () => {
       jest.advanceTimersByTime(10200);
     });
-    await waitFor(() =>
-      expect(screen.getAllByText('78 / 100')).toHaveLength(2),
-    );
+    expect(
+      await screen.findByRole('link', { name: /Compare to other candidates/i }),
+    ).toBeInTheDocument();
   });
 
   it('cleans up polling timer on unmount', async () => {

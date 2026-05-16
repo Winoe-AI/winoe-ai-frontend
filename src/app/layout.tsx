@@ -4,6 +4,7 @@ import { GeistSans } from 'geist/font/sans';
 import { GeistMono } from 'geist/font/mono';
 import { Source_Serif_4 } from 'next/font/google';
 import './globals.css';
+import '@/styles/print.css';
 import { NotificationsProvider } from '@/shared/notifications';
 import { QueryProvider } from '@/shared/query';
 

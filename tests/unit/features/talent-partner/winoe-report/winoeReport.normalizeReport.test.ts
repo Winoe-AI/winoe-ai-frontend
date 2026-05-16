@@ -74,6 +74,22 @@ describe('normalizeReport', () => {
           },
           evidence: [],
         },
+        {
+          dayIndex: 5,
+          score: 0.77,
+          rubricBreakdown: {
+            reflection_self_awareness: 0.77,
+          },
+          evidence: [
+            {
+              kind: 'reflection',
+              ref: 'day5-reflection.md:L8-L22',
+              dayIndex: 5,
+              dimensionKey: 'reflection_self_awareness',
+              excerpt: 'Reflection essay about tradeoffs and follow-up work.',
+            },
+          ],
+        },
       ],
       reviewerSummaries: [],
       disabledDayIndexes: [],
@@ -98,6 +114,18 @@ describe('normalizeReport', () => {
     expect(
       report?.dimensionScores.find(
         (item) => item.key === 'project_scaffolding_quality',
+      ),
+    ).toMatchObject({
+      evidence: expect.arrayContaining([
+        expect.objectContaining({
+          ref: 'commit-1',
+          dimensionKey: 'project_scaffolding_quality',
+        }),
+      ]),
+    });
+    expect(
+      report?.dimensionScores.find(
+        (item) => item.key === 'project_scaffolding_quality',
       )?.score,
     ).toBe(0.72);
     expect(
@@ -105,9 +133,13 @@ describe('normalizeReport', () => {
         (item) => item.key === 'reflection_self_awareness',
       ),
     ).toMatchObject({
-      score: null,
-      emptyStateMessage:
-        'No linked artifacts were returned for this dimension yet.',
+      evidence: expect.arrayContaining([
+        expect.objectContaining({
+          ref: 'day5-reflection.md:L8-L22',
+          dimensionKey: 'reflection_self_awareness',
+        }),
+      ]),
+      score: 0.77,
     });
     expect(
       report?.dimensionScores.find((item) => item.key === 'custom_dimension'),
@@ -139,5 +171,40 @@ describe('normalizeReport', () => {
 
     expect(report?.dimensionScores.at(-1)?.key).toBe('zeta_custom');
     expect(report?.dimensionScores[0]?.key).toBe('project_scaffolding_quality');
+  });
+
+  it('normalizes scores without collapsing ten-point dimension inputs', () => {
+    const report = normalizeReport({
+      overallWinoeScore: 67.31,
+      recommendation: 'strong_hire',
+      dimensionScores: [
+        {
+          key: 'communication_handoff_demo',
+          label: 'Communication / Handoff + Demo',
+          score: 7.4,
+          summary:
+            'Display-scale dimension score should survive normalization.',
+          evidence: [],
+        },
+      ],
+      dayScores: [
+        {
+          dayIndex: 4,
+          score: 74,
+          rubricBreakdown: {},
+          evidence: [],
+        },
+      ],
+      reviewerSummaries: [],
+      disabledDayIndexes: [],
+    });
+
+    expect(report?.overallWinoeScore).toBeCloseTo(0.6731, 4);
+    expect(
+      report?.dimensionScores.find(
+        (item) => item.key === 'communication_handoff_demo',
+      )?.score,
+    ).toBeCloseTo(0.74, 2);
+    expect(report?.dayScores[0]?.score).toBeCloseTo(0.74, 2);
   });
 });
