@@ -188,4 +188,10 @@ body {
   body.winoe-report-print-mode .winoe-report-hero [class*='border'] {
     border-color: #d1d5db !important;
   }
+
+  body.winoe-report-print-mode .collapsible-content {
+    display: block !important;
+    overflow: visible !important;
+    padding-bottom: 0 !important;
+  }
 }

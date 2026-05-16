@@ -15,7 +15,7 @@ export function normalizeWinoeReportPayload(
     return {
       kind: 'failed',
       errorCode: 'winoe_report_payload_invalid',
-      message: 'Winoe Report payload was invalid.',
+      message: 'Winoe Report data was invalid.',
     };
   }
 
@@ -45,7 +45,7 @@ export function normalizeWinoeReportPayload(
       return {
         kind: 'failed',
         errorCode: 'winoe_report_report_invalid',
-        message: 'Winoe Report report was missing or invalid.',
+        message: 'Winoe Report data was missing or invalid.',
       };
     }
     const warnings = Array.from(

@@ -41,7 +41,10 @@ export function CandidateCompareSection({
     candidatesLoading || (candidateCount > 0 && compareLoading);
 
   return (
-    <section className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm">
+    <section
+      id="benchmarks"
+      className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm"
+    >
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div>
           <h2 className="text-lg font-semibold text-gray-900">Benchmarks</h2>

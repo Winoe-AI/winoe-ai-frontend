@@ -1,19 +1,20 @@
 'use client';
 
 import { useParams } from 'next/navigation';
-import { WinoeReportPageToolbar } from './WinoeReportPageToolbar';
-import { WinoeReportReadySection } from './WinoeReportReadySection';
+import { useMemo } from 'react';
 import { WinoeReportStatusPanel } from './WinoeReportStatusPanel';
 import { WinoeReportWarningBanner } from './WinoeReportWarningBanner';
 import { useWinoeReportContext } from './useWinoeReportContext';
 import { useWinoeReport } from './useWinoeReport';
 import { useWinoeReportPrintMode } from './useWinoeReportPrintMode';
+import { normalizeWinoeReportViewModel } from './winoeReport.viewModel';
+import { WinoeReportView } from './WinoeReportView';
 
 export default function WinoeReportPage() {
   const params = useParams<{ id: string; candidateSessionId: string }>();
   const trialId = params.id;
   const candidateSessionId = params.candidateSessionId ?? '';
-  const { trialTitle, candidateName, candidateStatus } = useWinoeReportContext({
+  const { trialTitle, candidateName } = useWinoeReportContext({
     trialId,
     candidateSessionId,
   });
@@ -21,31 +22,37 @@ export default function WinoeReportPage() {
     useWinoeReport(candidateSessionId);
   useWinoeReportPrintMode();
 
-  const submissionsHref = `/dashboard/trials/${trialId}/candidates/${candidateSessionId}`;
+  const viewModel = useMemo(() => {
+    if (!state.report) return null;
+    return normalizeWinoeReportViewModel({
+      candidateName,
+      trialTitle,
+      generatedAt: state.generatedAt,
+      report: state.report,
+    });
+  }, [candidateName, state.generatedAt, state.report, trialTitle]);
+
+  const compareHref = trialId
+    ? `/dashboard/trials/${trialId}#benchmarks`
+    : null;
+
+  if (viewModel) {
+    return (
+      <div className="winoe-report-print-root py-6">
+        <WinoeReportWarningBanner warnings={state.warnings} />
+        <WinoeReportView
+          viewModel={viewModel}
+          onDownloadPdf={() => window.print()}
+          compareHref={compareHref}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="winoe-report-print-root flex flex-col gap-4 py-8">
-      <WinoeReportPageToolbar
-        submissionsHref={submissionsHref}
-        candidateSessionId={candidateSessionId}
-        trialTitle={trialTitle}
-        candidateName={candidateName}
-        candidateStatus={candidateStatus}
-        reportStatus={state.status}
-        generatedAt={state.generatedAt}
-        loading={loading}
-        showPrint={state.status === 'ready'}
-        onReload={() => void reload()}
-      />
-
       <WinoeReportWarningBanner warnings={state.warnings} />
-
-      {state.status === 'ready' && state.report ? (
-        <WinoeReportReadySection
-          report={state.report}
-          generatedAt={state.generatedAt}
-        />
-      ) : (
+      <div className="mx-auto w-full max-w-[960px] px-4 md:px-6">
         <WinoeReportStatusPanel
           status={state.status}
           message={state.message}
@@ -55,7 +62,7 @@ export default function WinoeReportPage() {
           onGenerate={() => void generate()}
           onRetry={() => void reload()}
         />
-      )}
+      </div>
     </div>
   );
 }
