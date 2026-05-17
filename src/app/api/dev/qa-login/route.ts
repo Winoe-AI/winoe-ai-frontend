@@ -17,7 +17,7 @@ const ROLE_PERMISSIONS: Record<QaRole, string[]> = {
 };
 
 const ROLE_DEFAULT_RETURN_TO: Record<QaRole, string> = {
-  talent_partner: '/dashboard/trials',
+  talent_partner: '/talent-partner/trials',
   candidate: '/candidate/dashboard',
 };
 

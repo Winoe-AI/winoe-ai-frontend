@@ -25,10 +25,10 @@ describe('TalentPartnerTrialDetailPage - candidates links/search', () => {
     ).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText('Completed').length).toBeGreaterThanOrEqual(1);
     const hrefs = screen
-      .getAllByRole('link', { name: 'View submissions →' })
+      .getAllByRole('link', { name: 'View submission' })
       .map((a) => (a as HTMLAnchorElement).getAttribute('href'));
-    expect(hrefs).toContain('/dashboard/trials/1/candidates/2');
-    expect(hrefs).toContain('/dashboard/trials/1/candidates/3');
+    expect(hrefs).toContain('/talent-partner/trials/1/candidates/2/submission');
+    expect(hrefs).toContain('/talent-partner/trials/1/candidates/3/submission');
   });
 
   it('sorts candidates by status and supports search filtering', async () => {

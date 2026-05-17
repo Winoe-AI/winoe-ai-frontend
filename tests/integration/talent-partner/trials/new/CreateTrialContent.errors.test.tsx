@@ -45,6 +45,6 @@ describe('NewTrialWizard errors', () => {
     render(<TrialCreatePage />);
 
     await user.click(screen.getByRole('button', { name: /^Cancel$/i }));
-    expect(routerMock.push).toHaveBeenCalledWith('/dashboard/trials');
+    expect(routerMock.push).toHaveBeenCalledWith('/talent-partner/trials');
   });
 });

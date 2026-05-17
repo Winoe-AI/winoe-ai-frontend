@@ -36,7 +36,7 @@ export function CandidateRow({
   onResend,
   onCloseManual,
 }: Props) {
-  const submissionsHref = `/dashboard/trials/${trialId}/candidates/${candidate.candidateSessionId}`;
+  const submissionsHref = `/talent-partner/trials/${trialId}/candidates/${candidate.candidateSessionId}/submission`;
   const prefetchCandidateData = useCandidateRowPrefetch(
     trialId,
     candidate.candidateSessionId,
@@ -69,7 +69,7 @@ export function CandidateRow({
           onMouseEnter={prefetchCandidateData}
           onFocus={prefetchCandidateData}
         >
-          View submissions →
+          View submission
         </Link>
       </td>
     </tr>

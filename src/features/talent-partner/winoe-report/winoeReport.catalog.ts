@@ -89,7 +89,7 @@ const DAY_LABELS: Record<number, string> = {
   2: 'Implementation Kickoff',
   3: 'Implementation Wrap-Up',
   4: 'Handoff + Demo',
-  5: 'Reflection Essay',
+  5: 'Reflection',
 };
 
 const EVIDENCE_KIND_LABELS: Record<string, string> = {

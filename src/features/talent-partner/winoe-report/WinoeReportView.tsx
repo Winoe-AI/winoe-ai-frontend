@@ -22,6 +22,7 @@ type WinoeReportViewProps = {
   viewModel: WinoeReportViewModel;
   onDownloadPdf: () => void;
   compareHref: string | null;
+  submissionHref: string | null;
 };
 
 type ActiveArtifactRequest = {
@@ -42,6 +43,7 @@ export function WinoeReportView({
   viewModel,
   onDownloadPdf,
   compareHref,
+  submissionHref,
 }: WinoeReportViewProps) {
   const [selectedDimensionId, setSelectedDimensionId] = useState<string | null>(
     viewModel.dimensions[0]?.id ?? null,
@@ -170,6 +172,7 @@ export function WinoeReportView({
             onDownloadPdf={onDownloadPdf}
             onShare={() => setShareOpen(true)}
             compareHref={compareHref}
+            submissionHref={submissionHref}
           />
 
           <EvidenceAppendix dimensions={viewModel.dimensions} />

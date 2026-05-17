@@ -1,6 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { AppHeader } from '@/shared/layout/AppHeader';
 import { contentContainer } from '@/shared/layout/layoutStyles';
 import {
@@ -66,7 +66,9 @@ describe('WinoeReportPage print-proof artifact', () => {
       </div>,
     );
 
-    expect(await screen.findByText(/Candidate report/i)).toBeInTheDocument();
+    await waitFor(() =>
+      expect(screen.getAllByText(/^Winoe Report$/i).length).toBeGreaterThan(0),
+    );
     expect(screen.getByText(/Candidate's Work/i)).toBeInTheDocument();
     expect(screen.getByText(/Evidence Appendix/i)).toBeInTheDocument();
     expect(screen.getByText(/Winoe Score/i)).toBeInTheDocument();
@@ -83,7 +85,7 @@ describe('WinoeReportPage print-proof artifact', () => {
       container.querySelector('[data-winoe-report-no-print="true"]'),
     ).not.toBeNull();
     expect(screen.queryByText(/^Footer Actions$/i)).not.toBeInTheDocument();
-    expect(screen.queryByText(/^Winoe Report$/i)).not.toBeInTheDocument();
+    expect(screen.getAllByText(/^Winoe Report$/i).length).toBeGreaterThan(0);
 
     [
       '.winoe-report',

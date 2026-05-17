@@ -110,15 +110,19 @@ export default function TalentPartnerAppShell({
   const navLinks = [
     {
       name: 'Trials',
-      href: '/dashboard/trials',
+      href: '/talent-partner/trials',
       icon: <TrialsIcon />,
-      activePaths: ['/dashboard', '/dashboard/trials'],
+      activePaths: [
+        '/talent-partner/trials',
+        '/dashboard',
+        '/dashboard/trials',
+      ],
     },
     {
       name: 'Benchmarks',
-      href: '/dashboard/benchmarks',
+      href: '/talent-partner/benchmarks',
       icon: <BenchmarksIcon />,
-      activePaths: ['/dashboard/benchmarks'],
+      activePaths: ['/talent-partner/benchmarks', '/dashboard/benchmarks'],
     },
     {
       name: 'Settings',

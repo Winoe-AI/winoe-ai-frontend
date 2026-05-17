@@ -1,0 +1,20 @@
+{
+  "iso1": {
+    "status": 403,
+    "body": {
+      "detail": "Trial access forbidden"
+    }
+  },
+  "iso2": {
+    "status": 400,
+    "body": {
+      "detail": "Candidates must belong to the same Trial."
+    }
+  },
+  "iso3": {
+    "status": 403,
+    "body": {
+      "detail": "Candidate access forbidden"
+    }
+  }
+}

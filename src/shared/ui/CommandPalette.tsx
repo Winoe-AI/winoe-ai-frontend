@@ -89,7 +89,7 @@ export function CommandPalette({ trials = [] }: CommandPaletteProps) {
         section: 'Quick Actions',
         shortcut: 'I',
         onSelect: () => {
-          router.push('/dashboard/trials');
+          router.push('/talent-partner/trials');
         },
         icon: (
           <svg
@@ -115,7 +115,7 @@ export function CommandPalette({ trials = [] }: CommandPaletteProps) {
         section: 'Quick Actions',
         shortcut: 'B',
         onSelect: () => {
-          router.push('/dashboard/benchmarks');
+          router.push('/talent-partner/benchmarks');
         },
         icon: (
           <svg
@@ -197,7 +197,7 @@ export function CommandPalette({ trials = [] }: CommandPaletteProps) {
         section: 'Recent',
         onSelect: () => {
           rememberRecentTrialId(trial.id);
-          router.push(`/dashboard/trials/${trial.id}`);
+          router.push(`/talent-partner/trials/${trial.id}`);
         },
         icon: <TrialsIcon />,
       });
@@ -211,7 +211,7 @@ export function CommandPalette({ trials = [] }: CommandPaletteProps) {
         section: 'Navigate to',
         onSelect: () => {
           rememberRecentTrialId(trial.id);
-          router.push(`/dashboard/trials/${trial.id}`);
+          router.push(`/talent-partner/trials/${trial.id}`);
         },
         icon: <TrialsIcon />,
       });
@@ -224,7 +224,7 @@ export function CommandPalette({ trials = [] }: CommandPaletteProps) {
           section: 'Navigate to',
           onSelect: () => {
             rememberRecentTrialId(trial.id);
-            router.push(`/dashboard/trials/${trial.id}?tab=candidates`);
+            router.push(`/talent-partner/trials/${trial.id}?tab=candidates`);
           },
         });
       });

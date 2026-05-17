@@ -64,7 +64,7 @@ describe('WinoeReportPage rendering', () => {
       (await screen.findAllByText(/Project scaffolding quality/i)).length,
     ).toBeGreaterThan(0);
     expect(screen.getByText(/Winoe Score/i)).toBeInTheDocument();
-    expect(screen.queryByText(/^Winoe Report$/i)).not.toBeInTheDocument();
+    expect(screen.getAllByText(/^Winoe Report$/i).length).toBeGreaterThan(0);
     expect(screen.queryByText(/Footer Actions/i)).not.toBeInTheDocument();
     expect(screen.getByText(/Candidate's Work/i)).toBeInTheDocument();
     expect(screen.getByText(/Narrative Assessment/i)).toBeInTheDocument();
@@ -89,8 +89,14 @@ describe('WinoeReportPage rendering', () => {
       screen.getByRole('button', { name: /Share with team/i }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole('link', { name: /Compare to other candidates/i }),
-    ).toHaveAttribute('href', '/dashboard/trials/1#benchmarks');
+      screen.getByRole('link', { name: /Open Benchmarks/i }),
+    ).toHaveAttribute('href', '/talent-partner/trials/1/benchmarks');
+    expect(
+      screen.getByRole('link', { name: /View raw submission/i }),
+    ).toHaveAttribute(
+      'href',
+      '/talent-partner/trials/1/candidates/2/submission',
+    );
     await user.click(
       screen.getAllByRole('button', { name: /View evidence/i })[0],
     );

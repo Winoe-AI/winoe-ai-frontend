@@ -10,6 +10,7 @@ type Props = {
   showLoading: boolean;
   compareError: string | null;
   cohortCount: number;
+  candidateCount: number;
   sortedRows: CandidateCompareRow[];
   trialId: string;
   sort: SortState | null;
@@ -21,6 +22,7 @@ export function CandidateCompareSectionBody({
   showLoading,
   compareError,
   cohortCount,
+  candidateCount,
   sortedRows,
   trialId,
   sort,
@@ -48,8 +50,16 @@ export function CandidateCompareSectionBody({
   if (cohortCount === 0) {
     return (
       <EmptyState
-        title="No completed candidates yet"
-        description="Benchmarks will appear once candidates complete this Trial and Winoe Reports are available."
+        title={
+          candidateCount > 0
+            ? 'No benchmark-ready candidates yet'
+            : 'No completed candidates yet'
+        }
+        description={
+          candidateCount > 0
+            ? 'Completed candidates exist, but their Winoe Reports are still generating or unavailable.'
+            : 'Benchmarks will appear once candidates complete this Trial and Winoe Reports are available.'
+        }
       />
     );
   }

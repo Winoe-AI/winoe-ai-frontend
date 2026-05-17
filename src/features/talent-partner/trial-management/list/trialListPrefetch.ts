@@ -29,7 +29,7 @@ export function useTrialListPrefetch(trials: TrialListItem[]) {
   const prefetchTrial = useCallback(
     (trialId: string) => {
       if (!ENABLE_INTENT_PREFETCH) return;
-      void router.prefetch(`/dashboard/trials/${trialId}`);
+      void router.prefetch(`/talent-partner/trials/${trialId}`);
       void Promise.all([
         queryClient.prefetchQuery({
           queryKey: queryKeys.talentPartner.trialDetail(trialId),

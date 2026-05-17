@@ -553,7 +553,7 @@ export default function NewTrialWizard() {
               <Button
                 type="button"
                 variant="secondary"
-                onClick={() => router.push('/dashboard/trials')}
+                onClick={() => router.push('/talent-partner/trials')}
               >
                 Cancel
               </Button>
@@ -682,7 +682,7 @@ export default function NewTrialWizard() {
                     <Button
                       type="button"
                       variant="secondary"
-                      onClick={() => router.push('/dashboard/trials')}
+                      onClick={() => router.push('/talent-partner/trials')}
                     >
                       Back to Trials
                     </Button>
@@ -711,7 +711,7 @@ export default function NewTrialWizard() {
                     <Button
                       type="button"
                       variant="secondary"
-                      onClick={() => router.push('/dashboard/trials')}
+                      onClick={() => router.push('/talent-partner/trials')}
                     >
                       Back to Trials
                     </Button>

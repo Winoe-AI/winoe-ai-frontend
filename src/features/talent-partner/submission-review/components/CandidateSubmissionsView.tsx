@@ -41,8 +41,8 @@ export function CandidateSubmissionsView({
       <SubmissionsHeader
         title={labels.title}
         subtitle={labels.subtitle}
-        backHref={`/dashboard/trials/${trialId}`}
-        winoeReportHref={`/dashboard/trials/${trialId}/candidates/${candidateSessionId}/winoe-report`}
+        backHref={`/talent-partner/trials/${trialId}`}
+        winoeReportHref={`/talent-partner/trials/${trialId}/candidates/${candidateSessionId}/winoe-report`}
         status={state.candidate?.status}
         inviteEmail={state.candidate?.inviteEmail ?? null}
         onRefresh={actions.reload}

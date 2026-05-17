@@ -43,10 +43,12 @@ describe('CandidateCompareSection states', () => {
     render(
       <CandidateCompareSection {...baseProps} candidateCount={1} rows={[]} />,
     );
-    expect(screen.getByText('No completed candidates yet')).toBeInTheDocument();
+    expect(
+      screen.getByText('No benchmark-ready candidates yet'),
+    ).toBeInTheDocument();
     expect(
       screen.getByText(
-        'Benchmarks will appear once candidates complete this Trial and Winoe Reports are available.',
+        'Completed candidates exist, but their Winoe Reports are still generating or unavailable.',
       ),
     ).toBeInTheDocument();
   });

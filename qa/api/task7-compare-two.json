@@ -1,0 +1,35 @@
+{
+  "status": 200,
+  "body": {
+    "candidates": [
+      {
+        "id": "5",
+        "name": "Avery Chen",
+        "email": "avery.chen.demo@winoe.ai",
+        "trial_id": "2",
+        "trial_title": "YC Demo Backend Engineer Trial",
+        "report_id": "3",
+        "winoe_score": 91,
+        "dimensions": [],
+        "status": "evaluated",
+        "submitted_at": "2026-05-16T16:28:22Z",
+        "score_ring": 91,
+        "radar_dimensions": []
+      },
+      {
+        "id": "6",
+        "name": "Jordan Patel",
+        "email": "jordan.patel.demo@winoe.ai",
+        "trial_id": "2",
+        "trial_title": "YC Demo Backend Engineer Trial",
+        "report_id": "4",
+        "winoe_score": 74,
+        "dimensions": [],
+        "status": "evaluated",
+        "submitted_at": "2026-05-16T16:28:22Z",
+        "score_ring": 74,
+        "radar_dimensions": []
+      }
+    ]
+  }
+}
