@@ -3,6 +3,8 @@ export * from './trialsApi';
 export * from './trialsCreateApi';
 export * from './trialsCreateV4Api';
 export * from './trialsUpdateApi';
+export * from './submissionReviewApi';
+export * from './benchmarksApi';
 export * from './companyAiConfigApi';
 export * from './candidatesApi';
 export * from './invitesApi';

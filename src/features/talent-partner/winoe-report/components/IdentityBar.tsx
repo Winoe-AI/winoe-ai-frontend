@@ -18,7 +18,7 @@ export function IdentityBar({
     <header className="identity-bar flex flex-col gap-3 border-b border-subtle pb-4 md:flex-row md:items-end md:justify-between">
       <div className="space-y-1">
         <p className="text-xs font-semibold uppercase tracking-[0.24em] text-secondary">
-          Candidate report
+          Winoe Report
         </p>
         <h1 className="text-2xl font-semibold tracking-tight text-primary md:text-3xl">
           {candidateName} · {trialTitle}

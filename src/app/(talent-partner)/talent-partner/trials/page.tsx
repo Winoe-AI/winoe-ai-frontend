@@ -1,5 +1,12 @@
-import { redirect } from 'next/navigation';
+import type { Metadata } from 'next';
+import { BRAND_NAME } from '@/platform/config/brand';
+import TalentPartnerDashboardPage from '@/features/talent-partner/dashboard/TalentPartnerDashboardPage';
 
-export default function TalentPartnerTrialsAliasPage() {
-  redirect('/dashboard/trials');
+export const metadata: Metadata = {
+  title: `Trials | ${BRAND_NAME}`,
+  description: 'Manage trials, candidates, and invites.',
+};
+
+export default function TalentPartnerTrialsPage() {
+  return <TalentPartnerDashboardPage />;
 }

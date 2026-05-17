@@ -1,0 +1,36 @@
+{
+  "val1": {
+    "status": 422,
+    "body": {
+      "detail": [
+        {
+          "type": "missing",
+          "loc": ["query", "trial_id"],
+          "msg": "Field required",
+          "input": null,
+          "url": "https://errors.pydantic.dev/2.12/v/missing"
+        }
+      ],
+      "errorCode": "VALIDATION_ERROR",
+      "retryable": false
+    }
+  },
+  "val2": {
+    "status": 400,
+    "body": {
+      "detail": "Compare requires 2 or 3 candidates."
+    }
+  },
+  "val3": {
+    "status": 400,
+    "body": {
+      "detail": "Compare requires unique candidate IDs."
+    }
+  },
+  "val4": {
+    "status": 400,
+    "body": {
+      "detail": "Compare requires numeric candidate IDs."
+    }
+  }
+}

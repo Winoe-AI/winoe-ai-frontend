@@ -35,7 +35,7 @@ describe('WinoeReportPage polling and generate flow', () => {
       jest.advanceTimersByTime(10200);
     });
     expect(
-      await screen.findByRole('link', { name: /Compare to other candidates/i }),
+      await screen.findByRole('link', { name: /Open Benchmarks/i }),
     ).toBeInTheDocument();
   });
 
@@ -76,7 +76,7 @@ describe('WinoeReportPage polling and generate flow', () => {
       jest.advanceTimersByTime(10200);
     });
     expect(
-      await screen.findByRole('link', { name: /Compare to other candidates/i }),
+      await screen.findByRole('link', { name: /Open Benchmarks/i }),
     ).toBeInTheDocument();
   });
 
@@ -112,7 +112,7 @@ describe('WinoeReportPage polling and generate flow', () => {
       jest.advanceTimersByTime(10200);
     });
     expect(
-      await screen.findByRole('link', { name: /Compare to other candidates/i }),
+      await screen.findByRole('link', { name: /Open Benchmarks/i }),
     ).toBeInTheDocument();
   });
 

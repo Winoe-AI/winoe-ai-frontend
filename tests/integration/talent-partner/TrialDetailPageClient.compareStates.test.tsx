@@ -146,7 +146,7 @@ describe('TalentPartnerTrialDetailPage - compare states', () => {
       within(row44).getByRole('link', { name: /View Winoe Report/i }),
     ).toHaveAttribute(
       'href',
-      '/dashboard/trials/trial-1/candidates/44/winoe-report',
+      '/talent-partner/trials/trial-1/candidates/44/winoe-report',
     );
   });
 

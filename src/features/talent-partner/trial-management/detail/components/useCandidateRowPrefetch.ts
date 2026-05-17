@@ -2,7 +2,7 @@
 import { useCallback } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { fetchCandidateWinoeReport } from '@/features/talent-partner/winoe-report/winoeReport.api';
-import { reloadCandidateSubmissions } from '@/features/talent-partner/submission-review/hooks/useReloadCandidateSubmissions';
+import { getSubmissionReview } from '@/features/talent-partner/api/submissionReviewApi';
 import { queryKeys } from '@/shared/query';
 
 export function useCandidateRowPrefetch(
@@ -15,19 +15,17 @@ export function useCandidateRowPrefetch(
     const sessionId = String(candidateSessionId);
     void Promise.all([
       queryClient.prefetchQuery({
-        queryKey: queryKeys.talentPartner.candidateSubmissions(
+        queryKey: [
+          'talent_partner',
+          'submission-review',
           trialId,
           sessionId,
-        ),
+        ] as const,
         queryFn: ({ signal }) =>
-          reloadCandidateSubmissions({
-            trialId,
-            candidateSessionId: sessionId,
-            pageSize: 8,
-            showAll: false,
-            preloadArtifacts: false,
-            skipCache: false,
+          getSubmissionReview(trialId, sessionId, {
             signal,
+            cache: 'no-store',
+            dedupeKey: `submission-review-${trialId}-${sessionId}`,
           }),
         staleTime: 10_000,
       }),

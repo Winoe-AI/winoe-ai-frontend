@@ -78,6 +78,7 @@ export function CandidateCompareSection({
           showLoading={showLoading}
           compareError={compareError}
           cohortCount={cohortCount}
+          candidateCount={candidateCount}
           sortedRows={sortedRows}
           trialId={trialId}
           sort={sort}

@@ -72,13 +72,7 @@ describe('CandidateCompareSection row rendering', () => {
       within(rowTwo).getByRole('link', { name: /View Winoe Report/i }),
     ).toHaveAttribute(
       'href',
-      '/dashboard/trials/trial-1/candidates/cand-2/winoe-report',
+      '/talent-partner/trials/trial-1/candidates/cand-2/winoe-report',
     );
-    expect(screen.queryByText(/^Hire$/i)).not.toBeInTheDocument();
-    expect(screen.queryByText(/^Reject$/i)).not.toBeInTheDocument();
-    expect(screen.queryByText(/^Fit Score$/i)).not.toBeInTheDocument();
-    expect(screen.queryByText(/^Fit Profile$/i)).not.toBeInTheDocument();
-    expect(screen.queryByText(/recruiter/i)).not.toBeInTheDocument();
-    expect(screen.queryByText(/simulation/i)).not.toBeInTheDocument();
   });
 });

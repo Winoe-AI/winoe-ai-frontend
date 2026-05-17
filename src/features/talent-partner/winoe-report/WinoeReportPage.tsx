@@ -33,7 +33,10 @@ export default function WinoeReportPage() {
   }, [candidateName, state.generatedAt, state.report, trialTitle]);
 
   const compareHref = trialId
-    ? `/dashboard/trials/${trialId}#benchmarks`
+    ? `/talent-partner/trials/${trialId}/benchmarks`
+    : null;
+  const submissionHref = trialId
+    ? `/talent-partner/trials/${trialId}/candidates/${candidateSessionId}/submission`
     : null;
 
   if (viewModel) {
@@ -44,6 +47,7 @@ export default function WinoeReportPage() {
           viewModel={viewModel}
           onDownloadPdf={() => window.print()}
           compareHref={compareHref}
+          submissionHref={submissionHref}
         />
       </div>
     );

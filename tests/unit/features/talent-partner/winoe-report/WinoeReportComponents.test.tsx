@@ -197,6 +197,27 @@ describe('Winoe Report components', () => {
     ).not.toBeInTheDocument();
   });
 
+  it('renders raw submission and benchmarks links when provided', () => {
+    render(
+      <FooterActions
+        onDownloadPdf={jest.fn()}
+        onShare={jest.fn()}
+        compareHref="/talent-partner/trials/trial-1/benchmarks"
+        submissionHref="/talent-partner/trials/trial-1/candidates/101/submission"
+      />,
+    );
+
+    expect(
+      screen.getByRole('link', { name: /View raw submission/i }),
+    ).toHaveAttribute(
+      'href',
+      '/talent-partner/trials/trial-1/candidates/101/submission',
+    );
+    expect(
+      screen.getByRole('link', { name: /Open Benchmarks/i }),
+    ).toHaveAttribute('href', '/talent-partner/trials/trial-1/benchmarks');
+  });
+
   it('uses Benchmarks language for the radar fallback', () => {
     render(
       <RadarChart

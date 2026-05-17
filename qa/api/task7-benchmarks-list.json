@@ -1,0 +1,68 @@
+{
+  "status": 200,
+  "body": {
+    "cohort": {
+      "n": 4,
+      "median": 84,
+      "mean": 83,
+      "range": [74, 91],
+      "sufficient": true
+    },
+    "pagination": {
+      "page": 1,
+      "page_size": 25,
+      "total": 4,
+      "total_pages": 1
+    },
+    "candidates": [
+      {
+        "id": "5",
+        "name": "Avery Chen",
+        "email": "avery.chen.demo@winoe.ai",
+        "trial_id": "2",
+        "trial_title": "YC Demo Backend Engineer Trial",
+        "report_id": "3",
+        "winoe_score": 91,
+        "dimensions": [],
+        "status": "evaluated",
+        "submitted_at": "2026-05-16T16:28:22Z"
+      },
+      {
+        "id": "6",
+        "name": "Jordan Patel",
+        "email": "jordan.patel.demo@winoe.ai",
+        "trial_id": "2",
+        "trial_title": "YC Demo Backend Engineer Trial",
+        "report_id": "4",
+        "winoe_score": 74,
+        "dimensions": [],
+        "status": "evaluated",
+        "submitted_at": "2026-05-16T16:28:22Z"
+      },
+      {
+        "id": "7",
+        "name": "Casey Nguyen",
+        "email": "casey.nguyen.demo@winoe.ai",
+        "trial_id": "2",
+        "trial_title": "YC Demo Backend Engineer Trial",
+        "report_id": "5",
+        "winoe_score": 84,
+        "dimensions": [],
+        "status": "evaluated",
+        "submitted_at": "2026-05-16T16:28:22Z"
+      },
+      {
+        "id": "8",
+        "name": "Candidate QA",
+        "email": "winoecandidate@gmail.com",
+        "trial_id": "2",
+        "trial_title": "YC Demo Backend Engineer Trial",
+        "report_id": null,
+        "winoe_score": null,
+        "dimensions": [],
+        "status": "report_pending",
+        "submitted_at": "2026-05-16T16:29:38.274915Z"
+      }
+    ]
+  }
+}

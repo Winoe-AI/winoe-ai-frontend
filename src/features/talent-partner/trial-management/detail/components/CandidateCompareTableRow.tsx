@@ -19,7 +19,7 @@ type Props = {
 };
 
 export function CandidateCompareTableRow({ trialId, row }: Props) {
-  const winoeReportHref = `/dashboard/trials/${trialId}/candidates/${row.candidateSessionId}/winoe-report`;
+  const winoeReportHref = `/talent-partner/trials/${trialId}/candidates/${row.candidateSessionId}/winoe-report`;
 
   return (
     <tr

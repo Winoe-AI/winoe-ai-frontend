@@ -114,14 +114,14 @@ describe('TalentPartnerDashboardPage profile/list states', () => {
       screen.getByRole('option', { name: /Platform Engineer/i }),
     );
     expect(routerMock.push).toHaveBeenCalledWith(
-      '/dashboard/trials/trial_cmdk',
+      '/talent-partner/trials/trial_cmdk',
     );
 
     await user.keyboard('{Control>}k{/Control}');
     await user.click(
       screen.getByRole('option', { name: /Invite candidates/i }),
     );
-    expect(routerMock.push).toHaveBeenCalledWith('/dashboard/trials');
+    expect(routerMock.push).toHaveBeenCalledWith('/talent-partner/trials');
   });
 
   it('shows inline trial load error', () => {

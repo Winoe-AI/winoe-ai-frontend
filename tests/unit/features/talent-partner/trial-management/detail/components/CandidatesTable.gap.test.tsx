@@ -96,10 +96,10 @@ describe('CandidatesTable gap coverage', () => {
 
     await user.type(screen.getByLabelText(/Search candidates/i), 'Ada');
     expect(props.setSearch).toHaveBeenCalled();
-    const viewLink = screen.getByRole('link', { name: /View submissions/i });
+    const viewLink = screen.getByRole('link', { name: /View submission/i });
     expect(viewLink).toHaveAttribute(
       'href',
-      '/dashboard/trials/trial-1/candidates/101',
+      '/talent-partner/trials/trial-1/candidates/101/submission',
     );
   });
 });

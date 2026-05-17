@@ -59,13 +59,13 @@ describe('/api/dev/qa-login route', () => {
     jest.clearAllMocks();
   });
 
-  it('mints local talent-partner session and redirects to /dashboard/trials', async () => {
+  it('mints local talent-partner session and redirects to /talent-partner/trials', async () => {
     const res = await GET(
       new NextRequest('http://localhost/api/dev/qa-login?role=talent_partner'),
     );
     expect(res.status).toBe(307);
     expect(res.headers.get('location')).toBe(
-      'http://localhost/dashboard/trials',
+      'http://localhost/talent-partner/trials',
     );
     const cookies = res.cookies.getAll();
     expect(cookies).toEqual(

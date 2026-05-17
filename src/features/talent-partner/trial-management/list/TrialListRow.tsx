@@ -20,7 +20,7 @@ export function TrialListRow({ trial, onInvite, onPrefetch }: Props) {
       <div className="grid grid-cols-12 items-center gap-3">
         <div className="col-span-4">
           <Link
-            href={`/dashboard/trials/${trial.id}`}
+            href={`/talent-partner/trials/${trial.id}`}
             prefetch={LINK_PREFETCH_RETURNING}
             onMouseEnter={() => onPrefetch(trial.id)}
             onFocus={() => onPrefetch(trial.id)}

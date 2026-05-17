@@ -330,7 +330,7 @@ export function DashboardContent({
               >
                 <TableCell>
                   <Link
-                    href={`/dashboard/trials/${trial.id}`}
+                    href={`/talent-partner/trials/${trial.id}`}
                     className="font-medium text-primary hover:underline focus:underline"
                     onClick={() => rememberRecentTrialId(trial.id)}
                   >
@@ -348,7 +348,7 @@ export function DashboardContent({
                 </TableCell>
                 <TableCell>
                   <Link
-                    href={`/dashboard/trials/${trial.id}?tab=candidates`}
+                    href={`/talent-partner/trials/${trial.id}?tab=candidates`}
                     className="flex items-center"
                     aria-label={`View candidates for ${trial.title}`}
                     onClick={() => rememberRecentTrialId(trial.id)}
